@@ -28,50 +28,53 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
+    ): vscode.CompletionItem[] {
         var func = Helpers.parseDocumentFunction(document, position);
+
         if (func === null) {
-            return out;
+            return [];
         }
 
         if (
-            func &&
-            ((func.class &&
+            (func.class &&
                 Helpers.tags.auth.classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-                Helpers.tags.auth.functions.some((fn: string) =>
-                    func.function.includes(fn),
-                ))
+            Helpers.tags.auth.functions.some((fn: string) =>
+                func.function.includes(fn),
+            )
         ) {
             if (func.paramIndex === 1) {
-                for (let i in this.models) {
+                // TODO: Any reason not to do this ahead of time?
+                return this.models.map((model) => {
                     let completeItem = new vscode.CompletionItem(
-                        this.models[i].replace(/\\/, "\\\\"),
+                        model.replace(/\\/, "\\\\"),
                         vscode.CompletionItemKind.Value,
                     );
                     completeItem.range = document.getWordRangeAtPosition(
                         position,
                         Helpers.wordMatchRegex,
                     );
-                    out.push(completeItem);
-                }
-            } else {
-                for (let i in this.abilities) {
-                    let completeItem = new vscode.CompletionItem(
-                        this.abilities[i],
-                        vscode.CompletionItemKind.Value,
-                    );
-                    completeItem.range = document.getWordRangeAtPosition(
-                        position,
-                        Helpers.wordMatchRegex,
-                    );
-                    out.push(completeItem);
-                }
+
+                    return completeItem;
+                });
             }
+
+            return this.abilities.map((ability) => {
+                let completeItem = new vscode.CompletionItem(
+                    ability,
+                    vscode.CompletionItemKind.Value,
+                );
+                completeItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+
+                return completeItem;
+            });
         }
-        return out;
+
+        return [];
     }
 
     loadAbilities() {

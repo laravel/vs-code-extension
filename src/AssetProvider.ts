@@ -19,33 +19,35 @@ export default class AssetProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
-        var func = Helpers.parseDocumentFunction(document, position);
+    ): vscode.CompletionItem[] {
+        const func = Helpers.parseDocumentFunction(document, position);
+
         if (func === null) {
-            return out;
+            return [];
         }
 
+        // TODO: This I don't like
         if (
-            func &&
-            Helpers.tags.asset.functions.some((fn: string) =>
+            !Helpers.tags.asset.functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {
-            for (var i in this.publicFiles) {
-                var completeItem = new vscode.CompletionItem(
-                    this.publicFiles[i],
-                    vscode.CompletionItemKind.Constant,
-                );
-                completeItem.range = document.getWordRangeAtPosition(
-                    position,
-                    Helpers.wordMatchRegex,
-                );
-                out.push(completeItem);
-            }
+            return [];
         }
 
-        return out;
+        return this.publicFiles.map((file) => {
+            let completeItem = new vscode.CompletionItem(
+                file,
+                vscode.CompletionItemKind.Constant,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+
+            return completeItem;
+        });
     }
 
     load() {

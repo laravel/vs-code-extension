@@ -27,103 +27,55 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
-        var func = Helpers.parseDocumentFunction(document, position);
+    ): vscode.CompletionItem[] {
+        let out: vscode.CompletionItem[] = [];
+        let func = Helpers.parseDocumentFunction(document, position);
         let sourceCode = document.getText();
         let sourceBeforeCursor = sourceCode.substr(
             0,
             document.offsetAt(position),
         );
-        var isFactory =
+        let isFactory =
             sourceBeforeCursor.includes("extends Factory") ||
             sourceBeforeCursor.includes("$factory->define(");
-        var match = null;
-        var objectName = "";
-        var modelName = "";
-        var modelClass = "";
-        if (func != null || isFactory) {
+        let match = null;
+        let objectName = "";
+        let modelName = "";
+        let modelClass = "";
+        let model = null;
+
+        if (func !== null || isFactory) {
             if (func) {
-                let modelNameRegex = /([A-z0-9_\\]+)::[^:;]+$/g;
-                var namespaceRegex = /namespace\s+(.+);/g;
-                var namespace = "";
-                while (
-                    (match = modelNameRegex.exec(sourceBeforeCursor)) !== null
-                ) {
-                    modelName = match[1];
-                }
-                if (modelName.length === 0) {
-                    let variableNameRegex = /(\$([A-z0-9_\\]+))->[^;]+$/g;
-                    while (
-                        (match = variableNameRegex.exec(sourceBeforeCursor)) !==
-                        null
-                    ) {
-                        objectName = match[2];
-                    }
-                    if (objectName.length > 0) {
-                        modelNameRegex = new RegExp(
-                            "\\$" +
-                                objectName +
-                                "\\s*=\\s*([A-z0-9_\\\\]+)::[^:]",
-                            "g",
-                        );
-                        while (
-                            (match =
-                                modelNameRegex.exec(sourceBeforeCursor)) !==
-                            null
-                        ) {
-                            modelName = match[1];
-                        }
-                    }
-                }
-                if (
-                    (match = namespaceRegex.exec(sourceBeforeCursor)) !== null
-                ) {
-                    namespace = match[1];
-                }
-                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+                model = this.getModelFromFunc(sourceBeforeCursor);
             } else {
-                var factoryModelClassRegex =
-                    /(protected \$model = ([A-Za-z0-9_\\]+)::class;)|(\$factory->define\(\s*([A-Za-z0-9_\\]+)::class)/g;
-                if (
-                    (match =
-                        factoryModelClassRegex.exec(sourceBeforeCursor)) !==
-                    null
-                ) {
-                    if (typeof match[4] !== "undefined") {
-                        // Laravel 7 <
-                        modelName = match[4];
-                    } else {
-                        // Laravel >= 8
-                        modelName = match[2];
-                    }
-                }
-                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+                model = this.getModelFromFactory(sourceBeforeCursor);
             }
 
-            if (typeof this.models[modelClass] !== "undefined") {
-                if (
-                    func &&
-                    Helpers.relationMethods.some((fn: string) =>
-                        func.function.includes(fn),
-                    )
-                ) {
-                    out = out.concat(
-                        this.getCompletionItems(
-                            document,
-                            position,
-                            this.models[modelClass].relations,
-                        ),
-                    );
-                } else {
-                    out = out.concat(
-                        this.getCompletionItems(
-                            document,
-                            position,
-                            this.models[modelClass].attributes,
-                        ),
-                    );
-                }
+            if (typeof model === "undefined") {
+                return [];
+            }
+
+            if (
+                func &&
+                Helpers.relationMethods.some((fn: string) =>
+                    func.function.includes(fn),
+                )
+            ) {
+                out = out.concat(
+                    this.getCompletionItems(
+                        document,
+                        position,
+                        this.models[modelClass].relations,
+                    ),
+                );
+            } else {
+                out = out.concat(
+                    this.getCompletionItems(
+                        document,
+                        position,
+                        this.models[modelClass].attributes,
+                    ),
+                );
             }
         } else {
             let isArrayObject = false;
@@ -213,50 +165,116 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         return out;
     }
 
-    getModelClass(modelName: string, sourceBeforeCursor: string) {
+    getModelFromFactory(sourceBeforeCursor: string) {
         let match = null;
+        let modelName = "";
         let modelClass = "";
+
+        let factoryModelClassRegex =
+            /(protected \$model = ([A-Za-z0-9_\\]+)::class;)|(\$factory->define\(\s*([A-Za-z0-9_\\]+)::class)/g;
+
+        if (
+            (match = factoryModelClassRegex.exec(sourceBeforeCursor)) !== null
+        ) {
+            if (typeof match[4] !== "undefined") {
+                // Laravel 7 <
+                modelName = match[4];
+            } else {
+                // Laravel >= 8
+                modelName = match[2];
+            }
+        }
+
+        modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+
+        return this.models[modelClass];
+    }
+
+    getModelFromFunc(sourceBeforeCursor: string) {
+        let modelNameRegex = /([A-z0-9_\\]+)::[^:;]+$/g;
+        let namespaceRegex = /namespace\s+(.+);/g;
+        let namespace = "";
+        let match;
+        let modelName = "";
+        let objectName = "";
+        let modelClass = "";
+
+        while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
+            modelName = match[1];
+        }
+
+        if (modelName.length === 0) {
+            let variableNameRegex = /(\$([A-z0-9_\\]+))->[^;]+$/g;
+
+            while (
+                (match = variableNameRegex.exec(sourceBeforeCursor)) !== null
+            ) {
+                objectName = match[2];
+            }
+
+            if (objectName.length > 0) {
+                modelNameRegex = new RegExp(
+                    "\\$" + objectName + "\\s*=\\s*([A-z0-9_\\\\]+)::[^:]",
+                    "g",
+                );
+                while (
+                    (match = modelNameRegex.exec(sourceBeforeCursor)) !== null
+                ) {
+                    modelName = match[1];
+                }
+            }
+        }
+
+        if ((match = namespaceRegex.exec(sourceBeforeCursor)) !== null) {
+            namespace = match[1];
+        }
+
+        modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+
+        return this.models[modelClass];
+    }
+
+    getModelClass(modelName: string, sourceBeforeCursor: string): string {
         if (modelName.length === 0) {
             return "";
         }
-        var modelClassRegex = new RegExp("use (.+)" + modelName + ";", "g");
-        if (modelName.substr(0, 1) === "\\") {
-            modelClass = modelName.substr(1);
-        } else if (
-            (match = modelClassRegex.exec(sourceBeforeCursor)) !== null
-        ) {
-            modelClass = match[1] + modelName;
-        } else {
-            modelClass = modelName;
+
+        if (modelName.substring(0, 1) === "\\") {
+            return modelName.substring(1);
         }
-        return modelClass;
+
+        let modelClassRegex = new RegExp(`use (.+)${modelName};`, "g");
+        let match = modelClassRegex.exec(sourceBeforeCursor);
+
+        if (match !== null) {
+            return match[1] + modelName;
+        }
+
+        return modelName;
     }
 
     getModelAttributesCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
         modelClass: string,
-    ): Array<vscode.CompletionItem> {
-        let out: Array<vscode.CompletionItem> = [];
-        if (typeof this.models[modelClass] !== "undefined") {
-            out = out.concat(
-                this.getCompletionItems(
-                    document,
-                    position,
-                    this.models[modelClass].attributes.map(
-                        (attr: any) =>
-                            attr[
-                                vscode.workspace
-                                    .getConfiguration("Laravel")
-                                    .get<string>(
-                                        "modelAttributeCase",
-                                        "default",
-                                    )
-                            ],
-                    ),
-                ),
-            );
-            out = out.concat(
+    ): vscode.CompletionItem[] {
+        if (typeof this.models[modelClass] === "undefined") {
+            return [];
+        }
+
+        return this.getCompletionItems(
+            document,
+            position,
+            this.models[modelClass].attributes.map(
+                (attr: any) =>
+                    attr[
+                        vscode.workspace
+                            .getConfiguration("Laravel")
+                            .get<string>("modelAttributeCase", "default")
+                    ],
+            ),
+        )
+            .concat(
                 this.getCompletionItems(
                     document,
                     position,
@@ -270,8 +288,8 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     ),
                     vscode.CompletionItemKind.Constant,
                 ),
-            );
-            out = out.concat(
+            )
+            .concat(
                 this.getCompletionItems(
                     document,
                     position,
@@ -279,26 +297,24 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     vscode.CompletionItemKind.Value,
                 ),
             );
-        }
-        return out;
     }
 
     getCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
-        items: Array<string>,
+        items: string[],
         type: vscode.CompletionItemKind = vscode.CompletionItemKind.Property,
-    ): Array<vscode.CompletionItem> {
-        let out: Array<vscode.CompletionItem> = [];
-        for (let item of items) {
-            var completeItem = new vscode.CompletionItem(item, type);
+    ): vscode.CompletionItem[] {
+        return items.map((item) => {
+            let completeItem = new vscode.CompletionItem(item, type);
+
             completeItem.range = document.getWordRangeAtPosition(
                 position,
                 Helpers.wordMatchRegex,
             );
-            out.push(completeItem);
-        }
-        return out;
+
+            return completeItem;
+        });
     }
 
     loadModels() {
@@ -313,10 +329,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                 model_paths: JSON.stringify(
                     vscode.workspace
                         .getConfiguration("Laravel")
-                        .get<Array<string>>("modelsPaths", [
-                            "app",
-                            "app/Models",
-                        ]),
+                        .get<string[]>("modelsPaths", ["app", "app/Models"]),
                 ),
             }),
             "Eloquent Attributes and Relations",

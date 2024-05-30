@@ -19,43 +19,39 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
+    ): vscode.CompletionItem[] {
         let isBlade =
-            document.languageId == "blade" ||
-            document.languageId == "laravel-blade" ||
+            ["blade", "laravel-blade"].includes(document.languageId) ||
             document.fileName.endsWith(".blade.php");
+
         if (
+            isBlade === false ||
             vscode.workspace
                 .getConfiguration("Laravel")
-                .get<boolean>("disableBlade", false) ||
-            isBlade === false
+                .get<boolean>("disableBlade", false)
         ) {
             return [];
         }
-        var out: Array<vscode.CompletionItem> = this.getDefaultDirectives(
-            document,
-            position,
-        );
 
-        for (var i in this.customDirectives) {
-            var completeItem = new vscode.CompletionItem(
-                "@" +
-                    this.customDirectives[i].name +
-                    (this.customDirectives[i].hasParams ? "(...)" : ""),
-                vscode.CompletionItemKind.Keyword,
-            );
-            completeItem.insertText = new vscode.SnippetString(
-                "@" +
-                    this.customDirectives[i].name +
-                    (this.customDirectives[i].hasParams ? "(${1})" : ""),
-            );
-            completeItem.range = document.getWordRangeAtPosition(
-                position,
-                Helpers.wordMatchRegex,
-            );
-            out.push(completeItem);
-        }
-        return out;
+        return this.getDefaultDirectives(document, position).concat(
+            this.customDirectives.map((directive) => {
+                let completeItem = new vscode.CompletionItem(
+                    `@${directive.name}${directive.hasParams ? "(...)" : ""}`,
+                    vscode.CompletionItemKind.Keyword,
+                );
+
+                completeItem.insertText = new vscode.SnippetString(
+                    `@${directive.name}${directive.hasParams ? "(${1})" : ""}`,
+                );
+
+                completeItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+
+                return completeItem;
+            }),
+        );
     }
 
     loadCustomDirectives() {
@@ -73,13 +69,13 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
     getDefaultDirectives(
         document: vscode.TextDocument,
         position: vscode.Position,
-    ): Array<vscode.CompletionItem> {
+    ): vscode.CompletionItem[] {
         let out: vscode.CompletionItem[] = [];
 
         const directives = this.defaultDirectives();
 
         for (let key in directives) {
-            var completeItem = new vscode.CompletionItem(
+            let completeItem = new vscode.CompletionItem(
                 key,
                 vscode.CompletionItemKind.Keyword,
             );

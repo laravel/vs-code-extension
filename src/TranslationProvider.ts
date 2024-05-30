@@ -25,8 +25,8 @@ export default class TranslationProvider
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
+    ): vscode.CompletionItem[] {
+        var out: vscode.CompletionItem[] = [];
         var func = Helpers.parseDocumentFunction(document, position);
         if (func === null) {
             return out;

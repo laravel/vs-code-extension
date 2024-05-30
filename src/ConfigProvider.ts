@@ -28,40 +28,42 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
-        var func = Helpers.parseDocumentFunction(document, position);
+    ): vscode.CompletionItem[] {
+        let func = Helpers.parseDocumentFunction(document, position);
 
         if (func === null) {
-            return out;
+            return [];
         }
 
         if (
-            func &&
-            ((func.class &&
+            (func.class &&
                 Helpers.tags.config.classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-                Helpers.tags.config.functions.some((fn: string) =>
-                    func.function.includes(fn),
-                ))
+            Helpers.tags.config.functions.some((fn: string) =>
+                func.function.includes(fn),
+            )
         ) {
-            for (var i in this.configs) {
-                var completeItem = new vscode.CompletionItem(
-                    this.configs[i].name,
+            return this.configs.map((config) => {
+                let completeItem = new vscode.CompletionItem(
+                    config.name,
                     vscode.CompletionItemKind.Value,
                 );
+
                 completeItem.range = document.getWordRangeAtPosition(
                     position,
                     Helpers.wordMatchRegex,
                 );
-                if (this.configs[i].value) {
-                    completeItem.detail = this.configs[i].value.toString();
+
+                if (config.value) {
+                    completeItem.detail = config.value.toString();
                 }
-                out.push(completeItem);
-            }
+
+                return completeItem;
+            });
         }
-        return out;
+
+        return [];
     }
 
     load() {

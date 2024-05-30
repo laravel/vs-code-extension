@@ -19,9 +19,10 @@ export default class EnvProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
-        var func = Helpers.parseDocumentFunction(document, position);
+    ): vscode.CompletionItem[] {
+        let out: vscode.CompletionItem[] = [];
+        let func = Helpers.parseDocumentFunction(document, position);
+
         if (func === null) {
             return out;
         }
@@ -32,8 +33,8 @@ export default class EnvProvider implements vscode.CompletionItemProvider {
                 func.function.includes(fn),
             )
         ) {
-            for (var i in this.enviroments) {
-                var completeItem = new vscode.CompletionItem(
+            for (let i in this.enviroments) {
+                let completeItem = new vscode.CompletionItem(
                     i,
                     vscode.CompletionItemKind.Constant,
                 );

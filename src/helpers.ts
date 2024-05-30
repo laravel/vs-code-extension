@@ -340,8 +340,10 @@ export default class Helpers {
         document: vscode.TextDocument,
         position: vscode.Position,
     ) {
-        var pos = document.offsetAt(position);
-        return Helpers.parseFunction(document.getText(), pos);
+        return Helpers.parseFunction(
+            document.getText(),
+            document.offsetAt(position),
+        );
     }
 
     /**

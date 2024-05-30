@@ -23,8 +23,8 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
+    ): vscode.CompletionItem[] {
+        var out: vscode.CompletionItem[] = [];
         var func = Helpers.parseDocumentFunction(document, position);
 
         if (func === null) {
@@ -89,11 +89,8 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         return out;
     }
 
-    getYields(
-        func: string,
-        documentText: string,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
+    getYields(func: string, documentText: string): vscode.CompletionItem[] {
+        var out: vscode.CompletionItem[] = [];
         var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
         var regexResult: any = [];
         if ((regexResult = extendsRegex.exec(documentText))) {

@@ -28,108 +28,118 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
-    ): Array<vscode.CompletionItem> {
-        var out: Array<vscode.CompletionItem> = [];
-        var func = Helpers.parseDocumentFunction(document, position);
-        console.log("routes", func);
+    ): vscode.CompletionItem[] {
+        let func = Helpers.parseDocumentFunction(document, position);
+
         if (func === null) {
-            return out;
+            return [];
         }
 
-        if (
-            func &&
-            ((func.class &&
+        let shouldCreateCompletion =
+            (func.class &&
                 Helpers.tags.route.classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-                Helpers.tags.route.functions.some((fn: string) =>
-                    func.function.includes(fn),
-                ))
+            Helpers.tags.route.functions.some((fn: string) =>
+                func.function.includes(fn),
+            );
+
+        if (!shouldCreateCompletion) {
+            return [];
+        }
+
+        if (
+            func.class === "Route" &&
+            [
+                "get",
+                "post",
+                "put",
+                "patch",
+                "delete",
+                "options",
+                "any",
+                "match",
+            ].some((fc: string) => func.function.includes(fc))
         ) {
             if (
-                func.class === "Route" &&
-                [
-                    "get",
-                    "post",
-                    "put",
-                    "patch",
-                    "delete",
-                    "options",
-                    "any",
-                    "match",
-                ].some((fc: string) => func.function.includes(fc))
+                (func.function === "match" && func.paramIndex === 2) ||
+                (func.function !== "match" && func.paramIndex === 1)
             ) {
-                if (
-                    (func.function === "match" && func.paramIndex === 2) ||
-                    (func.function !== "match" && func.paramIndex === 1)
-                ) {
-                    // Route action autocomplete.
-                    for (let i in this.controllers) {
-                        if (
-                            typeof this.controllers[i] === "string" &&
-                            this.controllers[i].length > 0
-                        ) {
-                            var compeleteItem2 = new vscode.CompletionItem(
-                                this.controllers[i],
-                                vscode.CompletionItemKind.Enum,
-                            );
-                            compeleteItem2.range =
-                                document.getWordRangeAtPosition(
-                                    position,
-                                    Helpers.wordMatchRegex,
-                                );
-                            out.push(compeleteItem2);
-                        }
-                    }
-                }
-            } else if (func.function.includes("middleware") === false) {
-                if (func.paramIndex === 1) {
-                    // route parameters autocomplete
-                    for (let i in this.routes) {
-                        if (this.routes[i].name === func.parameters[0]) {
-                            for (var j in this.routes[i].parameters) {
-                                var compeleteItem = new vscode.CompletionItem(
-                                    this.routes[i].parameters[j],
-                                    vscode.CompletionItemKind.Variable,
-                                );
-                                compeleteItem.range =
-                                    document.getWordRangeAtPosition(
-                                        position,
-                                        Helpers.wordMatchRegex,
-                                    );
-                                out.push(compeleteItem);
-                            }
-                            return out;
-                        }
-                    }
-                }
-
-                // Route name autocomplete
-                for (let i in this.routes) {
-                    if (
-                        typeof this.routes[i].name === "string" &&
-                        this.routes[i].name.length > 0
-                    ) {
-                        var compeleteItem3 = new vscode.CompletionItem(
-                            this.routes[i].name,
+                // Route action autocomplete.
+                return this.controllers
+                    .filter(
+                        (controller) =>
+                            typeof controller === "string" &&
+                            controller.length > 0,
+                    )
+                    .map((controller: string) => {
+                        let compeleteItem = new vscode.CompletionItem(
+                            controller,
                             vscode.CompletionItemKind.Enum,
                         );
-                        compeleteItem3.range = document.getWordRangeAtPosition(
+
+                        compeleteItem.range = document.getWordRangeAtPosition(
                             position,
                             Helpers.wordMatchRegex,
                         );
-                        compeleteItem3.detail =
-                            this.routes[i].action +
-                            "\n\n" +
-                            this.routes[i].method +
-                            ":" +
-                            this.routes[i].uri;
-                        out.push(compeleteItem3);
-                    }
-                }
+
+                        return compeleteItem;
+                    });
             }
+
+            return [];
         }
-        return out;
+
+        if (func.function.includes("middleware") !== false) {
+            return [];
+        }
+
+        if (func.paramIndex === 1) {
+            // route parameters autocomplete
+            return this.routes
+                .filter((route) => route.name === func.parameters[0])
+                .map((route) => {
+                    return route.parameters.map((parameter: string) => {
+                        let compeleteItem = new vscode.CompletionItem(
+                            parameter,
+                            vscode.CompletionItemKind.Variable,
+                        );
+
+                        compeleteItem.range = document.getWordRangeAtPosition(
+                            position,
+                            Helpers.wordMatchRegex,
+                        );
+
+                        return compeleteItem;
+                    });
+                })
+                .flat();
+        }
+
+        // Route name autocomplete
+        return this.routes
+            .filter(
+                (route) =>
+                    typeof route.name === "string" && route.name.length > 0,
+            )
+            .map((route) => {
+                let completionItem = new vscode.CompletionItem(
+                    route.name,
+                    vscode.CompletionItemKind.Enum,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+
+                completionItem.detail = [
+                    route.action,
+                    `${route.method}:${route.uri}`,
+                ].join("\n\n");
+
+                return completionItem;
+            });
     }
 
     loadRoutes() {
