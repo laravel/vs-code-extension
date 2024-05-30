@@ -364,6 +364,10 @@ export default class Helpers {
                     "Application Models",
                 )
                     .then(function (result) {
+                        if (!result) {
+                            return;
+                        }
+
                         var models = JSON.parse(result);
                         self.modelsCache = models;
                         resolve(models);

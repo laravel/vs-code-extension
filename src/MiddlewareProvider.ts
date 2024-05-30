@@ -56,7 +56,9 @@ export default class MiddlewareProvider
         ) {
             runInLaravel(template("middleware"), "Middlewares")
                 .then((result) => {
-                    this.middlewares = JSON.parse(result);
+                    if (result) {
+                        this.middlewares = JSON.parse(result);
+                    }
                 })
                 .catch((exception) => {
                     console.error(exception);

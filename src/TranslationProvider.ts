@@ -96,18 +96,26 @@ export default class TranslationProvider
             runInLaravel(
                 "echo json_encode(app('translator')->getLoader()->namespaces());",
                 "Translation namespaces",
-            ).then(async function (result) {
-                var tranlationNamespaces = JSON.parse(result);
+            ).then(async function (res) {
+                if (!res) {
+                    return;
+                }
+
+                var tranlationNamespaces = JSON.parse(res);
                 for (let i in tranlationNamespaces) {
                     tranlationNamespaces[i + "::"] = tranlationNamespaces[i];
                     delete tranlationNamespaces[i];
                 }
-                let langPath = JSON.parse(
-                    await runInLaravel(
-                        "echo json_encode(app()->langPath());",
-                        "Translation Path",
-                    ),
+                const result = await runInLaravel(
+                    "echo json_encode(app()->langPath());",
+                    "Translation Path",
                 );
+
+                if (!result) {
+                    return;
+                }
+
+                let langPath = JSON.parse(result);
                 tranlationNamespaces[""] = langPath;
                 var nestedTranslationGroups = function (
                     basePath: string,
@@ -220,6 +228,10 @@ export default class TranslationProvider
                         "]);",
                     "Translations inside namespaces",
                 ).then(function (translationGroupsResult) {
+                    if (!translationGroupsResult) {
+                        return;
+                    }
+
                     translationGroups = JSON.parse(translationGroupsResult);
                     for (var i in translationGroups) {
                         translations = translations.concat(
@@ -231,6 +243,10 @@ export default class TranslationProvider
                         "echo json_encode(__('*'));",
                         "Default path Translations",
                     ).then(function (jsontransResult) {
+                        if (!jsontransResult) {
+                            return;
+                        }
+
                         translations = translations.concat(
                             self
                                 .getTranslations(

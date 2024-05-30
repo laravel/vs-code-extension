@@ -147,6 +147,10 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                         "}, app('router')->getRoutes()->getRoutes()));",
                     "HTTP Routes",
                 ).then(function (result) {
+                    if (!result) {
+                        return;
+                    }
+
                     var routes = JSON.parse(result);
                     routes = routes.filter((route: any) => route !== "null");
                     self.routes = routes;

@@ -5,18 +5,17 @@ import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 
-// TODO: Figure this out so we catch all configurations?
 type Config = {
-    [key: string]: string | { [key: string]: string } | null | string[];
+    [key: string]: any;
 };
 
-type ConfigValue = {
+type ConfigItem = {
     name: string;
     value: string;
 };
 
 export default class ConfigProvider implements vscode.CompletionItemProvider {
-    private configs: ConfigValue[] = [];
+    private configs: ConfigItem[] = [];
 
     constructor() {
         this.load();
@@ -68,14 +67,16 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
     load() {
         runInLaravel("echo json_encode(config()->all());", "Configs")
             .then((result) => {
-                this.configs = this.getConfigs(JSON.parse(result));
+                if (result) {
+                    this.configs = this.getConfigs(JSON.parse(result));
+                }
             })
             .catch(function (exception) {
                 console.error(exception);
             });
     }
 
-    getConfigs(conf: Config): ConfigValue[] {
+    getConfigs(conf: Config): ConfigItem[] {
         // TODO: Boo?
         let result: any[] = [];
 
@@ -86,7 +87,7 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         return result.flat();
     }
 
-    getConfigValue(conf: Config, key: string): ConfigValue | ConfigValue[] {
+    getConfigValue(conf: Config, key: string): ConfigItem | ConfigItem[] {
         if (conf[key] instanceof Array) {
             return { name: key, value: "array(...)" };
         }

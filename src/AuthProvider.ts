@@ -80,7 +80,9 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
 
         runInLaravel(template("auth"), "Auth Data")
             .then((result) => {
-                this.abilities = JSON.parse(result);
+                if (result) {
+                    this.abilities = JSON.parse(result);
+                }
             })
             .catch((exception) => {
                 console.error(exception);
