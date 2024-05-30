@@ -24,103 +24,110 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        var out: vscode.CompletionItem[] = [];
         var func = Helpers.parseDocumentFunction(document, position);
 
         if (func === null) {
-            return out;
+            return [];
         }
 
         if (
-            func &&
-            ((func.class &&
+            (func.class &&
                 Helpers.tags.view.classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-                Helpers.tags.view.functions.some((fn: string) =>
-                    func.function.includes(fn),
-                ))
+            Helpers.tags.view.functions.some((fn: string) =>
+                func.function.includes(fn),
+            )
         ) {
+            let out: vscode.CompletionItem[] = [];
+
             if (func.paramIndex === 0 || func.paramIndex === null) {
                 for (let i in this.views) {
-                    var compeleteItem = new vscode.CompletionItem(
+                    let completionItem = new vscode.CompletionItem(
                         i,
                         vscode.CompletionItemKind.Constant,
                     );
-                    compeleteItem.range = document.getWordRangeAtPosition(
+
+                    completionItem.range = document.getWordRangeAtPosition(
                         position,
                         Helpers.wordMatchRegex,
                     );
-                    out.push(compeleteItem);
+                    out.push(completionItem);
                 }
-            } else if (typeof this.views[func.parameters[0]] !== "undefined") {
-                var viewContent = fs.readFileSync(
-                    this.views[func.parameters[0]],
-                    "utf8",
-                );
-                var variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
-                var r: any = [];
-                var variableNames = [];
-                while ((r = variableRegex.exec(viewContent))) {
-                    variableNames.push(r[1]);
-                }
-                variableNames = variableNames.filter(
-                    (v, i, a) => a.indexOf(v) === i,
-                );
-                for (let i in variableNames) {
-                    var variableCompeleteItem = new vscode.CompletionItem(
-                        variableNames[i],
-                        vscode.CompletionItemKind.Constant,
-                    );
-                    variableCompeleteItem.range =
-                        document.getWordRangeAtPosition(
-                            position,
-                            Helpers.wordMatchRegex,
-                        );
-                    out.push(variableCompeleteItem);
-                }
+
+                return out;
             }
-        } else if (
-            func &&
-            (func.function === "@section" || func.function === "@push")
-        ) {
-            out = this.getYields(func.function, document.getText());
+
+            if (typeof this.views[func.parameters[0]] === "undefined") {
+                return [];
+            }
+
+            let viewContent = fs.readFileSync(
+                this.views[func.parameters[0]],
+                "utf8",
+            );
+
+            let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
+            let r: RegExpExecArray | null = null;
+            let variableNames = new Set<string>([]);
+
+            while ((r = variableRegex.exec(viewContent))) {
+                variableNames.add(r[1]);
+            }
+
+            return [...variableNames].map((variableName) => {
+                let variableCompeleteItem = new vscode.CompletionItem(
+                    variableName,
+                    vscode.CompletionItemKind.Constant,
+                );
+                variableCompeleteItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+                return variableCompeleteItem;
+            });
         }
-        return out;
+
+        if (["@section", "@push"].includes(func.function)) {
+            return this.getYields(func.function, document.getText());
+        }
+
+        return [];
     }
 
     getYields(func: string, documentText: string): vscode.CompletionItem[] {
-        var out: vscode.CompletionItem[] = [];
-        var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
-        var regexResult: any = [];
-        if ((regexResult = extendsRegex.exec(documentText))) {
-            if (typeof this.views[regexResult[1]] !== "undefined") {
-                var parentContent = fs.readFileSync(
-                    this.views[regexResult[1]],
-                    "utf8",
-                );
-                var yieldRegex =
-                    /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
-                if (func === "@push") {
-                    yieldRegex =
-                        /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
-                }
-                var yeildNames = [];
-                while ((regexResult = yieldRegex.exec(parentContent))) {
-                    yeildNames.push(regexResult[1]);
-                }
-                yeildNames = yeildNames.filter((v, i, a) => a.indexOf(v) === i);
-                for (var i in yeildNames) {
-                    var yieldCompeleteItem = new vscode.CompletionItem(
-                        yeildNames[i],
-                        vscode.CompletionItemKind.Constant,
-                    );
-                    out.push(yieldCompeleteItem);
-                }
-                out = out.concat(this.getYields(func, parentContent));
-            }
+        let extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
+        let regexResult = extendsRegex.exec(documentText);
+
+        if (!regexResult) {
+            return [];
         }
-        return out;
+
+        if (typeof this.views[regexResult[1]] === "undefined") {
+            return [];
+        }
+
+        let parentContent = fs.readFileSync(this.views[regexResult[1]], "utf8");
+        let yieldRegex =
+            func === "@push"
+                ? /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g
+                : /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
+
+        let yieldNames = new Set<string>([]);
+
+        while ((regexResult = yieldRegex.exec(parentContent))) {
+            yieldNames.add(regexResult[1]);
+        }
+
+        return [...yieldNames]
+            .map(
+                (yieldName) =>
+                    new vscode.CompletionItem(
+                        yieldName,
+                        vscode.CompletionItemKind.Constant,
+                    ),
+            )
+            .concat(this.getYields(func, parentContent));
     }
 
     load() {
@@ -169,6 +176,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                         var viewsInNamespace = this.getViews(
                             viewNamespaces[i][j],
                         );
+
                         for (var k in viewsInNamespace) {
                             this.views[`${i}::${k}`] = viewNamespaces[k];
                         }
@@ -181,31 +189,37 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
     }
 
     getViews(path: string): { [key: string]: string } {
-        if (path.substr(-1) !== "/" && path.substr(-1) !== "\\") {
+        if (path.substring(-1) !== "/" && path.substring(-1) !== "\\") {
             path += "/";
         }
-        var out: { [key: string]: string } = {};
-        var self = this;
-        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
-            fs.readdirSync(path).forEach(function (file) {
-                if (fs.lstatSync(path + file).isDirectory()) {
-                    var viewsInDirectory = self.getViews(path + file + "/");
-                    for (var i in viewsInDirectory) {
-                        out[
-                            file +
-                                vscode.workspace
-                                    .getConfiguration("Laravel")
-                                    .get<string>("viewDirectorySeparator") +
-                                i
-                        ] = viewsInDirectory[i];
-                    }
-                } else {
-                    if (file.includes("blade.php")) {
-                        out[file.replace(".blade.php", "")] = path + file;
-                    }
-                }
-            });
+
+        if (!fs.existsSync(path) || !fs.lstatSync(path).isDirectory()) {
+            return {};
         }
-        return out;
+
+        const directorySeparator = vscode.workspace
+            .getConfiguration("Laravel")
+            .get<string>("viewDirectorySeparator");
+
+        return fs
+            .readdirSync(path)
+            .reduce((obj: { [key: string]: string }, file) => {
+                if (fs.lstatSync(path + file).isDirectory()) {
+                    let viewsInDirectory = this.getViews(path + file + "/");
+
+                    for (let i in viewsInDirectory) {
+                        obj[file + directorySeparator + i] =
+                            viewsInDirectory[i];
+                    }
+
+                    return obj;
+                }
+
+                if (file.includes("blade.php")) {
+                    obj[file.replace(".blade.php", "")] = path + file;
+                }
+
+                return obj;
+            }, {});
     }
 }
