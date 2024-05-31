@@ -1,9 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import * as cp from "child_process";
 import * as fs from "fs";
-import * as os from "os";
 import { resolve } from "path";
 import Logger from "./Logger";
 import { runInLaravel } from "./PHP";
@@ -17,61 +15,20 @@ export default class Helpers {
     static lastErrorMessage: number = 0;
     static disableErrorMessage: boolean = false;
 
-    static tags: any = {
-        config: { classes: ["Config"], functions: ["config"] },
-        mix: { classes: [], functions: ["mix"] },
-        route: { classes: ["Route"], functions: ["route", "signedRoute"] },
-        trans: { classes: ["Lang"], functions: ["__", "trans", "@lang"] },
-        validation: {
-            classes: ["Validator"],
-            functions: ["validate", "sometimes", "rules"],
-        },
-        view: {
-            classes: ["View"],
-            functions: [
-                "view",
-                "markdown",
-                "links",
-                "@extends",
-                "@component",
-                "@include",
-                "@each",
-            ],
-        },
-        env: { classes: [], functions: ["env"] },
-        auth: {
-            classes: ["Gate"],
-            functions: ["can", "@can", "@cannot", "@canany"],
-        },
-        asset: { classes: [], functions: ["asset"] },
-        model: { classes: [], functions: [] },
-    };
     static functionRegex: any = null;
 
-    static relationMethods = [
-        "has",
-        "orHas",
-        "whereHas",
-        "orWhereHas",
-        "whereDoesntHave",
-        "orWhereDoesntHave",
-        "doesntHave",
-        "orDoesntHave",
-        "hasMorph",
-        "orHasMorph",
-        "doesntHaveMorph",
-        "orDoesntHaveMorph",
-        "whereHasMorph",
-        "orWhereHasMorph",
-        "whereDoesntHaveMorph",
-        "orWhereDoesntHaveMorph",
-        "withAggregate",
-        "withCount",
-        "withMax",
-        "withMin",
-        "withSum",
-        "withAvg",
-    ];
+    static classes: Array<string> = [];
+
+    // TODO: Tighten up the typing here
+    static registerProvider(provider: any) {
+        if (typeof provider.tags !== "undefined") {
+            let tags = provider.tags();
+
+            if (tags.classes) {
+                this.classes = this.classes.concat(tags.classes);
+            }
+        }
+    }
 
     /**
      * Create full path from project file name
@@ -213,15 +170,10 @@ export default class Helpers {
         level: number = 0,
     ): any {
         var out: any = null;
-        var classes = [];
-        for (let i in Helpers.tags) {
-            for (let j in Helpers.tags[i].classes) {
-                classes.push(Helpers.tags[i].classes[j]);
-            }
-        }
+
         var regexPattern =
             "(((" +
-            classes.join("|") +
+            this.classes.join("|") +
             ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]|\\((?:[^)(]|\\([^)(]*\\))*\\))*)(\\)|$))";
         var functionRegex = new RegExp(regexPattern, "g");
         var paramsRegex =
@@ -229,7 +181,7 @@ export default class Helpers {
         var inlineFunctionMatch =
             /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
 
-        text = text.substr(Math.max(0, position - 200), 400);
+        text = text.substring(Math.max(0, position - 200), 400);
         position -= Math.max(0, position - 200);
 
         var match = null;

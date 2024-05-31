@@ -18,13 +18,28 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         ]);
     }
 
+    static tags(): Tags {
+        return {
+            classes: ["View"],
+            functions: [
+                "view",
+                "markdown",
+                "links",
+                "@extends",
+                "@component",
+                "@include",
+                "@each",
+            ],
+        };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        var func = Helpers.parseDocumentFunction(document, position);
+        let func = Helpers.parseDocumentFunction(document, position);
 
         if (func === null) {
             return [];
@@ -32,19 +47,17 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
 
         if (
             (func.class &&
-                Helpers.tags.view.classes.some((cls: string) =>
+                ViewProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-            Helpers.tags.view.functions.some((fn: string) =>
+            ViewProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {
-            let out: vscode.CompletionItem[] = [];
-
             if (func.paramIndex === 0 || func.paramIndex === null) {
-                for (let i in this.views) {
+                return Object.entries(this.views).map(([key]) => {
                     let completionItem = new vscode.CompletionItem(
-                        i,
+                        key,
                         vscode.CompletionItemKind.Constant,
                     );
 
@@ -52,10 +65,9 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                         position,
                         Helpers.wordMatchRegex,
                     );
-                    out.push(completionItem);
-                }
 
-                return out;
+                    return completionItem;
+                });
             }
 
             if (typeof this.views[func.parameters[0]] === "undefined") {
@@ -142,9 +154,9 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                     return;
                 }
 
-                const allPaths = JSON.parse(results);
+                const data = JSON.parse(results);
 
-                const viewPaths = allPaths.paths
+                data.paths
                     .map((path: string) =>
                         path.replace(
                             Helpers.projectPath("/", true),
@@ -158,7 +170,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                         );
                     });
 
-                const viewNamespaces = allPaths.hints;
+                const viewNamespaces = data.hints;
 
                 for (let i in viewNamespaces) {
                     viewNamespaces[i] = viewNamespaces[i].map(

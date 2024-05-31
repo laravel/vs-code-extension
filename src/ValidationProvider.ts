@@ -94,6 +94,13 @@ export default class ValidationProvider
         uuid: "uuid",
     };
 
+    static tags(): Tags {
+        return {
+            classes: ["Validator"],
+            functions: ["validate", "sometimes", "rules"],
+        };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -107,13 +114,13 @@ export default class ValidationProvider
             (func &&
                 func.paramIndex !== null &&
                 func.function &&
-                Helpers.tags.validation.functions.some((fn: string) =>
+                ValidationProvider.tags().functions.some((fn: string) =>
                     func.function.includes(fn),
                 )) ||
             (func &&
                 func.paramIndex !== null &&
                 func.class &&
-                Helpers.tags.validation.classes.some((cls: string) =>
+                ValidationProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
             document.getText().match(/class .* extends (\S+Request)/g) ||

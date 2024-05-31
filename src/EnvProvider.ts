@@ -14,6 +14,10 @@ export default class EnvProvider implements vscode.CompletionItemProvider {
         createFileWatcher(".env", this.load.bind(this));
     }
 
+    static tags(): Tags {
+        return { classes: [], functions: ["env"] };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -28,24 +32,26 @@ export default class EnvProvider implements vscode.CompletionItemProvider {
         }
 
         if (
-            func &&
-            Helpers.tags.env.functions.some((fn: string) =>
+            !EnvProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {
-            for (let i in this.enviroments) {
-                let completeItem = new vscode.CompletionItem(
-                    i,
-                    vscode.CompletionItemKind.Constant,
-                );
-                completeItem.range = document.getWordRangeAtPosition(
-                    position,
-                    Helpers.wordMatchRegex,
-                );
-                completeItem.detail = this.enviroments[i];
-                out.push(completeItem);
-            }
+            return out;
         }
+
+        for (let i in this.enviroments) {
+            let completeItem = new vscode.CompletionItem(
+                i,
+                vscode.CompletionItemKind.Constant,
+            );
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+            completeItem.detail = this.enviroments[i];
+            out.push(completeItem);
+        }
+
         return out;
     }
 

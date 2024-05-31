@@ -10,6 +10,10 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
     private routes: Array<any> = [];
     private controllers: Array<any> = [];
 
+    static tags(): Tags {
+        return { classes: ["Route"], functions: ["route", "signedRoute"] };
+    }
+
     constructor() {
         this.loadRoutes();
         this.loadControllers();
@@ -37,10 +41,10 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
 
         let shouldCreateCompletion =
             (func.class &&
-                Helpers.tags.route.classes.some((cls: string) =>
+                RouteProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-            Helpers.tags.route.functions.some((fn: string) =>
+            RouteProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             );
 

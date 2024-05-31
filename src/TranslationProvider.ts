@@ -11,6 +11,10 @@ export default class TranslationProvider
 {
     private translations: Array<any> = [];
 
+    static tags(): Tags {
+        return { classes: ["Lang"], functions: ["__", "trans", "@lang"] };
+    }
+
     constructor() {
         this.loadTranslations();
 
@@ -35,10 +39,10 @@ export default class TranslationProvider
         if (
             func &&
             ((func.class &&
-                Helpers.tags.trans.classes.some((cls: string) =>
+                TranslationProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-                Helpers.tags.trans.functions.some((fn: string) =>
+                TranslationProvider.tags().functions.some((fn: string) =>
                     func.function.includes(fn),
                 ))
         ) {

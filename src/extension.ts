@@ -66,6 +66,8 @@ export function activate(context: vscode.ExtensionContext) {
     ];
 
     providers.forEach((Provider) => {
+        Helpers.registerProvider(Provider);
+
         context.subscriptions.push(
             vscode.languages.registerCompletionItemProvider(
                 LANGUAGES,

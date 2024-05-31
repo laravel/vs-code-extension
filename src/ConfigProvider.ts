@@ -23,6 +23,10 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         createFileWatcher("config/{,*,**/*}.php", this.load.bind(this));
     }
 
+    static tags(): Tags {
+        return { classes: ["Config"], functions: ["config"] };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -37,10 +41,10 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
 
         if (
             (func.class &&
-                Helpers.tags.config.classes.some((cls: string) =>
+                ConfigProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-            Helpers.tags.config.functions.some((fn: string) =>
+            ConfigProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {

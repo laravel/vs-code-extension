@@ -12,6 +12,10 @@ export default class MixProvider implements vscode.CompletionItemProvider {
         setInterval(() => this.load(), 60000);
     }
 
+    static tags(): Tags {
+        return { classes: [], functions: ["mix"] };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -25,7 +29,7 @@ export default class MixProvider implements vscode.CompletionItemProvider {
         }
 
         if (
-            !Helpers.tags.mix.functions.some((fn: string) =>
+            !MixProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {

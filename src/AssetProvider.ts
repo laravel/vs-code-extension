@@ -14,6 +14,10 @@ export default class AssetProvider implements vscode.CompletionItemProvider {
         createFileWatcher("public/**/*", this.load.bind(this));
     }
 
+    static tags(): Tags {
+        return { classes: [], functions: ["asset"] };
+    }
+
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -28,7 +32,7 @@ export default class AssetProvider implements vscode.CompletionItemProvider {
 
         // TODO: This I don't like
         if (
-            !Helpers.tags.asset.functions.some((fn: string) =>
+            !AssetProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {

@@ -18,9 +18,16 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
         }
 
         // TODO: huh?
-        this.loadAbilities();
+        this.load();
 
-        // setInterval(() => this.loadAbilities(), 60000);
+        // setInterval(() => this.load(), 60000);
+    }
+
+    static tags(): Tags {
+        return {
+            classes: ["Gate"],
+            functions: ["can", "@can", "@cannot", "@canany"],
+        };
     }
 
     provideCompletionItems(
@@ -37,10 +44,10 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
 
         if (
             (func.class &&
-                Helpers.tags.auth.classes.some((cls: string) =>
+                AuthProvider.tags().classes.some((cls: string) =>
                     func.class.includes(cls),
                 )) ||
-            Helpers.tags.auth.functions.some((fn: string) =>
+            AuthProvider.tags().functions.some((fn: string) =>
                 func.function.includes(fn),
             )
         ) {
@@ -77,7 +84,7 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
         return [];
     }
 
-    loadAbilities() {
+    load() {
         // TODO: huh?
         Helpers.getModels().then((models) => (this.models = models));
 

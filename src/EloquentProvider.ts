@@ -9,6 +9,31 @@ import Logger from "./Logger";
 export default class EloquentProvider implements vscode.CompletionItemProvider {
     private models: { [key: string]: any } = {};
 
+    private relationMethods = [
+        "has",
+        "orHas",
+        "whereHas",
+        "orWhereHas",
+        "whereDoesntHave",
+        "orWhereDoesntHave",
+        "doesntHave",
+        "orDoesntHave",
+        "hasMorph",
+        "orHasMorph",
+        "doesntHaveMorph",
+        "orDoesntHaveMorph",
+        "whereHasMorph",
+        "orWhereHasMorph",
+        "whereDoesntHaveMorph",
+        "orWhereDoesntHaveMorph",
+        "withAggregate",
+        "withCount",
+        "withMax",
+        "withMin",
+        "withSum",
+        "withAvg",
+    ];
+
     constructor() {
         const paths = vscode.workspace
             .getConfiguration("Laravel")
@@ -57,7 +82,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
 
             if (
                 func &&
-                Helpers.relationMethods.some((fn: string) =>
+                this.relationMethods.some((fn: string) =>
                     func.function.includes(fn),
                 )
             ) {
