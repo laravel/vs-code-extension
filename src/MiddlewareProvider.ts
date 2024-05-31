@@ -4,11 +4,10 @@ import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class MiddlewareProvider
-    implements vscode.CompletionItemProvider
-{
-    private middlewares: Array<any> = [];
+export default class MiddlewareProvider implements Provider {
+    private middlewares: any[] = [];
 
     constructor() {
         this.load();
@@ -18,18 +17,17 @@ export default class MiddlewareProvider
         ]);
     }
 
+    tags(): Tags {
+        return { classes: [], functions: ["middleware"] };
+    }
+
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null || !func.function.includes("middleware")) {
-            return [];
-        }
-
         return this.middlewares.map((middleware, i) => {
             let completionItem = new vscode.CompletionItem(
                 i.toString(),

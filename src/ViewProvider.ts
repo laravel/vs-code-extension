@@ -5,8 +5,9 @@ import * as fs from "fs";
 import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class ViewProvider implements vscode.CompletionItemProvider {
+export default class ViewProvider implements Provider {
     private views: { [key: string]: string } = {};
 
     constructor() {
@@ -18,7 +19,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         ]);
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return {
             classes: ["View"],
             functions: [
@@ -29,82 +30,67 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 "@component",
                 "@include",
                 "@each",
+                "@section",
+                "@push",
             ],
         };
     }
 
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return [];
-        }
-
-        if (
-            (func.class &&
-                ViewProvider.tags().classes.some((cls: string) =>
-                    func.class.includes(cls),
-                )) ||
-            ViewProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            if (func.paramIndex === 0 || func.paramIndex === null) {
-                return Object.entries(this.views).map(([key]) => {
-                    let completionItem = new vscode.CompletionItem(
-                        key,
-                        vscode.CompletionItemKind.Constant,
-                    );
-
-                    completionItem.range = document.getWordRangeAtPosition(
-                        position,
-                        Helpers.wordMatchRegex,
-                    );
-
-                    return completionItem;
-                });
-            }
-
-            if (typeof this.views[func.parameters[0]] === "undefined") {
-                return [];
-            }
-
-            let viewContent = fs.readFileSync(
-                this.views[func.parameters[0]],
-                "utf8",
-            );
-
-            let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
-            let r: RegExpExecArray | null = null;
-            let variableNames = new Set<string>([]);
-
-            while ((r = variableRegex.exec(viewContent))) {
-                variableNames.add(r[1]);
-            }
-
-            return [...variableNames].map((variableName) => {
-                let variableCompeleteItem = new vscode.CompletionItem(
-                    variableName,
-                    vscode.CompletionItemKind.Constant,
-                );
-                variableCompeleteItem.range = document.getWordRangeAtPosition(
-                    position,
-                    Helpers.wordMatchRegex,
-                );
-                return variableCompeleteItem;
-            });
-        }
-
-        if (["@section", "@push"].includes(func.function)) {
+        if (func.function && ["@section", "@push"].includes(func.function)) {
             return this.getYields(func.function, document.getText());
         }
 
-        return [];
+        if (func.paramIndex === 0 || func.paramIndex === null) {
+            return Object.entries(this.views).map(([key]) => {
+                let completionItem = new vscode.CompletionItem(
+                    key,
+                    vscode.CompletionItemKind.Constant,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+
+                return completionItem;
+            });
+        }
+
+        if (typeof this.views[func.parameters[0]] === "undefined") {
+            return [];
+        }
+
+        let viewContent = fs.readFileSync(
+            this.views[func.parameters[0]],
+            "utf8",
+        );
+
+        let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
+        let r: RegExpExecArray | null = null;
+        let variableNames = new Set<string>([]);
+
+        while ((r = variableRegex.exec(viewContent))) {
+            variableNames.add(r[1]);
+        }
+
+        return [...variableNames].map((variableName) => {
+            let variableCompeleteItem = new vscode.CompletionItem(
+                variableName,
+                vscode.CompletionItemKind.Constant,
+            );
+            variableCompeleteItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+            return variableCompeleteItem;
+        });
     }
 
     getYields(func: string, documentText: string): vscode.CompletionItem[] {

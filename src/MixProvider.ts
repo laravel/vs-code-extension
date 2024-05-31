@@ -3,39 +3,28 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import Helpers from "./helpers";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class MixProvider implements vscode.CompletionItemProvider {
-    private mixes: Array<any> = [];
+export default class MixProvider implements Provider {
+    private mixes: any[] = [];
 
     constructor() {
         this.load();
-        setInterval(() => this.load(), 60000);
+        // TODO: wat
+        // setInterval(() => this.load(), 60000);
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return { classes: [], functions: ["mix"] };
     }
 
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return [];
-        }
-
-        if (
-            !MixProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            return [];
-        }
-
         return this.mixes.map((mix) => {
             let completeItem = new vscode.CompletionItem(
                 mix,

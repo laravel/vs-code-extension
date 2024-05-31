@@ -3,10 +3,11 @@
 import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class AuthProvider implements vscode.CompletionItemProvider {
-    private abilities: Array<any> = [];
-    private models: Array<any> = [];
+export default class AuthProvider implements Provider {
+    private abilities: any[] = [];
+    private models: any[] = [];
 
     constructor() {
         if (
@@ -23,7 +24,7 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
         // setInterval(() => this.load(), 60000);
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return {
             classes: ["Gate"],
             functions: ["can", "@can", "@cannot", "@canany"],
@@ -31,47 +32,19 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
     }
 
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        var func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return [];
-        }
-
-        if (
-            (func.class &&
-                AuthProvider.tags().classes.some((cls: string) =>
-                    func.class.includes(cls),
-                )) ||
-            AuthProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            if (func.paramIndex === 1) {
-                // TODO: Any reason not to do this ahead of time?
-                return this.models.map((model) => {
-                    let completeItem = new vscode.CompletionItem(
-                        model.replace(/\\/, "\\\\"),
-                        vscode.CompletionItemKind.Value,
-                    );
-                    completeItem.range = document.getWordRangeAtPosition(
-                        position,
-                        Helpers.wordMatchRegex,
-                    );
-
-                    return completeItem;
-                });
-            }
-
-            return this.abilities.map((ability) => {
+        if (func.paramIndex === 1) {
+            return this.models.map((model) => {
                 let completeItem = new vscode.CompletionItem(
-                    ability,
+                    model.replace(/\\/, "\\\\"),
                     vscode.CompletionItemKind.Value,
                 );
+
                 completeItem.range = document.getWordRangeAtPosition(
                     position,
                     Helpers.wordMatchRegex,
@@ -81,7 +54,18 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
             });
         }
 
-        return [];
+        return this.abilities.map((ability) => {
+            let completeItem = new vscode.CompletionItem(
+                ability,
+                vscode.CompletionItemKind.Value,
+            );
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+
+            return completeItem;
+        });
     }
 
     load() {

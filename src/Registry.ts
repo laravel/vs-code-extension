@@ -31,33 +31,25 @@ export default class Registry implements vscode.CompletionItemProvider {
             return [];
         }
 
-        const classItem = this.providers.find((provider) =>
-            provider.tags().classes.some((cls) => func.class.includes(cls)),
-        );
-
-        if (classItem) {
-            return classItem.classCompletionItems(
-                document,
-                position,
-                token,
-                context,
+        const item =
+            this.providers.find((provider) =>
+                provider.tags().classes.find((cls) => cls === func.class),
+            ) ||
+            this.providers.find((provider) =>
+                provider.tags().functions.find((fn) => fn === func.function),
             );
+
+        if (!item) {
+            return [];
         }
 
-        const functionItem = this.providers.find((provider) =>
-            provider.tags().functions.some((fn) => func.function.includes(fn)),
+        return item.provideCompletionItems(
+            func,
+            document,
+            position,
+            token,
+            context,
         );
-
-        if (functionItem) {
-            return functionItem.functionCompletionItems(
-                document,
-                position,
-                token,
-                context,
-            );
-        }
-
-        return [];
     }
 
     /**
@@ -91,13 +83,13 @@ export default class Registry implements vscode.CompletionItemProvider {
         var match = null;
         var match2 = null;
 
-        if (
-            Helpers.cachedParseFunction !== null &&
-            Helpers.cachedParseFunction.text === text &&
-            position === Helpers.cachedParseFunction.position
-        ) {
-            return Helpers.cachedParseFunction.out;
-        }
+        // if (
+        //     Helpers.cachedParseFunction !== null &&
+        //     Helpers.cachedParseFunction.text === text &&
+        //     position === Helpers.cachedParseFunction.position
+        // ) {
+        //     return Helpers.cachedParseFunction.out;
+        // }
 
         if (level >= 6) {
             return null;

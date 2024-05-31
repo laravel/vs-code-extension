@@ -91,7 +91,7 @@ export default class Helpers {
         return "";
     }
 
-    static arrayUnique(value: any, index: any, self: Array<any>) {
+    static arrayUnique(value: any, index: any, self: any[]) {
         return self.indexOf(value) === index;
     }
 

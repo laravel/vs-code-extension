@@ -5,96 +5,82 @@ import * as fs from "fs";
 import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class TranslationProvider
-    implements vscode.CompletionItemProvider
-{
-    private translations: Array<any> = [];
-
-    static tags(): Tags {
-        return { classes: ["Lang"], functions: ["__", "trans", "@lang"] };
-    }
+export default class TranslationProvider implements Provider {
+    private translations: any[] = [];
 
     constructor() {
-        this.loadTranslations();
+        this.load();
 
         createFileWatcher(
             "{,**/}{lang,localization,localizations,trans,translation,translations}/{*,**/*}",
-            this.loadTranslations.bind(this),
+            this.load.bind(this),
         );
     }
 
+    tags(): Tags {
+        return { classes: ["Lang"], functions: ["__", "trans", "@lang"] };
+    }
+
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         var out: vscode.CompletionItem[] = [];
-        var func = Helpers.parseDocumentFunction(document, position);
-        if (func === null) {
+
+        if (func.paramIndex === 1) {
+            // parameters autocomplete
+            var paramRegex = /\:([A-Za-z0-9_]+)/g;
+            var match = null;
+
+            for (let i in this.translations) {
+                if (this.translations[i].name === func.parameters[0]) {
+                    while (
+                        (match = paramRegex.exec(
+                            this.translations[i].value,
+                        )) !== null
+                    ) {
+                        var compeleteItem = new vscode.CompletionItem(
+                            match[1],
+                            vscode.CompletionItemKind.Variable,
+                        );
+                        compeleteItem.range = document.getWordRangeAtPosition(
+                            position,
+                            Helpers.wordMatchRegex,
+                        );
+                        out.push(compeleteItem);
+                    }
+                    return out;
+                }
+            }
+
             return out;
         }
 
-        if (
-            func &&
-            ((func.class &&
-                TranslationProvider.tags().classes.some((cls: string) =>
-                    func.class.includes(cls),
-                )) ||
-                TranslationProvider.tags().functions.some((fn: string) =>
-                    func.function.includes(fn),
-                ))
-        ) {
-            if (func.paramIndex === 1) {
-                // parameters autocomplete
-                var paramRegex = /\:([A-Za-z0-9_]+)/g;
-                var match = null;
-
-                for (let i in this.translations) {
-                    if (this.translations[i].name === func.parameters[0]) {
-                        while (
-                            (match = paramRegex.exec(
-                                this.translations[i].value,
-                            )) !== null
-                        ) {
-                            var compeleteItem = new vscode.CompletionItem(
-                                match[1],
-                                vscode.CompletionItemKind.Variable,
-                            );
-                            compeleteItem.range =
-                                document.getWordRangeAtPosition(
-                                    position,
-                                    Helpers.wordMatchRegex,
-                                );
-                            out.push(compeleteItem);
-                        }
-                        return out;
-                    }
-                }
-                return out;
+        for (let i in this.translations) {
+            var completeItem = new vscode.CompletionItem(
+                this.translations[i].name,
+                vscode.CompletionItemKind.Value,
+            );
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+            if (this.translations[i].value) {
+                completeItem.detail = this.translations[i].value.toString();
             }
-
-            for (let i in this.translations) {
-                var completeItem = new vscode.CompletionItem(
-                    this.translations[i].name,
-                    vscode.CompletionItemKind.Value,
-                );
-                completeItem.range = document.getWordRangeAtPosition(
-                    position,
-                    Helpers.wordMatchRegex,
-                );
-                if (this.translations[i].value) {
-                    completeItem.detail = this.translations[i].value.toString();
-                }
-                out.push(completeItem);
-            }
+            out.push(completeItem);
         }
+
         return out;
     }
 
-    loadTranslations() {
-        var translations: Array<any> = [];
+    load() {
+        var translations: any[] = [];
         try {
             var self = this;
             runInLaravel(
@@ -274,8 +260,8 @@ export default class TranslationProvider
         }
     }
 
-    getTranslations(translations: Array<any>, prefix: string): Array<any> {
-        var out: Array<any> = [];
+    getTranslations(translations: any[], prefix: string): any[] {
+        var out: any[] = [];
         for (var i in translations) {
             if (translations[i] instanceof Object) {
                 out.push({ name: prefix + "." + i, value: "array(...)" });

@@ -5,7 +5,7 @@ import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 
 export default class BladeProvider implements vscode.CompletionItemProvider {
-    private customDirectives: Array<any> = [];
+    private customDirectives: any[] = [];
 
     constructor() {
         this.loadCustomDirectives();

@@ -4,8 +4,9 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import Helpers from "./helpers";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class AssetProvider implements vscode.CompletionItemProvider {
+export default class AssetProvider implements Provider {
     private publicFiles: string[] = [];
 
     constructor() {
@@ -14,31 +15,17 @@ export default class AssetProvider implements vscode.CompletionItemProvider {
         createFileWatcher("public/**/*", this.load.bind(this));
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return { classes: [], functions: ["asset"] };
     }
 
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        const func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return [];
-        }
-
-        // TODO: This I don't like
-        if (
-            !AssetProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            return [];
-        }
-
         return this.publicFiles.map((file) => {
             let completeItem = new vscode.CompletionItem(
                 file,

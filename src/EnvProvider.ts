@@ -4,8 +4,9 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import Helpers from "./helpers";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class EnvProvider implements vscode.CompletionItemProvider {
+export default class EnvProvider implements Provider {
     private enviroments: { [key: string]: string } = {};
 
     constructor() {
@@ -14,45 +15,32 @@ export default class EnvProvider implements vscode.CompletionItemProvider {
         createFileWatcher(".env", this.load.bind(this));
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return { classes: [], functions: ["env"] };
     }
 
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let out: vscode.CompletionItem[] = [];
-        let func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return out;
-        }
-
-        if (
-            !EnvProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            return out;
-        }
-
-        for (let i in this.enviroments) {
+        return Object.entries(this.enviroments).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
-                i,
+                key,
                 vscode.CompletionItemKind.Constant,
             );
+
             completeItem.range = document.getWordRangeAtPosition(
                 position,
                 Helpers.wordMatchRegex,
             );
-            completeItem.detail = this.enviroments[i];
-            out.push(completeItem);
-        }
 
-        return out;
+            completeItem.detail = value;
+
+            return completeItem;
+        });
     }
 
     load() {

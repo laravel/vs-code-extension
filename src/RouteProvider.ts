@@ -5,14 +5,11 @@ import * as fs from "fs";
 import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class RouteProvider implements vscode.CompletionItemProvider {
-    private routes: Array<any> = [];
-    private controllers: Array<any> = [];
-
-    static tags(): Tags {
-        return { classes: ["Route"], functions: ["route", "signedRoute"] };
-    }
+export default class RouteProvider implements Provider {
+    private routes: any[] = [];
+    private controllers: any[] = [];
 
     constructor() {
         this.loadRoutes();
@@ -27,31 +24,17 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         );
     }
 
+    tags(): Tags {
+        return { classes: ["Route"], functions: ["route", "signedRoute"] };
+    }
+
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let func = Helpers.parseDocumentFunction(document, position);
-
-        if (func === null) {
-            return [];
-        }
-
-        let shouldCreateCompletion =
-            (func.class &&
-                RouteProvider.tags().classes.some((cls: string) =>
-                    func.class.includes(cls),
-                )) ||
-            RouteProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            );
-
-        if (!shouldCreateCompletion) {
-            return [];
-        }
-
         if (
             func.class === "Route" &&
             [
@@ -63,7 +46,7 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                 "options",
                 "any",
                 "match",
-            ].some((fc: string) => func.function.includes(fc))
+            ].some((fc: string) => func.function === fc)
         ) {
             if (
                 (func.function === "match" && func.paramIndex === 2) ||

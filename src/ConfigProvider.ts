@@ -4,16 +4,16 @@ import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import { Provider, Tags } from ".";
+import { CompletionItemFunction, Provider, Tags } from ".";
 
-type Config = {
+interface Config {
     [key: string]: any;
-};
+}
 
-type ConfigItem = {
+interface ConfigItem {
     name: string;
     value: string;
-};
+}
 
 export default class ConfigProvider implements Provider {
     private configs: ConfigItem[] = [];
@@ -28,7 +28,8 @@ export default class ConfigProvider implements Provider {
         return { classes: ["Config"], functions: ["config"] };
     }
 
-    classCompletionItems(
+    provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -51,15 +52,6 @@ export default class ConfigProvider implements Provider {
 
             return completeItem;
         });
-    }
-
-    functionCompletionItems(
-        document: vscode.TextDocument,
-        position: vscode.Position,
-        token: vscode.CancellationToken,
-        context: vscode.CompletionContext,
-    ): vscode.CompletionItem[] {
-        return this.classCompletionItems(document, position, token, context);
     }
 
     load() {

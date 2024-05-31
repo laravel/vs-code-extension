@@ -18,6 +18,7 @@ import EloquentProvider from "./EloquentProvider";
 import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
 import Registry from "./Registry";
+import { Provider } from ".";
 
 function shouldActivate(): boolean {
     const hasWorkspaces =
@@ -53,20 +54,20 @@ export function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "blade" },
         { scheme: "file", language: "laravel-blade" },
     ];
-    const TRIGGER_CHARACTERS = ["'", '"'];
-    // const providers = [
-    //     // RouteProvider,
-    //     // ViewProvider,
-    //     // // ConfigProvider,
-    //     // TranslationProvider,
-    //     // MixProvider,
-    //     // EnvProvider,
-    //     // MiddlewareProvider,
-    //     // AuthProvider,
-    //     // AssetProvider,
-    // ];
 
-    const delegatedProviders = [ConfigProvider];
+    const TRIGGER_CHARACTERS = ["'", '"'];
+
+    const delegatedProviders = [
+        ConfigProvider,
+        RouteProvider,
+        ViewProvider,
+        TranslationProvider,
+        MixProvider,
+        EnvProvider,
+        MiddlewareProvider,
+        AuthProvider,
+        AssetProvider,
+    ];
 
     const delegatedRegistry = new Registry();
 

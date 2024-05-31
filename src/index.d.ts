@@ -5,15 +5,17 @@ interface Tags {
     functions: string[];
 }
 
+interface CompletionItemFunction {
+    class: string | null;
+    function: string | null;
+    parameters: string[];
+    paramIndex: number | null;
+}
+
 interface Provider {
     tags(): Tags;
-    classCompletionItems(
-        document: vscode.TextDocument,
-        position: vscode.Position,
-        token: vscode.CancellationToken,
-        context: vscode.CompletionContext,
-    ): vscode.CompletionItem[];
-    functionCompletionItems(
+    provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
