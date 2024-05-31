@@ -17,6 +17,7 @@ import AssetProvider from "./AssetProvider";
 import EloquentProvider from "./EloquentProvider";
 import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
+import Registry from "./Registry";
 
 function shouldActivate(): boolean {
     const hasWorkspaces =
@@ -53,29 +54,45 @@ export function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "laravel-blade" },
     ];
     const TRIGGER_CHARACTERS = ["'", '"'];
-    const providers = [
-        RouteProvider,
-        ViewProvider,
-        ConfigProvider,
-        TranslationProvider,
-        MixProvider,
-        EnvProvider,
-        MiddlewareProvider,
-        AuthProvider,
-        AssetProvider,
-    ];
+    // const providers = [
+    //     // RouteProvider,
+    //     // ViewProvider,
+    //     // // ConfigProvider,
+    //     // TranslationProvider,
+    //     // MixProvider,
+    //     // EnvProvider,
+    //     // MiddlewareProvider,
+    //     // AuthProvider,
+    //     // AssetProvider,
+    // ];
 
-    providers.forEach((Provider) => {
-        Helpers.registerProvider(Provider);
+    const delegatedProviders = [ConfigProvider];
 
-        context.subscriptions.push(
-            vscode.languages.registerCompletionItemProvider(
-                LANGUAGES,
-                new Provider(),
-                ...TRIGGER_CHARACTERS,
-            ),
-        );
+    const delegatedRegistry = new Registry();
+
+    delegatedProviders.forEach((provider) => {
+        delegatedRegistry.registerProvider(new provider());
     });
+
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            LANGUAGES,
+            delegatedRegistry,
+            ...TRIGGER_CHARACTERS,
+        ),
+    );
+
+    // providers.forEach((Provider) => {
+    //     Helpers.registerProvider(Provider);
+
+    //     context.subscriptions.push(
+    //         vscode.languages.registerCompletionItemProvider(
+    //             LANGUAGES,
+    //             new Provider(),
+    //             ...TRIGGER_CHARACTERS,
+    //         ),
+    //     );
+    // });
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(

@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import { Provider, Tags } from ".";
 
 type Config = {
     [key: string]: any;
@@ -14,7 +15,7 @@ type ConfigItem = {
     value: string;
 };
 
-export default class ConfigProvider implements vscode.CompletionItemProvider {
+export default class ConfigProvider implements Provider {
     private configs: ConfigItem[] = [];
 
     constructor() {
@@ -23,51 +24,42 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         createFileWatcher("config/{,*,**/*}.php", this.load.bind(this));
     }
 
-    static tags(): Tags {
+    tags(): Tags {
         return { classes: ["Config"], functions: ["config"] };
     }
 
-    provideCompletionItems(
+    classCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let func = Helpers.parseDocumentFunction(document, position);
+        return this.configs.map((config) => {
+            let completeItem = new vscode.CompletionItem(
+                config.name,
+                vscode.CompletionItemKind.Value,
+            );
 
-        if (func === null) {
-            return [];
-        }
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
 
-        if (
-            (func.class &&
-                ConfigProvider.tags().classes.some((cls: string) =>
-                    func.class.includes(cls),
-                )) ||
-            ConfigProvider.tags().functions.some((fn: string) =>
-                func.function.includes(fn),
-            )
-        ) {
-            return this.configs.map((config) => {
-                let completeItem = new vscode.CompletionItem(
-                    config.name,
-                    vscode.CompletionItemKind.Value,
-                );
+            if (config.value) {
+                completeItem.detail = config.value.toString();
+            }
 
-                completeItem.range = document.getWordRangeAtPosition(
-                    position,
-                    Helpers.wordMatchRegex,
-                );
+            return completeItem;
+        });
+    }
 
-                if (config.value) {
-                    completeItem.detail = config.value.toString();
-                }
-
-                return completeItem;
-            });
-        }
-
-        return [];
+    functionCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return this.classCompletionItems(document, position, token, context);
     }
 
     load() {
