@@ -6,6 +6,7 @@ import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import Logger from "./Logger";
 
 export default class RouteProvider implements Provider {
     private routes: any[] = [];
@@ -77,7 +78,7 @@ export default class RouteProvider implements Provider {
             return [];
         }
 
-        if (func.function.includes("middleware") !== false) {
+        if (func.function?.includes("middleware") !== false) {
             return [];
         }
 

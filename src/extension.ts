@@ -18,7 +18,6 @@ import EloquentProvider from "./EloquentProvider";
 import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
 import Registry from "./Registry";
-import { Provider } from ".";
 
 function shouldActivate(): boolean {
     const hasWorkspaces =
@@ -82,18 +81,6 @@ export function activate(context: vscode.ExtensionContext) {
             ...TRIGGER_CHARACTERS,
         ),
     );
-
-    // providers.forEach((Provider) => {
-    //     Helpers.registerProvider(Provider);
-
-    //     context.subscriptions.push(
-    //         vscode.languages.registerCompletionItemProvider(
-    //             LANGUAGES,
-    //             new Provider(),
-    //             ...TRIGGER_CHARACTERS,
-    //         ),
-    //     );
-    // });
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
