@@ -44,15 +44,15 @@ export default class TranslationProvider implements Provider {
                             this.translations[i].value,
                         )) !== null
                     ) {
-                        var compeleteItem = new vscode.CompletionItem(
+                        var completionItem = new vscode.CompletionItem(
                             match[1],
                             vscode.CompletionItemKind.Variable,
                         );
-                        compeleteItem.range = document.getWordRangeAtPosition(
+                        completionItem.range = document.getWordRangeAtPosition(
                             position,
                             Helpers.wordMatchRegex,
                         );
-                        out.push(compeleteItem);
+                        out.push(completionItem);
                     }
                     return out;
                 }

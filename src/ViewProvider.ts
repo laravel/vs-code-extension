@@ -81,15 +81,15 @@ export default class ViewProvider implements Provider {
         }
 
         return [...variableNames].map((variableName) => {
-            let variableCompeleteItem = new vscode.CompletionItem(
+            let variablecompletionItem = new vscode.CompletionItem(
                 variableName,
                 vscode.CompletionItemKind.Constant,
             );
-            variableCompeleteItem.range = document.getWordRangeAtPosition(
+            variablecompletionItem.range = document.getWordRangeAtPosition(
                 position,
                 Helpers.wordMatchRegex,
             );
-            return variableCompeleteItem;
+            return variablecompletionItem;
         });
     }
 

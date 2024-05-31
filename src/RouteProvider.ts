@@ -6,7 +6,6 @@ import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import Logger from "./Logger";
 
 export default class RouteProvider implements Provider {
     private routes: any[] = [];
@@ -30,6 +29,35 @@ export default class RouteProvider implements Provider {
         return { classes: ["Route"], functions: ["route", "signedRoute"] };
     }
 
+    autoCompleteAction(func: CompletionItemFunction): boolean {
+        if (func.class !== "Route") {
+            return false;
+        }
+
+        if (func.function === null) {
+            return false;
+        }
+
+        return [
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "options",
+            "any",
+            "match",
+        ].includes(func.function);
+    }
+
+    autoCompleteActionParam(func: CompletionItemFunction): boolean {
+        if (func.function === "match") {
+            return func.paramIndex === 2;
+        }
+
+        return func.paramIndex === 1;
+    }
+
     provideCompletionItems(
         func: CompletionItemFunction,
         document: vscode.TextDocument,
@@ -37,46 +65,33 @@ export default class RouteProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (
-            func.class === "Route" &&
-            [
-                "get",
-                "post",
-                "put",
-                "patch",
-                "delete",
-                "options",
-                "any",
-                "match",
-            ].some((fc: string) => func.function === fc)
-        ) {
-            if (
-                (func.function === "match" && func.paramIndex === 2) ||
-                (func.function !== "match" && func.paramIndex === 1)
-            ) {
-                // Route action autocomplete.
-                return this.controllers
-                    .filter(
-                        (controller) =>
-                            typeof controller === "string" &&
-                            controller.length > 0,
-                    )
-                    .map((controller: string) => {
-                        let compeleteItem = new vscode.CompletionItem(
-                            controller,
-                            vscode.CompletionItemKind.Enum,
-                        );
+        // TODO: maybe something like this?
+        // this.autoCompleteAction(func) || this.autoCompleteMiddleware() || this.autoCompleteRoute()
 
-                        compeleteItem.range = document.getWordRangeAtPosition(
-                            position,
-                            Helpers.wordMatchRegex,
-                        );
-
-                        return compeleteItem;
-                    });
+        if (this.autoCompleteAction(func)) {
+            if (!this.autoCompleteActionParam(func)) {
+                return [];
             }
 
-            return [];
+            // Route action autocomplete
+            return this.controllers
+                .filter(
+                    (controller) =>
+                        typeof controller === "string" && controller.length > 0,
+                )
+                .map((controller: string) => {
+                    let completionItem = new vscode.CompletionItem(
+                        controller,
+                        vscode.CompletionItemKind.Enum,
+                    );
+
+                    completionItem.range = document.getWordRangeAtPosition(
+                        position,
+                        Helpers.wordMatchRegex,
+                    );
+
+                    return completionItem;
+                });
         }
 
         if (func.function === "middleware") {
@@ -103,17 +118,17 @@ export default class RouteProvider implements Provider {
                 .filter((route) => route.name === func.parameters[0])
                 .map((route) => {
                     return route.parameters.map((parameter: string) => {
-                        let compeleteItem = new vscode.CompletionItem(
+                        let completionItem = new vscode.CompletionItem(
                             parameter,
                             vscode.CompletionItemKind.Variable,
                         );
 
-                        compeleteItem.range = document.getWordRangeAtPosition(
+                        completionItem.range = document.getWordRangeAtPosition(
                             position,
                             Helpers.wordMatchRegex,
                         );
 
-                        return compeleteItem;
+                        return completionItem;
                     });
                 })
                 .flat();
