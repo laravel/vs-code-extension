@@ -11,7 +11,6 @@ import TranslationProvider from "./TranslationProvider";
 import MixProvider from "./MixProvider";
 import ValidationProvider from "./ValidationProvider";
 import EnvProvider from "./EnvProvider";
-import MiddlewareProvider from "./MiddlewareProvider";
 import AuthProvider from "./AuthProvider";
 import AssetProvider from "./AssetProvider";
 import EloquentProvider from "./EloquentProvider";
@@ -20,11 +19,7 @@ import Logger from "./Logger";
 import Registry from "./Registry";
 
 function shouldActivate(): boolean {
-    const hasWorkspaces =
-        vscode.workspace.workspaceFolders instanceof Array &&
-        vscode.workspace.workspaceFolders.length > 0;
-
-    if (!hasWorkspaces) {
+    if (!Helpers.hasWorkspace()) {
         return false;
     }
 
@@ -63,7 +58,6 @@ export function activate(context: vscode.ExtensionContext) {
         TranslationProvider,
         MixProvider,
         EnvProvider,
-        MiddlewareProvider,
         AuthProvider,
         AssetProvider,
     ];

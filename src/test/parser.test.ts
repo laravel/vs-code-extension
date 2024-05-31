@@ -292,6 +292,24 @@ suite("Parser Test Suite", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("discard leftover array if currently typing", () => {
+        const code = `<?php
+
+        Route::get('/', function () {
+        User::where(fn($thing) => $thing, ['`;
+
+        const expected = {
+            class: "User",
+            function: "where",
+            paramIndex: 1,
+            parameters: ["fn($thing)=>$thing"],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("parameter grab bag", () => {
         const code = `<?php
 

@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import Helpers from "./helpers";
-import { runInLaravel } from "./PHP";
+import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import Logger from "./Logger";
@@ -11,18 +11,19 @@ import Logger from "./Logger";
 export default class RouteProvider implements Provider {
     private routes: any[] = [];
     private controllers: any[] = [];
+    private middlewares: any[] = [];
 
     constructor() {
-        this.loadRoutes();
-        this.loadControllers();
+        this.load();
 
         createFileWatcher(
             "{,**/}{Controllers,[Rr]oute}{,s}{.php,/*.php,/**/*.php}",
-            () => {
-                this.loadRoutes();
-                this.loadControllers();
-            },
+            this.load.bind(this),
         );
+
+        createFileWatcher("app/Http/Kernel.php", this.load.bind(this), [
+            "change",
+        ]);
     }
 
     tags(): Tags {
@@ -78,12 +79,26 @@ export default class RouteProvider implements Provider {
             return [];
         }
 
-        if (func.function?.includes("middleware") !== false) {
-            return [];
+        if (func.function === "middleware") {
+            return Object.entries(this.middlewares).map(([key, value]) => {
+                let completionItem = new vscode.CompletionItem(
+                    key,
+                    vscode.CompletionItemKind.Enum,
+                );
+
+                completionItem.detail = value;
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    Helpers.wordMatchRegex,
+                );
+
+                return completionItem;
+            });
         }
 
         if (func.paramIndex === 1) {
-            // route parameters autocomplete
+            // Route parameters autocomplete
             return this.routes
                 .filter((route) => route.name === func.parameters[0])
                 .map((route) => {
@@ -130,33 +145,43 @@ export default class RouteProvider implements Provider {
             });
     }
 
-    loadRoutes() {
-        if (
-            vscode.workspace.workspaceFolders instanceof Array &&
-            vscode.workspace.workspaceFolders.length > 0
-        ) {
-            try {
-                var self = this;
-                runInLaravel(
-                    "echo json_encode(array_map(function ($route) {" +
-                        "    return ['method' => implode('|', array_filter($route->methods(), function ($method) {" +
-                        "        return $method != 'HEAD';" +
-                        "    })), 'uri' => $route->uri(), 'name' => $route->getName(), 'action' => str_replace('App\\\\Http\\\\Controllers\\\\', '', $route->getActionName()), 'parameters' => $route->parameterNames()];" +
-                        "}, app('router')->getRoutes()->getRoutes()));",
-                    "HTTP Routes",
-                ).then(function (result) {
-                    if (!result) {
-                        return;
-                    }
-
-                    var routes = JSON.parse(result);
-                    routes = routes.filter((route: any) => route !== "null");
-                    self.routes = routes;
-                });
-            } catch (exception) {
-                console.error(exception);
-            }
+    load() {
+        if (!Helpers.hasWorkspace()) {
+            return;
         }
+
+        this.loadRoutes();
+        this.loadControllers();
+        this.loadMiddleware();
+    }
+
+    loadMiddleware() {
+        runInLaravel(template("middleware"), "Middlewares")
+            .then((result) => {
+                if (result) {
+                    this.middlewares = JSON.parse(result);
+                }
+            })
+            .catch((exception) => {
+                console.error(exception);
+            });
+    }
+
+    loadRoutes() {
+        runInLaravel(template("routes"), "HTTP Routes")
+            .then((result) => {
+                if (!result) {
+                    return;
+                }
+
+                this.routes = JSON.parse(result).filter(
+                    // TODO: "null"?
+                    (route: any) => route !== "null",
+                );
+            })
+            .catch((exception) => {
+                console.error(exception);
+            });
     }
 
     loadControllers() {
@@ -164,72 +189,74 @@ export default class RouteProvider implements Provider {
             this.controllers = this.getControllers(
                 Helpers.projectPath("app/Http/Controllers"),
             ).map((contoller) => contoller.replace(/@__invoke/, ""));
-            this.controllers = this.controllers.filter(
-                (v, i, a) => a.indexOf(v) === i,
-            );
         } catch (exception) {
             console.error(exception);
         }
     }
 
-    getControllers(path: string): Array<string> {
-        var self = this;
-        var controllers: Array<string> = [];
-        if (path.substr(-1) !== "/" && path.substr(-1) !== "\\") {
+    getControllers(path: string): string[] {
+        let controllers = new Set<string>();
+
+        if (path.substring(-1) !== "/" && path.substring(-1) !== "\\") {
             path += "/";
         }
-        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
-            fs.readdirSync(path).forEach(function (file) {
-                if (fs.lstatSync(path + file).isDirectory()) {
-                    controllers = controllers.concat(
-                        self.getControllers(path + file + "/"),
-                    );
-                } else {
-                    if (file.includes(".php")) {
-                        var controllerContent = fs.readFileSync(
-                            path + file,
-                            "utf8",
-                        );
-                        if (controllerContent.length < 50000) {
-                            var match =
-                                /class\s+([A-Za-z0-9_]+)\s+extends\s+.+/g.exec(
-                                    controllerContent,
-                                );
-                            var matchNamespace =
-                                /namespace .+\\Http\\Controllers\\?([A-Za-z0-9_]*)/g.exec(
-                                    controllerContent,
-                                );
-                            var functionRegex =
-                                /public\s+function\s+([A-Za-z0-9_]+)\(.*\)/g;
-                            if (match !== null && matchNamespace) {
-                                var className = match[1];
-                                var namespace = matchNamespace[1];
-                                while (
-                                    (match =
-                                        functionRegex.exec(
-                                            controllerContent,
-                                        )) !== null &&
-                                    match[1] !== "__construct"
-                                ) {
-                                    if (namespace.length > 0) {
-                                        controllers.push(
-                                            namespace +
-                                                "\\" +
-                                                className +
-                                                "@" +
-                                                match[1],
-                                        );
-                                    }
-                                    controllers.push(
-                                        className + "@" + match[1],
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+
+        if (!fs.existsSync(path) || !fs.lstatSync(path).isDirectory()) {
+            return [...controllers];
         }
-        return controllers;
+
+        fs.readdirSync(path).forEach((file) => {
+            const fullPath = path + file;
+
+            if (fs.lstatSync(fullPath).isDirectory()) {
+                this.getControllers(fullPath + "/").forEach((controller) => {
+                    controllers.add(controller);
+                });
+
+                return;
+            }
+
+            if (!file.includes(".php")) {
+                return;
+            }
+
+            const controllerContent = fs.readFileSync(fullPath, "utf8");
+
+            if (controllerContent.length > 50_000) {
+                // TODO: Hm, yeah?
+                return;
+            }
+
+            let match = /class\s+([A-Za-z0-9_]+)\s+extends\s+.+/g.exec(
+                controllerContent,
+            );
+
+            const matchNamespace =
+                /namespace .+\\Http\\Controllers\\?([A-Za-z0-9_]*)/g.exec(
+                    controllerContent,
+                );
+
+            if (match === null || !matchNamespace) {
+                return;
+            }
+
+            const functionRegex = /public\s+function\s+([A-Za-z0-9_]+)\(.*\)/g;
+
+            let className = match[1];
+            let namespace = matchNamespace[1];
+
+            while (
+                (match = functionRegex.exec(controllerContent)) !== null &&
+                match[1] !== "__construct"
+            ) {
+                if (namespace.length > 0) {
+                    controllers.add(`${namespace}\\${className}@${match[1]}`);
+                }
+
+                controllers.add(`${className}@${match[1]}`);
+            }
+        });
+
+        return [...controllers];
     }
 }

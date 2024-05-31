@@ -78,10 +78,7 @@ export default class Helpers {
             return basePathForCode + path;
         }
 
-        if (
-            vscode.workspace.workspaceFolders instanceof Array &&
-            vscode.workspace.workspaceFolders.length > 0
-        ) {
+        if (Helpers.hasWorkspace()) {
             for (let workspaceFolder of vscode.workspace.workspaceFolders) {
                 if (fs.existsSync(workspaceFolder.uri.fsPath + "/artisan")) {
                     return workspaceFolder.uri.fsPath + path;
@@ -169,5 +166,12 @@ export default class Helpers {
         }
 
         return "\t" + text;
+    }
+
+    static hasWorkspace(): boolean {
+        return (
+            vscode.workspace.workspaceFolders instanceof Array &&
+            vscode.workspace.workspaceFolders.length > 0
+        );
     }
 }

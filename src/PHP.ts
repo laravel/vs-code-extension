@@ -411,10 +411,6 @@ export const parse = (code: string): ParsingResult | null => {
         currentParam = "";
     }
 
-    if (currentParam.length > 0) {
-        finalParams.push(currentParam);
-    }
-
     result.parameters = finalParams;
     result.paramIndex = finalParams.length;
 
