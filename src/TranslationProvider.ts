@@ -6,7 +6,6 @@ import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import Logger from "./Logger";
 
 type Translation = { name: string; value: string };
 
