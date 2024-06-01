@@ -6,9 +6,12 @@ import Helpers from "./helpers";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import Logger from "./Logger";
+
+type Translation = { name: string; value: string };
 
 export default class TranslationProvider implements Provider {
-    private translations: any[] = [];
+    private translations: Translation[] = [];
 
     constructor() {
         this.load();
@@ -30,229 +33,196 @@ export default class TranslationProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        var out: vscode.CompletionItem[] = [];
-
         if (func.paramIndex === 1) {
-            // parameters autocomplete
-            var paramRegex = /\:([A-Za-z0-9_]+)/g;
-            var match = null;
+            // Parameters autocomplete
+            return this.translations
+                .filter(
+                    (translation) => translation.name === func.parameters[0],
+                )
+                .map((translation) => {
+                    let out: vscode.CompletionItem[] = [];
+                    let match = null;
+                    let paramRegex = /\:([A-Za-z0-9_]+)/g;
 
-            for (let i in this.translations) {
-                if (this.translations[i].name === func.parameters[0]) {
                     while (
-                        (match = paramRegex.exec(
-                            this.translations[i].value,
-                        )) !== null
+                        (match = paramRegex.exec(translation.value)) !== null
                     ) {
-                        var completionItem = new vscode.CompletionItem(
+                        let completionItem = new vscode.CompletionItem(
                             match[1],
                             vscode.CompletionItemKind.Variable,
                         );
+
                         completionItem.range = document.getWordRangeAtPosition(
                             position,
                             Helpers.wordMatchRegex,
                         );
+
                         out.push(completionItem);
                     }
-                    return out;
-                }
-            }
 
-            return out;
+                    return out;
+                })
+                .flat();
         }
 
-        for (let i in this.translations) {
-            var completeItem = new vscode.CompletionItem(
-                this.translations[i].name,
+        return this.translations.map((translation) => {
+            let completionItem = new vscode.CompletionItem(
+                translation.name,
                 vscode.CompletionItemKind.Value,
             );
-            completeItem.range = document.getWordRangeAtPosition(
+
+            completionItem.range = document.getWordRangeAtPosition(
                 position,
                 Helpers.wordMatchRegex,
             );
-            if (this.translations[i].value) {
-                completeItem.detail = this.translations[i].value.toString();
-            }
-            out.push(completeItem);
+
+            completionItem.detail = translation.value;
+
+            return completionItem;
+        });
+    }
+
+    nestedTranslationGroups(
+        basePath: string,
+        relativePath: string = "",
+    ): string[] {
+        let path = `${basePath}/${relativePath}`;
+
+        if (!fs.existsSync(path) || !fs.lstatSync(path).isDirectory()) {
+            return [];
         }
 
-        return out;
+        return fs
+            .readdirSync(path)
+            .map((file) => {
+                const stat = fs.lstatSync(`${path}/${file}`);
+
+                if (stat.isFile()) {
+                    return relativePath + "/" + file.replace(/\.php/, "");
+                }
+
+                if (stat.isDirectory()) {
+                    return this.nestedTranslationGroups(
+                        basePath,
+                        (relativePath.length > 0 ? `${relativePath}/` : "") +
+                            file,
+                    );
+                }
+
+                return "";
+            })
+            .flat()
+            .filter((item) => item.length > 0);
     }
 
     load() {
-        var translations: any[] = [];
+        this.translations = [];
+
         try {
-            var self = this;
             runInLaravel(
-                "echo json_encode(app('translator')->getLoader()->namespaces());",
+                `echo json_encode([
+                    'namespaces' => app('translator')->getLoader()->namespaces(),
+                    'path' => app()->langPath(),
+                ]);`,
                 "Translation namespaces",
-            ).then(async function (res) {
+            ).then(async (res) => {
                 if (!res) {
                     return;
                 }
 
-                var tranlationNamespaces = JSON.parse(res);
-                for (let i in tranlationNamespaces) {
-                    tranlationNamespaces[i + "::"] = tranlationNamespaces[i];
-                    delete tranlationNamespaces[i];
-                }
-                const result = await runInLaravel(
-                    "echo json_encode(app()->langPath());",
-                    "Translation Path",
-                );
+                const result: {
+                    namespaces: { [key: string]: string };
+                    path: string;
+                } = JSON.parse(res);
 
-                if (!result) {
-                    return;
-                }
+                let translationNamespaces = Object.entries(
+                    result.namespaces,
+                ).map(([key, value]) => [`${key}::`, value]);
 
-                let langPath = JSON.parse(result);
-                tranlationNamespaces[""] = langPath;
-                var nestedTranslationGroups = function (
-                    basePath: string,
-                    relativePath: string = "",
-                ): Array<string> {
-                    let path = basePath + "/" + relativePath;
-                    let out: Array<string> = [];
-                    if (
-                        fs.existsSync(path) &&
-                        fs.lstatSync(path).isDirectory()
-                    ) {
-                        fs.readdirSync(path).forEach(function (file) {
-                            if (fs.lstatSync(path + "/" + file).isFile()) {
-                                out.push(
-                                    relativePath +
-                                        "/" +
-                                        file.replace(/\.php/, ""),
-                                );
-                            } else if (
-                                fs.lstatSync(path + "/" + file).isDirectory()
-                            ) {
-                                let nestedOut = nestedTranslationGroups(
-                                    basePath,
-                                    (relativePath.length > 0
-                                        ? relativePath + "/"
-                                        : "") + file,
-                                );
-                                for (let nested of nestedOut) {
-                                    out.push(nested);
-                                }
-                            }
-                        });
-                    }
-                    return out;
-                };
-                var translationGroups: any = [];
-                fs.readdirSync(langPath).forEach(function (langDir) {
-                    var path: any = langPath + "/" + langDir;
-                    if (
-                        fs.existsSync(path) &&
-                        fs.lstatSync(path).isDirectory()
-                    ) {
-                        fs.readdirSync(path).forEach(function (subDirectory) {
-                            let subDirectoryPath = path + "/" + subDirectory;
-                            if (
-                                fs.existsSync(subDirectoryPath) &&
-                                fs.lstatSync(subDirectoryPath).isDirectory()
-                            ) {
-                                let nestedDirectories = nestedTranslationGroups(
+                translationNamespaces.push(["", result.path]);
+
+                let translationGroups = new Set<string>();
+
+                fs.readdirSync(result.path)
+                    .map((langDir) => `${result.path}/${langDir}`)
+                    .filter(
+                        (path) =>
+                            fs.existsSync(path) &&
+                            fs.lstatSync(path).isDirectory(),
+                    )
+                    .forEach((path) => {
+                        fs.readdirSync(path)
+                            .filter(
+                                (subDirectory) =>
+                                    fs.existsSync(`${path}/${subDirectory}`) &&
+                                    fs
+                                        .lstatSync(`${path}/${subDirectory}`)
+                                        .isDirectory(),
+                            )
+                            .forEach((subDirectory) => {
+                                this.nestedTranslationGroups(
                                     path,
                                     subDirectory,
-                                );
-                                for (let nestedDirectory of nestedDirectories) {
-                                    translationGroups.push(nestedDirectory);
-                                }
-                            }
-                        });
-                    }
-                });
-                for (let i in tranlationNamespaces) {
-                    if (
-                        fs.existsSync(tranlationNamespaces[i]) &&
-                        fs.lstatSync(tranlationNamespaces[i]).isDirectory()
-                    ) {
-                        fs.readdirSync(tranlationNamespaces[i]).forEach(
-                            function (langDir) {
-                                var path: any =
-                                    tranlationNamespaces[i] + "/" + langDir;
-                                if (
-                                    fs.existsSync(path) &&
-                                    fs.lstatSync(path).isDirectory()
-                                ) {
-                                    fs.readdirSync(path).forEach(function (
-                                        file,
-                                    ) {
-                                        if (
-                                            fs
-                                                .lstatSync(path + "/" + file)
-                                                .isFile()
-                                        ) {
-                                            translationGroups.push(
-                                                i + file.replace(/\.php/, ""),
-                                            );
-                                        }
+                                ).forEach((nestedDirectory) => {
+                                    translationGroups.add(nestedDirectory);
+                                });
+                            });
+                    });
+
+                translationNamespaces
+                    .filter(
+                        ([key, path]) =>
+                            fs.existsSync(path) &&
+                            fs.lstatSync(path).isDirectory(),
+                    )
+                    .forEach(([key, path]) => {
+                        fs.readdirSync(path)
+                            .map((langDir) => `${path}/${langDir}`)
+                            .filter(
+                                (langDir) =>
+                                    fs.existsSync(langDir) &&
+                                    fs.lstatSync(langDir).isDirectory(),
+                            )
+                            .forEach((langDir) => {
+                                fs.readdirSync(langDir)
+                                    .filter((file) =>
+                                        fs
+                                            .lstatSync(`${langDir}/${file}`)
+                                            .isFile(),
+                                    )
+                                    .forEach((file) => {
+                                        translationGroups.add(
+                                            key + file.replace(/\.php/, ""),
+                                        );
                                     });
-                                }
-                            },
-                        );
-                    }
-                }
-                translationGroups = translationGroups.filter(function (
-                    item: any,
-                    index: any,
-                    array: any,
-                ) {
-                    return array.indexOf(item) === index;
-                });
+                            });
+                    });
+
                 runInLaravel(
                     "echo json_encode([" +
-                        translationGroups
+                        [...translationGroups]
                             .map(
                                 (transGroup: string) =>
-                                    "'" +
-                                    transGroup +
-                                    "' => __('" +
-                                    transGroup +
-                                    "')",
+                                    `'${transGroup}' => __('${transGroup}')`,
                             )
                             .join(",") +
                         "]);",
                     "Translations inside namespaces",
-                ).then(function (translationGroupsResult) {
+                ).then((translationGroupsResult) => {
                     if (!translationGroupsResult) {
                         return;
                     }
 
-                    translationGroups = JSON.parse(translationGroupsResult);
-                    for (var i in translationGroups) {
-                        translations = translations.concat(
-                            self.getTranslations(translationGroups[i], i),
-                        );
-                    }
-                    self.translations = translations;
-                    runInLaravel(
-                        "echo json_encode(__('*'));",
-                        "Default path Translations",
-                    ).then(function (jsontransResult) {
-                        if (!jsontransResult) {
-                            return;
-                        }
-
-                        translations = translations.concat(
-                            self
-                                .getTranslations(
-                                    JSON.parse(jsontransResult),
-                                    "",
-                                )
-                                .map(function (transInfo) {
-                                    transInfo.name = transInfo.name.replace(
-                                        /^\./,
-                                        "",
-                                    );
-                                    return transInfo;
-                                }),
-                        );
-                        self.translations = translations;
-                    });
+                    Object.entries(JSON.parse(translationGroupsResult)).forEach(
+                        ([key, value]) => {
+                            // @ts-ignore
+                            this.getTranslations(value, key).forEach(
+                                (transInfo) => {
+                                    this.translations.push(transInfo);
+                                },
+                            );
+                        },
+                    );
                 });
             });
         } catch (exception) {
@@ -260,18 +230,21 @@ export default class TranslationProvider implements Provider {
         }
     }
 
-    getTranslations(translations: any[], prefix: string): any[] {
-        var out: any[] = [];
-        for (var i in translations) {
-            if (translations[i] instanceof Object) {
-                out.push({ name: prefix + "." + i, value: "array(...)" });
-                out = out.concat(
-                    this.getTranslations(translations[i], prefix + "." + i),
-                );
-            } else {
-                out.push({ name: prefix + "." + i, value: translations[i] });
-            }
-        }
-        return out;
+    getTranslations(
+        translations: { [key: string]: any },
+        prefix: string,
+    ): Translation[] {
+        return Object.entries(translations)
+            .map(([key, translation]) => {
+                if (translation instanceof Object) {
+                    return this.getTranslations(
+                        translation,
+                        `${prefix}.${key}`,
+                    );
+                }
+
+                return { name: `${prefix}.${key}`, value: translation };
+            })
+            .flat();
     }
 }
