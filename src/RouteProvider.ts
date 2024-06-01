@@ -8,6 +8,7 @@ import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
 
 export default class RouteProvider implements Provider {
+    // TODO: Tighten up the typing here
     private routes: any[] = [];
     private controllers: any[] = [];
     private middlewares: any[] = [];
