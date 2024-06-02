@@ -78,7 +78,7 @@ export default class Helpers {
             return basePathForCode + path;
         }
 
-        if (Helpers.hasWorkspace()) {
+        if (Helpers.hasWorkspace() && vscode.workspace.workspaceFolders) {
             for (let workspaceFolder of vscode.workspace.workspaceFolders) {
                 if (fs.existsSync(workspaceFolder.uri.fsPath + "/artisan")) {
                     return workspaceFolder.uri.fsPath + path;
@@ -130,7 +130,7 @@ export default class Helpers {
             if (Math.floor(Date.now() / 1000) - self.modelsCacheTime < 60) {
                 return resolve(self.modelsCache);
             } else {
-                runInLaravel(
+                runInLaravel<string[]>(
                     `
 					echo json_encode(array_values(array_filter(array_map(function ($name) {return app()->getNamespace().str_replace([app_path().'/', app_path().'\\\\', '.php', '/'], ['', '', '', '\\\\'], $name);}, array_merge(glob(app_path('*')), glob(app_path('Models/*')))), function ($class) {
 						return class_exists($class) && is_subclass_of($class, 'Illuminate\\\\Database\\\\Eloquent\\\\Model');
@@ -139,13 +139,8 @@ export default class Helpers {
                     "Application Models",
                 )
                     .then(function (result) {
-                        if (!result) {
-                            return;
-                        }
-
-                        var models = JSON.parse(result);
-                        self.modelsCache = models;
-                        resolve(models);
+                        self.modelsCache = result;
+                        resolve(result);
                     })
                     .catch(function (error) {
                         console.error(error);

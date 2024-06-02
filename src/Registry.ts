@@ -41,6 +41,7 @@ export default class Registry implements vscode.CompletionItemProvider {
         return provider.provideCompletionItems(
             {
                 class: parseResult.class || null,
+                fqn: parseResult.fqn || null,
                 function: parseResult.function || null,
                 parameters: parseResult.parameters,
                 paramIndex: parseResult.paramIndex,
@@ -52,35 +53,35 @@ export default class Registry implements vscode.CompletionItemProvider {
         );
     }
 
-    private getProviderFromResult(parseResult: ParsingResult) {
-        // Try for the most specific provider first
-        const provider =
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .classes.find((cls) => cls === parseResult.class),
-            ) &&
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .functions.find((fn) => fn === parseResult.function),
-            );
-
-        if (provider) {
-            return provider;
-        }
-
-        return (
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .classes.find((cls) => cls === parseResult.class),
-            ) ||
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .functions.find((fn) => fn === parseResult.function),
-            )
+    private getProviderByClass(className: string | undefined) {
+        return this.providers.find((provider) =>
+            provider.tags().classes.find((cls) => cls === className),
         );
+    }
+
+    private getProviderByFunction(functionName: string | undefined) {
+        return this.providers.find((provider) =>
+            provider.tags().functions.find((fn) => fn === functionName),
+        );
+    }
+
+    private getProviderFromResult(parseResult: ParsingResult) {
+        // Try for the most specific provider first, then get less specific
+        const providerFunc = [
+            () =>
+                this.getProviderByClass(parseResult.fqn) &&
+                this.getProviderByFunction(parseResult.function),
+            () =>
+                this.getProviderByClass(parseResult.class) &&
+                this.getProviderByFunction(parseResult.function),
+            () =>
+                this.getProviderByClass(parseResult.fqn) ||
+                this.getProviderByFunction(parseResult.function),
+            () =>
+                this.getProviderByClass(parseResult.class) ||
+                this.getProviderByFunction(parseResult.function),
+        ].find((provider) => provider() !== undefined);
+
+        return providerFunc ? providerFunc() : null;
     }
 }

@@ -213,12 +213,76 @@ type Token = string | TokenFormatted;
 const getToken = (tokens: TokenFormatted[], index: string, offset: number) =>
     tokens[parseInt(index) + offset];
 
-const extractClassAndFunction = (tokens: TokenFormatted[]) => {
+const getFqn = (
+    tokens: TokenFormatted[],
+    cls: string,
+): {
+    fqn?: string | null;
+    class: string;
+} => {
+    const tokensReversed = tokens.reverse();
+    const firstUse = tokensReversed.findIndex((token) => token[0] === "T_USE");
+
+    for (let j = firstUse; j < tokensReversed.length; j++) {
+        const [type, value, line] = tokensReversed[j];
+
+        if (type !== "T_USE") {
+            continue;
+        }
+
+        const fqnCandidate = tokensReversed[j + 1];
+
+        Logger.info("fqnCandidate", fqnCandidate, cls);
+
+        if (fqnCandidate[1] === cls) {
+            return {
+                class: cls.split("\\").pop() ?? cls,
+                fqn: fqnCandidate[1],
+            };
+        }
+
+        if (fqnCandidate[1].endsWith(`\\${cls}`)) {
+            return {
+                class: cls,
+                fqn: fqnCandidate[1],
+            };
+        }
+
+        const nextToken = tokensReversed[j + 2];
+
+        if (nextToken[0] !== "T_AS") {
+            continue;
+        }
+
+        const alias = tokensReversed[j + 3];
+
+        if (alias[1] === cls) {
+            return {
+                class: fqnCandidate[1].split("\\").pop() ?? fqnCandidate[1],
+                fqn: fqnCandidate[1],
+            };
+        }
+    }
+
+    return {
+        class: cls,
+    };
+};
+
+const extractClassAndFunction = (
+    tokens: TokenFormatted[],
+): {
+    class?: string | null;
+    fqn?: string | null;
+    func?: string | null;
+} => {
     const func = tokens.shift()?.[1];
 
     if (!["T_OBJECT_OPERATOR", "T_DOUBLE_COLON"].includes(tokens[0][0])) {
         // Just a function, return early
-        return [null, func];
+        return {
+            func,
+        };
     }
 
     let variableToFind = null;
@@ -235,8 +299,13 @@ const extractClassAndFunction = (tokens: TokenFormatted[]) => {
                     nextToken[0] === "T_STRING" ||
                     nextToken[0] === "T_NAME_QUALIFIED"
                 ) {
+                    const cls = nextToken[1];
+
                     // Type hinted, we got the class
-                    return [nextToken[1], func];
+                    return {
+                        ...getFqn(tokens, cls),
+                        func: func,
+                    };
                 }
 
                 if (
@@ -244,7 +313,9 @@ const extractClassAndFunction = (tokens: TokenFormatted[]) => {
                     getToken(tokens, i, 2)[0] === "T_FUNCTION"
                 ) {
                     // It was a param in a function, no type hint, no class
-                    return [null, func];
+                    return {
+                        func,
+                    };
                 }
 
                 if (previousToken[1] === "=") {
@@ -253,17 +324,29 @@ const extractClassAndFunction = (tokens: TokenFormatted[]) => {
                         (getToken(tokens, i, -3)[0] === "T_STRING" ||
                             getToken(tokens, i, -3)[0] === "T_NAME_QUALIFIED")
                     ) {
-                        return [getToken(tokens, i, -3)[1], func];
+                        const cls = getToken(tokens, i, -3)[1];
+
+                        return {
+                            ...getFqn(tokens, cls),
+                            func,
+                        };
                     }
 
                     if (
                         getToken(tokens, i, -2)[0] === "T_STRING" ||
                         getToken(tokens, i, -2)[0] === "T_NAME_QUALIFIED"
                     ) {
-                        return [getToken(tokens, i, -2)[1], func];
+                        const cls = getToken(tokens, i, -2)[1];
+
+                        return {
+                            ...getFqn(tokens, cls),
+                            func,
+                        };
                     }
 
-                    return [null, func];
+                    return {
+                        func,
+                    };
                 }
             }
 
@@ -271,7 +354,12 @@ const extractClassAndFunction = (tokens: TokenFormatted[]) => {
         }
 
         if (type === "T_DOUBLE_COLON") {
-            return [getToken(tokens, i, 1)[1], func];
+            const cls = getToken(tokens, i, 1)[1];
+
+            return {
+                ...getFqn(tokens, cls),
+                func,
+            };
         }
 
         if (type === "T_OBJECT_OPERATOR") {
@@ -283,11 +371,14 @@ const extractClassAndFunction = (tokens: TokenFormatted[]) => {
         }
     }
 
-    return [null, func];
+    return {
+        func,
+    };
 };
 
 export interface ParsingResult {
     class?: string;
+    fqn?: string;
     function?: string;
     paramIndex: number;
     parameters: string[];
@@ -337,7 +428,11 @@ export const parse = (code: string): ParsingResult | null => {
 
         if (value === "(") {
             if (closedParens === 0) {
-                const [cls, func] = extractClassAndFunction(tokens);
+                const {
+                    class: cls,
+                    func,
+                    fqn,
+                } = extractClassAndFunction(tokens);
 
                 result = {
                     paramIndex: 0,
@@ -350,6 +445,10 @@ export const parse = (code: string): ParsingResult | null => {
 
                 if (func) {
                     result.function = func;
+                }
+
+                if (fqn) {
+                    result.fqn = fqn;
                 }
 
                 break;

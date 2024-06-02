@@ -7,9 +7,10 @@ interface Tags {
 
 interface CompletionItemFunction {
     class: string | null;
+    fqn: string | null;
     function: string | null;
     parameters: string[];
-    paramIndex: number | null;
+    paramIndex: number;
 }
 
 interface Provider {

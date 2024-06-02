@@ -5,7 +5,8 @@ import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import Logger from "./Logger";
-import { Provider } from ".";
+import { CompletionItemFunction, Provider, Tags } from ".";
+import { get } from "http";
 
 interface Model {
     fqn: string;
@@ -51,6 +52,16 @@ export default class EloquentProvider implements Provider {
         "withAvg",
     ];
 
+    private firstParamMethods = [
+        "where",
+        "orWhere",
+        "orderBy",
+        "orderByDesc",
+        "firstWhere",
+        "max",
+        "sum",
+    ];
+
     constructor() {
         this.modelPaths = vscode.workspace
             .getConfiguration("Laravel")
@@ -65,282 +76,132 @@ export default class EloquentProvider implements Provider {
         this.load();
     }
 
+    tags(): Tags {
+        return {
+            classes: this.models.map((model) => model.fqn),
+            functions: this.relationMethods.concat(this.firstParamMethods),
+        };
+        /**
+        update,         $flights->each->update(['departed' => false]);
+
+        Destination::addSelect(['last_flight' => Flight::select('name')
+        ->whereColumn('destination_id', 'destinations.id')
+        ->orderByDesc('arrived_at')
+
+        // Retrieve flight by name or create it if it doesn't exist...
+$flight = Flight::firstOrCreate([
+    'name' => 'London to Paris'
+]);
+
+// Retrieve flight by name or create it with the name, delayed, and arrival_time attributes...
+$flight = Flight::firstOrCreate(
+    ['name' => 'London to Paris'],
+    ['delayed' => 1, 'arrival_time' => '11:30']
+);
+
+// Retrieve flight by name or instantiate a new Flight instance...
+$flight = Flight::firstOrNew([
+    'name' => 'London to Paris'
+]);
+
+// Retrieve flight by name or instantiate with the name, delayed, and arrival_time attributes...
+$flight = Flight::firstOrNew(
+    ['name' => 'Tokyo to Sydney'],
+    ['delayed' => 1, 'arrival_time' => '11:30']
+);
+        **/
+    }
+
     provideCompletionItems(
+        func: CompletionItemFunction,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let out: vscode.CompletionItem[] = [];
-        let func = Helpers.parseDocumentFunction(document, position);
-        let sourceCode = document.getText();
-        let sourceBeforeCursor = sourceCode.substr(
-            0,
-            document.offsetAt(position),
-        );
-        let isFactory =
-            sourceBeforeCursor.includes("extends Factory") ||
-            sourceBeforeCursor.includes("$factory->define(");
-        let match = null;
-        let objectName = "";
-        let modelName = "";
-        let modelClass = "";
-        let model = null;
+        if (!func.fqn) {
+            // If we don't have a fully qualified name, we can't provide completions
+            return [];
+        }
 
-        if (func !== null || isFactory) {
-            if (func) {
-                model = this.getModelFromFunc(sourceBeforeCursor);
-            } else {
-                model = this.getModelFromFactory(sourceBeforeCursor);
-            }
+        const model = this.models.find((model) => model.fqn === func.fqn);
 
-            if (typeof model === "undefined") {
+        // If we can't find the model, we can't provide completions
+        if (!model) {
+            return [];
+        }
+
+        if (this.firstParamMethods.includes(func.function || "")) {
+            if (func.paramIndex > 0) {
                 return [];
             }
 
-            if (
-                func &&
-                this.relationMethods.some((fn: string) =>
-                    func.function.includes(fn),
-                )
-            ) {
-                out = out.concat(
-                    this.getCompletionItems(
-                        document,
-                        position,
-                        this.models[modelClass].relations,
-                    ),
-                );
-            } else {
-                out = out.concat(
-                    this.getCompletionItems(
-                        document,
-                        position,
-                        this.models[modelClass].attributes,
-                    ),
-                );
-            }
-        } else {
-            let isArrayObject = false;
-            let objectRegex =
-                /(\$?([A-z0-9_\[\]]+)|(Auth::user\(\)))\-\>[A-z0-9_]*$/g;
-            while ((match = objectRegex.exec(sourceBeforeCursor)) !== null) {
-                objectName =
-                    typeof match[2] !== "undefined" ? match[2] : match[3];
-            }
-            if (objectName.match(/\$?[A-z0-9_]+\[.+\].*$/g)) {
-                isArrayObject = true;
-                objectName = objectName.replace(/\[.+\].*$/g, "");
-            }
-            if (objectName.length > 0 && objectName != "Auth::user()") {
-                let modelNameRegex = new RegExp(
-                    "\\$" + objectName + "\\s*=\\s*([A-z0-9_\\\\]+)::[^:;]",
-                    "g",
-                );
-                while (
-                    (match = modelNameRegex.exec(sourceBeforeCursor)) !== null
-                ) {
-                    modelName = match[1];
-                }
-                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
-            }
-            if (modelClass == "Auth" || objectName == "Auth::user()") {
-                if (typeof this.models["App\\User"] !== "undefined") {
-                    out = out.concat(
-                        this.getModelAttributesCompletionItems(
-                            document,
-                            position,
-                            "App\\User",
-                        ),
-                    );
-                } else if (
-                    typeof this.models["App\\Models\\User"] !== "undefined"
-                ) {
-                    out = out.concat(
-                        this.getModelAttributesCompletionItems(
-                            document,
-                            position,
-                            "App\\Models\\User",
-                        ),
-                    );
-                }
-            }
-            let customVariables = vscode.workspace
-                .getConfiguration("Laravel")
-                .get<any>("modelVariables", {});
-            for (let customVariable in customVariables) {
-                if (
-                    customVariable === objectName &&
-                    typeof this.models[customVariables[customVariable]] !==
-                        "undefined"
-                ) {
-                    out = out.concat(
-                        this.getModelAttributesCompletionItems(
-                            document,
-                            position,
-                            customVariables[customVariable],
-                        ),
-                    );
-                }
-            }
-            for (let i in this.models) {
-                if (
-                    i == modelClass ||
-                    this.models[i].camelCase == objectName ||
-                    this.models[i].snakeCase == objectName ||
-                    (isArrayObject == true &&
-                        (this.models[i].pluralCamelCase == objectName ||
-                            this.models[i].pluralSnakeCase == objectName))
-                ) {
-                    out = out.concat(
-                        this.getModelAttributesCompletionItems(
-                            document,
-                            position,
-                            i,
-                        ),
-                    );
-                }
-            }
+            return this.getAttributeCompletionItems(document, position, model);
         }
-        out = out.filter(
-            (v, i, a) => a.map((ai) => ai.label).indexOf(v.label) === i,
-        ); // Remove duplicate items
-        return out;
+
+        if (this.relationMethods.includes(func.function || "")) {
+            if (func.paramIndex > 0) {
+                return [];
+            }
+
+            return this.getRelationshipCompletionItems(
+                document,
+                position,
+                model,
+            );
+        }
+
+        return [];
     }
 
-    getModelFromFactory(sourceBeforeCursor: string) {
-        let match = null;
-        let modelName = "";
-        let modelClass = "";
-
-        let factoryModelClassRegex =
-            /(protected \$model = ([A-Za-z0-9_\\]+)::class;)|(\$factory->define\(\s*([A-Za-z0-9_\\]+)::class)/g;
-
-        if (
-            (match = factoryModelClassRegex.exec(sourceBeforeCursor)) !== null
-        ) {
-            if (typeof match[4] !== "undefined") {
-                // Laravel 7 <
-                modelName = match[4];
-            } else {
-                // Laravel >= 8
-                modelName = match[2];
-            }
-        }
-
-        modelClass = this.getModelClass(modelName, sourceBeforeCursor);
-
-        return this.models.find((model) => model.fqn === modelClass);
-    }
-
-    getModelFromFunc(sourceBeforeCursor: string) {
-        let modelNameRegex = /([A-z0-9_\\]+)::[^:;]+$/g;
-        let namespaceRegex = /namespace\s+(.+);/g;
-        let namespace = "";
-        let match;
-        let modelName = "";
-        let objectName = "";
-        let modelClass = "";
-
-        while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
-            modelName = match[1];
-        }
-
-        if (modelName.length === 0) {
-            let variableNameRegex = /(\$([A-z0-9_\\]+))->[^;]+$/g;
-
-            while (
-                (match = variableNameRegex.exec(sourceBeforeCursor)) !== null
-            ) {
-                objectName = match[2];
-            }
-
-            if (objectName.length > 0) {
-                modelNameRegex = new RegExp(
-                    "\\$" + objectName + "\\s*=\\s*([A-z0-9_\\\\]+)::[^:]",
-                    "g",
-                );
-                while (
-                    (match = modelNameRegex.exec(sourceBeforeCursor)) !== null
-                ) {
-                    modelName = match[1];
-                }
-            }
-        }
-
-        if ((match = namespaceRegex.exec(sourceBeforeCursor)) !== null) {
-            namespace = match[1];
-        }
-
-        modelClass = this.getModelClass(modelName, sourceBeforeCursor);
-
-        return this.models.find((model) => model.fqn === modelClass);
-    }
-
-    getModelClass(modelName: string, sourceBeforeCursor: string): string {
-        if (modelName.length === 0) {
-            return "";
-        }
-
-        if (modelName.substring(0, 1) === "\\") {
-            return modelName.substring(1);
-        }
-
-        let modelClassRegex = new RegExp(`use (.+)${modelName};`, "g");
-        let match = modelClassRegex.exec(sourceBeforeCursor);
-
-        if (match !== null) {
-            return match[1] + modelName;
-        }
-
-        return modelName;
-    }
-
-    getModelAttributesCompletionItems(
+    getRelationshipCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
-        modelClass: string,
+        model: Model,
     ): vscode.CompletionItem[] {
-        return [];
-        // if (!this.models.find((model) => model.fqn === modelClass)) {
-        //     return [];
-        // }
+        return this.getCompletionItems(
+            document,
+            position,
+            model.relations,
+            vscode.CompletionItemKind.Value,
+        );
+    }
 
-        // return this.getCompletionItems(
-        //     document,
-        //     position,
-        //     this.models[modelClass].attributes.map(
-        //         (attr: any) =>
-        //             attr[
-        //                 vscode.workspace
-        //                     .getConfiguration("Laravel")
-        //                     .get<string>("modelAttributeCase", "default")
-        //             ],
-        //     ),
-        // )
-        //     .concat(
-        //         this.getCompletionItems(
-        //             document,
-        //             position,
-        //             this.models[modelClass].accessors.map(
-        //                 (attr: any) =>
-        //                     attr[
-        //                         vscode.workspace
-        //                             .getConfiguration("Laravel")
-        //                             .get<string>("modelAccessorCase", "snake")
-        //                     ],
-        //             ),
-        //             vscode.CompletionItemKind.Constant,
-        //         ),
-        //     )
-        //     .concat(
-        //         this.getCompletionItems(
-        //             document,
-        //             position,
-        //             this.models[modelClass].relations,
-        //             vscode.CompletionItemKind.Value,
-        //         ),
-        //     );
+    getAttributeCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        model: Model,
+    ): vscode.CompletionItem[] {
+        return this.getCompletionItems(
+            document,
+            position,
+            model.attributes.map(
+                (attr: any) =>
+                    attr[
+                        vscode.workspace
+                            .getConfiguration("Laravel")
+                            .get<string>("modelAttributeCase", "default")
+                    ],
+            ),
+        )
+            .concat(
+                this.getCompletionItems(
+                    document,
+                    position,
+                    model.accessors.map(
+                        (attr: any) =>
+                            attr[
+                                vscode.workspace
+                                    .getConfiguration("Laravel")
+                                    .get<string>("modelAccessorCase", "snake")
+                            ],
+                    ),
+                    vscode.CompletionItemKind.Constant,
+                ),
+            )
+            .concat(
+                this.getRelationshipCompletionItems(document, position, model),
+            );
     }
 
     getCompletionItems(

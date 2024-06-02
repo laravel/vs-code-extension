@@ -9,7 +9,7 @@ import ViewProvider from "./ViewProvider";
 import ConfigProvider from "./ConfigProvider";
 import TranslationProvider from "./TranslationProvider";
 import MixProvider from "./MixProvider";
-import ValidationProvider from "./ValidationProvider";
+// import ValidationProvider from "./ValidationProvider";
 import EnvProvider from "./EnvProvider";
 import AuthProvider from "./AuthProvider";
 import AssetProvider from "./AssetProvider";
@@ -68,6 +68,12 @@ export function activate(context: vscode.ExtensionContext) {
         delegatedRegistry.registerProvider(new provider());
     });
 
+    const eloquentRegistry = new Registry();
+
+    const eloquentProvider = new EloquentProvider();
+
+    eloquentRegistry.registerProvider(eloquentProvider);
+
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
@@ -81,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
         // ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
-            new EloquentProvider(),
+            eloquentRegistry,
             ...TRIGGER_CHARACTERS.concat([">"]),
         ),
         // vscode.languages.registerCompletionItemProvider(
