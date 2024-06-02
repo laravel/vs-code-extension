@@ -70,9 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const eloquentRegistry = new Registry();
 
-    const eloquentProvider = new EloquentProvider();
-
-    eloquentRegistry.registerProvider(eloquentProvider);
+    eloquentRegistry.registerProvider(new EloquentProvider());
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
@@ -80,16 +78,16 @@ export function activate(context: vscode.ExtensionContext) {
             delegatedRegistry,
             ...TRIGGER_CHARACTERS,
         ),
-        // vscode.languages.registerCompletionItemProvider(
-        //     LANGUAGES,
-        //     new ValidationProvider(),
-        //     ...TRIGGER_CHARACTERS.concat(["|"]),
-        // ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             eloquentRegistry,
             ...TRIGGER_CHARACTERS.concat([">"]),
         ),
+        // vscode.languages.registerCompletionItemProvider(
+        //     LANGUAGES,
+        //     new ValidationProvider(),
+        //     ...TRIGGER_CHARACTERS.concat(["|"]),
+        // ),
         // vscode.languages.registerCompletionItemProvider(
         //     LANGUAGES,
         //     new BladeProvider(),
