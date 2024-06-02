@@ -10,14 +10,14 @@ export default class Helpers {
     static wordMatchRegex = /[\w\d\-_\.\:\\\/@]+/g;
     static phpParser: any = null;
     static cachedParseFunction: any = null;
-    static modelsCache: Array<string>;
+    static modelsCache: string[];
     static modelsCacheTime: number = 0;
     static lastErrorMessage: number = 0;
     static disableErrorMessage: boolean = false;
 
     static functionRegex: any = null;
 
-    static classes: Array<string> = [];
+    static classes: string[] = [];
 
     // TODO: Tighten up the typing here
     static registerProvider(provider: any) {
@@ -122,11 +122,11 @@ export default class Helpers {
     /**
      * Get laravel models as array.
      *
-     * @returns array<string>
+     * @returns string[]
      */
-    static getModels(): Promise<Array<string>> {
+    static getModels(): Promise<string[]> {
         var self = this;
-        return new Promise<Array<string>>(function (resolve, reject) {
+        return new Promise<string[]>(function (resolve, reject) {
             if (Math.floor(Date.now() / 1000) - self.modelsCacheTime < 60) {
                 return resolve(self.modelsCache);
             } else {

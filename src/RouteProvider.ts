@@ -172,11 +172,9 @@ export default class RouteProvider implements Provider {
     }
 
     loadMiddleware() {
-        runInLaravel(template("middleware"), "Middlewares")
+        runInLaravel<any[]>(template("middleware"), "Middlewares")
             .then((result) => {
-                if (result) {
-                    this.middlewares = JSON.parse(result);
-                }
+                this.middlewares = result;
             })
             .catch((exception) => {
                 console.error(exception);
@@ -184,13 +182,9 @@ export default class RouteProvider implements Provider {
     }
 
     loadRoutes() {
-        runInLaravel(template("routes"), "HTTP Routes")
+        runInLaravel<any[]>(template("routes"), "HTTP Routes")
             .then((result) => {
-                if (!result) {
-                    return;
-                }
-
-                this.routes = JSON.parse(result).filter(
+                this.routes = result.filter(
                     // TODO: "null"?
                     (route: any) => route !== "null",
                 );

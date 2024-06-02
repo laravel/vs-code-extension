@@ -55,11 +55,12 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
     }
 
     loadCustomDirectives() {
-        runInLaravel(template("blade-directives"), "Custom Blade Directives")
+        runInLaravel<any[]>(
+            template("blade-directives"),
+            "Custom Blade Directives",
+        )
             .then((result) => {
-                if (result) {
-                    this.customDirectives = JSON.parse(result);
-                }
+                this.customDirectives = result;
             })
             .catch((exception) => {
                 console.error(exception);

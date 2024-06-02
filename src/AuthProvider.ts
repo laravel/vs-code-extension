@@ -72,11 +72,9 @@ export default class AuthProvider implements Provider {
         // TODO: huh?
         Helpers.getModels().then((models) => (this.models = models));
 
-        runInLaravel(template("auth"), "Auth Data")
+        runInLaravel<any[]>(template("auth"), "Auth Data")
             .then((result) => {
-                if (result) {
-                    this.abilities = JSON.parse(result);
-                }
+                this.abilities = result;
             })
             .catch((exception) => {
                 console.error(exception);

@@ -118,22 +118,16 @@ export default class TranslationProvider implements Provider {
         this.translations = [];
 
         try {
-            runInLaravel(
+            runInLaravel<{
+                namespaces: { [key: string]: string };
+                path: string;
+            }>(
                 `echo json_encode([
                     'namespaces' => app('translator')->getLoader()->namespaces(),
                     'path' => app()->langPath(),
                 ]);`,
                 "Translation namespaces",
-            ).then(async (res) => {
-                if (!res) {
-                    return;
-                }
-
-                const result: {
-                    namespaces: { [key: string]: string };
-                    path: string;
-                } = JSON.parse(res);
-
+            ).then(async (result) => {
                 let translationNamespaces = Object.entries(
                     result.namespaces,
                 ).map(([key, value]) => [`${key}::`, value]);
@@ -197,7 +191,9 @@ export default class TranslationProvider implements Provider {
                             });
                     });
 
-                runInLaravel(
+                runInLaravel<{
+                    [key: string]: any[];
+                }>(
                     "echo json_encode([" +
                         [...translationGroups]
                             .map(
@@ -208,13 +204,8 @@ export default class TranslationProvider implements Provider {
                         "]);",
                     "Translations inside namespaces",
                 ).then((translationGroupsResult) => {
-                    if (!translationGroupsResult) {
-                        return;
-                    }
-
-                    Object.entries(JSON.parse(translationGroupsResult)).forEach(
+                    Object.entries(translationGroupsResult).forEach(
                         ([key, value]) => {
-                            // @ts-ignore
                             this.getTranslations(value, key).forEach(
                                 (transInfo) => {
                                     this.translations.push(transInfo);

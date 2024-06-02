@@ -55,11 +55,9 @@ export default class ConfigProvider implements Provider {
     }
 
     load() {
-        runInLaravel("echo json_encode(config()->all());", "Configs")
+        runInLaravel<Config>("echo json_encode(config()->all());", "Configs")
             .then((result) => {
-                if (result) {
-                    this.configs = this.getConfigs(JSON.parse(result));
-                }
+                this.configs = this.getConfigs(result);
             })
             .catch(function (exception) {
                 console.error(exception);

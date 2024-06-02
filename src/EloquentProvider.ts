@@ -2,12 +2,29 @@
 
 import * as vscode from "vscode";
 import Helpers from "./helpers";
-import { artisan, runInLaravel, template } from "./PHP";
+import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import Logger from "./Logger";
+import { Provider } from ".";
 
-export default class EloquentProvider implements vscode.CompletionItemProvider {
-    private models: { [key: string]: any } = {};
+interface Model {
+    fqn: string;
+    attributes: {
+        default: string;
+        camel: string;
+        snake: string;
+    }[];
+    accessors: string[];
+    relations: string[];
+    camelCase: string;
+    snakeCase: string;
+    pluralCamelCase: string;
+    pluralSnakeCase: string;
+}
+
+export default class EloquentProvider implements Provider {
+    private models: Model[] = [];
+    private modelPaths: string[] = [];
 
     private relationMethods = [
         "has",
@@ -35,16 +52,17 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
     ];
 
     constructor() {
-        const paths = vscode.workspace
+        this.modelPaths = vscode.workspace
             .getConfiguration("Laravel")
-            .get<Array<string>>("modelsPaths", ["app", "app/Models"])
-            .concat(["database/migrations"]);
+            .get<string[]>("modelsPaths", ["app", "app/Models"]);
+
+        const paths = this.modelPaths.concat(["database/migrations"]);
 
         paths.forEach((path) =>
-            createFileWatcher(`${path}/*.php`, this.loadModels.bind(this)),
+            createFileWatcher(`${path}/*.php`, this.load.bind(this)),
         );
 
-        this.loadModels();
+        this.load();
     }
 
     provideCompletionItems(
@@ -212,7 +230,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
 
         modelClass = this.getModelClass(modelName, sourceBeforeCursor);
 
-        return this.models[modelClass];
+        return this.models.find((model) => model.fqn === modelClass);
     }
 
     getModelFromFunc(sourceBeforeCursor: string) {
@@ -256,7 +274,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
 
         modelClass = this.getModelClass(modelName, sourceBeforeCursor);
 
-        return this.models[modelClass];
+        return this.models.find((model) => model.fqn === modelClass);
     }
 
     getModelClass(modelName: string, sourceBeforeCursor: string): string {
@@ -283,45 +301,46 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         position: vscode.Position,
         modelClass: string,
     ): vscode.CompletionItem[] {
-        if (typeof this.models[modelClass] === "undefined") {
-            return [];
-        }
+        return [];
+        // if (!this.models.find((model) => model.fqn === modelClass)) {
+        //     return [];
+        // }
 
-        return this.getCompletionItems(
-            document,
-            position,
-            this.models[modelClass].attributes.map(
-                (attr: any) =>
-                    attr[
-                        vscode.workspace
-                            .getConfiguration("Laravel")
-                            .get<string>("modelAttributeCase", "default")
-                    ],
-            ),
-        )
-            .concat(
-                this.getCompletionItems(
-                    document,
-                    position,
-                    this.models[modelClass].accessors.map(
-                        (attr: any) =>
-                            attr[
-                                vscode.workspace
-                                    .getConfiguration("Laravel")
-                                    .get<string>("modelAccessorCase", "snake")
-                            ],
-                    ),
-                    vscode.CompletionItemKind.Constant,
-                ),
-            )
-            .concat(
-                this.getCompletionItems(
-                    document,
-                    position,
-                    this.models[modelClass].relations,
-                    vscode.CompletionItemKind.Value,
-                ),
-            );
+        // return this.getCompletionItems(
+        //     document,
+        //     position,
+        //     this.models[modelClass].attributes.map(
+        //         (attr: any) =>
+        //             attr[
+        //                 vscode.workspace
+        //                     .getConfiguration("Laravel")
+        //                     .get<string>("modelAttributeCase", "default")
+        //             ],
+        //     ),
+        // )
+        //     .concat(
+        //         this.getCompletionItems(
+        //             document,
+        //             position,
+        //             this.models[modelClass].accessors.map(
+        //                 (attr: any) =>
+        //                     attr[
+        //                         vscode.workspace
+        //                             .getConfiguration("Laravel")
+        //                             .get<string>("modelAccessorCase", "snake")
+        //                     ],
+        //             ),
+        //             vscode.CompletionItemKind.Constant,
+        //         ),
+        //     )
+        //     .concat(
+        //         this.getCompletionItems(
+        //             document,
+        //             position,
+        //             this.models[modelClass].relations,
+        //             vscode.CompletionItemKind.Value,
+        //         ),
+        //     );
     }
 
     getCompletionItems(
@@ -342,27 +361,20 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         });
     }
 
-    loadModels() {
-        // artisan("model:show User --json").then((result) => {
-        //     Logger.channel?.info("Model results", result);
-        // });
-        // return;
-        // TODO: Probably just run this
-        // php artisan model:show User --json
-        runInLaravel(
+    load() {
+        runInLaravel<{
+            [key: string]: Omit<Model, "fqn">;
+        }>(
             template("eloquent-provider", {
-                model_paths: JSON.stringify(
-                    vscode.workspace
-                        .getConfiguration("Laravel")
-                        .get<string[]>("modelsPaths", ["app", "app/Models"]),
-                ),
+                model_paths: JSON.stringify(this.modelPaths),
             }),
             "Eloquent Attributes and Relations",
         )
             .then((result) => {
-                if (result) {
-                    this.models = JSON.parse(result);
-                }
+                this.models = Object.entries(result).map(([key, value]) => ({
+                    ...value,
+                    fqn: key,
+                }));
             })
             .catch(function (e) {
                 console.error(e);

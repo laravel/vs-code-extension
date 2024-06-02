@@ -130,19 +130,16 @@ export default class ViewProvider implements Provider {
 
     load() {
         try {
-            runInLaravel(`
+            runInLaravel<{
+                paths: string[];
+                hints: { [key: string]: string[] };
+            }>(`
             echo json_encode([
                 'paths' => app('view')->getFinder()->getPaths(),
                 'hints' => app('view')->getFinder()->getHints(),
             ]);
             `).then((results) => {
-                if (!results) {
-                    return;
-                }
-
-                const data = JSON.parse(results);
-
-                data.paths
+                results.paths
                     .map((path: string) =>
                         path.replace(
                             Helpers.projectPath("/", true),
@@ -156,7 +153,7 @@ export default class ViewProvider implements Provider {
                         );
                     });
 
-                const viewNamespaces = data.hints;
+                const viewNamespaces = results.hints;
 
                 for (let i in viewNamespaces) {
                     viewNamespaces[i] = viewNamespaces[i].map(
@@ -176,7 +173,7 @@ export default class ViewProvider implements Provider {
                         );
 
                         for (var k in viewsInNamespace) {
-                            this.views[`${i}::${k}`] = viewNamespaces[k];
+                            this.views[`${i}::${k}`] = viewsInNamespace[k];
                         }
                     }
                 }

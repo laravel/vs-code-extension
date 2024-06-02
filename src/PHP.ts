@@ -47,16 +47,18 @@ export const template = (
     return templateString;
 };
 
-export const runInLaravel = (
+export const runInLaravel = <Type>(
     code: string,
     description: string | null = null,
-): Promise<string | void> => {
+    asJson: boolean = true,
+): Promise<Type> => {
     code = code.replace(/(?:\r\n|\r|\n)/g, " ");
+
     if (
         !fs.existsSync(Helpers.projectPath("vendor/autoload.php")) ||
         !fs.existsSync(Helpers.projectPath("bootstrap/app.php"))
     ) {
-        return new Promise((resolve, error) => resolve(""));
+        return new Promise((resolve, error) => error("Not a Laravel project"));
     }
 
     const command = template("bootstrap-laravel", {
@@ -78,8 +80,8 @@ export const runInLaravel = (
 
             const out = regex.exec(result);
 
-            if (out) {
-                return out[1];
+            if (out && out[1]) {
+                return asJson ? JSON.parse(out[1]) : out[1];
             }
 
             // TODO: Fix this
