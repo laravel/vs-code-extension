@@ -53,33 +53,50 @@ export default class Registry implements vscode.CompletionItemProvider {
         );
     }
 
-    private getProviderByClass(className: string | undefined) {
-        return this.providers.find((provider) =>
-            provider.tags().classes.find((cls) => cls === className),
-        );
-    }
+    private findProviderByClassAndFunction(
+        className: string | undefined,
+        functionName: string | undefined,
+        condition: "AND" | "OR" = "AND",
+    ) {
+        return this.providers.find((provider) => {
+            const classMatch =
+                provider.tags().classes.find((cls) => cls === className) !==
+                undefined;
+            const functionMatch =
+                provider.tags().functions.find((fn) => fn === functionName) !==
+                undefined;
 
-    private getProviderByFunction(functionName: string | undefined) {
-        return this.providers.find((provider) =>
-            provider.tags().functions.find((fn) => fn === functionName),
-        );
+            return condition === "AND"
+                ? classMatch && functionMatch
+                : classMatch || functionMatch;
+        });
     }
 
     private getProviderFromResult(parseResult: ParsingResult) {
         // Try for the most specific provider first, then get less specific
         const providerFunc = [
             () =>
-                this.getProviderByClass(parseResult.fqn) &&
-                this.getProviderByFunction(parseResult.function),
+                this.findProviderByClassAndFunction(
+                    parseResult.fqn,
+                    parseResult.function,
+                ),
             () =>
-                this.getProviderByClass(parseResult.class) &&
-                this.getProviderByFunction(parseResult.function),
+                this.findProviderByClassAndFunction(
+                    parseResult.class,
+                    parseResult.function,
+                ),
             () =>
-                this.getProviderByClass(parseResult.fqn) ||
-                this.getProviderByFunction(parseResult.function),
+                this.findProviderByClassAndFunction(
+                    parseResult.fqn,
+                    parseResult.function,
+                    "OR",
+                ),
             () =>
-                this.getProviderByClass(parseResult.class) ||
-                this.getProviderByFunction(parseResult.function),
+                this.findProviderByClassAndFunction(
+                    parseResult.class,
+                    parseResult.function,
+                    "OR",
+                ),
         ].find((provider) => provider() !== undefined);
 
         return providerFunc ? providerFunc() : null;
