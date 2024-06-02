@@ -74,21 +74,21 @@ export function activate(context: vscode.ExtensionContext) {
             delegatedRegistry,
             ...TRIGGER_CHARACTERS,
         ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            new ValidationProvider(),
-            ...TRIGGER_CHARACTERS.concat(["|"]),
-        ),
+        // vscode.languages.registerCompletionItemProvider(
+        //     LANGUAGES,
+        //     new ValidationProvider(),
+        //     ...TRIGGER_CHARACTERS.concat(["|"]),
+        // ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             new EloquentProvider(),
             ...TRIGGER_CHARACTERS.concat([">"]),
         ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            new BladeProvider(),
-            "@",
-        ),
+        // vscode.languages.registerCompletionItemProvider(
+        //     LANGUAGES,
+        //     new BladeProvider(),
+        //     "@",
+        // ),
     );
 }
 
