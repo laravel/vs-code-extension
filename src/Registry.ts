@@ -97,8 +97,16 @@ export default class Registry implements vscode.CompletionItemProvider {
                     parseResult.function,
                     "OR",
                 ),
-        ].find((provider) => provider() !== undefined);
+        ];
 
-        return providerFunc ? providerFunc() : null;
+        for (const func of providerFunc) {
+            const provider = func();
+
+            if (provider) {
+                return provider;
+            }
+        }
+
+        return null;
     }
 }
