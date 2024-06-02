@@ -223,6 +223,13 @@ const getFqn = (
     const tokensReversed = tokens.reverse();
     const firstUse = tokensReversed.findIndex((token) => token[0] === "T_USE");
 
+    if (firstUse === -1) {
+        return {
+            class: cls.split("\\").pop() ?? cls,
+            fqn: cls,
+        };
+    }
+
     for (let j = firstUse; j < tokensReversed.length; j++) {
         const [type, value, line] = tokensReversed[j];
 
