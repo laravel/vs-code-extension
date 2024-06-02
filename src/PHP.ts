@@ -47,11 +47,11 @@ export const template = (
     return templateString;
 };
 
-export const runInLaravel = <Type>(
+export const runInLaravel = <T>(
     code: string,
     description: string | null = null,
     asJson: boolean = true,
-): Promise<Type> => {
+): Promise<T> => {
     code = code.replace(/(?:\r\n|\r|\n)/g, " ");
 
     if (
