@@ -74,9 +74,6 @@ export function activate(context: vscode.ExtensionContext) {
             delegatedRegistry,
             ...TRIGGER_CHARACTERS,
         ),
-    );
-
-    context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             new ValidationProvider(),
