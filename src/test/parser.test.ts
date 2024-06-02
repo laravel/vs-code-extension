@@ -41,6 +41,7 @@ suite("Parser Test Suite", () => {
         const expected = {
             function: "get",
             class: "Route",
+            fqn: "Route",
             paramIndex: 0,
             parameters: [],
         };
@@ -57,6 +58,7 @@ suite("Parser Test Suite", () => {
         const expected = {
             function: "get",
             class: "User",
+            fqn: "User",
             paramIndex: 0,
             parameters: [],
         };
@@ -75,6 +77,7 @@ suite("Parser Test Suite", () => {
         const expected = {
             function: "find",
             class: "User",
+            fqn: "User",
             paramIndex: 0,
             parameters: [],
         };
@@ -84,7 +87,7 @@ suite("Parser Test Suite", () => {
         assert.deepStrictEqual(result, expected);
     });
 
-    test("red herring typehinted class and method", () => {
+    test("red herring typehinted class and method without typehint", () => {
         const code = `<?php
 
         Route::get('/', function (NotUser $user) {
@@ -115,6 +118,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "find",
             paramIndex: 0,
             parameters: [],
@@ -135,6 +139,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "find",
             paramIndex: 0,
             parameters: [],
@@ -171,7 +176,8 @@ suite("Parser Test Suite", () => {
         $user->where('name', 'something')->find('`;
 
         const expected = {
-            class: "App\\Models\\User",
+            class: "User",
+            fqn: "App\\Models\\User",
             function: "find",
             paramIndex: 0,
             parameters: [],
@@ -190,6 +196,69 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
+            function: "where",
+            paramIndex: 0,
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("find fqn from use", () => {
+        const code = `<?php
+        use App\\Models\\User;
+        use App\\Models\\Post;
+
+        Route::get('/', function () {
+        User::where('`;
+
+        const expected = {
+            class: "User",
+            fqn: "App\\Models\\User",
+            function: "where",
+            paramIndex: 0,
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("find fqn from alias", () => {
+        const code = `<?php
+        use App\\Models\\User as UserModel;
+
+        Route::get('/', function () {
+        UserModel::where('`;
+
+        const expected = {
+            class: "User",
+            fqn: "App\\Models\\User",
+            function: "where",
+            paramIndex: 0,
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("find fqn from alias with other use statement", () => {
+        const code = `<?php
+        use App\\User;
+        use App\\Models\\User as UserModel;
+
+        Route::get('/', function () {
+        UserModel::where('`;
+
+        const expected = {
+            class: "User",
+            fqn: "App\\Models\\User",
             function: "where",
             paramIndex: 0,
             parameters: [],
@@ -208,6 +277,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 1,
             parameters: ["first"],
@@ -226,6 +296,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 1,
             parameters: ["['what'=>'ok']"],
@@ -244,6 +315,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 2,
             parameters: ["first", "['what'=>'ok']"],
@@ -264,6 +336,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 1,
             parameters: ["function($thing){return $thing;}"],
@@ -282,6 +355,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 1,
             parameters: ["fn($thing)=>$thing"],
@@ -300,6 +374,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 1,
             parameters: ["fn($thing)=>$thing"],
@@ -320,6 +395,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             class: "User",
+            fqn: "User",
             function: "where",
             paramIndex: 5,
             parameters: [
