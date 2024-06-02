@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { Provider } from ".";
-import { parse } from "./PHP";
+import { ParsingResult, parse } from "./PHP";
 import Logger from "./Logger";
 
 export default class Registry implements vscode.CompletionItemProvider {
@@ -26,29 +26,19 @@ export default class Registry implements vscode.CompletionItemProvider {
 
         const parseResult = parse(docUntilPosition);
 
-        Logger.channel?.info("Parse result", parseResult);
+        Logger.info("Parse result", parseResult);
 
         if (parseResult === null) {
             return [];
         }
 
-        const item =
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .classes.find((cls) => cls === parseResult.class),
-            ) ||
-            this.providers.find((provider) =>
-                provider
-                    .tags()
-                    .functions.find((fn) => fn === parseResult.function),
-            );
+        const provider = this.getProviderFromResult(parseResult);
 
-        if (!item) {
+        if (!provider) {
             return [];
         }
 
-        return item.provideCompletionItems(
+        return provider.provideCompletionItems(
             {
                 class: parseResult.class || null,
                 function: parseResult.function || null,
@@ -59,6 +49,38 @@ export default class Registry implements vscode.CompletionItemProvider {
             position,
             token,
             context,
+        );
+    }
+
+    private getProviderFromResult(parseResult: ParsingResult) {
+        // Try for the most specific provider first
+        const provider =
+            this.providers.find((provider) =>
+                provider
+                    .tags()
+                    .classes.find((cls) => cls === parseResult.class),
+            ) &&
+            this.providers.find((provider) =>
+                provider
+                    .tags()
+                    .functions.find((fn) => fn === parseResult.function),
+            );
+
+        if (provider) {
+            return provider;
+        }
+
+        return (
+            this.providers.find((provider) =>
+                provider
+                    .tags()
+                    .classes.find((cls) => cls === parseResult.class),
+            ) ||
+            this.providers.find((provider) =>
+                provider
+                    .tags()
+                    .functions.find((fn) => fn === parseResult.function),
+            )
         );
     }
 }

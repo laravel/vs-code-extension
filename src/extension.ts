@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     Logger.setup();
 
-    Logger.channel?.info("Started");
+    Logger.info("Started");
 
     console.log("Laravel VS Code Started...");
 

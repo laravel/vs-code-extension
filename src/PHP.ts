@@ -67,7 +67,7 @@ export const runInLaravel = <Type>(
         bootstrap_path: Helpers.projectPath("bootstrap/app.php", true),
     });
 
-    // Logger.channel?.info(command);
+    // Logger.info(command);
 
     return runPhp(command, description)
         .then((result: string) => {
@@ -85,14 +85,14 @@ export const runInLaravel = <Type>(
             }
 
             // TODO: Fix this
-            Logger.channel?.error(
+            Logger.error(
                 "Parse Error:\n " + (description ?? "") + "\n\n" + result,
             );
 
             throw new Error("No output found");
         })
         .catch((error) => {
-            Logger.channel?.error(command);
+            Logger.error(command);
 
             Helpers.showErrorPopup();
         });
@@ -135,10 +135,10 @@ export const runPhp = (
 
     let out = new Promise<string>(function (resolve, error) {
         if (description !== null) {
-            Logger.channel?.info("Command started: " + description);
+            Logger.info("Command started: " + description);
         }
 
-        // Logger.channel?.info(command);
+        // Logger.info(command);
 
         cp.exec(
             command,
@@ -152,7 +152,7 @@ export const runPhp = (
             (err, stdout, stderr) => {
                 if (err === null) {
                     if (description !== null) {
-                        Logger.channel?.info("Resolved: " + description);
+                        Logger.info("Resolved: " + description);
                     }
 
                     return resolve(stdout);
@@ -160,11 +160,11 @@ export const runPhp = (
 
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
 
-                Logger.channel?.error(
+                Logger.error(
                     "Error:\n " + (description ?? "") + "\n\n" + errorOutput,
                 );
 
-                Logger.channel?.error(command);
+                Logger.error(command);
 
                 Helpers.showErrorPopup();
 
@@ -195,7 +195,7 @@ export const artisan = (command: string): Promise<string> => {
 
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
 
-                Logger.channel?.error(
+                Logger.error(
                     "Error:\n " + (command ?? "") + "\n\n" + errorOutput,
                 );
 

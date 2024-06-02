@@ -12,4 +12,19 @@ export default class Logger {
 
         Logger.channel = window.createOutputChannel("Laravel", { log: true });
     }
+
+    static info(message: string, ...args: any[]) {
+        Logger.setup();
+        Logger.channel?.info(message, ...args);
+    }
+
+    static warn(message: string, ...args: any[]) {
+        Logger.setup();
+        Logger.channel?.warn(message, ...args);
+    }
+
+    static error(message: string, ...args: any[]) {
+        Logger.setup();
+        Logger.channel?.error(message, ...args);
+    }
 }
