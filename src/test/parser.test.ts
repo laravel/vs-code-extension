@@ -399,7 +399,7 @@ suite("Parser Test Suite", () => {
             function: "where",
             paramIndex: 5,
             parameters: [
-                "'ok'",
+                "ok",
                 "[1,2,3]",
                 "5",
                 "function($thing){return $thing;}",

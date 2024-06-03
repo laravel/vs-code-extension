@@ -424,7 +424,7 @@ export const parse = (code: string): ParsingResult | null => {
     let params = [];
 
     for (let i in tokens) {
-        const nextToken = tokens.shift();
+        const nextToken = tokens[i];
         const [type, value, line] = nextToken;
 
         if (value === ")") {
@@ -439,7 +439,7 @@ export const parse = (code: string): ParsingResult | null => {
                     class: cls,
                     func,
                     fqn,
-                } = extractClassAndFunction(tokens);
+                } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
 
                 result = {
                     paramIndex: 0,
