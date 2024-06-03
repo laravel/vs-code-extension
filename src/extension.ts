@@ -18,6 +18,7 @@ import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
 import Registry from "./Registry";
 import LinkProvider from "./LinkProvider";
+import InertiaProvider from "./InertiaProvider";
 
 function shouldActivate(): boolean {
     if (!Helpers.hasWorkspace()) {
@@ -61,6 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
         EnvProvider,
         AuthProvider,
         AssetProvider,
+        InertiaProvider,
     ];
 
     const delegatedRegistry = new Registry();
