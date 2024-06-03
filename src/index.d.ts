@@ -29,3 +29,9 @@ interface Provider {
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[];
 }
+
+interface View {
+    name: string;
+    relativePath: string;
+    uri: vscode.Uri;
+}

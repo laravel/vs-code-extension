@@ -17,6 +17,7 @@ import EloquentProvider from "./EloquentProvider";
 import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
 import Registry from "./Registry";
+import LinkProvider from "./LinkProvider";
 
 function shouldActivate(): boolean {
     if (!Helpers.hasWorkspace()) {
@@ -72,6 +73,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     eloquentRegistry.registerProvider(new EloquentProvider());
 
+    let link = vscode.languages.registerDocumentLinkProvider(
+        LANGUAGES,
+        new LinkProvider(),
+    );
+
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
@@ -83,6 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
             eloquentRegistry,
             ...TRIGGER_CHARACTERS.concat([">"]),
         ),
+        link,
         // vscode.languages.registerCompletionItemProvider(
         //     LANGUAGES,
         //     new ValidationProvider(),
