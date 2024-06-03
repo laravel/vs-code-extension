@@ -56,11 +56,23 @@ export default class InertiaProvider implements Provider {
             "utf8",
         );
 
-        let variableRegex = /defineProps<({.+})>/s;
-        let r: RegExpExecArray | null = null;
+        return this.getPropAutoComplete(viewContent).map((variableName) => {
+            let variablecompletionItem = new vscode.CompletionItem(
+                variableName,
+                vscode.CompletionItemKind.Constant,
+            );
+            variablecompletionItem.range = document.getWordRangeAtPosition(
+                position,
+                Helpers.wordMatchRegex,
+            );
+            return variablecompletionItem;
+        });
+    }
+
+    private getPropAutoComplete(viewContent: string): string[] {
         let variableNames = new Set<string>([]);
 
-        let match = viewContent.match(variableRegex);
+        let match = viewContent.match(/defineProps<({.+})>/s);
 
         if (!match) {
             return [];
@@ -96,16 +108,6 @@ export default class InertiaProvider implements Provider {
             variableNames.add(key);
         });
 
-        return [...variableNames].map((variableName) => {
-            let variablecompletionItem = new vscode.CompletionItem(
-                variableName,
-                vscode.CompletionItemKind.Constant,
-            );
-            variablecompletionItem.range = document.getWordRangeAtPosition(
-                position,
-                Helpers.wordMatchRegex,
-            );
-            return variablecompletionItem;
-        });
+        return [...variableNames];
     }
 }
