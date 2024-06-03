@@ -112,13 +112,13 @@
 
 //         if (
 //             (func &&
-//                 func.paramIndex !== null &&
+//                 func.param.index !== null &&
 //                 func.function &&
 //                 ValidationProvider.tags().functions.some((fn: string) =>
 //                     func.function.includes(fn),
 //                 )) ||
 //             (func &&
-//                 func.paramIndex !== null &&
+//                 func.param.index !== null &&
 //                 func.class &&
 //                 ValidationProvider.tags().classes.some((cls: string) =>
 //                     func.class.includes(cls),

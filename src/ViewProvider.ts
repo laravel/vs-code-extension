@@ -47,7 +47,7 @@ export default class ViewProvider implements Provider {
             return this.getYields(func.function, document.getText());
         }
 
-        if (func.paramIndex === 0 || func.paramIndex === null) {
+        if (func.param.index === 0 || func.param.index === null) {
             return Object.entries(this.views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,

@@ -53,10 +53,10 @@ export default class RouteProvider implements Provider {
 
     autoCompleteActionParam(func: CompletionItemFunction): boolean {
         if (func.function === "match") {
-            return func.paramIndex === 2;
+            return func.param.index === 2;
         }
 
-        return func.paramIndex === 1;
+        return func.param.index === 1;
     }
 
     provideCompletionItems(
@@ -113,7 +113,7 @@ export default class RouteProvider implements Provider {
             });
         }
 
-        if (func.paramIndex === 1) {
+        if (func.param.index === 1) {
             // Route parameters autocomplete
             return this.routes
                 .filter((route) => route.name === func.parameters[0])

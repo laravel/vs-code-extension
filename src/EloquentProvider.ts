@@ -132,7 +132,7 @@ $flight = Flight::firstOrNew(
         }
 
         if (this.firstParamMethods.includes(func.function || "")) {
-            if (func.paramIndex > 0) {
+            if (func.param.index > 0) {
                 return [];
             }
 
@@ -140,7 +140,7 @@ $flight = Flight::firstOrNew(
         }
 
         if (this.relationMethods.includes(func.function || "")) {
-            if (func.paramIndex > 0) {
+            if (func.param.index > 0) {
                 return [];
             }
 

@@ -32,7 +32,11 @@ export default class TranslationProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (func.paramIndex === 1) {
+        if (func.param.index === 1) {
+            if (!func.param.isKey) {
+                return [];
+            }
+
             // Parameters autocomplete
             return this.translations
                 .filter(
@@ -46,6 +50,11 @@ export default class TranslationProvider implements Provider {
                     while (
                         (match = paramRegex.exec(translation.value)) !== null
                     ) {
+                        if (func.param.keys.includes(match[1])) {
+                            // We've already added this parameter, don't suggest it
+                            continue;
+                        }
+
                         let completionItem = new vscode.CompletionItem(
                             match[1],
                             vscode.CompletionItemKind.Variable,

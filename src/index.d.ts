@@ -10,7 +10,13 @@ interface CompletionItemFunction {
     fqn: string | null;
     function: string | null;
     parameters: string[];
-    paramIndex: number;
+    param: {
+        index: number;
+        isArray: boolean;
+        isKey: boolean;
+        key: string | null;
+        keys: string[];
+    };
 }
 
 interface Provider {

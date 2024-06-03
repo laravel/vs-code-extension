@@ -18,10 +18,7 @@ export default class AuthProvider implements Provider {
             return;
         }
 
-        // TODO: huh?
         this.load();
-
-        // setInterval(() => this.load(), 60000);
     }
 
     tags(): Tags {
@@ -38,7 +35,7 @@ export default class AuthProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (func.paramIndex === 1) {
+        if (func.param.index === 1) {
             return this.models.map((model) => {
                 let completeItem = new vscode.CompletionItem(
                     model.replace(/\\/, "\\\\"),

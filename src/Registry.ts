@@ -44,7 +44,7 @@ export default class Registry implements vscode.CompletionItemProvider {
                 fqn: parseResult.fqn || null,
                 function: parseResult.function || null,
                 parameters: parseResult.parameters,
-                paramIndex: parseResult.paramIndex,
+                param: parseResult.param,
             },
             document,
             position,

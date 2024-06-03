@@ -2,6 +2,14 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { parse } from "../PHP";
 
+const getParam = (obj = {}) => ({
+    index: 0,
+    isArray: false,
+    isKey: false,
+    key: null,
+    ...obj,
+});
+
 suite("Parser Test Suite", () => {
     vscode.window.showInformationMessage("Start parser tests.");
 
@@ -24,7 +32,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "config",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -42,7 +50,7 @@ suite("Parser Test Suite", () => {
             function: "get",
             class: "Route",
             fqn: "Route",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -59,7 +67,7 @@ suite("Parser Test Suite", () => {
             function: "get",
             class: "User",
             fqn: "User",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -78,7 +86,7 @@ suite("Parser Test Suite", () => {
             function: "find",
             class: "User",
             fqn: "User",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -99,7 +107,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "find",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -120,7 +128,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "find",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -141,7 +149,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "find",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -159,7 +167,7 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "find",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -179,7 +187,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "App\\Models\\User",
             function: "find",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -198,7 +206,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -219,7 +227,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "App\\Models\\User",
             function: "where",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -239,7 +247,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "App\\Models\\User",
             function: "where",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -260,7 +268,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "App\\Models\\User",
             function: "where",
-            paramIndex: 0,
+            param: getParam(),
             parameters: [],
         };
 
@@ -279,7 +287,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 1,
+            param: getParam({
+                index: 1,
+            }),
             parameters: ["first"],
         };
 
@@ -298,7 +308,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 1,
+            param: { index: 1, isArray: false, isKey: false, key: null },
             parameters: ["['what'=>'ok']"],
         };
 
@@ -317,7 +327,7 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 2,
+            param: { index: 2, isArray: false, isKey: false, key: null },
             parameters: ["first", "['what'=>'ok']"],
         };
 
@@ -338,7 +348,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 1,
+            param: getParam({
+                index: 1,
+            }),
             parameters: ["function($thing){return $thing;}"],
         };
 
@@ -357,26 +369,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 1,
-            parameters: ["fn($thing)=>$thing"],
-        };
-
-        const result = parse(code);
-
-        assert.deepStrictEqual(result, expected);
-    });
-
-    test("discard leftover array if currently typing", () => {
-        const code = `<?php
-
-        Route::get('/', function () {
-        User::where(fn($thing) => $thing, ['`;
-
-        const expected = {
-            class: "User",
-            fqn: "User",
-            function: "where",
-            paramIndex: 1,
+            param: getParam({
+                index: 1,
+            }),
             parameters: ["fn($thing)=>$thing"],
         };
 
@@ -397,7 +392,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            paramIndex: 5,
+            param: getParam({
+                index: 5,
+            }),
             parameters: [
                 "ok",
                 "[1,2,3]",
@@ -411,4 +408,102 @@ suite("Parser Test Suite", () => {
 
         assert.deepStrictEqual(result, expected);
     });
+
+    test("parameter array key detection", () => {
+        const code = `<?php
+
+        Route::get('/', function () {
+        User::where('ok', ['`;
+
+        const expected = {
+            class: "User",
+            fqn: "User",
+            function: "where",
+            param: getParam({
+                index: 1,
+                isArray: true,
+                isKey: true,
+            }),
+            parameters: ["ok"],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("parameter array key detection when further along in the array", () => {
+        const code = `<?php
+
+        Route::get('/', function () {
+        User::where('ok', ['sure' => 'thing', '`;
+
+        const expected = {
+            class: "User",
+            fqn: "User",
+            function: "where",
+            param: getParam({
+                index: 1,
+                isArray: true,
+                isKey: true,
+                keys: ["sure"],
+            }),
+            parameters: ["ok"],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("parameter array key detection when simple array", () => {
+        const code = `<?php
+
+        Route::get('/', function () {
+        User::where('ok', ['sure', '`;
+
+        const expected = {
+            class: "User",
+            fqn: "User",
+            function: "where",
+            param: getParam({
+                index: 1,
+                isArray: true,
+                isKey: true,
+                keys: ["sure"],
+            }),
+            parameters: ["ok"],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("it will handle nested arrays correctly", () => {
+        const code = `<?php
+
+        Route::get('/', function () {
+        User::where('ok', ['sure', ['`;
+
+        const expected = {
+            class: "User",
+            fqn: "User",
+            function: "where",
+            param: getParam({
+                index: 1,
+                isArray: true,
+                isKey: false,
+                keys: ["sure"],
+            }),
+            parameters: ["ok"],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    // TODO: Check on double quotes everywhere
+    // TODO: Check for old style array syntax
 });

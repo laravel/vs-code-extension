@@ -383,7 +383,13 @@ export interface ParsingResult {
     class?: string;
     fqn?: string;
     function?: string;
-    paramIndex: number;
+    param: {
+        index: number;
+        isArray: boolean;
+        isKey: boolean;
+        key: string | null;
+        keys: string[];
+    };
     parameters: string[];
 }
 
@@ -438,7 +444,13 @@ export const parse = (code: string): ParsingResult | null => {
                 } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
 
                 result = {
-                    paramIndex: 0,
+                    param: {
+                        index: 0,
+                        isArray: false,
+                        isKey: false,
+                        key: null,
+                        keys: [],
+                    },
                     parameters: [],
                 };
 
@@ -472,7 +484,9 @@ export const parse = (code: string): ParsingResult | null => {
     let currentParam = "";
 
     const finalParams = [];
+    let paramTokens = [];
 
+    // Params are in reverse order, so we need to loop them in their actual order
     const paramsToLoop = params.reverse();
 
     for (let i in paramsToLoop) {
@@ -481,6 +495,7 @@ export const parse = (code: string): ParsingResult | null => {
         if (["[", "(", "{"].includes(value)) {
             nestedLevel++;
             currentParam += value;
+            paramTokens.push(params[i]);
 
             continue;
         }
@@ -488,6 +503,7 @@ export const parse = (code: string): ParsingResult | null => {
         if (["]", ")", "}"].includes(value)) {
             nestedLevel--;
             currentParam += value;
+            paramTokens.push(params[i]);
 
             continue;
         }
@@ -496,6 +512,7 @@ export const parse = (code: string): ParsingResult | null => {
             const finalValue = type === "T_RETURN" ? value + " " : value;
 
             currentParam += finalValue;
+            paramTokens.push(params[i]);
 
             continue;
         }
@@ -507,16 +524,61 @@ export const parse = (code: string): ParsingResult | null => {
                     : value;
 
             currentParam += finalValue;
+            paramTokens.push(params[i]);
 
             continue;
         }
 
         finalParams.push(currentParam);
         currentParam = "";
+        paramTokens = [];
+    }
+
+    if (paramTokens.length > 0) {
+        let finalParamNestingLevel = 0;
+        let inKey = true;
+        let currentKeys = [];
+
+        for (let i in paramTokens) {
+            const [type, value, line] = paramTokens[i];
+
+            if (finalParamNestingLevel === 1 && inKey) {
+                console.log(JSON.stringify(paramTokens[i]));
+                if (type === "T_CONSTANT_ENCAPSED_STRING") {
+                    currentKeys.push(value.substring(1).slice(0, -1));
+                }
+            }
+
+            if (type === "T_DOUBLE_ARROW") {
+                inKey = false;
+            }
+
+            if (["["].includes(value)) {
+                finalParamNestingLevel++;
+                inKey = true;
+            }
+
+            if (["]"].includes(value)) {
+                finalParamNestingLevel--;
+                inKey = true;
+            }
+        }
+
+        if (finalParamNestingLevel > 0) {
+            result.param.isArray = true;
+        }
+
+        if (finalParamNestingLevel === 1) {
+            if (["[", ","].includes(paramTokens[paramTokens.length - 1][1])) {
+                result.param.isKey = true;
+            }
+        }
+
+        result.param.keys = currentKeys;
     }
 
     result.parameters = finalParams;
-    result.paramIndex = finalParams.length;
+    result.param.index = finalParams.length;
 
     return result;
 };
