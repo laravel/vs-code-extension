@@ -543,7 +543,6 @@ export const parse = (code: string): ParsingResult | null => {
             const [type, value, line] = paramTokens[i];
 
             if (finalParamNestingLevel === 1 && inKey) {
-                console.log(JSON.stringify(paramTokens[i]));
                 if (type === "T_CONSTANT_ENCAPSED_STRING") {
                     currentKeys.push(value.substring(1).slice(0, -1));
                 }
