@@ -4,29 +4,19 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import Helpers from "./helpers";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import ViewRegistry from "./ViewRegistry";
+import InertiaRegistry from "./InertiaRegistry";
 
-export default class ViewProvider implements Provider {
-    private viewRegistry: typeof ViewRegistry;
+export default class InertiaProvider implements Provider {
+    private viewRegistry: typeof InertiaRegistry;
 
     constructor() {
-        this.viewRegistry = ViewRegistry;
+        this.viewRegistry = InertiaRegistry;
     }
 
     tags(): Tags {
         return {
-            classes: ["View"],
-            functions: [
-                "view",
-                "markdown",
-                "links",
-                "@extends",
-                "@component",
-                "@include",
-                "@each",
-                "@section",
-                "@push",
-            ],
+            classes: ["Inertia"],
+            functions: ["render", "modal"],
         };
     }
 
@@ -37,10 +27,6 @@ export default class ViewProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (func.function && ["@section", "@push"].includes(func.function)) {
-            return this.getYields(func.function, document.getText());
-        }
-
         if (func.param.index === 0) {
             return Object.entries(this.viewRegistry.views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -70,13 +56,45 @@ export default class ViewProvider implements Provider {
             "utf8",
         );
 
-        let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
+        let variableRegex = /defineProps<({.+})>/s;
         let r: RegExpExecArray | null = null;
         let variableNames = new Set<string>([]);
 
-        while ((r = variableRegex.exec(viewContent))) {
-            variableNames.add(r[1]);
+        let match = viewContent.match(variableRegex);
+
+        if (!match) {
+            return [];
         }
+
+        let props = match[0]
+            .replace("defineProps<", "")
+            .replace(">", "")
+            .replace(/\?\:/g, ":")
+            // Remove all whitespace
+            .replace(/\s/g, "");
+
+        // Chop off the starting and ending curly braces
+        props = props.substring(1, props.length - 1);
+
+        let nestedLevel = 0;
+
+        props.split(";").forEach((prop) => {
+            if (prop.includes("{")) {
+                nestedLevel++;
+            }
+
+            if (prop.includes("}")) {
+                nestedLevel--;
+            }
+
+            if (nestedLevel > 0 || !prop.includes(":")) {
+                return;
+            }
+
+            let [key] = prop.split(":");
+
+            variableNames.add(key);
+        });
 
         return [...variableNames].map((variableName) => {
             let variablecompletionItem = new vscode.CompletionItem(

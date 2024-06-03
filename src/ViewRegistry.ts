@@ -77,20 +77,20 @@ class ViewRegistry {
                     return this.getViews(`${path}/${file}`);
                 }
 
-                if (file.includes("blade.php")) {
-                    const name = file.replace(".blade.php", "");
-
-                    return {
-                        name,
-                        relativePath: `${path}/${name}`.replace(
-                            Helpers.projectPath(""),
-                            "",
-                        ),
-                        uri: vscode.Uri.file(`${path}/${file}`),
-                    };
+                if (!file.includes("blade.php")) {
+                    return [];
                 }
 
-                return [];
+                const name = file.replace(".blade.php", "");
+
+                return {
+                    name,
+                    relativePath: `${path}/${name}`.replace(
+                        Helpers.projectPath(""),
+                        "",
+                    ),
+                    uri: vscode.Uri.file(`${path}/${file}`),
+                };
             })
             .flat();
     }

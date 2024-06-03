@@ -8,15 +8,17 @@ import {
     workspace,
     Position,
     Range,
+    Uri,
 } from "vscode";
 import Logger from "./Logger";
 import ViewRegistry from "./ViewRegistry";
+import InertiaRegistry from "./InertiaRegistry";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     public provideDocumentLinks(
         doc: TextDocument,
     ): ProviderResult<DocumentLink[]> {
-        return this.getViewLinks(doc);
+        return this.getViewLinks(doc).concat(this.getInertiaLinks(doc));
     }
 
     private getViewLinks(doc: TextDocument): DocumentLink[] {
@@ -29,17 +31,33 @@ export default class LinkProvider implements vsDocumentLinkProvider {
             "@component",
             // TODO: Deal with aliases
             "View::make",
-            "Inertia::(?:render|modal)",
         ].map((item) => `${item}\\(['"]`);
 
         let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
 
-        Logger.info("regex", regex);
-
-        return this.findInDoc(doc, regex);
+        return this.findInDoc(doc, regex, (match) => {
+            return ViewRegistry.views[match[0]]?.uri ?? null;
+        });
     }
 
-    private findInDoc(doc: TextDocument, regex: string): DocumentLink[] {
+    private getInertiaLinks(doc: TextDocument): DocumentLink[] {
+        let toCheck = ["Inertia::(?:render|modal)"].map(
+            (item) => `${item}\\(['"]`,
+        );
+
+        let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+
+        return this.findInDoc(doc, regex, (match) => {
+            return InertiaRegistry.views[match[0]]?.uri ?? null;
+        });
+    }
+
+    private findInDoc(
+        doc: TextDocument,
+        regex: string,
+        getItem: (match: RegExpExecArray) => Uri | null,
+    ): DocumentLink[] {
+        // Logger.info("regex", regex);
         let documentLinks: DocumentLink[] = [];
         let newRegex = new RegExp(regex, "g");
 
@@ -51,13 +69,18 @@ export default class LinkProvider implements vsDocumentLinkProvider {
 
             // Logger.info("match", match, line.text);
 
-            if (match !== null && ViewRegistry.views[match[0]] !== undefined) {
-                let view = ViewRegistry.views[match[0]];
+            if (match !== null) {
+                let item = getItem(match);
+
+                if (item === null) {
+                    continue;
+                }
+
                 let start = new Position(line.lineNumber, match.index);
                 let end = start.translate(0, match[0].length);
                 let documentlink = new DocumentLink(
                     new Range(start, end),
-                    view.uri,
+                    item,
                 );
 
                 documentLinks.push(documentlink);
