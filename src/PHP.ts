@@ -67,8 +67,6 @@ export const runInLaravel = <T>(
         bootstrap_path: Helpers.projectPath("bootstrap/app.php", true),
     });
 
-    // Logger.info(command);
-
     return runPhp(command, description)
         .then((result: string) => {
             const regex = new RegExp(
@@ -238,8 +236,6 @@ const getFqn = (
         }
 
         const fqnCandidate = tokensReversed[j + 1];
-
-        Logger.info("fqnCandidate", fqnCandidate, cls);
 
         if (fqnCandidate[1] === cls) {
             return {
