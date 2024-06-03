@@ -108,42 +108,4 @@ export default class InertiaProvider implements Provider {
             return variablecompletionItem;
         });
     }
-
-    getYields(func: string, documentText: string): vscode.CompletionItem[] {
-        let extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
-        let regexResult = extendsRegex.exec(documentText);
-
-        if (!regexResult) {
-            return [];
-        }
-
-        if (typeof this.viewRegistry.views[regexResult[1]] === "undefined") {
-            return [];
-        }
-
-        let parentContent = fs.readFileSync(
-            this.viewRegistry.views[regexResult[1]].uri.path,
-            "utf8",
-        );
-        let yieldRegex =
-            func === "@push"
-                ? /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g
-                : /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
-
-        let yieldNames = new Set<string>([]);
-
-        while ((regexResult = yieldRegex.exec(parentContent))) {
-            yieldNames.add(regexResult[1]);
-        }
-
-        return [...yieldNames]
-            .map(
-                (yieldName) =>
-                    new vscode.CompletionItem(
-                        yieldName,
-                        vscode.CompletionItemKind.Constant,
-                    ),
-            )
-            .concat(this.getYields(func, parentContent));
-    }
 }
