@@ -13,12 +13,17 @@ import {
 import Logger from "./Logger";
 import ViewRegistry from "./ViewRegistry";
 import InertiaRegistry from "./InertiaRegistry";
+import ConfigRegistry from "./ConfigRegistry";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     public provideDocumentLinks(
         doc: TextDocument,
     ): ProviderResult<DocumentLink[]> {
-        return this.getViewLinks(doc).concat(this.getInertiaLinks(doc));
+        return [
+            this.getViewLinks(doc),
+            this.getInertiaLinks(doc),
+            this.getConfigLinks(doc),
+        ].flat();
     }
 
     private getViewLinks(doc: TextDocument): DocumentLink[] {
@@ -52,12 +57,24 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         });
     }
 
+    private getConfigLinks(doc: TextDocument): DocumentLink[] {
+        let toCheck = ["config", "Config::get"].map((item) => `${item}\\(['"]`);
+
+        let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+
+        return this.findInDoc(doc, regex, (match) => {
+            return (
+                ConfigRegistry.items.find((item) => item.name === match[0])
+                    ?.uri ?? null
+            );
+        });
+    }
+
     private findInDoc(
         doc: TextDocument,
         regex: string,
         getItem: (match: RegExpExecArray) => Uri | null,
     ): DocumentLink[] {
-        // Logger.info("regex", regex);
         let documentLinks: DocumentLink[] = [];
         let newRegex = new RegExp(regex, "g");
 
@@ -66,8 +83,6 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         while (index < doc.lineCount) {
             let line = doc.lineAt(index);
             let match = newRegex.exec(line.text);
-
-            // Logger.info("match", match, line.text);
 
             if (match !== null) {
                 let item = getItem(match);

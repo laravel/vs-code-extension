@@ -19,6 +19,16 @@ interface CompletionItemFunction {
     };
 }
 
+interface Config {
+    [key: string]: any;
+}
+
+interface ConfigItem {
+    name: string;
+    value: string;
+    uri?: vscode.Uri;
+}
+
 interface Provider {
     tags(): Tags;
     provideCompletionItems(
