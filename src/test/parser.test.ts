@@ -7,6 +7,7 @@ const getParam = (obj = {}) => ({
     isArray: false,
     isKey: false,
     key: null,
+    keys: [],
     ...obj,
 });
 
@@ -308,7 +309,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            param: { index: 1, isArray: false, isKey: false, key: null },
+            param: getParam({
+                index: 1,
+            }),
             parameters: ["['what'=>'ok']"],
         };
 
@@ -327,7 +330,9 @@ suite("Parser Test Suite", () => {
             class: "User",
             fqn: "User",
             function: "where",
-            param: { index: 2, isArray: false, isKey: false, key: null },
+            param: getParam({
+                index: 2,
+            }),
             parameters: ["first", "['what'=>'ok']"],
         };
 
@@ -503,7 +508,4 @@ suite("Parser Test Suite", () => {
 
         assert.deepStrictEqual(result, expected);
     });
-
-    // TODO: Check on double quotes everywhere
-    // TODO: Check for old style array syntax
 });
