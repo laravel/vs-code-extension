@@ -5,7 +5,7 @@ import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { CompletionItemFunction, Provider, Tags } from ".";
 
-export default class AuthProvider implements Provider {
+export default class GateProvider implements Provider {
     private abilities: any[] = [];
     private models: any[] = [];
 

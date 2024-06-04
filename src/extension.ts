@@ -11,14 +11,14 @@ import TranslationProvider from "./TranslationProvider";
 import MixProvider from "./MixProvider";
 import ValidationProvider from "./ValidationProvider";
 import EnvProvider from "./EnvProvider";
-import AuthProvider from "./AuthProvider";
+import GateProvider from "./GateProvider";
 import AssetProvider from "./AssetProvider";
 import EloquentProvider from "./EloquentProvider";
 import BladeProvider from "./BladeProvider";
 import Logger from "./Logger";
 import Registry from "./Registry";
 import LinkProvider from "./LinkProvider";
-import HoverProvider from "./HoverProvider";
+// import HoverProvider from "./HoverProvider";
 import InertiaProvider from "./InertiaProvider";
 
 function shouldActivate(): boolean {
@@ -61,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
         TranslationProvider,
         MixProvider,
         EnvProvider,
-        AuthProvider,
+        GateProvider,
         AssetProvider,
         InertiaProvider,
     ];
