@@ -4,9 +4,7 @@ import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import Logger from "./Logger";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import { get } from "http";
 
 interface Model {
     fqn: string;
