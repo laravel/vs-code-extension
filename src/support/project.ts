@@ -29,6 +29,22 @@ export const projectPath = (path = "", forCode = false): string => {
     return "";
 };
 
+export const relativePath = (path: string): string => {
+    for (let workspaceFolder of getWorkspaceFolders()) {
+        if (path.startsWith(workspaceFolder.uri.fsPath)) {
+            let tempPath = path.replace(workspaceFolder.uri.fsPath, "");
+
+            if (tempPath[0] === "/") {
+                tempPath = tempPath.substring(1);
+            }
+
+            return tempPath;
+        }
+    }
+
+    return path;
+};
+
 const resolvePath = (basePath: string, relativePath: string): string => {
     if (basePath.startsWith(".") && hasWorkspace()) {
         basePath = path.resolve(getWorkspaceFolders()[0].uri.fsPath, basePath);

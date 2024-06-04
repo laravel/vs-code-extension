@@ -2,9 +2,7 @@
 
 import {
     DocumentLink,
-    Position,
     ProviderResult,
-    Range,
     TextDocument,
     Uri,
     DocumentLinkProvider as vsDocumentLinkProvider,
@@ -12,6 +10,12 @@ import {
 import { getConfigs } from "../repositories/configs";
 import { getInertiaViews } from "../repositories/inertia";
 import { getViews } from "../repositories/views";
+import { findMatchesInDoc } from "../support/doc";
+import {
+    configMatchRegex,
+    inertiaMatchRegex,
+    viewMatchRegex,
+} from "../support/patterns";
 
 export default class Link implements vsDocumentLinkProvider {
     public provideDocumentLinks(
@@ -25,42 +29,19 @@ export default class Link implements vsDocumentLinkProvider {
     }
 
     private getViewLinks(doc: TextDocument): DocumentLink[] {
-        let toCheck = [
-            "view",
-            "markdown",
-            "assertViewIs",
-            "@include",
-            "@extends",
-            "@component",
-            // TODO: Deal with aliases
-            "View::make",
-        ].map((item) => `${item}\\(['"]`);
-
-        let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
-
-        return this.findInDoc(doc, regex, (match) => {
+        return this.findInDoc(doc, viewMatchRegex, (match) => {
             return getViews()[match[0]]?.uri ?? null;
         });
     }
 
     private getInertiaLinks(doc: TextDocument): DocumentLink[] {
-        let toCheck = ["Inertia::(?:render|modal)"].map(
-            (item) => `${item}\\(['"]`,
-        );
-
-        let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
-
-        return this.findInDoc(doc, regex, (match) => {
+        return this.findInDoc(doc, inertiaMatchRegex, (match) => {
             return getInertiaViews()[match[0]]?.uri ?? null;
         });
     }
 
     private getConfigLinks(doc: TextDocument): DocumentLink[] {
-        let toCheck = ["config", "Config::get"].map((item) => `${item}\\(['"]`);
-
-        let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
-
-        return this.findInDoc(doc, regex, (match) => {
+        return this.findInDoc(doc, configMatchRegex, (match) => {
             return (
                 getConfigs().find((item) => item.name === match[0])?.uri ?? null
             );
@@ -72,35 +53,14 @@ export default class Link implements vsDocumentLinkProvider {
         regex: string,
         getItem: (match: RegExpExecArray) => Uri | null,
     ): DocumentLink[] {
-        let documentLinks: DocumentLink[] = [];
-        let newRegex = new RegExp(regex, "g");
+        return findMatchesInDoc(doc, regex, (match, range) => {
+            const item = getItem(match);
 
-        let index = 0;
-
-        while (index < doc.lineCount) {
-            let line = doc.lineAt(index);
-            let match = newRegex.exec(line.text);
-
-            if (match !== null) {
-                let item = getItem(match);
-
-                if (item === null) {
-                    continue;
-                }
-
-                let start = new Position(line.lineNumber, match.index);
-                let end = start.translate(0, match[0].length);
-                let documentlink = new DocumentLink(
-                    new Range(start, end),
-                    item,
-                );
-
-                documentLinks.push(documentlink);
+            if (item === null) {
+                return null;
             }
 
-            index++;
-        }
-
-        return documentLinks;
+            return new DocumentLink(range, item);
+        });
     }
 }

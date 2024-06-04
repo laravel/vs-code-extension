@@ -2,22 +2,22 @@
 
 import * as vscode from "vscode";
 
+import { info } from "console";
 import AssetCompletion from "./completion/Asset";
 import BladeCompletion from "./completion/Blade";
 import ConfigCompletion from "./completion/Config";
+import EloquentCompletion from "./completion/Eloquent";
 import EnvCompletion from "./completion/Env";
 import GateCompletion from "./completion/Gate";
+import InertiaCompletion from "./completion/Inertia";
 import MixCompletion from "./completion/Mix";
 import Registry from "./completion/Registry";
 import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
-import ViewCompletion from "./completion/View";
-import LinkProvider from "./link/LinkProvider";
-// import HoverProvider from "./HoverProvider";
-import { info } from "console";
-import EloquentCompletion from "./completion/Eloquent";
-import InertiaCompletion from "./completion/Inertia";
 import ValidationCompletion from "./completion/Validation";
+import ViewCompletion from "./completion/View";
+import HoverProvider from "./hover/HoverProvider";
+import LinkProvider from "./link/LinkProvider";
 import { hasWorkspace, projectPathExists } from "./support/project";
 
 function shouldActivate(): boolean {
@@ -75,11 +75,6 @@ export function activate(context: vscode.ExtensionContext) {
     const validationRegistry = new Registry();
     validationRegistry.registerProvider(new ValidationCompletion());
 
-    // let hover = vscode.languages.registerHoverProvider(
-    //     LANGUAGES,
-    //     new HoverProvider(),
-    // );
-
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
@@ -105,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
             new LinkProvider(),
         ),
-        // hover,
+        vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
     );
 }
 
