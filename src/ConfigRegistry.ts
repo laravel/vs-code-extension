@@ -4,6 +4,7 @@ import { createFileWatcher } from "./fileWatcher";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import Helpers from "./helpers";
+import { projectPath } from "./support/project";
 
 class ConfigRegistry {
     items: ConfigItem[] = [];
@@ -33,7 +34,7 @@ class ConfigRegistry {
 
         for (let key in conf) {
             if (topLevel) {
-                let path = Helpers.projectPath(`config/${key}.php`);
+                let path = projectPath(`config/${key}.php`);
                 uri = fs.existsSync(path) ? vscode.Uri.file(path) : undefined;
 
                 this.cachedFilePaths.set(key, uri);

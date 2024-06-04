@@ -1,10 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import * as fs from "fs";
-import { resolve } from "path";
 import Logger from "./Logger";
 import { runInLaravel } from "./PHP";
+import { config } from "./support/config";
 
 export default class Helpers {
     static wordMatchRegex = /[\w\d\-_\.\:\\\/@]+/g;
@@ -30,72 +29,13 @@ export default class Helpers {
         }
     }
 
-    /**
-     * Create full path from project file name
-     *
-     * @param path
-     * @param forCode
-     * @param string
-     */
-    static projectPath(path: string, forCode: boolean = false): string {
-        if (path[0] !== "/") {
-            path = "/" + path;
-        }
-
-        let basePath = vscode.workspace
-            .getConfiguration("Laravel")
-            .get<string>("basePath");
-        if (forCode === false && basePath && basePath.length > 0) {
-            if (
-                basePath.startsWith(".") &&
-                vscode.workspace.workspaceFolders &&
-                vscode.workspace.workspaceFolders.length > 0
-            ) {
-                basePath = resolve(
-                    vscode.workspace.workspaceFolders[0].uri.fsPath,
-                    basePath,
-                );
-            }
-            basePath = basePath.replace(/[\/\\]$/, "");
-            return basePath + path;
-        }
-
-        let basePathForCode = vscode.workspace
-            .getConfiguration("Laravel")
-            .get<string>("basePathForCode");
-        if (forCode && basePathForCode && basePathForCode.length > 0) {
-            if (
-                basePathForCode.startsWith(".") &&
-                vscode.workspace.workspaceFolders &&
-                vscode.workspace.workspaceFolders.length > 0
-            ) {
-                basePathForCode = resolve(
-                    vscode.workspace.workspaceFolders[0].uri.fsPath,
-                    basePathForCode,
-                );
-            }
-            basePathForCode = basePathForCode.replace(/[\/\\]$/, "");
-            return basePathForCode + path;
-        }
-
-        if (Helpers.hasWorkspace() && vscode.workspace.workspaceFolders) {
-            for (let workspaceFolder of vscode.workspace.workspaceFolders) {
-                if (fs.existsSync(workspaceFolder.uri.fsPath + "/artisan")) {
-                    return workspaceFolder.uri.fsPath + path;
-                }
-            }
-        }
-        return "";
-    }
-
     static arrayUnique(value: any, index: any, self: any[]) {
         return self.indexOf(value) === index;
     }
 
     static showErrorPopup() {
-        let disableErrorAlert = vscode.workspace
-            .getConfiguration("Laravel")
-            .get<boolean>("disableErrorAlert");
+        let disableErrorAlert = config<boolean>("disableErrorAlert", false);
+
         if (
             disableErrorAlert == false &&
             Helpers.disableErrorMessage == false &&
@@ -161,12 +101,5 @@ export default class Helpers {
         }
 
         return "\t" + text;
-    }
-
-    static hasWorkspace(): boolean {
-        return (
-            vscode.workspace.workspaceFolders instanceof Array &&
-            vscode.workspace.workspaceFolders.length > 0
-        );
     }
 }

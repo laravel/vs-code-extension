@@ -1,9 +1,9 @@
+import * as fs from "fs";
+import * as vscode from "vscode";
 import { View } from ".";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import Helpers from "./helpers";
-import * as fs from "fs";
-import * as vscode from "vscode";
+import { projectPath } from "./support/project";
 
 class ViewRegistry {
     views: {
@@ -31,10 +31,7 @@ class ViewRegistry {
             `).then((results) => {
             results.paths
                 .map((path: string) =>
-                    path.replace(
-                        Helpers.projectPath("/", true),
-                        Helpers.projectPath("/"),
-                    ),
+                    path.replace(projectPath("/", true), projectPath("/")),
                 )
                 .forEach((path: string) => {
                     this.getViews(path).forEach((view) => {
@@ -47,8 +44,8 @@ class ViewRegistry {
                     viewNamespaces
                         .map((path) =>
                             path.replace(
-                                Helpers.projectPath("/", true),
-                                Helpers.projectPath("/"),
+                                projectPath("/", true),
+                                projectPath("/"),
                             ),
                         )
                         .forEach((path) => {
@@ -86,7 +83,7 @@ class ViewRegistry {
                 return {
                     name,
                     relativePath: `${path}/${name}`.replace(
-                        Helpers.projectPath(""),
+                        projectPath(""),
                         "",
                     ),
                     uri: vscode.Uri.file(`${path}/${file}`),

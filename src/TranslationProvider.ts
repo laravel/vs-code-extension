@@ -1,11 +1,11 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
-import Helpers from "./helpers";
+import * as vscode from "vscode";
+import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import { CompletionItemFunction, Provider, Tags } from ".";
+import { wordMatchRegex } from "./support/patterns";
 
 type Translation = { name: string; value: string };
 
@@ -62,7 +62,7 @@ export default class TranslationProvider implements Provider {
 
                         completionItem.range = document.getWordRangeAtPosition(
                             position,
-                            Helpers.wordMatchRegex,
+                            wordMatchRegex,
                         );
 
                         out.push(completionItem);
@@ -81,7 +81,7 @@ export default class TranslationProvider implements Provider {
 
             completionItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             completionItem.detail = translation.value;

@@ -27,4 +27,11 @@ export default class Logger {
         Logger.setup();
         Logger.channel?.error(message, ...args);
     }
+
+    static bigInfo(message: string, ...args: any[]) {
+        Logger.setup();
+        Logger.channel?.info("---------------");
+        Logger.channel?.info(message);
+        Logger.channel?.info("---------------");
+    }
 }

@@ -18,8 +18,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:php",
-    "onLanguage:blade"
+    "onLanguage:php"
   ],
   "main": "./out/extension.js",
   "grammars": [

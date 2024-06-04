@@ -4,6 +4,7 @@ import { createFileWatcher } from "./fileWatcher";
 import Helpers from "./helpers";
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { projectPath } from "./support/project";
 
 class InertiaRegistry {
     views: {
@@ -23,7 +24,7 @@ class InertiaRegistry {
 
     private load() {
         ["/resources/js/Pages"].forEach((path) => {
-            this.getViews(Helpers.projectPath(path)).forEach((view) => {
+            this.getViews(projectPath(path)).forEach((view) => {
                 this.views[view.name] = view;
             });
         });
@@ -54,7 +55,7 @@ class InertiaRegistry {
                 return {
                     name,
                     relativePath: `${path}/${name}`.replace(
-                        Helpers.projectPath(""),
+                        projectPath(""),
                         "",
                     ),
                     uri: vscode.Uri.file(`${path}/${file}`),

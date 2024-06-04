@@ -1,10 +1,10 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
-import Helpers from "./helpers";
+import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import ViewRegistry from "./ViewRegistry";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class ViewProvider implements Provider {
     private viewRegistry: typeof ViewRegistry;
@@ -50,7 +50,7 @@ export default class ViewProvider implements Provider {
 
                 completionItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 return completionItem;
@@ -85,7 +85,7 @@ export default class ViewProvider implements Provider {
             );
             variablecompletionItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
             return variablecompletionItem;
         });

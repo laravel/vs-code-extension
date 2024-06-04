@@ -1,11 +1,12 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
-import Helpers from "./helpers";
+import * as vscode from "vscode";
+import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import { CompletionItemFunction, Provider, Tags } from ".";
+import { wordMatchRegex } from "./support/patterns";
+import { projectPath } from "./support/project";
 
 export default class RouteProvider implements Provider {
     // TODO: Tighten up the typing here
@@ -88,7 +89,7 @@ export default class RouteProvider implements Provider {
 
                     completionItem.range = document.getWordRangeAtPosition(
                         position,
-                        Helpers.wordMatchRegex,
+                        wordMatchRegex,
                     );
 
                     return completionItem;
@@ -106,7 +107,7 @@ export default class RouteProvider implements Provider {
 
                 completionItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 return completionItem;
@@ -126,7 +127,7 @@ export default class RouteProvider implements Provider {
 
                         completionItem.range = document.getWordRangeAtPosition(
                             position,
-                            Helpers.wordMatchRegex,
+                            wordMatchRegex,
                         );
 
                         return completionItem;
@@ -149,7 +150,7 @@ export default class RouteProvider implements Provider {
 
                 completionItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 completionItem.detail = [
@@ -162,10 +163,6 @@ export default class RouteProvider implements Provider {
     }
 
     load() {
-        if (!Helpers.hasWorkspace()) {
-            return;
-        }
-
         this.loadRoutes();
         this.loadControllers();
         this.loadMiddleware();
@@ -197,7 +194,7 @@ export default class RouteProvider implements Provider {
     loadControllers() {
         try {
             this.controllers = this.getControllers(
-                Helpers.projectPath("app/Http/Controllers"),
+                projectPath("app/Http/Controllers"),
             ).map((contoller) => contoller.replace(/@__invoke/, ""));
         } catch (exception) {
             console.error(exception);

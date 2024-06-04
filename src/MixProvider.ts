@@ -1,9 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import * as fs from "fs";
-import Helpers from "./helpers";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import { wordMatchRegex } from "./support/patterns";
+import { projectPathExists, readFileInProject } from "./support/project";
 
 export default class MixProvider implements Provider {
     private mixes: any[] = [];
@@ -33,7 +33,7 @@ export default class MixProvider implements Provider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             return completeItem;
@@ -42,13 +42,13 @@ export default class MixProvider implements Provider {
 
     load() {
         try {
-            const path = Helpers.projectPath("public/mix-manifest.json");
+            const path = "public/mix-manifest.json";
 
-            if (!fs.existsSync(path)) {
+            if (!projectPathExists(path)) {
                 return;
             }
 
-            let mixes = JSON.parse(fs.readFileSync(path, "utf8"));
+            let mixes = readFileInProject(path);
 
             this.mixes = Object.keys(mixes).map((mixFile) =>
                 mixFile.replace(/^\//g, ""),

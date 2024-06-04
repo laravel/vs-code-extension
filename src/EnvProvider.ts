@@ -1,10 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import * as fs from "fs";
-import Helpers from "./helpers";
-import { createFileWatcher } from "./fileWatcher";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import { createFileWatcher } from "./fileWatcher";
+import { wordMatchRegex } from "./support/patterns";
+import { projectPathExists, readFileInProject } from "./support/project";
 
 export default class EnvProvider implements Provider {
     private enviroments: { [key: string]: string } = {};
@@ -34,7 +34,7 @@ export default class EnvProvider implements Provider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             completeItem.detail = value;
@@ -45,24 +45,19 @@ export default class EnvProvider implements Provider {
 
     load() {
         try {
-            if (!fs.existsSync(Helpers.projectPath(".env"))) {
+            if (!projectPathExists(".env")) {
                 return;
             }
 
-            let enviroments: any = {};
-
-            let envs = fs
-                .readFileSync(Helpers.projectPath(".env"), "utf8")
-                .split("\n");
-
-            for (let i in envs) {
-                let envKeyValue = envs[i].split("=");
-
-                if (envKeyValue.length === 2) {
-                    enviroments[envKeyValue[0]] = envKeyValue[1];
-                }
-            }
-            this.enviroments = enviroments;
+            readFileInProject(".env")
+                .split("\n")
+                .map((env) => env.trim())
+                .filter((env) => !env.startsWith("#"))
+                .map((env) => env.split("=").map((env) => env.trim()))
+                .filter((env) => env.length === 2)
+                .forEach(([key, value]) => {
+                    this.enviroments[key] = value;
+                });
         } catch (exception) {
             console.error(exception);
         }

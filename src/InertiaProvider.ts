@@ -1,10 +1,10 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
-import Helpers from "./helpers";
+import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import InertiaRegistry from "./InertiaRegistry";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class InertiaProvider implements Provider {
     private viewRegistry: typeof InertiaRegistry;
@@ -36,7 +36,7 @@ export default class InertiaProvider implements Provider {
 
                 completionItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 return completionItem;
@@ -63,7 +63,7 @@ export default class InertiaProvider implements Provider {
             );
             variablecompletionItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
             return variablecompletionItem;
         });

@@ -1,20 +1,18 @@
 "use strict";
 
 import * as vscode from "vscode";
-import Helpers from "./helpers";
-import { runInLaravel, template } from "./PHP";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import { runInLaravel, template } from "./PHP";
+import Helpers from "./helpers";
+import { config } from "./support/config";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class GateProvider implements Provider {
     private abilities: any[] = [];
     private models: any[] = [];
 
     constructor() {
-        if (
-            vscode.workspace
-                .getConfiguration("Laravel")
-                .get<boolean>("disableAuth", false)
-        ) {
+        if (config<boolean>("disableAuth", false)) {
             return;
         }
 
@@ -44,7 +42,7 @@ export default class GateProvider implements Provider {
 
                 completeItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 return completeItem;
@@ -58,7 +56,7 @@ export default class GateProvider implements Provider {
             );
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             return completeItem;

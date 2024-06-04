@@ -1,9 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import Helpers from "./helpers";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import Logger from "./Logger";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class ValidationProvider implements Provider {
     private rules: {
@@ -162,7 +161,7 @@ export default class ValidationProvider implements Provider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             completeItem.insertText = new vscode.SnippetString(value);

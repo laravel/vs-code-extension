@@ -1,9 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
+import Helpers from "./helpers";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class BladeProvider implements vscode.CompletionItemProvider {
     private customDirectives: any[] = [];
@@ -41,7 +42,7 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
 
                 completeItem.range = document.getWordRangeAtPosition(
                     position,
-                    Helpers.wordMatchRegex,
+                    wordMatchRegex,
                 );
 
                 return completeItem;
@@ -78,7 +79,7 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             return completeItem;

@@ -1,10 +1,11 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
-import Helpers from "./helpers";
-import { createFileWatcher } from "./fileWatcher";
+import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
+import { createFileWatcher } from "./fileWatcher";
+import { wordMatchRegex } from "./support/patterns";
+import { projectPath } from "./support/project";
 
 export default class AssetProvider implements Provider {
     private publicFiles: string[] = [];
@@ -34,7 +35,7 @@ export default class AssetProvider implements Provider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             return completeItem;
@@ -49,7 +50,7 @@ export default class AssetProvider implements Provider {
 
     getFiles(dir: string = "public", depth: number = 0): string[] {
         try {
-            let dirFullPath = Helpers.projectPath(dir);
+            let dirFullPath = projectPath(dir);
 
             if (!fs.existsSync(dirFullPath)) {
                 return [];

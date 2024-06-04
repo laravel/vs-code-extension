@@ -1,32 +1,31 @@
 "use strict";
 
 import * as vscode from "vscode";
-import * as fs from "fs";
-import Helpers from "./helpers";
 
-import RouteProvider from "./RouteProvider";
-import ViewProvider from "./ViewProvider";
+import AssetProvider from "./AssetProvider";
+import BladeProvider from "./BladeProvider";
 import ConfigProvider from "./ConfigProvider";
-import TranslationProvider from "./TranslationProvider";
-import MixProvider from "./MixProvider";
-import ValidationProvider from "./ValidationProvider";
+import EloquentProvider from "./EloquentProvider";
 import EnvProvider from "./EnvProvider";
 import GateProvider from "./GateProvider";
-import AssetProvider from "./AssetProvider";
-import EloquentProvider from "./EloquentProvider";
-import BladeProvider from "./BladeProvider";
-import Logger from "./Logger";
-import Registry from "./Registry";
 import LinkProvider from "./LinkProvider";
+import Logger from "./Logger";
+import MixProvider from "./MixProvider";
+import Registry from "./Registry";
+import RouteProvider from "./RouteProvider";
+import TranslationProvider from "./TranslationProvider";
+import ValidationProvider from "./ValidationProvider";
+import ViewProvider from "./ViewProvider";
 // import HoverProvider from "./HoverProvider";
 import InertiaProvider from "./InertiaProvider";
+import { hasWorkspace, projectPathExists } from "./support/project";
 
 function shouldActivate(): boolean {
-    if (!Helpers.hasWorkspace()) {
+    if (!hasWorkspace()) {
         return false;
     }
 
-    if (!fs.existsSync(Helpers.projectPath("artisan"))) {
+    if (!projectPathExists("artisan")) {
         return false;
     }
 

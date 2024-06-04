@@ -1,10 +1,11 @@
 "use strict";
 
 import * as vscode from "vscode";
-import Helpers from "./helpers";
+import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel, template } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
-import { CompletionItemFunction, Provider, Tags } from ".";
+import { config } from "./support/config";
+import { wordMatchRegex } from "./support/patterns";
 
 interface Model {
     fqn: string;
@@ -61,9 +62,10 @@ export default class EloquentProvider implements Provider {
     ];
 
     constructor() {
-        this.modelPaths = vscode.workspace
-            .getConfiguration("Laravel")
-            .get<string[]>("modelsPaths", ["app", "app/Models"]);
+        this.modelPaths = config<string[]>("modelsPaths", [
+            "app",
+            "app/Models",
+        ]);
 
         const paths = this.modelPaths.concat(["database/migrations"]);
 
@@ -175,11 +177,7 @@ $flight = Flight::firstOrNew(
             position,
             model.attributes.map(
                 (attr: any) =>
-                    attr[
-                        vscode.workspace
-                            .getConfiguration("Laravel")
-                            .get<string>("modelAttributeCase", "default")
-                    ],
+                    attr[config<string>("modelAttributeCase", "default")],
             ),
         )
             .concat(
@@ -188,11 +186,7 @@ $flight = Flight::firstOrNew(
                     position,
                     model.accessors.map(
                         (attr: any) =>
-                            attr[
-                                vscode.workspace
-                                    .getConfiguration("Laravel")
-                                    .get<string>("modelAccessorCase", "snake")
-                            ],
+                            attr[config<string>("modelAccessorCase", "snak")],
                     ),
                     vscode.CompletionItemKind.Constant,
                 ),
@@ -213,7 +207,7 @@ $flight = Flight::firstOrNew(
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             return completeItem;

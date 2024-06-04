@@ -1,9 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import Helpers from "./helpers";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import ConfigRegistry from "./ConfigRegistry";
+import { wordMatchRegex } from "./support/patterns";
 
 export default class ConfigProvider implements Provider {
     private configs: typeof ConfigRegistry;
@@ -31,7 +31,7 @@ export default class ConfigProvider implements Provider {
 
             completeItem.range = document.getWordRangeAtPosition(
                 position,
-                Helpers.wordMatchRegex,
+                wordMatchRegex,
             );
 
             if (config.value) {

@@ -1,10 +1,15 @@
-import * as fs from "fs";
-import * as vscode from "vscode";
-import Helpers from "./helpers";
-import Logger from "./Logger";
-import * as os from "os";
 import * as cp from "child_process";
+import * as fs from "fs";
+import * as os from "os";
 import engine from "php-parser";
+import Logger from "./Logger";
+import Helpers from "./helpers";
+import { config } from "./support/config";
+import {
+    getWorkspaceFolders,
+    projectPath,
+    projectPathExists,
+} from "./support/project";
 
 // TODO: Problem?
 // @ts-ignore
@@ -55,16 +60,16 @@ export const runInLaravel = <T>(
     code = code.replace(/(?:\r\n|\r|\n)/g, " ");
 
     if (
-        !fs.existsSync(Helpers.projectPath("vendor/autoload.php")) ||
-        !fs.existsSync(Helpers.projectPath("bootstrap/app.php"))
+        !projectPathExists("vendor/autoload.php") ||
+        !projectPathExists("bootstrap/app.php")
     ) {
         return new Promise((resolve, error) => error("Not a Laravel project"));
     }
 
     const command = template("bootstrap-laravel", {
         output: code,
-        vendor_autoload_path: Helpers.projectPath("vendor/autoload.php", true),
-        bootstrap_path: Helpers.projectPath("bootstrap/app.php", true),
+        vendor_autoload_path: projectPath("vendor/autoload.php", true),
+        bootstrap_path: projectPath("bootstrap/app.php", true),
     });
 
     return runPhp(command, description)
@@ -124,10 +129,7 @@ export const runPhp = (
     });
 
     // TODO: Command template includes {code} placeholder? Hm. Why?
-    let commandTemplate =
-        vscode.workspace
-            .getConfiguration("Laravel")
-            .get<string>("phpCommand") ?? 'php -r "{code}"';
+    let commandTemplate = config<string>("phpCommand", 'php -r "{code}"');
 
     let command = commandTemplate.replace("{code}", code);
 
@@ -141,11 +143,7 @@ export const runPhp = (
         cp.exec(
             command,
             {
-                cwd:
-                    vscode.workspace.workspaceFolders &&
-                    vscode.workspace.workspaceFolders.length > 0
-                        ? vscode.workspace.workspaceFolders[0].uri.fsPath
-                        : undefined,
+                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
@@ -174,17 +172,13 @@ export const runPhp = (
 };
 
 export const artisan = (command: string): Promise<string> => {
-    const fullCommand = Helpers.projectPath("artisan") + " " + command;
+    const fullCommand = projectPath("artisan") + " " + command;
 
     return new Promise<string>((resolve, error) => {
         const result = cp.exec(
             fullCommand,
             {
-                cwd:
-                    vscode.workspace.workspaceFolders &&
-                    vscode.workspace.workspaceFolders.length > 0
-                        ? vscode.workspace.workspaceFolders[0].uri.fsPath
-                        : undefined,
+                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
