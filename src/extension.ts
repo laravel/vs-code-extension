@@ -9,7 +9,7 @@ import ViewProvider from "./ViewProvider";
 import ConfigProvider from "./ConfigProvider";
 import TranslationProvider from "./TranslationProvider";
 import MixProvider from "./MixProvider";
-// import ValidationProvider from "./ValidationProvider";
+import ValidationProvider from "./ValidationProvider";
 import EnvProvider from "./EnvProvider";
 import AuthProvider from "./AuthProvider";
 import AssetProvider from "./AssetProvider";
@@ -73,18 +73,20 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     const eloquentRegistry = new Registry();
-
     eloquentRegistry.registerProvider(new EloquentProvider());
+
+    const validationRegistry = new Registry();
+    validationRegistry.registerProvider(new ValidationProvider());
 
     let link = vscode.languages.registerDocumentLinkProvider(
         LANGUAGES,
         new LinkProvider(),
     );
 
-    let hover = vscode.languages.registerHoverProvider(
-        LANGUAGES,
-        new HoverProvider(),
-    );
+    // let hover = vscode.languages.registerHoverProvider(
+    //     LANGUAGES,
+    //     new HoverProvider(),
+    // );
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
@@ -97,13 +99,13 @@ export function activate(context: vscode.ExtensionContext) {
             eloquentRegistry,
             ...TRIGGER_CHARACTERS.concat([">"]),
         ),
+        vscode.languages.registerCompletionItemProvider(
+            LANGUAGES,
+            validationRegistry,
+            ...TRIGGER_CHARACTERS.concat(["|"]),
+        ),
         link,
-        hover,
-        // vscode.languages.registerCompletionItemProvider(
-        //     LANGUAGES,
-        //     new ValidationProvider(),
-        //     ...TRIGGER_CHARACTERS.concat(["|"]),
-        // ),
+        // hover,
         // vscode.languages.registerCompletionItemProvider(
         //     LANGUAGES,
         //     new BladeProvider(),
