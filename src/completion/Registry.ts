@@ -1,9 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider } from ".";
-import Logger from "./Logger";
-import { ParsingResult, parse } from "./PHP";
+import { CompletionProvider } from "..";
+import { info } from "../support/logger";
+import { ParsingResult, parse } from "./../support/php";
 
 export default class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];
@@ -26,7 +26,7 @@ export default class Registry implements vscode.CompletionItemProvider {
 
         const parseResult = parse(docUntilPosition);
 
-        Logger.info("Parse result", parseResult);
+        info("Parse result", parseResult);
 
         if (parseResult === null) {
             return [];

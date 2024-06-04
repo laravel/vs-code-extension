@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { Config, ConfigItem } from "..";
-import { runInLaravel } from "../PHP";
 import { createFileWatcher } from "../support/fileWatcher";
+import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
 let items: ConfigItem[] = [];

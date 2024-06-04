@@ -2,14 +2,10 @@ import * as cp from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import engine from "php-parser";
-import Logger from "./Logger";
-import { config } from "./support/config";
-import { showErrorPopup } from "./support/popup";
-import {
-    getWorkspaceFolders,
-    projectPath,
-    projectPathExists,
-} from "./support/project";
+import { config } from "./config";
+import { error, info } from "./logger";
+import { showErrorPopup } from "./popup";
+import { getWorkspaceFolders, projectPath, projectPathExists } from "./project";
 
 // TODO: Problem?
 // @ts-ignore
@@ -88,9 +84,7 @@ export const runInLaravel = <T>(
             }
 
             // TODO: Fix this
-            Logger.error(
-                "Parse Error:\n " + (description ?? "") + "\n\n" + result,
-            );
+            error("Parse Error:\n " + (description ?? "") + "\n\n" + result);
 
             throw new Error("No output found");
         })
@@ -133,7 +127,7 @@ export const runPhp = (
 
     let out = new Promise<string>(function (resolve, error) {
         if (description !== null) {
-            Logger.info("Command started: " + description);
+            info("Command started: " + description);
         }
 
         // Logger.info(command);
@@ -146,7 +140,7 @@ export const runPhp = (
             (err, stdout, stderr) => {
                 if (err === null) {
                     if (description !== null) {
-                        Logger.info("Resolved: " + description);
+                        info("Resolved: " + description);
                     }
 
                     return resolve(stdout);

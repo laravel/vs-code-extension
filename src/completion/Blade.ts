@@ -1,9 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { runInLaravel, template } from "./../PHP";
 import { createFileWatcher } from "./../support/fileWatcher";
 import { wordMatchRegex } from "./../support/patterns";
+import { runInLaravel, template } from "./../support/php";
 import { indent } from "./../support/util";
 
 export default class Blade implements vscode.CompletionItemProvider {

@@ -2,22 +2,22 @@
 
 import * as vscode from "vscode";
 
-import AssetProvider from "./AssetProvider";
-import BladeProvider from "./BladeProvider";
-import ConfigProvider from "./completion/ConfigProvider";
-import EloquentProvider from "./EloquentProvider";
-import EnvProvider from "./EnvProvider";
-import GateProvider from "./GateProvider";
-import LinkProvider from "./LinkProvider";
-import Logger from "./Logger";
-import MixProvider from "./MixProvider";
-import Registry from "./Registry";
-import RouteProvider from "./RouteProvider";
-import TranslationProvider from "./TranslationProvider";
-import ValidationProvider from "./ValidationProvider";
-import ViewProvider from "./ViewProvider";
+import AssetCompletion from "./completion/Asset";
+import BladeCompletion from "./completion/Blade";
+import ConfigCompletion from "./completion/Config";
+import EnvCompletion from "./completion/Env";
+import GateCompletion from "./completion/Gate";
+import MixCompletion from "./completion/Mix";
+import Registry from "./completion/Registry";
+import RouteCompletion from "./completion/Route";
+import TranslationCompletion from "./completion/Translation";
+import ViewCompletion from "./completion/View";
+import LinkProvider from "./link/LinkProvider";
 // import HoverProvider from "./HoverProvider";
-import InertiaProvider from "./InertiaProvider";
+import { info } from "console";
+import EloquentCompletion from "./completion/Eloquent";
+import InertiaCompletion from "./completion/Inertia";
+import ValidationCompletion from "./completion/Validation";
 import { hasWorkspace, projectPathExists } from "./support/project";
 
 function shouldActivate(): boolean {
@@ -39,9 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
     }
 
-    Logger.setup();
-
-    Logger.info("Started");
+    info("Started");
 
     console.log("Laravel VS Code Started...");
 
@@ -54,15 +52,15 @@ export function activate(context: vscode.ExtensionContext) {
     const TRIGGER_CHARACTERS = ["'", '"'];
 
     const delegatedProviders = [
-        ConfigProvider,
-        RouteProvider,
-        ViewProvider,
-        TranslationProvider,
-        MixProvider,
-        EnvProvider,
-        GateProvider,
-        AssetProvider,
-        InertiaProvider,
+        ConfigCompletion,
+        RouteCompletion,
+        ViewCompletion,
+        TranslationCompletion,
+        MixCompletion,
+        EnvCompletion,
+        GateCompletion,
+        AssetCompletion,
+        InertiaCompletion,
     ];
 
     const delegatedRegistry = new Registry();
@@ -72,10 +70,10 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     const eloquentRegistry = new Registry();
-    eloquentRegistry.registerProvider(new EloquentProvider());
+    eloquentRegistry.registerProvider(new EloquentCompletion());
 
     const validationRegistry = new Registry();
-    validationRegistry.registerProvider(new ValidationProvider());
+    validationRegistry.registerProvider(new ValidationCompletion());
 
     // let hover = vscode.languages.registerHoverProvider(
     //     LANGUAGES,
@@ -100,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
-            new BladeProvider(),
+            new BladeCompletion(),
             "@",
         ),
         vscode.languages.registerDocumentLinkProvider(

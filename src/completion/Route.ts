@@ -3,9 +3,9 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionItemFunction, CompletionProvider, Tags } from "..";
-import { runInLaravel, template } from "./../PHP";
 import { createFileWatcher } from "./../support/fileWatcher";
 import { wordMatchRegex } from "./../support/patterns";
+import { runInLaravel, template } from "./../support/php";
 import { projectPath } from "./../support/project";
 
 export default class Route implements CompletionProvider {

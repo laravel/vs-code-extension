@@ -3,9 +3,9 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionItemFunction, CompletionProvider, Tags } from "..";
-import { runInLaravel } from "./../PHP";
 import { createFileWatcher } from "./../support/fileWatcher";
 import { wordMatchRegex } from "./../support/patterns";
+import { runInLaravel } from "./../support/php";
 
 type TranslationItem = { name: string; value: string };
 

@@ -9,9 +9,9 @@ import {
     Uri,
     DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
-import { getConfigs } from "./repositories/configs";
-import { getInertiaViews } from "./repositories/inertia";
-import { getViews } from "./repositories/views";
+import { getConfigs } from "../repositories/configs";
+import { getInertiaViews } from "../repositories/inertia";
+import { getViews } from "../repositories/views";
 
 export default class Link implements vsDocumentLinkProvider {
     public provideDocumentLinks(

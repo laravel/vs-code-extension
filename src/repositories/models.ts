@@ -1,7 +1,7 @@
 import { Model } from "..";
 import { config } from "../support/config";
-import { runInLaravel, template } from "./../PHP";
 import { createFileWatcher } from "./../support/fileWatcher";
+import { runInLaravel, template } from "./../support/php";
 
 let models: Model[] = [];
 
