@@ -1,5 +1,4 @@
 import { Config, ConfigItem } from ".";
-import Logger from "./Logger";
 import { runInLaravel } from "./PHP";
 import { createFileWatcher } from "./fileWatcher";
 import * as fs from "fs";
@@ -34,7 +33,6 @@ class ConfigRegistry {
 
         for (let key in conf) {
             if (topLevel) {
-                Logger.info("top level key", key);
                 let path = Helpers.projectPath(`config/${key}.php`);
                 uri = fs.existsSync(path) ? vscode.Uri.file(path) : undefined;
 
@@ -53,10 +51,6 @@ class ConfigRegistry {
         uri: vscode.Uri | undefined,
     ): ConfigItem | ConfigItem[] {
         if (conf[key] instanceof Object) {
-            if (!uri) {
-                Logger.info("No URI for", key);
-            }
-
             return [{ name: key, value: "array(...)", uri }].concat(
                 this.getConfigs(conf[key]).map((c) => ({
                     ...c,
