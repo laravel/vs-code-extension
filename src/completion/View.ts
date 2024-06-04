@@ -2,11 +2,11 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { getViews } from "./repositories/views";
-import { wordMatchRegex } from "./support/patterns";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { getViews } from "./../repositories/views";
+import { wordMatchRegex } from "./../support/patterns";
 
-export default class ViewProvider implements Provider {
+export default class View implements Provider {
     tags(): Tags {
         return {
             classes: ["View"],

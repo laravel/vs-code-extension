@@ -13,7 +13,7 @@ import { getConfigs } from "./repositories/configs";
 import { getInertiaViews } from "./repositories/inertia";
 import { getViews } from "./repositories/views";
 
-export default class LinkProvider implements vsDocumentLinkProvider {
+export default class Link implements vsDocumentLinkProvider {
     public provideDocumentLinks(
         doc: TextDocument,
     ): ProviderResult<DocumentLink[]> {

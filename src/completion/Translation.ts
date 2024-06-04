@@ -2,15 +2,15 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { runInLaravel } from "./PHP";
-import { createFileWatcher } from "./support/fileWatcher";
-import { wordMatchRegex } from "./support/patterns";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { runInLaravel } from "./../PHP";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { wordMatchRegex } from "./../support/patterns";
 
-type Translation = { name: string; value: string };
+type TranslationItem = { name: string; value: string };
 
-export default class TranslationProvider implements Provider {
-    private translations: Translation[] = [];
+export default class Translation implements Provider {
+    private translations: TranslationItem[] = [];
 
     constructor() {
         this.load();
@@ -232,7 +232,7 @@ export default class TranslationProvider implements Provider {
     getTranslations(
         translations: { [key: string]: any },
         prefix: string,
-    ): Translation[] {
+    ): TranslationItem[] {
         return Object.entries(translations)
             .map(([key, translation]) => {
                 if (translation instanceof Object) {

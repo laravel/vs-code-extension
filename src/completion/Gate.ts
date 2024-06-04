@@ -1,13 +1,13 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { runInLaravel, template } from "./PHP";
-import { getModels } from "./repositories/models";
-import { config } from "./support/config";
-import { wordMatchRegex } from "./support/patterns";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { runInLaravel, template } from "./../PHP";
+import { getModels } from "./../repositories/models";
+import { config } from "./../support/config";
+import { wordMatchRegex } from "./../support/patterns";
 
-export default class GateProvider implements Provider {
+export default class Gate implements Provider {
     private abilities: any[] = [];
 
     constructor() {

@@ -2,12 +2,12 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { createFileWatcher } from "./support/fileWatcher";
-import { wordMatchRegex } from "./support/patterns";
-import { projectPath } from "./support/project";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { wordMatchRegex } from "./../support/patterns";
+import { projectPath } from "./../support/project";
 
-export default class AssetProvider implements Provider {
+export default class Asset implements Provider {
     private publicFiles: string[] = [];
 
     constructor() {
@@ -73,7 +73,7 @@ export default class AssetProvider implements Provider {
 
                     if (
                         stat.isFile() &&
-                        filePath[0] !== "." &&
+                        filePath[0] !== ".." &&
                         filePath.endsWith(".php") === false
                     ) {
                         return shortFilePath;

@@ -1,15 +1,12 @@
 "use strict";
 
 import {
-    HoverProvider as vsHoverProvider,
-    TextDocument,
+    Hover,
     Position,
     ProviderResult,
-    Hover,
-    workspace,
-    MarkdownString,
+    TextDocument,
+    HoverProvider as vsHoverProvider,
 } from "vscode";
-import Logger from "./Logger";
 
 export default class HoverProvider implements vsHoverProvider {
     provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {

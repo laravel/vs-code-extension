@@ -2,13 +2,13 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { runInLaravel, template } from "./PHP";
-import { createFileWatcher } from "./support/fileWatcher";
-import { wordMatchRegex } from "./support/patterns";
-import { projectPath } from "./support/project";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { runInLaravel, template } from "./../PHP";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { wordMatchRegex } from "./../support/patterns";
+import { projectPath } from "./../support/project";
 
-export default class RouteProvider implements Provider {
+export default class Route implements Provider {
     // TODO: Tighten up the typing here
     private routes: any[] = [];
     private controllers: any[] = [];

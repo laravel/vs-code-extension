@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { runInLaravel, template } from "./PHP";
-import { createFileWatcher } from "./support/fileWatcher";
-import { wordMatchRegex } from "./support/patterns";
-import { indent } from "./support/util";
+import { runInLaravel, template } from "./../PHP";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { wordMatchRegex } from "./../support/patterns";
+import { indent } from "./../support/util";
 
-export default class BladeProvider implements vscode.CompletionItemProvider {
+export default class Blade implements vscode.CompletionItemProvider {
     private customDirectives: any[] = [];
 
     constructor() {

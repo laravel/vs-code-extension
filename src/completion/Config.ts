@@ -1,11 +1,11 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { getConfigs } from "./repositories/configs";
-import { wordMatchRegex } from "./support/patterns";
+import { CompletionItemFunction, Provider, Tags } from "..";
+import { getConfigs } from "../repositories/configs";
+import { wordMatchRegex } from "../support/patterns";
 
-export default class ConfigProvider implements Provider {
+export default class Config implements Provider {
     tags(): Tags {
         return { classes: ["Config"], functions: ["config"] };
     }

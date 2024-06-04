@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import AssetProvider from "./AssetProvider";
 import BladeProvider from "./BladeProvider";
-import ConfigProvider from "./ConfigProvider";
+import ConfigProvider from "./completion/ConfigProvider";
 import EloquentProvider from "./EloquentProvider";
 import EnvProvider from "./EnvProvider";
 import GateProvider from "./GateProvider";
