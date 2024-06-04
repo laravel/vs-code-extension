@@ -3,16 +3,10 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import ViewRepository from "./repositories/ViewRepository";
+import { getViews } from "./repositories/views";
 import { wordMatchRegex } from "./support/patterns";
 
 export default class ViewProvider implements Provider {
-    private ViewRepository: typeof ViewRepository;
-
-    constructor() {
-        this.ViewRepository = ViewRepository;
-    }
-
     tags(): Tags {
         return {
             classes: ["View"],
@@ -37,12 +31,14 @@ export default class ViewProvider implements Provider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        const views = getViews();
+
         if (func.function && ["@section", "@push"].includes(func.function)) {
             return this.getYields(func.function, document.getText());
         }
 
         if (func.param.index === 0) {
-            return Object.entries(this.ViewRepository.views).map(([key]) => {
+            return Object.entries(views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
                     vscode.CompletionItemKind.Constant,
@@ -58,15 +54,14 @@ export default class ViewProvider implements Provider {
         }
 
         if (
-            typeof this.ViewRepository.views[func.parameters[0]] ===
-                "undefined" ||
+            typeof views[func.parameters[0]] === "undefined" ||
             !func.param.isKey
         ) {
             return [];
         }
 
         let viewContent = fs.readFileSync(
-            this.ViewRepository.views[func.parameters[0]].uri.path,
+            views[func.parameters[0]].uri.path,
             "utf8",
         );
 
@@ -94,17 +89,18 @@ export default class ViewProvider implements Provider {
     getYields(func: string, documentText: string): vscode.CompletionItem[] {
         let extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
         let regexResult = extendsRegex.exec(documentText);
+        const views = getViews();
 
         if (!regexResult) {
             return [];
         }
 
-        if (typeof this.ViewRepository.views[regexResult[1]] === "undefined") {
+        if (typeof views[regexResult[1]] === "undefined") {
             return [];
         }
 
         let parentContent = fs.readFileSync(
-            this.ViewRepository.views[regexResult[1]].uri.path,
+            views[regexResult[1]].uri.path,
             "utf8",
         );
         let yieldRegex =

@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel, template } from "./PHP";
-import getModels from "./repositories/ModelRepository";
+import { getModels } from "./repositories/models";
 import { config } from "./support/config";
 import { wordMatchRegex } from "./support/patterns";
 

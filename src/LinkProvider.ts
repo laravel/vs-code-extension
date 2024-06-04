@@ -9,9 +9,9 @@ import {
     Uri,
     DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
-import ConfigRepository from "./repositories/ConfigRepository";
-import InertiaRepository from "./repositories/InertiaRepository";
-import ViewRepository from "./repositories/ViewRepository";
+import { getConfigs } from "./repositories/configs";
+import { getInertiaViews } from "./repositories/inertia";
+import { getViews } from "./repositories/views";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     public provideDocumentLinks(
@@ -39,7 +39,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
 
         return this.findInDoc(doc, regex, (match) => {
-            return ViewRepository.views[match[0]]?.uri ?? null;
+            return getViews()[match[0]]?.uri ?? null;
         });
     }
 
@@ -51,7 +51,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         let regex = `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
 
         return this.findInDoc(doc, regex, (match) => {
-            return InertiaRepository.views[match[0]]?.uri ?? null;
+            return getInertiaViews()[match[0]]?.uri ?? null;
         });
     }
 
@@ -62,8 +62,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
 
         return this.findInDoc(doc, regex, (match) => {
             return (
-                ConfigRepository.items.find((item) => item.name === match[0])
-                    ?.uri ?? null
+                getConfigs().find((item) => item.name === match[0])?.uri ?? null
             );
         });
     }

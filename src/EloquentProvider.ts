@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionItemFunction, Model, Provider, Tags } from ".";
-import getModels from "./repositories/ModelRepository";
+import { getModels } from "./repositories/models";
 import { config } from "./support/config";
 import { wordMatchRegex } from "./support/patterns";
 

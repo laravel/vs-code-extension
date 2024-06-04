@@ -27,12 +27,10 @@ const load = () => {
         });
 };
 
+load();
+
 modelPaths
     .concat(["database/migrations"])
     .forEach((path) => createFileWatcher(`${path}/*.php`, load));
 
-load();
-
-const getModels = (): Model[] => models;
-
-export default getModels;
+export const getModels = (): Model[] => models;
