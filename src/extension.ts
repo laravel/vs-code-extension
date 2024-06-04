@@ -78,11 +78,6 @@ export function activate(context: vscode.ExtensionContext) {
     const validationRegistry = new Registry();
     validationRegistry.registerProvider(new ValidationProvider());
 
-    let link = vscode.languages.registerDocumentLinkProvider(
-        LANGUAGES,
-        new LinkProvider(),
-    );
-
     // let hover = vscode.languages.registerHoverProvider(
     //     LANGUAGES,
     //     new HoverProvider(),
@@ -104,13 +99,16 @@ export function activate(context: vscode.ExtensionContext) {
             validationRegistry,
             ...TRIGGER_CHARACTERS.concat(["|"]),
         ),
-        link,
+        vscode.languages.registerCompletionItemProvider(
+            LANGUAGES,
+            new BladeProvider(),
+            "@",
+        ),
+        vscode.languages.registerDocumentLinkProvider(
+            LANGUAGES,
+            new LinkProvider(),
+        ),
         // hover,
-        // vscode.languages.registerCompletionItemProvider(
-        //     LANGUAGES,
-        //     new BladeProvider(),
-        //     "@",
-        // ),
     );
 }
 

@@ -3,15 +3,15 @@
 import * as vscode from "vscode";
 import Helpers from "./helpers";
 import { runInLaravel, template } from "./PHP";
+import { createFileWatcher } from "./fileWatcher";
 
 export default class BladeProvider implements vscode.CompletionItemProvider {
     private customDirectives: any[] = [];
 
     constructor() {
-        this.loadCustomDirectives();
+        this.load();
 
-        // TODO: huh?
-        // setInterval(() => this.loadCustomDirectives(), 600000);
+        createFileWatcher("app/{,*,**/*}Provider.php", this.load.bind(this));
     }
 
     provideCompletionItems(
@@ -24,12 +24,7 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
             ["blade", "laravel-blade"].includes(document.languageId) ||
             document.fileName.endsWith(".blade.php");
 
-        if (
-            isBlade === false ||
-            vscode.workspace
-                .getConfiguration("Laravel")
-                .get<boolean>("disableBlade", false)
-        ) {
+        if (!isBlade) {
             return [];
         }
 
@@ -54,7 +49,7 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
         );
     }
 
-    loadCustomDirectives() {
+    load() {
         runInLaravel<any[]>(
             template("blade-directives"),
             "Custom Blade Directives",
@@ -71,17 +66,11 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
         document: vscode.TextDocument,
         position: vscode.Position,
     ): vscode.CompletionItem[] {
-        let out: vscode.CompletionItem[] = [];
-
-        const directives = this.defaultDirectives();
-
-        for (let key in directives) {
+        return Object.entries(this.defaultDirectives()).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
                 key,
                 vscode.CompletionItemKind.Keyword,
             );
-
-            const value = directives[key];
 
             completeItem.insertText = new vscode.SnippetString(
                 typeof value === "string" ? value : value.join("\n"),
@@ -92,10 +81,8 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
                 Helpers.wordMatchRegex,
             );
 
-            out.push(completeItem);
-        }
-
-        return out;
+            return completeItem;
+        });
     }
 
     defaultDirectives(): { [key: string]: string | string[] } {
