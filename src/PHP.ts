@@ -3,8 +3,8 @@ import * as fs from "fs";
 import * as os from "os";
 import engine from "php-parser";
 import Logger from "./Logger";
-import Helpers from "./helpers";
 import { config } from "./support/config";
+import { showErrorPopup } from "./support/popup";
 import {
     getWorkspaceFolders,
     projectPath,
@@ -95,9 +95,7 @@ export const runInLaravel = <T>(
             throw new Error("No output found");
         })
         .catch((error) => {
-            Logger.error(command);
-
-            Helpers.showErrorPopup();
+            showErrorPopup(command);
         });
 };
 
@@ -156,13 +154,10 @@ export const runPhp = (
 
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
 
-                Logger.error(
+                showErrorPopup(
                     "Error:\n " + (description ?? "") + "\n\n" + errorOutput,
+                    command,
                 );
-
-                Logger.error(command);
-
-                Helpers.showErrorPopup();
 
                 error(errorOutput);
             },
@@ -175,7 +170,7 @@ export const artisan = (command: string): Promise<string> => {
     const fullCommand = projectPath("artisan") + " " + command;
 
     return new Promise<string>((resolve, error) => {
-        const result = cp.exec(
+        cp.exec(
             fullCommand,
             {
                 cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
@@ -187,11 +182,9 @@ export const artisan = (command: string): Promise<string> => {
 
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
 
-                Logger.error(
+                showErrorPopup(
                     "Error:\n " + (command ?? "") + "\n\n" + errorOutput,
                 );
-
-                Helpers.showErrorPopup();
 
                 error(errorOutput);
             },

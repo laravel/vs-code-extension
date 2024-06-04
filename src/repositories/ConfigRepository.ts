@@ -1,12 +1,11 @@
-import { Config, ConfigItem } from ".";
-import { runInLaravel } from "./PHP";
-import { createFileWatcher } from "./fileWatcher";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import Helpers from "./helpers";
-import { projectPath } from "./support/project";
+import { Config, ConfigItem } from "..";
+import { runInLaravel } from "./../PHP";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { projectPath } from "./../support/project";
 
-class ConfigRegistry {
+class ConfigRepository {
     items: ConfigItem[] = [];
     cachedFilePaths = new Map<string, vscode.Uri | undefined>();
 
@@ -69,4 +68,4 @@ class ConfigRegistry {
     }
 }
 
-export default new ConfigRegistry();
+export default new ConfigRepository();

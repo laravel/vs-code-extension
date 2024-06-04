@@ -3,13 +3,12 @@
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel, template } from "./PHP";
-import Helpers from "./helpers";
+import getModels from "./repositories/ModelRepository";
 import { config } from "./support/config";
 import { wordMatchRegex } from "./support/patterns";
 
 export default class GateProvider implements Provider {
     private abilities: any[] = [];
-    private models: any[] = [];
 
     constructor() {
         if (config<boolean>("disableAuth", false)) {
@@ -34,9 +33,9 @@ export default class GateProvider implements Provider {
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         if (func.param.index === 1) {
-            return this.models.map((model) => {
+            return getModels().map((model) => {
                 let completeItem = new vscode.CompletionItem(
-                    model.replace(/\\/, "\\\\"),
+                    model.fqn.replace(/\\/g, "\\\\"),
                     vscode.CompletionItemKind.Value,
                 );
 
@@ -64,9 +63,6 @@ export default class GateProvider implements Provider {
     }
 
     load() {
-        // TODO: huh?
-        Helpers.getModels().then((models) => (this.models = models));
-
         runInLaravel<any[]>(template("auth"), "Auth Data")
             .then((result) => {
                 this.abilities = result;

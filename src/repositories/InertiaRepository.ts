@@ -1,12 +1,10 @@
-import { View } from ".";
-import Logger from "./Logger";
-import { createFileWatcher } from "./fileWatcher";
-import Helpers from "./helpers";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { projectPath } from "./support/project";
+import { View } from "..";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { projectPath } from "./../support/project";
 
-class InertiaRegistry {
+class InertiaRepository {
     views: {
         [key: string]: View;
     } = {};
@@ -65,4 +63,4 @@ class InertiaRegistry {
     }
 }
 
-export default new InertiaRegistry();
+export default new InertiaRepository();

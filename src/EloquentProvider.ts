@@ -1,31 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from ".";
-import { runInLaravel, template } from "./PHP";
-import { createFileWatcher } from "./fileWatcher";
+import { CompletionItemFunction, Model, Provider, Tags } from ".";
+import getModels from "./repositories/ModelRepository";
 import { config } from "./support/config";
 import { wordMatchRegex } from "./support/patterns";
 
-interface Model {
-    fqn: string;
-    attributes: {
-        default: string;
-        camel: string;
-        snake: string;
-    }[];
-    accessors: string[];
-    relations: string[];
-    camelCase: string;
-    snakeCase: string;
-    pluralCamelCase: string;
-    pluralSnakeCase: string;
-}
-
 export default class EloquentProvider implements Provider {
-    private models: Model[] = [];
-    private modelPaths: string[] = [];
-
     private relationMethods = [
         "has",
         "orHas",
@@ -61,24 +42,9 @@ export default class EloquentProvider implements Provider {
         "sum",
     ];
 
-    constructor() {
-        this.modelPaths = config<string[]>("modelsPaths", [
-            "app",
-            "app/Models",
-        ]);
-
-        const paths = this.modelPaths.concat(["database/migrations"]);
-
-        paths.forEach((path) =>
-            createFileWatcher(`${path}/*.php`, this.load.bind(this)),
-        );
-
-        this.load();
-    }
-
     tags(): Tags {
         return {
-            classes: this.models.map((model) => model.fqn),
+            classes: getModels().map((model) => model.fqn),
             functions: this.relationMethods.concat(this.firstParamMethods),
         };
         /**
@@ -124,7 +90,7 @@ $flight = Flight::firstOrNew(
             return [];
         }
 
-        const model = this.models.find((model) => model.fqn === func.fqn);
+        const model = getModels().find((model) => model.fqn === func.fqn);
 
         // If we can't find the model, we can't provide completions
         if (!model) {
@@ -212,25 +178,5 @@ $flight = Flight::firstOrNew(
 
             return completeItem;
         });
-    }
-
-    load() {
-        runInLaravel<{
-            [key: string]: Omit<Model, "fqn">;
-        }>(
-            template("eloquent-provider", {
-                model_paths: JSON.stringify(this.modelPaths),
-            }),
-            "Eloquent Attributes and Relations",
-        )
-            .then((result) => {
-                this.models = Object.entries(result).map(([key, value]) => ({
-                    ...value,
-                    fqn: key,
-                }));
-            })
-            .catch(function (e) {
-                console.error(e);
-            });
     }
 }

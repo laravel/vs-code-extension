@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getWorkspaceFolders, hasWorkspace } from "./support/project";
+import { getWorkspaceFolders, hasWorkspace } from "./project";
 
 type FileEvent = "change" | "create" | "delete";
 

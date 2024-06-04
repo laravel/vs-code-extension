@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import { createFileWatcher } from "./fileWatcher";
+import { createFileWatcher } from "./support/fileWatcher";
 import { wordMatchRegex } from "./support/patterns";
 import { projectPathExists, readFileInProject } from "./support/project";
 

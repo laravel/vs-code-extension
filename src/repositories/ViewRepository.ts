@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { View } from ".";
-import { runInLaravel } from "./PHP";
-import { createFileWatcher } from "./fileWatcher";
-import { projectPath } from "./support/project";
+import { View } from "..";
+import { runInLaravel } from "./../PHP";
+import { createFileWatcher } from "./../support/fileWatcher";
+import { projectPath } from "./../support/project";
 
-class ViewRegistry {
+class ViewRepository {
     views: {
         [key: string]: View;
     } = {};
@@ -93,4 +93,4 @@ class ViewRegistry {
     }
 }
 
-export default new ViewRegistry();
+export default new ViewRepository();

@@ -3,14 +3,14 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import InertiaRegistry from "./InertiaRegistry";
+import InertiaRepository from "./repositories/InertiaRepository";
 import { wordMatchRegex } from "./support/patterns";
 
 export default class InertiaProvider implements Provider {
-    private viewRegistry: typeof InertiaRegistry;
+    private ViewRepository: typeof InertiaRepository;
 
     constructor() {
-        this.viewRegistry = InertiaRegistry;
+        this.ViewRepository = InertiaRepository;
     }
 
     tags(): Tags {
@@ -28,7 +28,7 @@ export default class InertiaProvider implements Provider {
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         if (func.param.index === 0) {
-            return Object.entries(this.viewRegistry.views).map(([key]) => {
+            return Object.entries(this.ViewRepository.views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
                     vscode.CompletionItemKind.Constant,
@@ -44,7 +44,7 @@ export default class InertiaProvider implements Provider {
         }
 
         if (
-            typeof this.viewRegistry.views[func.parameters[0]] ===
+            typeof this.ViewRepository.views[func.parameters[0]] ===
                 "undefined" ||
             !func.param.isKey
         ) {
@@ -52,7 +52,7 @@ export default class InertiaProvider implements Provider {
         }
 
         let viewContent = fs.readFileSync(
-            this.viewRegistry.views[func.parameters[0]].uri.path,
+            this.ViewRepository.views[func.parameters[0]].uri.path,
             "utf8",
         );
 

@@ -2,14 +2,14 @@
 
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
-import ConfigRegistry from "./ConfigRegistry";
+import ConfigRepository from "./repositories/ConfigRepository";
 import { wordMatchRegex } from "./support/patterns";
 
 export default class ConfigProvider implements Provider {
-    private configs: typeof ConfigRegistry;
+    private configs: typeof ConfigRepository;
 
     constructor() {
-        this.configs = ConfigRegistry;
+        this.configs = ConfigRepository;
     }
 
     tags(): Tags {

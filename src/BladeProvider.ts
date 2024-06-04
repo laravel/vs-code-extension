@@ -2,9 +2,9 @@
 
 import * as vscode from "vscode";
 import { runInLaravel, template } from "./PHP";
-import { createFileWatcher } from "./fileWatcher";
-import Helpers from "./helpers";
+import { createFileWatcher } from "./support/fileWatcher";
 import { wordMatchRegex } from "./support/patterns";
+import { indent } from "./support/util";
 
 export default class BladeProvider implements vscode.CompletionItemProvider {
     private customDirectives: any[] = [];
@@ -88,48 +88,40 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
 
     defaultDirectives(): { [key: string]: string | string[] } {
         return {
-            "@if(...)": ["@if (${1})", Helpers.indent("${2}"), "@endif"],
-            "@error(...)": [
-                "@error(${1})",
-                Helpers.indent("${2}"),
-                "@enderror",
-            ],
+            "@if(...)": ["@if (${1})", indent("${2}"), "@endif"],
+            "@error(...)": ["@error(${1})", indent("${2}"), "@enderror"],
             "@if(...) ... @else ... @endif": [
                 "@if (${1})",
-                Helpers.indent("${2}"),
+                indent("${2}"),
                 "@else",
-                Helpers.indent("${3}"),
+                indent("${3}"),
                 "@endif",
             ],
             "@foreach(...)": [
                 "@foreach (${1} as ${2})",
-                Helpers.indent("${3}"),
+                indent("${3}"),
                 "@endforeach",
             ],
             "@forelse(...)": [
                 "@forelse (${1} as ${2})",
-                Helpers.indent("${3}"),
+                indent("${3}"),
                 "@empty",
-                Helpers.indent("${4}"),
+                indent("${4}"),
                 "@endforelse",
             ],
-            "@for(...)": ["@for (${1})", Helpers.indent("${2}"), "@endfor"],
-            "@while(...)": [
-                "@while (${1})",
-                Helpers.indent("${2}"),
-                "@endwhile",
-            ],
+            "@for(...)": ["@for (${1})", indent("${2}"), "@endfor"],
+            "@while(...)": ["@while (${1})", indent("${2}"), "@endwhile"],
             "@switch(...)": [
                 "@switch(${1})",
-                Helpers.indent("@case(${2})"),
-                Helpers.indent("${3}", 2),
-                Helpers.indent("@break", 2),
+                indent("@case(${2})"),
+                indent("${3}", 2),
+                indent("@break", 2),
                 "",
-                Helpers.indent("@default"),
-                Helpers.indent("${4}", 2),
+                indent("@default"),
+                indent("${4}", 2),
                 "@endswitch",
             ],
-            "@case(...)": ["@case(${1})", Helpers.indent("${2}"), "@break"],
+            "@case(...)": ["@case(${1})", indent("${2}"), "@break"],
             "@break": "@break",
             "@continue": "@continue",
             "@break(...)": "@break(${1})",
@@ -137,56 +129,24 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
             "@default": "@default",
             "@extends(...)": "@extends(${1})",
             "@empty": "@empty",
-            "@verbatim ...": [
-                "@verbatim",
-                Helpers.indent("${1}"),
-                "@endverbatim",
-            ],
+            "@verbatim ...": ["@verbatim", indent("${1}"), "@endverbatim"],
             "@json(...)": "@json(${1})",
             "@elseif (...)": "@elseif (${1})",
             "@else": "@else",
-            "@unless(...)": [
-                "@unless (${1})",
-                Helpers.indent("${2}"),
-                "@endunless",
-            ],
-            "@isset(...)": [
-                "@isset(${1})",
-                Helpers.indent("${2}"),
-                "@endisset",
-            ],
-            "@empty(...)": [
-                "@empty(${1})",
-                Helpers.indent("${2}"),
-                "@endempty",
-            ],
-            "@auth": ["@auth", Helpers.indent("${1}"), "@endauth"],
-            "@guest": ["@guest", Helpers.indent("${1}"), "@endguest"],
-            "@auth(...)": ["@auth(${1})", Helpers.indent("${2}"), "@endauth"],
-            "@guest(...)": [
-                "@guest(${1})",
-                Helpers.indent("${2}"),
-                "@endguest",
-            ],
-            "@can(...)": ["@can(${1})", Helpers.indent("${2}"), "@endcan"],
-            "@cannot(...)": [
-                "@cannot(${1})",
-                Helpers.indent("${2}"),
-                "@endcannot",
-            ],
+            "@unless(...)": ["@unless (${1})", indent("${2}"), "@endunless"],
+            "@isset(...)": ["@isset(${1})", indent("${2}"), "@endisset"],
+            "@empty(...)": ["@empty(${1})", indent("${2}"), "@endempty"],
+            "@auth": ["@auth", indent("${1}"), "@endauth"],
+            "@guest": ["@guest", indent("${1}"), "@endguest"],
+            "@auth(...)": ["@auth(${1})", indent("${2}"), "@endauth"],
+            "@guest(...)": ["@guest(${1})", indent("${2}"), "@endguest"],
+            "@can(...)": ["@can(${1})", indent("${2}"), "@endcan"],
+            "@cannot(...)": ["@cannot(${1})", indent("${2}"), "@endcannot"],
             "@elsecan(...)": "@elsecan(${1})",
             "@elsecannot(...)": "@elsecannot(${1})",
-            "@production": [
-                "@production",
-                Helpers.indent("${1}"),
-                "@endproduction",
-            ],
-            "@env(...)": ["@env(${1})", Helpers.indent("${2}"), "@endenv"],
-            "@hasSection(...)": [
-                "@hasSection(${1})",
-                Helpers.indent("${2}"),
-                "@endif",
-            ],
+            "@production": ["@production", indent("${1}"), "@endproduction"],
+            "@env(...)": ["@env(${1})", indent("${2}"), "@endenv"],
+            "@hasSection(...)": ["@hasSection(${1})", indent("${2}"), "@endif"],
             "@sectionMissing(...)": ["@sectionMissing(${1})", "${2}", "@endif"],
             "@include(...)": "@include(${1})",
             "@includeIf(...)": "@includeIf(${1})",
@@ -194,17 +154,13 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
             "@includeUnless(...)": "@includeUnless(${1}, ${2})",
             "@includeFirst(...)": "@includeFirst(${1})",
             "@each(...)": "@each(${1}, ${2}, ${3})",
-            "@once": ["@once", Helpers.indent("${1}"), "@endonce"],
+            "@once": ["@once", indent("${1}"), "@endonce"],
             "@yield(...)": "@yield(${1})",
             "@slot(...)": "@slot(${1})",
             "@stack(...)": "@stack(${1})",
-            "@push(...)": ["@push(${1})", Helpers.indent("${2}"), "@endpush"],
-            "@prepend(...)": [
-                "@prepend(${1})",
-                Helpers.indent("${2}"),
-                "@endprepend",
-            ],
-            "@php": ["@php", Helpers.indent("${1}"), "@endphp"],
+            "@push(...)": ["@push(${1})", indent("${2}"), "@endpush"],
+            "@prepend(...)": ["@prepend(${1})", indent("${2}"), "@endprepend"],
+            "@php": ["@php", indent("${1}"), "@endphp"],
             "@component(...)": ["@component(${1})", "${2}", "@endcomponent"],
             "@section(...) ... @endsection": [
                 "@section(${1})",

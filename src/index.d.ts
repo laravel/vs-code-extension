@@ -19,6 +19,21 @@ interface CompletionItemFunction {
     };
 }
 
+interface Model {
+    fqn: string;
+    attributes: {
+        default: string;
+        camel: string;
+        snake: string;
+    }[];
+    accessors: string[];
+    relations: string[];
+    camelCase: string;
+    snakeCase: string;
+    pluralCamelCase: string;
+    pluralSnakeCase: string;
+}
+
 interface Config {
     [key: string]: any;
 }

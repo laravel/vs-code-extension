@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionItemFunction, Provider, Tags } from ".";
 import { runInLaravel, template } from "./PHP";
-import { createFileWatcher } from "./fileWatcher";
+import { createFileWatcher } from "./support/fileWatcher";
 import { wordMatchRegex } from "./support/patterns";
 import { projectPath } from "./support/project";
 
