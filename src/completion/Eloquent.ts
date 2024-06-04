@@ -145,21 +145,21 @@ $flight = Flight::firstOrNew(
                 (attr: any) =>
                     attr[config<string>("modelAttributeCase", "default")],
             ),
-        )
-            .concat(
-                this.getCompletionItems(
-                    document,
-                    position,
-                    model.accessors.map(
-                        (attr: any) =>
-                            attr[config<string>("modelAccessorCase", "snak")],
-                    ),
-                    vscode.CompletionItemKind.Constant,
+        ).concat(
+            this.getCompletionItems(
+                document,
+                position,
+                model.accessors.map(
+                    (attr: any) =>
+                        attr[config<string>("modelAccessorCase", "snake")],
                 ),
-            )
-            .concat(
-                this.getRelationshipCompletionItems(document, position, model),
-            );
+                vscode.CompletionItemKind.Constant,
+            ),
+        );
+
+        // .concat(
+        //     this.getRelationshipCompletionItems(document, position, model),
+        // );
     }
 
     getCompletionItems(
