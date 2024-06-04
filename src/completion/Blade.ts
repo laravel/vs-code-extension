@@ -12,7 +12,10 @@ export default class Blade implements vscode.CompletionItemProvider {
     constructor() {
         this.load();
 
-        createFileWatcher("app/{,*,**/*}Provider.php", this.load.bind(this));
+        createFileWatcher(
+            "app/{,*,**/*}CompletionProvider.php",
+            this.load.bind(this),
+        );
     }
 
     provideCompletionItems(

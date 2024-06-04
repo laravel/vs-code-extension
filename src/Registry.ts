@@ -1,14 +1,14 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { Provider } from ".";
-import { ParsingResult, parse } from "./PHP";
+import { CompletionProvider } from ".";
 import Logger from "./Logger";
+import { ParsingResult, parse } from "./PHP";
 
 export default class Registry implements vscode.CompletionItemProvider {
-    private providers: Provider[] = [];
+    private providers: CompletionProvider[] = [];
 
-    registerProvider(provider: Provider) {
+    registerProvider(provider: CompletionProvider) {
         this.providers.push(provider);
     }
 

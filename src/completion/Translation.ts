@@ -2,14 +2,14 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { runInLaravel } from "./../PHP";
 import { createFileWatcher } from "./../support/fileWatcher";
 import { wordMatchRegex } from "./../support/patterns";
 
 type TranslationItem = { name: string; value: string };
 
-export default class Translation implements Provider {
+export default class Translation implements CompletionProvider {
     private translations: TranslationItem[] = [];
 
     constructor() {

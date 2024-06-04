@@ -44,7 +44,7 @@ interface ConfigItem {
     uri?: vscode.Uri;
 }
 
-interface Provider {
+interface CompletionProvider {
     tags(): Tags;
     provideCompletionItems(
         func: CompletionItemFunction,

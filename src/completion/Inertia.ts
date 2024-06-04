@@ -2,11 +2,11 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { getInertiaViews } from "./../repositories/inertia";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Inertia implements Provider {
+export default class Inertia implements CompletionProvider {
     tags(): Tags {
         return {
             classes: ["Inertia"],

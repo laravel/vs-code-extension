@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { createFileWatcher } from "./../support/fileWatcher";
 import { wordMatchRegex } from "./../support/patterns";
 import { projectPathExists, readFileInProject } from "./../support/project";
 
-export default class Env implements Provider {
+export default class Env implements CompletionProvider {
     private enviroments: { [key: string]: string } = {};
 
     constructor() {

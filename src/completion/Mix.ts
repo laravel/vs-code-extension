@@ -1,11 +1,11 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { wordMatchRegex } from "./../support/patterns";
 import { projectPathExists, readFileInProject } from "./../support/project";
 
-export default class Mix implements Provider {
+export default class Mix implements CompletionProvider {
     private mixes: any[] = [];
 
     constructor() {

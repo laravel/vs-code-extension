@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Model, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Model, Tags } from "..";
 import { getModels } from "./../repositories/models";
 import { config } from "./../support/config";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Eloquent implements Provider {
+export default class Eloquent implements CompletionProvider {
     private relationMethods = [
         "has",
         "orHas",

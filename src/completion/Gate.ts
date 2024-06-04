@@ -1,13 +1,13 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { runInLaravel, template } from "./../PHP";
 import { getModels } from "./../repositories/models";
 import { config } from "./../support/config";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Gate implements Provider {
+export default class Gate implements CompletionProvider {
     private abilities: any[] = [];
 
     constructor() {

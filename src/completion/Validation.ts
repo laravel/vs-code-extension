@@ -1,10 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, Provider, Tags } from "..";
+import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Validation implements Provider {
+export default class Validation implements CompletionProvider {
     private rules: {
         [key: string]: string;
     } = {
