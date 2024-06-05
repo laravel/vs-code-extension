@@ -1,7 +1,9 @@
 import * as fs from "fs";
+import { globSync } from "glob";
 import * as vscode from "vscode";
 import { Config, ConfigItem } from "..";
 import { loadAndWatch } from "../support/fileWatcher";
+import { info } from "../support/logger";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
@@ -18,6 +20,21 @@ const load = () => {
         });
 };
 
+const getFilePath = (key: string): vscode.Uri | undefined => {
+    const path = projectPath(`config/${key}.php`);
+
+    if (fs.existsSync(path)) {
+        return vscode.Uri.file(path);
+    }
+
+    const files = globSync(projectPath(`vendor/**/config/${key}.php`));
+
+    if (files.length > 0) {
+        info(`Found config file for ${key} in vendor directory`, files[0]);
+        return vscode.Uri.file(files[0]);
+    }
+};
+
 const collectConfigs = (conf: Config, topLevel = false): ConfigItem[] => {
     // TODO: Boo?
     let result: any[] = [];
@@ -26,8 +43,7 @@ const collectConfigs = (conf: Config, topLevel = false): ConfigItem[] => {
 
     for (let key in conf) {
         if (topLevel) {
-            let path = projectPath(`config/${key}.php`);
-            uri = fs.existsSync(path) ? vscode.Uri.file(path) : undefined;
+            uri = getFilePath(key);
 
             cachedFilePaths.set(key, uri);
         }
