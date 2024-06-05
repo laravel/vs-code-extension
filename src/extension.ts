@@ -24,6 +24,7 @@ import HoverProvider from "./hover/HoverProvider";
 import inertiaHover from "./hover/Inertia";
 import viewHover from "./hover/View";
 import appBindingLink from "./link/AppBinding";
+import assetLink from "./link/Asset";
 import configLink from "./link/Config";
 import envLink from "./link/Env";
 import inertiaLink from "./link/Inertia";
@@ -95,11 +96,16 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     const linkProvider = new LinkProvider();
-    [configLink, viewLink, inertiaLink, appBindingLink, envLink].forEach(
-        (provider) => {
-            linkProvider.registerProvider(provider);
-        },
-    );
+    [
+        configLink,
+        viewLink,
+        inertiaLink,
+        appBindingLink,
+        envLink,
+        assetLink,
+    ].forEach((provider) => {
+        linkProvider.registerProvider(provider);
+    });
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(

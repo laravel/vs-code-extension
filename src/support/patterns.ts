@@ -26,6 +26,10 @@ export const configMatchRegex = (() => {
     return funcRegex(["config", "Config::get"]);
 })();
 
+export const assetMatchRegex = (() => {
+    return funcRegex(["asset"]);
+})();
+
 export const appBindingMatchRegex = (() => {
     return funcRegex(["app", "App::make"]);
 })();
