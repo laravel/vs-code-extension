@@ -47,13 +47,12 @@ export const findMatchesInDoc = <T>(
     cb: (match: RegExpExecArray, range: Range) => T | null,
 ): T[] => {
     let items: T[] = [];
-    let newRegex = new RegExp(regex, "g");
-
     let index = 0;
 
     while (index < doc.lineCount) {
+        let finalRegex = new RegExp(regex, "g");
         let line = doc.lineAt(index);
-        let match = newRegex.exec(line.text);
+        let match = finalRegex.exec(line.text);
 
         if (match !== null) {
             let start = new Position(line.lineNumber, match.index);
@@ -61,11 +60,9 @@ export const findMatchesInDoc = <T>(
 
             let item = cb(match, new Range(start, end));
 
-            if (item === null) {
-                continue;
+            if (item !== null) {
+                items.push(item);
             }
-
-            items.push(item);
         }
 
         index++;
