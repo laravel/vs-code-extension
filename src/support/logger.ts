@@ -18,7 +18,7 @@ const error = (message: string, ...args: any[]) => {
 
 const bigInfo = (message: string, ...args: any[]) => {
     channel.info("---------------");
-    channel.info(message);
+    channel.info(message, ...args);
     channel.info("---------------");
 };
 
