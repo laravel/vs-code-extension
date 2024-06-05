@@ -65,3 +65,5 @@ type HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ) => vscode.ProviderResult<vscode.Hover>;
+
+type LinkProvider = (doc: vscode.TextDocument) => vscode.DocumentLink[];

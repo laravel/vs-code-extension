@@ -20,7 +20,10 @@ import configHover from "./hover/Config";
 import HoverProvider from "./hover/HoverProvider";
 import inertiaHover from "./hover/Inertia";
 import viewHover from "./hover/View";
+import configLink from "./link/Config";
+import inertiaLink from "./link/Inertia";
 import LinkProvider from "./link/LinkProvider";
+import viewLink from "./link/View";
 import { hasWorkspace, projectPathExists } from "./support/project";
 
 function shouldActivate(): boolean {
@@ -83,6 +86,11 @@ export function activate(context: vscode.ExtensionContext) {
     hoverProvider.registerProvider(viewHover);
     hoverProvider.registerProvider(inertiaHover);
 
+    const linkProvider = new LinkProvider();
+    linkProvider.registerProvider(configLink);
+    linkProvider.registerProvider(viewLink);
+    linkProvider.registerProvider(inertiaLink);
+
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
@@ -104,10 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
             new BladeCompletion(),
             "@",
         ),
-        vscode.languages.registerDocumentLinkProvider(
-            LANGUAGES,
-            new LinkProvider(),
-        ),
+        vscode.languages.registerDocumentLinkProvider(LANGUAGES, linkProvider),
         vscode.languages.registerHoverProvider(LANGUAGES, hoverProvider),
     );
 }

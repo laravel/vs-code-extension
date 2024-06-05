@@ -1,4 +1,29 @@
-import { Hover, Position, ProviderResult, Range, TextDocument } from "vscode";
+import {
+    DocumentLink,
+    Hover,
+    Position,
+    ProviderResult,
+    Range,
+    TextDocument,
+    Uri,
+} from "vscode";
+
+// TODO: This doesn't really belong here, it has to do with Linking, but fine for now
+export const findInDoc = (
+    doc: TextDocument,
+    regex: string,
+    getItem: (match: RegExpExecArray) => Uri | null,
+): DocumentLink[] => {
+    return findMatchesInDoc(doc, regex, (match, range) => {
+        const item = getItem(match);
+
+        if (item === null) {
+            return null;
+        }
+
+        return new DocumentLink(range, item);
+    });
+};
 
 // TODO: This doesn't really belong here, it has to do with Hovering, but fine for now
 export const getMatch = (
