@@ -3,7 +3,6 @@ import { globSync } from "glob";
 import * as vscode from "vscode";
 import { Config, ConfigItem } from "..";
 import { loadAndWatch } from "../support/fileWatcher";
-import { info } from "../support/logger";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
@@ -30,7 +29,6 @@ const getFilePath = (key: string): vscode.Uri | undefined => {
     const files = globSync(projectPath(`vendor/**/config/${key}.php`));
 
     if (files.length > 0) {
-        info(`Found config file for ${key} in vendor directory`, files[0]);
         return vscode.Uri.file(files[0]);
     }
 };
