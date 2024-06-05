@@ -10,7 +10,7 @@ import {
 import { HoverProvider as ProviderFunc } from "..";
 
 export default class HoverProvider implements vsHoverProvider {
-    providers: ProviderFunc[] = [];
+    private providers: ProviderFunc[] = [];
 
     registerProvider(provider: ProviderFunc) {
         this.providers.push(provider);
