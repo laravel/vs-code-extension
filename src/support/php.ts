@@ -377,10 +377,6 @@ export interface ParsingResult {
 export const parse = (code: string): ParsingResult | null => {
     const tokens = parser
         .tokenGetAll(code)
-        .filter(
-            (token: Token) =>
-                typeof token === "string" || token[0] !== "T_WHITESPACE",
-        )
         .map((token: Token) => {
             if (typeof token === "string") {
                 return ["T_CUSTOM_STRING", token, -1];
@@ -388,6 +384,7 @@ export const parse = (code: string): ParsingResult | null => {
 
             return token;
         })
+        .filter((token: Token) => token[0] !== "T_WHITESPACE")
         .reverse();
 
     let result: ParsingResult | null = null;
@@ -399,6 +396,14 @@ export const parse = (code: string): ParsingResult | null => {
         firstToken[1] !== '"'
     ) {
         // We are only concerned with ' and " as the trigger
+        return null;
+    }
+
+    if (
+        firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
+        ['""', "''"].includes(firstToken[1])
+    ) {
+        // This is the closing quote, we are not interested in this
         return null;
     }
 
