@@ -3,30 +3,48 @@ import { getWorkspaceFolders, hasWorkspace } from "./project";
 
 type FileEvent = "change" | "create" | "delete";
 
+export const loadAndWatch = (
+    load: () => void,
+    patterns: string | string[],
+    events: FileEvent[] = ["change", "create", "delete"],
+): void => {
+    if (!hasWorkspace()) {
+        return;
+    }
+
+    load();
+
+    createFileWatcher(patterns, load, events);
+};
+
 export const createFileWatcher = (
-    pattern: string,
+    patterns: string | string[],
     callback: (e: vscode.Uri) => void,
     events: FileEvent[] = ["change", "create", "delete"],
-): vscode.FileSystemWatcher | null => {
+): vscode.FileSystemWatcher[] => {
     if (!hasWorkspace()) {
-        return null;
+        return [];
     }
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
-    );
+    patterns = typeof patterns === "string" ? [patterns] : patterns;
 
-    if (events.includes("change")) {
-        watcher.onDidChange(callback);
-    }
+    return patterns.map((pattern) => {
+        const watcher = vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
+        );
 
-    if (events.includes("create")) {
-        watcher.onDidCreate(callback);
-    }
+        if (events.includes("change")) {
+            watcher.onDidChange(callback);
+        }
 
-    if (events.includes("delete")) {
-        watcher.onDidDelete(callback);
-    }
+        if (events.includes("create")) {
+            watcher.onDidCreate(callback);
+        }
 
-    return watcher;
+        if (events.includes("delete")) {
+            watcher.onDidDelete(callback);
+        }
+
+        return watcher;
+    });
 };

@@ -1,6 +1,6 @@
 import { Model } from "..";
 import { config } from "../support/config";
-import { createFileWatcher } from "./../support/fileWatcher";
+import { loadAndWatch } from "./../support/fileWatcher";
 import { runInLaravel, template } from "./../support/php";
 
 let models: Model[] = [];
@@ -27,10 +27,10 @@ const load = () => {
         });
 };
 
-load();
-
-modelPaths
-    .concat(["database/migrations"])
-    .forEach((path) => createFileWatcher(`${path}/*.php`, load));
+loadAndWatch(
+    load,
+    modelPaths.concat(["database/migrations"]).map((path) => `${path}/*.php`),
+    ["create", "delete"],
+);
 
 export const getModels = (): Model[] => models;

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { View } from "..";
-import { createFileWatcher } from "../support/fileWatcher";
+import { loadAndWatch } from "../support/fileWatcher";
 import { projectPath, relativePath } from "./../support/project";
 
 let views: {
@@ -50,11 +50,6 @@ const collectViews = (path: string, basePath: string): View[] => {
         .flat();
 };
 
-load();
-
-createFileWatcher("{,**/}{resources/js/Pages}/{*,**/*}", load, [
-    "create",
-    "delete",
-]);
+loadAndWatch(load, "{,**/}{resources/js/Pages}/{*,**/*}", ["create", "delete"]);
 
 export const getInertiaViews = () => views;

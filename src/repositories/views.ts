@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { View } from "..";
-import { createFileWatcher } from "../support/fileWatcher";
+import { loadAndWatch } from "../support/fileWatcher";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
@@ -74,8 +74,6 @@ const collectViews = (path: string): View[] => {
         .flat();
 };
 
-load();
-
-createFileWatcher("{,**/}{view,views}/{*,**/*}", load, ["create", "delete"]);
+loadAndWatch(load, "{,**/}{view,views}/{*,**/*}", ["create", "delete"]);
 
 export const getViews = () => views;

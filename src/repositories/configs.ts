@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { Config, ConfigItem } from "..";
-import { createFileWatcher } from "../support/fileWatcher";
+import { loadAndWatch } from "../support/fileWatcher";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
@@ -60,8 +60,6 @@ const getConfigValue = (
     };
 };
 
-load();
-
-createFileWatcher("config/{,*,**/*}.php", load);
+loadAndWatch(load, "config/{,*,**/*}.php");
 
 export const getConfigs = (): ConfigItem[] => items;
