@@ -1,7 +1,12 @@
 export const wordMatchRegex = /[\w\d\-_\.\:\\\/@]+/g;
 
+const funcRegex = (funcs: string[]) => {
+    funcs = funcs.map((item) => `${item}\\(['"]`);
+    return `(?<=${funcs.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+};
+
 export const viewMatchRegex = (() => {
-    const toCheck = [
+    return funcRegex([
         "view",
         "markdown",
         "assertViewIs",
@@ -10,27 +15,21 @@ export const viewMatchRegex = (() => {
         "@component",
         // TODO: Deal with aliases
         "View::make",
-    ].map((item) => `${item}\\(['"]`);
-
-    return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+    ]);
 })();
 
 export const inertiaMatchRegex = (() => {
-    const toCheck = ["Inertia::(?:render|modal)"].map(
-        (item) => `${item}\\(['"]`,
-    );
-
-    return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+    return funcRegex(["Inertia::(?:render|modal)"]);
 })();
 
 export const configMatchRegex = (() => {
-    const toCheck = ["config", "Config::get"].map((item) => `${item}\\(['"]`);
-
-    return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+    return funcRegex(["config", "Config::get"]);
 })();
 
 export const appBindingMatchRegex = (() => {
-    const toCheck = ["app", "App::make"].map((item) => `${item}\\(['"]`);
+    return funcRegex(["app", "App::make"]);
+})();
 
-    return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+export const envMatchRegex = (() => {
+    return funcRegex(["env"]);
 })();

@@ -19,11 +19,13 @@ import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
 import appBindingHover from "./hover/AppBinding";
 import configHover from "./hover/Config";
+import envHover from "./hover/Env";
 import HoverProvider from "./hover/HoverProvider";
 import inertiaHover from "./hover/Inertia";
 import viewHover from "./hover/View";
 import appBindingLink from "./link/AppBinding";
 import configLink from "./link/Config";
+import envLink from "./link/Env";
 import inertiaLink from "./link/Inertia";
 import LinkProvider from "./link/LinkProvider";
 import viewLink from "./link/View";
@@ -86,16 +88,18 @@ export function activate(context: vscode.ExtensionContext) {
     validationRegistry.registerProvider(new ValidationCompletion());
 
     const hoverProvider = new HoverProvider();
-    [configHover, viewHover, inertiaHover, appBindingHover].forEach(
+    [configHover, viewHover, inertiaHover, appBindingHover, envHover].forEach(
         (provider) => {
             hoverProvider.registerProvider(provider);
         },
     );
 
     const linkProvider = new LinkProvider();
-    [configLink, viewLink, inertiaLink, appBindingLink].forEach((provider) => {
-        linkProvider.registerProvider(provider);
-    });
+    [configLink, viewLink, inertiaLink, appBindingLink, envLink].forEach(
+        (provider) => {
+            linkProvider.registerProvider(provider);
+        },
+    );
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(

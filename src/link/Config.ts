@@ -17,7 +17,7 @@ const provider: LinkProvider = (
             return null;
         }
 
-        // const configFileLines = fs.readFileSync(uri.fsPath, "utf8").split("\n");
+        // TODO: This should also be in hover
         const configKeyPath = match[0].split(".");
 
         const tokens = getTokens(fs.readFileSync(uri.fsPath, "utf8"))
