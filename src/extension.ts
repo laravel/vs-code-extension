@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 
 import { info } from "console";
+import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
 import BladeCompletion from "./completion/Blade";
 import ConfigCompletion from "./completion/Config";
@@ -16,10 +17,12 @@ import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
+import appBindingHover from "./hover/AppBinding";
 import configHover from "./hover/Config";
 import HoverProvider from "./hover/HoverProvider";
 import inertiaHover from "./hover/Inertia";
 import viewHover from "./hover/View";
+import appBindingLink from "./link/AppBinding";
 import configLink from "./link/Config";
 import inertiaLink from "./link/Inertia";
 import LinkProvider from "./link/LinkProvider";
@@ -67,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
         GateCompletion,
         AssetCompletion,
         InertiaCompletion,
+        AppCompletion,
     ];
 
     const delegatedRegistry = new Registry();
@@ -82,14 +86,16 @@ export function activate(context: vscode.ExtensionContext) {
     validationRegistry.registerProvider(new ValidationCompletion());
 
     const hoverProvider = new HoverProvider();
-    hoverProvider.registerProvider(configHover);
-    hoverProvider.registerProvider(viewHover);
-    hoverProvider.registerProvider(inertiaHover);
+    [configHover, viewHover, inertiaHover, appBindingHover].forEach(
+        (provider) => {
+            hoverProvider.registerProvider(provider);
+        },
+    );
 
     const linkProvider = new LinkProvider();
-    linkProvider.registerProvider(configLink);
-    linkProvider.registerProvider(viewLink);
-    linkProvider.registerProvider(inertiaLink);
+    [configLink, viewLink, inertiaLink, appBindingLink].forEach((provider) => {
+        linkProvider.registerProvider(provider);
+    });
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(

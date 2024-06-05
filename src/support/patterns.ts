@@ -28,3 +28,9 @@ export const configMatchRegex = (() => {
 
     return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
 })();
+
+export const appBindingMatchRegex = (() => {
+    const toCheck = ["app", "App::make"].map((item) => `${item}\\(['"]`);
+
+    return `(?<=${toCheck.join("|")})(?:[^'"\\s]+(?:\\/[^'"\\s]+)*)`;
+})();

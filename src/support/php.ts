@@ -374,6 +374,10 @@ export interface ParsingResult {
     parameters: string[];
 }
 
+export const getTokens = (code: string): Token[] => {
+    return parser.tokenGetAll(code);
+};
+
 export const parse = (code: string): ParsingResult | null => {
     const tokens = parser
         .tokenGetAll(code)
