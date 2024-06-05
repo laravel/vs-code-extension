@@ -16,7 +16,10 @@ import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
+import configHover from "./hover/Config";
 import HoverProvider from "./hover/HoverProvider";
+import inertiaHover from "./hover/Inertia";
+import viewHover from "./hover/View";
 import LinkProvider from "./link/LinkProvider";
 import { hasWorkspace, projectPathExists } from "./support/project";
 
@@ -75,6 +78,11 @@ export function activate(context: vscode.ExtensionContext) {
     const validationRegistry = new Registry();
     validationRegistry.registerProvider(new ValidationCompletion());
 
+    const hoverProvider = new HoverProvider();
+    hoverProvider.registerProvider(configHover);
+    hoverProvider.registerProvider(viewHover);
+    hoverProvider.registerProvider(inertiaHover);
+
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
@@ -100,7 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
             new LinkProvider(),
         ),
-        vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
+        vscode.languages.registerHoverProvider(LANGUAGES, hoverProvider),
     );
 }
 

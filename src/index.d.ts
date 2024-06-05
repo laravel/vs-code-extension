@@ -60,3 +60,8 @@ interface View {
     relativePath: string;
     uri: vscode.Uri;
 }
+
+type HoverProvider = (
+    doc: vscode.TextDocument,
+    pos: vscode.Position,
+) => vscode.ProviderResult<vscode.Hover>;

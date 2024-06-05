@@ -1,4 +1,20 @@
-import { Position, Range, TextDocument } from "vscode";
+import { Hover, Position, ProviderResult, Range, TextDocument } from "vscode";
+
+// TODO: This doesn't really belong here, it has to do with Hovering, but fine for now
+export const getMatch = (
+    doc: TextDocument,
+    pos: Position,
+    regex: string,
+    cb: (match: string) => ProviderResult<Hover>,
+): ProviderResult<Hover> => {
+    const linkRange = doc.getWordRangeAtPosition(pos, new RegExp(regex));
+
+    if (!linkRange) {
+        return null;
+    }
+
+    return cb(doc.getText(linkRange));
+};
 
 export const findMatchesInDoc = <T>(
     doc: TextDocument,
