@@ -2,14 +2,14 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
 import { getConfigs } from "../repositories/configs";
-import { findInDoc } from "../support/doc";
+import { findLinksInDoc } from "../support/doc";
 import { configMatchRegex } from "../support/patterns";
 import { getTokens } from "../support/php";
 
 const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
-    return findInDoc(doc, configMatchRegex, (match) => {
+    return findLinksInDoc(doc, configMatchRegex, (match) => {
         const uri =
             getConfigs().find((item) => item.name === match[0])?.uri ?? null;
 

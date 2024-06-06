@@ -1,4 +1,5 @@
 import {
+    Diagnostic,
     DocumentLink,
     Hover,
     Position,
@@ -8,14 +9,23 @@ import {
     Uri,
 } from "vscode";
 
-// TODO: This doesn't really belong here, it has to do with Linking, but fine for now
-export const findInDoc = (
+export const findWarningsInDoc = (
     doc: TextDocument,
     regex: string,
-    getItem: (match: RegExpExecArray) => Uri | null,
+    cb: (match: RegExpExecArray, range: Range) => Diagnostic | null,
+): Diagnostic[] => {
+    return findMatchesInDoc(doc, regex, (match, range) => {
+        return cb(match, range);
+    }).filter((item) => item !== null);
+};
+
+export const findLinksInDoc = (
+    doc: TextDocument,
+    regex: string,
+    cb: (match: RegExpExecArray) => Uri | null,
 ): DocumentLink[] => {
     return findMatchesInDoc(doc, regex, (match, range) => {
-        const item = getItem(match);
+        const item = cb(match);
 
         if (item === null) {
             return null;
@@ -26,7 +36,7 @@ export const findInDoc = (
 };
 
 // TODO: This doesn't really belong here, it has to do with Hovering, but fine for now
-export const getMatch = (
+export const findHoverMatchesInDoc = (
     doc: TextDocument,
     pos: Position,
     regex: string,

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { HoverProvider } from "..";
 import { getConfigs } from "../repositories/configs";
-import { getMatch } from "../support/doc";
+import { findHoverMatchesInDoc } from "../support/doc";
 import { configMatchRegex } from "../support/patterns";
 import { relativePath } from "../support/project";
 
@@ -9,7 +9,7 @@ const provider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return getMatch(doc, pos, configMatchRegex, (match) => {
+    return findHoverMatchesInDoc(doc, pos, configMatchRegex, (match) => {
         const item = getConfigs().find((config) => config.name === match);
 
         if (!item) {

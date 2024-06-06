@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
 import { getAssets } from "../repositories/asset";
-import { findInDoc } from "../support/doc";
+import { findLinksInDoc } from "../support/doc";
 import { assetMatchRegex } from "../support/patterns";
 
 const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
-    return findInDoc(doc, assetMatchRegex, (match) => {
+    return findLinksInDoc(doc, assetMatchRegex, (match) => {
         return getAssets().find((item) => item.path === match[0])?.uri ?? null;
     });
 };

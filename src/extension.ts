@@ -17,6 +17,7 @@ import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
+import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
 import LinkProvider from "./link/LinkProvider";
 import { hasWorkspace, projectPathExists } from "./support/project";
@@ -52,6 +53,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const TRIGGER_CHARACTERS = ["'", '"'];
 
+    updateDiagnostics(vscode.window.activeTextEditor);
+
+    context.subscriptions.push();
+
     const delegatedRegistry = new Registry(
         new ConfigCompletion(),
         new RouteCompletion(),
@@ -70,6 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
     const validationRegistry = new Registry(new ValidationCompletion());
 
     context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
+            updateDiagnostics(editor);
+        }),
+        vscode.workspace.onDidSaveTextDocument((event) => {
+            updateDiagnostics(vscode.window.activeTextEditor);
+        }),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             delegatedRegistry,
