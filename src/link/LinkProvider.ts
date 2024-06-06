@@ -6,14 +6,23 @@ import {
     TextDocument,
     DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
-import { LinkProvider } from "..";
+import { LinkProvider as LinkProviderType } from "..";
+import appBinding from "./AppBinding";
+import asset from "./Asset";
+import config from "./Config";
+import env from "./Env";
+import inertia from "./Inertia";
+import view from "./View";
 
-export default class Link implements vsDocumentLinkProvider {
-    private providers: LinkProvider[] = [];
-
-    registerProvider(provider: LinkProvider) {
-        this.providers.push(provider);
-    }
+export default class LinkProvider implements vsDocumentLinkProvider {
+    private providers: LinkProviderType[] = [
+        config,
+        view,
+        inertia,
+        appBinding,
+        env,
+        asset,
+    ];
 
     public provideDocumentLinks(
         doc: TextDocument,

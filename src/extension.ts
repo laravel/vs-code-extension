@@ -17,19 +17,8 @@ import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
-import appBindingHover from "./hover/AppBinding";
-import configHover from "./hover/Config";
-import envHover from "./hover/Env";
 import HoverProvider from "./hover/HoverProvider";
-import inertiaHover from "./hover/Inertia";
-import viewHover from "./hover/View";
-import appBindingLink from "./link/AppBinding";
-import assetLink from "./link/Asset";
-import configLink from "./link/Config";
-import envLink from "./link/Env";
-import inertiaLink from "./link/Inertia";
 import LinkProvider from "./link/LinkProvider";
-import viewLink from "./link/View";
 import { hasWorkspace, projectPathExists } from "./support/project";
 
 function shouldActivate(): boolean {
@@ -63,49 +52,22 @@ export function activate(context: vscode.ExtensionContext) {
 
     const TRIGGER_CHARACTERS = ["'", '"'];
 
-    const delegatedProviders = [
-        ConfigCompletion,
-        RouteCompletion,
-        ViewCompletion,
-        TranslationCompletion,
-        MixCompletion,
-        EnvCompletion,
-        GateCompletion,
-        AssetCompletion,
-        InertiaCompletion,
-        AppCompletion,
-    ];
-
-    const delegatedRegistry = new Registry();
-
-    delegatedProviders.forEach((provider) => {
-        delegatedRegistry.registerProvider(new provider());
-    });
-
-    const eloquentRegistry = new Registry();
-    eloquentRegistry.registerProvider(new EloquentCompletion());
-
-    const validationRegistry = new Registry();
-    validationRegistry.registerProvider(new ValidationCompletion());
-
-    const hoverProvider = new HoverProvider();
-    [configHover, viewHover, inertiaHover, appBindingHover, envHover].forEach(
-        (provider) => {
-            hoverProvider.registerProvider(provider);
-        },
+    const delegatedRegistry = new Registry(
+        new ConfigCompletion(),
+        new RouteCompletion(),
+        new ViewCompletion(),
+        new TranslationCompletion(),
+        new MixCompletion(),
+        new EnvCompletion(),
+        new GateCompletion(),
+        new AssetCompletion(),
+        new InertiaCompletion(),
+        new AppCompletion(),
     );
 
-    const linkProvider = new LinkProvider();
-    [
-        configLink,
-        viewLink,
-        inertiaLink,
-        appBindingLink,
-        envLink,
-        assetLink,
-    ].forEach((provider) => {
-        linkProvider.registerProvider(provider);
-    });
+    const eloquentRegistry = new Registry(new EloquentCompletion());
+
+    const validationRegistry = new Registry(new ValidationCompletion());
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
@@ -128,8 +90,11 @@ export function activate(context: vscode.ExtensionContext) {
             new BladeCompletion(),
             "@",
         ),
-        vscode.languages.registerDocumentLinkProvider(LANGUAGES, linkProvider),
-        vscode.languages.registerHoverProvider(LANGUAGES, hoverProvider),
+        vscode.languages.registerDocumentLinkProvider(
+            LANGUAGES,
+            new LinkProvider(),
+        ),
+        vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
     );
 }
 

@@ -8,8 +8,8 @@ import { ParsingResult, parse } from "./../support/php";
 export default class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];
 
-    registerProvider(provider: CompletionProvider) {
-        this.providers.push(provider);
+    constructor(...providers: CompletionProvider[]) {
+        this.providers.push(...providers);
     }
 
     provideCompletionItems(
