@@ -34,6 +34,14 @@ export const appBindingMatchRegex = (() => {
     return funcRegex(["app", "App::make"]);
 })();
 
+export const middlewareMatchRegex = (() => {
+    return funcRegex(["middleware"]);
+})();
+
+export const routeMatchRegex = (() => {
+    return funcRegex(["route", "signedRoute"]);
+})();
+
 export const envMatchRegex = (() => {
     return funcRegex(["env"]);
 })();

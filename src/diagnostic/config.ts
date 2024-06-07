@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { notFound } from ".";
 import { getConfigs } from "../repositories/configs";
 import { findWarningsInDoc } from "../support/doc";
 import { configMatchRegex } from "../support/patterns";
@@ -12,12 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return {
-                message: `Config [${match[0]}] not found.`,
-                severity: vscode.DiagnosticSeverity.Warning,
-                range,
-                source: "Laravel Extension",
-            };
+            return notFound("Config", match[0], range);
         });
     });
 };

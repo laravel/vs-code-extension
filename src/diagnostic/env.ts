@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { notFound } from ".";
 import { getEnv } from "../repositories/env";
 import { findWarningsInDoc } from "../support/doc";
 import { envMatchRegex } from "../support/patterns";
@@ -12,12 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return {
-                message: `[${match[0]}] not found in .env.`,
-                severity: vscode.DiagnosticSeverity.Warning,
-                range,
-                source: "Laravel Extension",
-            };
+            return notFound("Env", match[0], range);
         });
     });
 };

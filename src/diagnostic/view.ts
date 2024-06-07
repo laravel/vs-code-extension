@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { notFound } from ".";
 import { getViews } from "../repositories/views";
 import { findWarningsInDoc } from "../support/doc";
 import { viewMatchRegex } from "../support/patterns";
@@ -12,12 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return {
-                message: `View [${match[0]}] not found.`,
-                severity: vscode.DiagnosticSeverity.Warning,
-                range,
-                source: "Laravel Extension",
-            };
+            return notFound("View", match[0], range);
         });
     });
 };
