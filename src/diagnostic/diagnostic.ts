@@ -5,6 +5,7 @@ import config from "./config";
 import env from "./env";
 import inertia from "./inertia";
 import middleware from "./middleware";
+import mix from "./mix";
 import route from "./route";
 import view from "./view";
 
@@ -19,6 +20,7 @@ const providers = [
     view,
     middleware,
     route,
+    mix,
 ];
 
 export const updateDiagnostics = (

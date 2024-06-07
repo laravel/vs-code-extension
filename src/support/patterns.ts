@@ -30,6 +30,10 @@ export const assetMatchRegex = (() => {
     return funcRegex(["asset"]);
 })();
 
+export const mixManifestMatchRegex = (() => {
+    return funcRegex(["mix"]);
+})();
+
 export const appBindingMatchRegex = (() => {
     return funcRegex(["app", "App::make"]);
 })();

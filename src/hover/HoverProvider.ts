@@ -12,6 +12,7 @@ import appBinding from "./AppBinding";
 import config from "./Config";
 import env from "./Env";
 import inertia from "./Inertia";
+import mix from "./Mix";
 import view from "./View";
 
 export default class HoverProvider implements vsHoverProvider {
@@ -21,6 +22,7 @@ export default class HoverProvider implements vsHoverProvider {
         inertia,
         appBinding,
         env,
+        mix,
     ];
 
     provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {

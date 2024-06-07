@@ -1,19 +1,9 @@
-"use strict";
-
 import * as vscode from "vscode";
 import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { getMixManifest } from "../repositories/mix";
 import { wordMatchRegex } from "./../support/patterns";
-import { projectPathExists, readFileInProject } from "./../support/project";
 
 export default class Mix implements CompletionProvider {
-    private mixes: any[] = [];
-
-    constructor() {
-        this.load();
-        // TODO: wat
-        // setInterval(() => this.load(), 60000);
-    }
-
     tags(): Tags {
         return { classes: [], functions: ["mix"] };
     }
@@ -25,9 +15,9 @@ export default class Mix implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        return this.mixes.map((mix) => {
+        return getMixManifest().items.map((mix) => {
             let completeItem = new vscode.CompletionItem(
-                mix,
+                mix.key,
                 vscode.CompletionItemKind.Value,
             );
 
@@ -38,23 +28,5 @@ export default class Mix implements CompletionProvider {
 
             return completeItem;
         });
-    }
-
-    load() {
-        try {
-            const path = "public/mix-manifest.json";
-
-            if (!projectPathExists(path)) {
-                return;
-            }
-
-            let mixes = readFileInProject(path);
-
-            this.mixes = Object.keys(mixes).map((mixFile) =>
-                mixFile.replace(/^\//g, ""),
-            );
-        } catch (exception) {
-            console.error(exception);
-        }
     }
 }
