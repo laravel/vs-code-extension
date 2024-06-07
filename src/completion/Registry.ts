@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import { CompletionProvider } from "..";
 import { info } from "../support/logger";
-import { ParsingResult, parse } from "./../support/php";
+import { ParsingResult, parse } from "./../support/parser";
 
 export default class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];

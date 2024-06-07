@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { parse } from "../support/php";
+import { parse } from "../support/parser";
 
 const getParam = (obj = {}) => ({
     index: 0,

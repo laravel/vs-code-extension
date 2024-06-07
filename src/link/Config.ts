@@ -3,8 +3,8 @@ import * as vscode from "vscode";
 import { LinkProvider } from "..";
 import { getConfigs } from "../repositories/configs";
 import { findLinksInDoc } from "../support/doc";
+import { getTokens } from "../support/parser";
 import { configMatchRegex } from "../support/patterns";
-import { getTokens } from "../support/php";
 
 const provider: LinkProvider = (
     doc: vscode.TextDocument,
