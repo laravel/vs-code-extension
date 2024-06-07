@@ -1,23 +1,11 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { createFileWatcher } from "./../support/fileWatcher";
+import { getCustomBladeDirectives } from "../repositories/customBladeDirectives";
 import { wordMatchRegex } from "./../support/patterns";
-import { runInLaravel, template } from "./../support/php";
 import { indent } from "./../support/util";
 
 export default class Blade implements vscode.CompletionItemProvider {
-    private customDirectives: any[] = [];
-
-    constructor() {
-        this.load();
-
-        createFileWatcher(
-            "app/{,*,**/*}CompletionProvider.php",
-            this.load.bind(this),
-        );
-    }
-
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -33,7 +21,7 @@ export default class Blade implements vscode.CompletionItemProvider {
         }
 
         return this.getDefaultDirectives(document, position).concat(
-            this.customDirectives.map((directive) => {
+            getCustomBladeDirectives().items.map((directive) => {
                 let completeItem = new vscode.CompletionItem(
                     `@${directive.name}${directive.hasParams ? "(...)" : ""}`,
                     vscode.CompletionItemKind.Keyword,
@@ -51,19 +39,6 @@ export default class Blade implements vscode.CompletionItemProvider {
                 return completeItem;
             }),
         );
-    }
-
-    load() {
-        runInLaravel<any[]>(
-            template("blade-directives"),
-            "Custom Blade Directives",
-        )
-            .then((result) => {
-                this.customDirectives = result;
-            })
-            .catch((exception) => {
-                console.error(exception);
-            });
     }
 
     getDefaultDirectives(
