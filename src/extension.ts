@@ -3,6 +3,9 @@
 import * as vscode from "vscode";
 
 import { info } from "console";
+import { LanguageClient } from "vscode-languageclient/node";
+import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
+import { initClient } from "./blade/client";
 import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
 import BladeCompletion from "./completion/Blade";
@@ -21,6 +24,9 @@ import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
 import LinkProvider from "./link/LinkProvider";
 import { hasWorkspace, projectPathExists } from "./support/project";
+import DocumentHighlight from "./syntax/DocumentHighlight";
+
+let client: LanguageClient;
 
 function shouldActivate(): boolean {
     if (!hasWorkspace()) {
@@ -74,6 +80,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     const validationRegistry = new Registry(new ValidationCompletion());
 
+    const documentSelector: vscode.DocumentSelector = {
+        language: "blade",
+    };
+
+    client = initClient(context);
+
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             updateDiagnostics(editor);
@@ -81,6 +93,18 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
         }),
+        vscode.languages.registerDocumentHighlightProvider(
+            documentSelector,
+            new DocumentHighlight(),
+        ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            documentSelector,
+            new BladeFormattingEditProvider(),
+        ),
+        vscode.languages.registerDocumentRangeFormattingEditProvider(
+            documentSelector,
+            new BladeFormattingEditProvider(),
+        ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             delegatedRegistry,
@@ -109,4 +133,10 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
-export function deactivate() {}
+export function deactivate() {
+    info("Stopped");
+
+    if (client) {
+        client.stop();
+    }
+}
