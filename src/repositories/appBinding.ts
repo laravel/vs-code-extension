@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { loadAndWatch } from "../support/fileWatcher";
+import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
 type AppBindingResult = {
@@ -10,17 +10,20 @@ type AppBindingResult = {
     };
 };
 
-let items: {
+type AppBindingItem = {
     [key: string]: {
         class: string;
         uri: vscode.Uri;
     };
-} = {};
+};
 
-const load = () => {
-    runInLaravel<AppBindingResult>(template("app"), "App Bindings")
-        .then((result) => {
-            items = {};
+export const getAppBindings = repository<AppBindingItem>(
+    () => {
+        return runInLaravel<AppBindingResult>(
+            template("app"),
+            "App Bindings",
+        ).then((result) => {
+            const items: AppBindingItem = {};
 
             for (let key in result) {
                 items[key] = {
@@ -30,12 +33,10 @@ const load = () => {
                     }),
                 };
             }
-        })
-        .catch(function (exception) {
-            console.error(exception);
+
+            return items;
         });
-};
-
-loadAndWatch(load, "app/Providers/{,*,**/*}.php");
-
-export const getAppBindings = () => items;
+    },
+    "app/Providers/{,*,**/*}.php",
+    {},
+);

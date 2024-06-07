@@ -11,7 +11,8 @@ const provider: LinkProvider = (
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, configMatchRegex, (match) => {
         const uri =
-            getConfigs().find((item) => item.name === match[0])?.uri ?? null;
+            getConfigs().items.find((item) => item.name === match[0])?.uri ??
+            null;
 
         if (!uri) {
             return null;

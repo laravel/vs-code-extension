@@ -10,7 +10,7 @@ const provider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, inertiaMatchRegex, (match) => {
-        const item = getInertiaViews()[match];
+        const item = getInertiaViews().items[match];
 
         if (!item) {
             return null;

@@ -10,7 +10,7 @@ const provider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, appBindingMatchRegex, (match) => {
-        const item = getAppBindings()[match];
+        const item = getAppBindings().items[match];
 
         if (!item) {
             return null;

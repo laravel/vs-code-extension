@@ -8,7 +8,7 @@ const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, viewMatchRegex, (match) => {
-        return getViews()[match[0]]?.uri ?? null;
+        return getViews().items[match[0]]?.uri ?? null;
     });
 };
 

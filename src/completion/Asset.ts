@@ -17,7 +17,7 @@ export default class Asset implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        return getAssets().map((file) => {
+        return getAssets().items.map((file) => {
             let completeItem = new vscode.CompletionItem(
                 file.path,
                 vscode.CompletionItemKind.Constant,

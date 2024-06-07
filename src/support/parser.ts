@@ -218,6 +218,7 @@ export const parse = (code: string): ParsingResult | null => {
 
     const firstToken = tokens.shift();
 
+    // TODO: What about other triggers? Like blade or variable auto complete?
     if (
         firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
         firstToken[1] !== '"'
@@ -228,7 +229,7 @@ export const parse = (code: string): ParsingResult | null => {
 
     if (
         firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
-        ['""', "''"].includes(firstToken[1])
+        ![",", "(", "["].includes(tokens[0][1])
     ) {
         // This is the closing quote, we are not interested in this
         return null;

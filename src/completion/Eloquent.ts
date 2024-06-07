@@ -44,7 +44,7 @@ export default class Eloquent implements CompletionProvider {
 
     tags(): Tags {
         return {
-            classes: getModels().map((model) => model.fqn),
+            classes: getModels().items.map((model) => model.fqn),
             functions: this.relationMethods.concat(this.firstParamMethods),
         };
         /**
@@ -90,7 +90,7 @@ $flight = Flight::firstOrNew(
             return [];
         }
 
-        const model = getModels().find((model) => model.fqn === func.fqn);
+        const model = getModels().items.find((model) => model.fqn === func.fqn);
 
         // If we can't find the model, we can't provide completions
         if (!model) {

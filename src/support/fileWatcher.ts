@@ -3,10 +3,14 @@ import { getWorkspaceFolders, hasWorkspace } from "./project";
 
 type FileEvent = "change" | "create" | "delete";
 
+export type WatcherPattern = string | string[];
+
+export const defaultFileEvents: FileEvent[] = ["change", "create", "delete"];
+
 export const loadAndWatch = (
     load: () => void,
-    patterns: string | string[],
-    events: FileEvent[] = ["change", "create", "delete"],
+    patterns: WatcherPattern,
+    events: FileEvent[] = defaultFileEvents,
 ): void => {
     if (!hasWorkspace()) {
         return;
@@ -20,7 +24,7 @@ export const loadAndWatch = (
 export const createFileWatcher = (
     patterns: string | string[],
     callback: (e: vscode.Uri) => void,
-    events: FileEvent[] = ["change", "create", "delete"],
+    events: FileEvent[] = defaultFileEvents,
 ): vscode.FileSystemWatcher[] => {
     if (!hasWorkspace()) {
         return [];

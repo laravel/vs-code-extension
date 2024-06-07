@@ -9,7 +9,7 @@ const provider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, envMatchRegex, (match) => {
-        const item = getEnv()[match];
+        const item = getEnv().items[match];
 
         if (!item || item.value === "") {
             return null;

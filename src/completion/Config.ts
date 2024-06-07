@@ -17,7 +17,7 @@ export default class Config implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        return getConfigs().map((config) => {
+        return getConfigs().items.map((config) => {
             let completeItem = new vscode.CompletionItem(
                 config.name,
                 vscode.CompletionItemKind.Value,

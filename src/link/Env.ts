@@ -9,7 +9,7 @@ const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, envMatchRegex, (match) => {
-        const env = getEnv()[match[0]] ?? null;
+        const env = getEnv().items[match[0]] ?? null;
 
         if (!env) {
             return null;

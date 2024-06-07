@@ -8,7 +8,10 @@ const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, assetMatchRegex, (match) => {
-        return getAssets().find((item) => item.path === match[0])?.uri ?? null;
+        return (
+            getAssets().items.find((item) => item.path === match[0])?.uri ??
+            null
+        );
     });
 };
 

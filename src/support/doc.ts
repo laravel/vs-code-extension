@@ -12,11 +12,11 @@ import {
 export const findWarningsInDoc = (
     doc: TextDocument,
     regex: string,
-    cb: (match: RegExpExecArray, range: Range) => Diagnostic | null,
-): Diagnostic[] => {
-    return findMatchesInDoc(doc, regex, (match, range) => {
+    cb: (match: RegExpExecArray, range: Range) => Promise<Diagnostic | null>,
+): Promise<Diagnostic[]> => {
+    return findMatchesInDocAsync(doc, regex, (match, range) => {
         return cb(match, range);
-    }).filter((item) => item !== null);
+    }).then((items) => items.filter((item) => item !== null));
 };
 
 export const findLinksInDoc = (
@@ -49,6 +49,37 @@ export const findHoverMatchesInDoc = (
     }
 
     return cb(doc.getText(linkRange));
+};
+
+// TODO: This is a duplication of findMatchesInDocAsync, but I don't want to change it right now
+export const findMatchesInDocAsync = async <T>(
+    doc: TextDocument,
+    regex: string,
+    cb: (match: RegExpExecArray, range: Range) => Promise<T | null>,
+): Promise<T[]> => {
+    let items: T[] = [];
+    let index = 0;
+
+    while (index < doc.lineCount) {
+        let finalRegex = new RegExp(regex, "g");
+        let line = doc.lineAt(index);
+        let match = finalRegex.exec(line.text);
+
+        if (match !== null) {
+            let start = new Position(line.lineNumber, match.index);
+            let end = start.translate(0, match[0].length);
+
+            let item = await cb(match, new Range(start, end));
+
+            if (item !== null) {
+                items.push(item);
+            }
+        }
+
+        index++;
+    }
+
+    return items;
 };
 
 export const findMatchesInDoc = <T>(

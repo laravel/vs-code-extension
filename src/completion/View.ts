@@ -31,7 +31,7 @@ export default class View implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        const views = getViews();
+        const views = getViews().items;
 
         if (func.function && ["@section", "@push"].includes(func.function)) {
             return this.getYields(func.function, document.getText());
@@ -89,7 +89,7 @@ export default class View implements CompletionProvider {
     getYields(func: string, documentText: string): vscode.CompletionItem[] {
         let extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
         let regexResult = extendsRegex.exec(documentText);
-        const views = getViews();
+        const views = getViews().items;
 
         if (!regexResult) {
             return [];

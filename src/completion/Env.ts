@@ -17,7 +17,7 @@ export default class Env implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        return Object.entries(getEnv()).map(([key, value]) => {
+        return Object.entries(getEnv().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
                 key,
                 vscode.CompletionItemKind.Constant,

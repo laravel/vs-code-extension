@@ -1,23 +1,12 @@
 import * as fs from "fs";
 import { globSync } from "glob";
 import * as vscode from "vscode";
+import { repository } from ".";
 import { Config, ConfigItem } from "..";
-import { loadAndWatch } from "../support/fileWatcher";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
-let items: ConfigItem[] = [];
 let cachedFilePaths = new Map<string, vscode.Uri | undefined>();
-
-const load = () => {
-    runInLaravel<Config>("echo json_encode(config()->all());", "Configs")
-        .then((result) => {
-            items = collectConfigs(result, true);
-        })
-        .catch(function (exception) {
-            console.error(exception);
-        });
-};
 
 const getFilePath = (key: string): vscode.Uri | undefined => {
     const path = projectPath(`config/${key}.php`);
@@ -74,6 +63,13 @@ const getConfigValue = (
     };
 };
 
-loadAndWatch(load, "config/{,*,**/*}.php");
-
-export const getConfigs = (): ConfigItem[] => items;
+export const getConfigs = repository<ConfigItem[]>(
+    () => {
+        return runInLaravel<Config>(
+            "echo json_encode(config()->all());",
+            "Configs",
+        ).then((result) => collectConfigs(result, true));
+    },
+    "config/{,*,**/*}.php",
+    [],
+);

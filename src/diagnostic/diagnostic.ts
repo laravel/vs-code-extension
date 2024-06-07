@@ -25,8 +25,14 @@ export const updateDiagnostics = (
         return;
     }
 
-    collection.set(
-        document.uri,
-        providers.map((provider) => provider(document)).flat(),
+    Promise.all(providers.map((provider) => provider(document))).then(
+        (diagnostics) => {
+            collection.set(document.uri, diagnostics.flat());
+        },
     );
+
+    // collection.set(
+    //     document.uri,
+    //     providers.map((provider) => provider(document)).flat(),
+    // );
 };

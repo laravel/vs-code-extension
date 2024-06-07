@@ -1,24 +1,26 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { repository } from ".";
 import { View } from "..";
-import { loadAndWatch } from "../support/fileWatcher";
 import { runInLaravel } from "../support/php";
 import { projectPath } from "../support/project";
 
-let views: {
+interface ViewItem {
     [key: string]: View;
-} = {};
+}
 
 const load = () => {
-    runInLaravel<{
+    return runInLaravel<{
         paths: string[];
         hints: { [key: string]: string[] };
     }>(`
-            echo json_encode([
-                'paths' => app('view')->getFinder()->getPaths(),
-                'hints' => app('view')->getFinder()->getHints(),
-            ]);
-            `).then((results) => {
+    echo json_encode([
+        'paths' => app('view')->getFinder()->getPaths(),
+        'hints' => app('view')->getFinder()->getHints(),
+    ]);
+    `).then((results) => {
+        let views: ViewItem = {};
+
         results.paths
             .map((path: string) =>
                 path.replace(projectPath("/", true), projectPath("/")),
@@ -40,6 +42,8 @@ const load = () => {
                     });
                 });
         });
+
+        return views;
     });
 };
 
@@ -74,6 +78,9 @@ const collectViews = (path: string): View[] => {
         .flat();
 };
 
-loadAndWatch(load, "{,**/}{view,views}/{*,**/*}", ["create", "delete"]);
-
-export const getViews = () => views;
+export const getViews = repository<ViewItem>(
+    load,
+    "{,**/}{view,views}/{*,**/*}",
+    {},
+    ["create", "delete"],
+);

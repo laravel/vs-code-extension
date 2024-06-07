@@ -8,7 +8,7 @@ const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, appBindingMatchRegex, (match) => {
-        return getAppBindings()[match[0]]?.uri ?? null;
+        return getAppBindings().items[match[0]]?.uri ?? null;
     });
 };
 

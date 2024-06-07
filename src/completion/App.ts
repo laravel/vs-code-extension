@@ -17,7 +17,7 @@ export default class App implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        return Object.entries(getAppBindings()).map(([key, value]) => {
+        return Object.entries(getAppBindings().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
                 key,
                 vscode.CompletionItemKind.Constant,

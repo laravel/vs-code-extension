@@ -1,19 +1,23 @@
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { repository } from ".";
 import { View } from "..";
-import { loadAndWatch } from "../support/fileWatcher";
 import { projectPath, relativePath } from "./../support/project";
 
-let views: {
+interface ViewItem {
     [key: string]: View;
-} = {};
+}
 
 const load = () => {
+    let views: ViewItem = {};
+
     ["/resources/js/Pages"].forEach((path) => {
         collectViews(projectPath(path), path).forEach((view) => {
             views[view.name] = view;
         });
     });
+
+    return views;
 };
 
 const collectViews = (path: string, basePath: string): View[] => {
@@ -50,6 +54,9 @@ const collectViews = (path: string, basePath: string): View[] => {
         .flat();
 };
 
-loadAndWatch(load, "{,**/}{resources/js/Pages}/{*,**/*}", ["create", "delete"]);
-
-export const getInertiaViews = () => views;
+export const getInertiaViews = repository<ViewItem>(
+    () => new Promise((resolve) => resolve(load())),
+    "{,**/}{resources/js/Pages}/{*,**/*}",
+    {},
+    ["create", "delete"],
+);

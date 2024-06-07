@@ -3,20 +3,22 @@ import { getAppBindings } from "../repositories/appBinding";
 import { findWarningsInDoc } from "../support/doc";
 import { appBindingMatchRegex } from "../support/patterns";
 
-const provider = (doc: vscode.TextDocument): vscode.Diagnostic[] => {
+const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
     return findWarningsInDoc(doc, appBindingMatchRegex, (match, range) => {
-        const appBinding = getAppBindings()[match[0]];
+        return getAppBindings().whenLoaded((items) => {
+            const appBinding = items[match[0]];
 
-        if (appBinding) {
-            return null;
-        }
+            if (appBinding) {
+                return null;
+            }
 
-        return {
-            message: `App binding [${match[0]}] not found.`,
-            severity: vscode.DiagnosticSeverity.Warning,
-            range,
-            source: "Laravel Extension",
-        };
+            return {
+                message: `App binding [${match[0]}] not found.`,
+                severity: vscode.DiagnosticSeverity.Warning,
+                range,
+                source: "Laravel Extension",
+            };
+        });
     });
 };
 

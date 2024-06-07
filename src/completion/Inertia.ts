@@ -21,7 +21,7 @@ export default class Inertia implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        const views = getInertiaViews();
+        const views = getInertiaViews().items;
 
         if (func.param.index === 0) {
             return Object.entries(views).map(([key]) => {
