@@ -479,6 +479,24 @@ const parseParamsFromResults = (
     };
 };
 
+const getFunctionDefinition = (
+    tokens: TokenFormatted[],
+): string | undefined => {
+    for (let i in tokens) {
+        const [type, value, line] = tokens[i];
+
+        if (type !== "T_FUNCTION") {
+            continue;
+        }
+
+        const nextToken = getToken(tokens, i, -1);
+
+        if (nextToken[0] === "T_STRING") {
+            return nextToken[1];
+        }
+    }
+};
+
 export const parse = (code: string): ParsingResult | null => {
     const tokens = parser
         .tokenGetAll(code)
@@ -523,6 +541,7 @@ export const parse = (code: string): ParsingResult | null => {
         result = {
             ...result,
             ...classDefinition,
+            functionDefinition: getFunctionDefinition(tokens),
         };
     }
 
