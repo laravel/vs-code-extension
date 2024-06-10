@@ -515,15 +515,49 @@ suite("Parser Test Suite", () => {
 
         use Illuminate\\Database\\Eloquent\\Model;
         use Something\\Else\\Authenticable;
+        use Something\\Else\\Also;
 
-        class User extends Model implements Authenticable {
+        class User extends Model implements Authenticable, Also {
             public function something() {
                 return $this->where('`;
 
         const expected = {
             classDefinition: "App\\Models\\User",
             classExtends: "Illuminate\\Database\\Eloquent\\Model",
-            classImplements: ["Something\\Else\\Authenticable"],
+            classImplements: [
+                "Something\\Else\\Authenticable",
+                "Something\\Else\\Also",
+            ],
+            functionDefinition: "something",
+            function: "where",
+            param: getParam(),
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("it will detect class being defined in a different order", () => {
+        const code = `<?php
+        namespace App\\Models;
+
+        use Illuminate\\Database\\Eloquent\\Model;
+        use Something\\Else\\Authenticable;
+        use Something\\Else\\Also;
+
+        class User implements Authenticable, Also extends Model {
+            public function something() {
+                return $this->where('`;
+
+        const expected = {
+            classDefinition: "App\\Models\\User",
+            classExtends: "Illuminate\\Database\\Eloquent\\Model",
+            classImplements: [
+                "Something\\Else\\Authenticable",
+                "Something\\Else\\Also",
+            ],
             functionDefinition: "something",
             function: "where",
             param: getParam(),

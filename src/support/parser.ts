@@ -265,7 +265,10 @@ const getClassDefinition = (
         if (extendsOrImplements[index][0] === "T_IMPLEMENTS") {
             let implementsIndex = index + 1;
 
-            while (extendsOrImplements[implementsIndex]) {
+            while (
+                extendsOrImplements[implementsIndex] &&
+                extendsOrImplements[implementsIndex][0] !== "T_EXTENDS"
+            ) {
                 if (extendsOrImplements[implementsIndex][0] === "T_STRING") {
                     classImplements.push(
                         extendsOrImplements[implementsIndex][1],
