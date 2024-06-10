@@ -5,9 +5,7 @@ import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Validation implements CompletionProvider {
-    private rules: {
-        [key: string]: string;
-    } = {
+    private rules = {
         accepted: "accepted",
         active_url: "active_url",
         after_or_equal: "after_or_equal:${0:date}",
@@ -104,6 +102,10 @@ export default class Validation implements CompletionProvider {
             {
                 class: "Illuminate\\Support\\Facades\\Request",
                 functions: ["validate", "sometimes"],
+            },
+            {
+                classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
+                functionDefinition: "rules",
             },
         ];
     }

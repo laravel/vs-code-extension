@@ -4,7 +4,11 @@ type Tags = Tag[];
 
 interface Tag {
     class?: string;
-    functions: string[];
+    functions?: string[];
+    classDefinition?: string;
+    functionDefinition?: string;
+    classExtends?: string;
+    classImplements?: string;
 }
 
 interface CompletionItemFunction {
@@ -12,6 +16,10 @@ interface CompletionItemFunction {
     fqn: string | null;
     function: string | null;
     parameters: string[];
+    classDefinition: string | null;
+    functionDefinition: string | null;
+    classExtends: string | null;
+    classImplements: string[];
     param: {
         index: number;
         isArray: boolean;

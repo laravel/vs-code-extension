@@ -30,6 +30,7 @@ export default class Eloquent implements CompletionProvider {
         "withMin",
         "withSum",
         "withAvg",
+        "with",
     ];
 
     private firstParamMethods = [

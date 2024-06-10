@@ -45,6 +45,10 @@ export default class Registry implements vscode.CompletionItemProvider {
                 function: parseResult.function || null,
                 parameters: parseResult.parameters,
                 param: parseResult.param,
+                classDefinition: parseResult.classDefinition || null,
+                functionDefinition: parseResult.functionDefinition || null,
+                classExtends: parseResult.classExtends || null,
+                classImplements: parseResult.classImplements || [],
             },
             document,
             position,
@@ -64,18 +68,30 @@ export default class Registry implements vscode.CompletionItemProvider {
                         .find(
                             (tag) =>
                                 tag.class === parseResult.fqn &&
-                                tag.functions.find(
+                                (tag.functions || []).find(
                                     (fn) => fn === parseResult.function,
                                 ),
                         );
                 }
+
+                // if (parseResult.classExtends) {
+                //     return provider
+                //         .tags()
+                //         .find(
+                //             (tag) =>
+                //                 tag.class === parseResult.classDefinition && (tag.function || []).find(
+                //                     (fn) => fn === parseResult.function,
+                //                 ),
+                //         );
+                //         );
+                // }
 
                 return provider
                     .tags()
                     .find(
                         (tag) =>
                             !tag.class &&
-                            tag.functions.find(
+                            (tag.functions || []).find(
                                 (fn) => fn === parseResult.function,
                             ),
                     );
