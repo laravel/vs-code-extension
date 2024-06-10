@@ -38,6 +38,10 @@ export const appBindingMatchRegex = (() => {
     return funcRegex(["app", "App::make"]);
 })();
 
+export const translationBindingMatchRegex = (() => {
+    return funcRegex(["trans", "__"]);
+})();
+
 export const middlewareMatchRegex = (() => {
     return funcRegex(["middleware"]);
 })();

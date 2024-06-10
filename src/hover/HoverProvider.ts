@@ -13,6 +13,7 @@ import config from "./Config";
 import env from "./Env";
 import inertia from "./Inertia";
 import mix from "./Mix";
+import translation from "./Translation";
 import view from "./View";
 
 export default class HoverProvider implements vsHoverProvider {
@@ -23,6 +24,7 @@ export default class HoverProvider implements vsHoverProvider {
         appBinding,
         env,
         mix,
+        translation,
     ];
 
     provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {

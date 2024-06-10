@@ -7,6 +7,7 @@ import inertia from "./inertia";
 import middleware from "./middleware";
 import mix from "./mix";
 import route from "./route";
+import translation from "./translation";
 import view from "./view";
 
 const collection = vscode.languages.createDiagnosticCollection("laravel");
@@ -21,6 +22,7 @@ const providers = [
     middleware,
     route,
     mix,
+    translation,
 ];
 
 export const updateDiagnostics = (

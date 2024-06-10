@@ -7,6 +7,8 @@ import { getMiddleware } from "../repositories/middleware";
 import { getRoutes } from "../repositories/routes";
 import { wordMatchRegex } from "./../support/patterns";
 
+// TODO: This class is 3 classes: Route, Controller, Middleware
+// Not sure why they are all in one class
 export default class Route implements CompletionProvider {
     tags(): Tags {
         return { classes: ["Route"], functions: ["route", "signedRoute"] };
