@@ -22,7 +22,7 @@ const getFqn = (
     fqn?: string | null;
     class: string;
 } => {
-    const tokensReversed = tokens.reverse();
+    const tokensReversed = [...tokens].reverse();
     const firstUse = tokensReversed.findIndex((token) => token[0] === "T_USE");
 
     if (firstUse === -1) {
@@ -187,6 +187,10 @@ export interface ParsingResult {
     class?: string;
     fqn?: string;
     function?: string;
+    classDefinition?: string;
+    classExtends?: string;
+    classImplements?: string[];
+    functionDefinition?: string;
     param: {
         index: number;
         isArray: boolean;
@@ -201,43 +205,111 @@ export const getTokens = (code: string): Token[] => {
     return parser.tokenGetAll(code);
 };
 
-export const parse = (code: string): ParsingResult | null => {
-    const tokens = parser
-        .tokenGetAll(code)
-        .map((token: Token) => {
-            if (typeof token === "string") {
-                return ["T_CUSTOM_STRING", token, -1];
-            }
+const getNamespace = (tokens: Token[]): string | undefined => {
+    const namespaceIndex = tokens.findIndex(
+        (token) => token[0] === "T_NAMESPACE",
+    );
 
-            return token;
-        })
-        .filter((token: Token) => token[0] !== "T_WHITESPACE")
+    if (namespaceIndex === -1) {
+        return;
+    }
+
+    const ns = tokens[namespaceIndex - 1];
+
+    if (ns[0] !== "T_NAME_QUALIFIED") {
+        return;
+    }
+
+    return ns[1];
+};
+
+const getClassDefinition = (
+    tokens: TokenFormatted[],
+):
+    | Pick<
+          ParsingResult,
+          "classDefinition" | "classExtends" | "classImplements"
+      >
+    | undefined => {
+    const definitionIndex = tokens.findIndex((token) => token[0] === "T_CLASS");
+
+    if (definitionIndex === -1) {
+        return;
+    }
+
+    const className = tokens[definitionIndex - 1];
+
+    if (className[0] !== "T_STRING") {
+        return;
+    }
+
+    const namespace = getNamespace(tokens);
+    const tokensPastClassDefinition = tokens
+        .slice(0, definitionIndex - 1)
         .reverse();
+    const firstBrace = tokensPastClassDefinition.findIndex(
+        (token) => token[1] === "{",
+    );
 
-    let result: ParsingResult | null = null;
+    const extendsOrImplements = tokensPastClassDefinition.slice(0, firstBrace);
 
-    const firstToken = tokens.shift();
+    let index = 0;
+    let classExtends;
+    let classImplements: string[] = [];
 
-    // TODO: What about other triggers? Like blade or variable auto complete?
-    if (
-        firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
-        firstToken[1] !== '"'
-    ) {
-        // We are only concerned with ' and " as the trigger
-        return null;
+    while (index < extendsOrImplements.length) {
+        if (extendsOrImplements[index][0] === "T_EXTENDS") {
+            classExtends = getFqn(tokens, extendsOrImplements[index + 1][1]);
+        }
+
+        if (extendsOrImplements[index][0] === "T_IMPLEMENTS") {
+            let implementsIndex = index + 1;
+
+            while (extendsOrImplements[implementsIndex]) {
+                if (extendsOrImplements[implementsIndex][0] === "T_STRING") {
+                    classImplements.push(
+                        extendsOrImplements[implementsIndex][1],
+                    );
+                }
+
+                implementsIndex++;
+            }
+        }
+
+        index++;
     }
 
-    if (
-        firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
-        ![",", "(", "["].includes(tokens[0][1])
-    ) {
-        // This is the closing quote, we are not interested in this
-        return null;
-    }
+    return {
+        classDefinition: [namespace, className[1]]
+            .filter((i) => !!i)
+            .join("\\"),
+        classExtends: classExtends?.fqn ?? classExtends?.class,
+        classImplements: classImplements.map((i) => {
+            const fqn = getFqn(tokens, i);
 
-    let closedParens = 0;
+            return fqn.fqn ?? fqn.class;
+        }),
+    };
+};
 
+const parsingResultDefaultObject = (): ParsingResult => {
+    return {
+        param: {
+            index: 0,
+            isArray: false,
+            isKey: false,
+            key: null,
+            keys: [],
+        },
+        parameters: [],
+    };
+};
+
+const getInitialResult = (
+    tokens: TokenFormatted[],
+): [ParsingResult | null, TokenFormatted[]] => {
     let params = [];
+    let closedParens = 0;
 
     for (let i in tokens) {
         const nextToken = tokens[i];
@@ -257,16 +329,7 @@ export const parse = (code: string): ParsingResult | null => {
                     fqn,
                 } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
 
-                result = {
-                    param: {
-                        index: 0,
-                        isArray: false,
-                        isKey: false,
-                        key: null,
-                        keys: [],
-                    },
-                    parameters: [],
-                };
+                let result = parsingResultDefaultObject();
 
                 if (cls) {
                     result.class = cls;
@@ -280,7 +343,7 @@ export const parse = (code: string): ParsingResult | null => {
                     result.fqn = fqn;
                 }
 
-                break;
+                return [result, params];
             }
 
             closedParens--;
@@ -289,16 +352,27 @@ export const parse = (code: string): ParsingResult | null => {
         params.push(nextToken);
     }
 
-    if (!result) {
-        return null;
-    }
+    return [null, []];
+};
 
+const parseParamsFromResults = (
+    params: TokenFormatted[],
+): {
+    parameters: string[];
+    isArray: boolean;
+    isKey: boolean;
+    keys: string[];
+} => {
     let nestedLevel = 0;
 
     let currentParam = "";
 
-    const finalParams = [];
+    const parameters = [];
+
     let paramTokens = [];
+    let isArray = false;
+    let isKey = false;
+    let keys: string[] = [];
 
     // Params are in reverse order, so we need to loop them in their actual order
     const paramsToLoop = params.reverse();
@@ -343,55 +417,123 @@ export const parse = (code: string): ParsingResult | null => {
             continue;
         }
 
-        finalParams.push(currentParam);
+        parameters.push(currentParam);
         currentParam = "";
         paramTokens = [];
     }
 
-    if (paramTokens.length > 0) {
-        let finalParamNestingLevel = 0;
-        let inKey = true;
-        let currentKeys = [];
-
-        for (let i in paramTokens) {
-            const [type, value, line] = paramTokens[i];
-
-            if (finalParamNestingLevel === 1 && inKey) {
-                if (type === "T_CONSTANT_ENCAPSED_STRING") {
-                    currentKeys.push(value.substring(1).slice(0, -1));
-                }
-            }
-
-            if (type === "T_DOUBLE_ARROW") {
-                inKey = false;
-            }
-
-            if (["["].includes(value)) {
-                finalParamNestingLevel++;
-                inKey = true;
-            }
-
-            if (["]"].includes(value)) {
-                finalParamNestingLevel--;
-                inKey = true;
-            }
-        }
-
-        if (finalParamNestingLevel > 0) {
-            result.param.isArray = true;
-        }
-
-        if (finalParamNestingLevel === 1) {
-            if (["[", ","].includes(paramTokens[paramTokens.length - 1][1])) {
-                result.param.isKey = true;
-            }
-        }
-
-        result.param.keys = currentKeys;
+    if (paramTokens.length === 0) {
+        return {
+            parameters,
+            isArray,
+            isKey,
+            keys,
+        };
     }
 
-    result.parameters = finalParams;
-    result.param.index = finalParams.length;
+    let finalParamNestingLevel = 0;
+    let inKey = true;
+
+    for (let i in paramTokens) {
+        const [type, value, line] = paramTokens[i];
+
+        if (finalParamNestingLevel === 1 && inKey) {
+            if (type === "T_CONSTANT_ENCAPSED_STRING") {
+                keys.push(value.substring(1).slice(0, -1));
+            }
+        }
+
+        if (type === "T_DOUBLE_ARROW") {
+            inKey = false;
+        }
+
+        if (["["].includes(value)) {
+            finalParamNestingLevel++;
+            inKey = true;
+        }
+
+        if (["]"].includes(value)) {
+            finalParamNestingLevel--;
+            inKey = true;
+        }
+    }
+
+    if (finalParamNestingLevel > 0) {
+        isArray = true;
+    }
+
+    if (finalParamNestingLevel === 1) {
+        if (["[", ","].includes(paramTokens[paramTokens.length - 1][1])) {
+            isKey = true;
+        }
+    }
+
+    return {
+        parameters,
+        isArray,
+        isKey,
+        keys,
+    };
+};
+
+export const parse = (code: string): ParsingResult | null => {
+    const tokens = parser
+        .tokenGetAll(code)
+        .map((token: Token) => {
+            if (typeof token === "string") {
+                return ["T_CUSTOM_STRING", token, -1];
+            }
+
+            return token;
+        })
+        .filter((token: Token) => token[0] !== "T_WHITESPACE")
+        .reverse();
+
+    const firstToken = tokens.shift();
+
+    // TODO: What about other triggers? Like blade or variable auto complete?
+    if (
+        firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
+        firstToken[1] !== '"'
+    ) {
+        // We are only concerned with ' and " as the trigger
+        return null;
+    }
+
+    if (
+        firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
+        ![",", "(", "["].includes(tokens[0][1])
+    ) {
+        // This is the closing quote, we are not interested in this
+        return null;
+    }
+
+    let [result, params] = getInitialResult(tokens);
+
+    const classDefinition = getClassDefinition(tokens);
+
+    if (classDefinition) {
+        if (!result) {
+            result = parsingResultDefaultObject();
+        }
+
+        result = {
+            ...result,
+            ...classDefinition,
+        };
+    }
+
+    if (!result) {
+        return null;
+    }
+
+    const finalParams = parseParamsFromResults(params);
+
+    result.parameters = finalParams.parameters;
+    result.param.index = finalParams.parameters.length;
+    result.param.keys = finalParams.keys;
+    result.param.isArray = finalParams.isArray;
+    result.param.isKey = finalParams.isKey;
 
     return result;
 };

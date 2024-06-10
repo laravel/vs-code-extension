@@ -508,4 +508,30 @@ suite("Parser Test Suite", () => {
 
         assert.deepStrictEqual(result, expected);
     });
+
+    test("it will detect class being defined", () => {
+        const code = `<?php
+        namespace App\\Models;
+
+        use Illuminate\\Database\\Eloquent\\Model;
+        use Something\\Else\\Authenticable;
+
+        class User extends Model implements Authenticable {
+            public function something() {
+                return $this->where('`;
+
+        const expected = {
+            classDefinition: "App\\Models\\User",
+            classExtends: "Illuminate\\Database\\Eloquent\\Model",
+            classImplements: ["Something\\Else\\Authenticable"],
+            functionDefinition: "something",
+            function: "where",
+            param: getParam(),
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
 });
