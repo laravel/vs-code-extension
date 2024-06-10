@@ -5,7 +5,11 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class Mix implements CompletionProvider {
     tags(): Tags {
-        return { classes: [], functions: ["mix"] };
+        return [
+            {
+                functions: ["mix"],
+            },
+        ];
     }
 
     provideCompletionItems(

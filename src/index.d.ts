@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
 
-interface Tags {
-    classes: string[];
+type Tags = Tag[];
+
+interface Tag {
+    class?: string;
     functions: string[];
 }
 

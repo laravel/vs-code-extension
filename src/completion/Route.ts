@@ -11,7 +11,24 @@ import { wordMatchRegex } from "./../support/patterns";
 // Not sure why they are all in one class
 export default class Route implements CompletionProvider {
     tags(): Tags {
-        return { classes: ["Route"], functions: ["route", "signedRoute"] };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\Route",
+                functions: [
+                    "get",
+                    "post",
+                    "put",
+                    "patch",
+                    "delete",
+                    "options",
+                    "any",
+                    "match",
+                ],
+            },
+            {
+                functions: ["route", "signedRoute"],
+            },
+        ];
     }
 
     autoCompleteAction(func: CompletionItemFunction): boolean {

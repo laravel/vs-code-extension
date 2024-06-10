@@ -7,7 +7,15 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class App implements CompletionProvider {
     tags(): Tags {
-        return { classes: ["App"], functions: ["app", "make"] };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\App",
+                functions: ["make", "bound", "isShared"],
+            },
+            {
+                functions: ["app"],
+            },
+        ];
     }
 
     provideCompletionItems(

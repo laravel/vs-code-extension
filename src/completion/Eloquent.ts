@@ -43,10 +43,11 @@ export default class Eloquent implements CompletionProvider {
     ];
 
     tags(): Tags {
-        return {
-            classes: getModels().items.map((model) => model.fqn),
+        return getModels().items.map((model) => ({
+            class: model.fqn,
             functions: this.relationMethods.concat(this.firstParamMethods),
-        };
+        }));
+
         /**
         update,         $flights->each->update(['departed' => false]);
 

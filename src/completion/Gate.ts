@@ -19,10 +19,24 @@ export default class Gate implements CompletionProvider {
     }
 
     tags(): Tags {
-        return {
-            classes: ["Gate"],
-            functions: ["can", "@can", "@cannot", "@canany"],
-        };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\Gate",
+                functions: [
+                    "has",
+                    "allows",
+                    "denies",
+                    "check",
+                    "any",
+                    "none",
+                    "authorize",
+                    "inspect",
+                ],
+            },
+            {
+                functions: ["can", "@can", "@cannot", "@canany"],
+            },
+        ];
     }
 
     provideCompletionItems(

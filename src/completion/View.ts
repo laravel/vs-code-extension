@@ -8,20 +8,32 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class View implements CompletionProvider {
     tags(): Tags {
-        return {
-            classes: ["View"],
-            functions: [
-                "view",
-                "markdown",
-                "links",
-                "@extends",
-                "@component",
-                "@include",
-                "@each",
-                "@section",
-                "@push",
-            ],
-        };
+        return [
+            {
+                class: "View",
+                functions: [
+                    "make",
+                    "first",
+                    "renderWhen",
+                    "renderUnless",
+                    "renderEach",
+                    "exists",
+                ],
+            },
+            {
+                functions: [
+                    "view",
+                    "markdown",
+                    "links",
+                    "@extends",
+                    "@component",
+                    "@include",
+                    "@each",
+                    "@section",
+                    "@push",
+                ],
+            },
+        ];
     }
 
     provideCompletionItems(

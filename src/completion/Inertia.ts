@@ -8,10 +8,12 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class Inertia implements CompletionProvider {
     tags(): Tags {
-        return {
-            classes: ["Inertia"],
-            functions: ["render", "modal"],
-        };
+        return [
+            {
+                class: "Inertia\\Inertia",
+                functions: ["render", "modal"],
+            },
+        ];
     }
 
     provideCompletionItems(

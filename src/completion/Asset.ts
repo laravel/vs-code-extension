@@ -7,7 +7,11 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class Asset implements CompletionProvider {
     tags(): Tags {
-        return { classes: [], functions: ["asset"] };
+        return [
+            {
+                functions: ["asset"],
+            },
+        ];
     }
 
     provideCompletionItems(

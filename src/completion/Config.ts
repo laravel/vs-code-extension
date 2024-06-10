@@ -7,7 +7,15 @@ import { wordMatchRegex } from "../support/patterns";
 
 export default class Config implements CompletionProvider {
     tags(): Tags {
-        return { classes: ["Config"], functions: ["config"] };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\Config",
+                functions: ["get"],
+            },
+            {
+                functions: ["config"],
+            },
+        ];
     }
 
     provideCompletionItems(

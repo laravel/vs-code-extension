@@ -53,60 +53,33 @@ export default class Registry implements vscode.CompletionItemProvider {
         );
     }
 
-    private findProviderByClassAndFunction(
-        className: string | undefined,
-        functionName: string | undefined,
-        condition: "AND" | "OR" = "AND",
-    ) {
-        return this.providers.find((provider) => {
-            const classMatch =
-                provider.tags().classes.find((cls) => cls === className) !==
-                undefined;
-            const functionMatch =
-                provider.tags().functions.find((fn) => fn === functionName) !==
-                undefined;
+    private getProviderFromResult(
+        parseResult: ParsingResult,
+    ): CompletionProvider | null {
+        return (
+            this.providers.find((provider) => {
+                if (parseResult.fqn) {
+                    return provider
+                        .tags()
+                        .find(
+                            (tag) =>
+                                tag.class === parseResult.fqn &&
+                                tag.functions.find(
+                                    (fn) => fn === parseResult.function,
+                                ),
+                        );
+                }
 
-            return condition === "AND"
-                ? classMatch && functionMatch
-                : classMatch || functionMatch;
-        });
-    }
-
-    private getProviderFromResult(parseResult: ParsingResult) {
-        // Try for the most specific provider first, then get less specific
-        const providerFunc = [
-            () =>
-                this.findProviderByClassAndFunction(
-                    parseResult.fqn,
-                    parseResult.function,
-                ),
-            () =>
-                this.findProviderByClassAndFunction(
-                    parseResult.class,
-                    parseResult.function,
-                ),
-            () =>
-                this.findProviderByClassAndFunction(
-                    parseResult.fqn,
-                    parseResult.function,
-                    "OR",
-                ),
-            () =>
-                this.findProviderByClassAndFunction(
-                    parseResult.class,
-                    parseResult.function,
-                    "OR",
-                ),
-        ];
-
-        for (const func of providerFunc) {
-            const provider = func();
-
-            if (provider) {
-                return provider;
-            }
-        }
-
-        return null;
+                return provider
+                    .tags()
+                    .find(
+                        (tag) =>
+                            !tag.class &&
+                            tag.functions.find(
+                                (fn) => fn === parseResult.function,
+                            ),
+                    );
+            }) || null
+        );
     }
 }

@@ -96,10 +96,16 @@ export default class Validation implements CompletionProvider {
     };
 
     tags(): Tags {
-        return {
-            classes: ["Validator", "Request"],
-            functions: ["validate", "sometimes"], //  "rules"
-        };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\Validator",
+                functions: ["validate", "sometimes"],
+            },
+            {
+                class: "Illuminate\\Support\\Facades\\Request",
+                functions: ["validate", "sometimes"],
+            },
+        ];
     }
 
     provideCompletionItems(

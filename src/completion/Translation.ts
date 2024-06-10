@@ -7,7 +7,21 @@ import { wordMatchRegex } from "./../support/patterns";
 
 export default class Translation implements CompletionProvider {
     tags(): Tags {
-        return { classes: ["Lang"], functions: ["__", "trans", "@lang"] };
+        return [
+            {
+                class: "Illuminate\\Support\\Facades\\Lang",
+                functions: [
+                    "has",
+                    "hasForLocale",
+                    "get",
+                    "getForLocale",
+                    "choice",
+                ],
+            },
+            {
+                functions: ["__", "trans", "@lang"],
+            },
+        ];
     }
 
     provideCompletionItems(
