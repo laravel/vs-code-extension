@@ -10,7 +10,7 @@ export default class View implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "View",
+                class: "Illuminate\\Support\\Facades\\View",
                 functions: [
                     "make",
                     "first",
@@ -21,6 +21,7 @@ export default class View implements CompletionProvider {
                 ],
             },
             {
+                // TODO: Some of these belong to other classes...
                 functions: [
                     "view",
                     "markdown",
@@ -47,6 +48,26 @@ export default class View implements CompletionProvider {
 
         if (func.function && ["@section", "@push"].includes(func.function)) {
             return this.getYields(func.function, document.getText());
+        }
+
+        if (["renderWhen", "renderUnless"].find((f) => f === func.function)) {
+            if (func.param.index !== 1) {
+                return [];
+            }
+
+            return Object.entries(views).map(([key]) => {
+                let completionItem = new vscode.CompletionItem(
+                    key,
+                    vscode.CompletionItemKind.Constant,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+
+                return completionItem;
+            });
         }
 
         if (func.param.index === 0) {

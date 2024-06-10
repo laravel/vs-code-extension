@@ -3,7 +3,6 @@
 import * as vscode from "vscode";
 import { CompletionItemFunction, CompletionProvider, Tags } from "..";
 import { getModels } from "./../repositories/models";
-import { config } from "./../support/config";
 import { wordMatchRegex } from "./../support/patterns";
 import { runInLaravel, template } from "./../support/php";
 
@@ -11,10 +10,6 @@ export default class Gate implements CompletionProvider {
     private abilities: any[] = [];
 
     constructor() {
-        if (config<boolean>("disableAuth", false)) {
-            return;
-        }
-
         this.load();
     }
 

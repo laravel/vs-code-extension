@@ -32,34 +32,7 @@ export default class Translation implements CompletionProvider {
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         if (func.param.index === 1) {
-            if (!func.param.isKey) {
-                return [];
-            }
-
-            // Parameters autocomplete
-            return Object.entries(getTranslations().items)
-                .filter(([key, value]) => key === func.parameters[0])
-                .map(([key, value]) => {
-                    return value.default.params
-                        .filter((param) => {
-                            return !func.param.keys.includes(param);
-                        })
-                        .map((param) => {
-                            let completionItem = new vscode.CompletionItem(
-                                param,
-                                vscode.CompletionItemKind.Variable,
-                            );
-
-                            completionItem.range =
-                                document.getWordRangeAtPosition(
-                                    position,
-                                    wordMatchRegex,
-                                );
-
-                            return completionItem;
-                        });
-                })
-                .flat();
+            return this.getParameterCompletionItems(func, document, position);
         }
 
         return Object.entries(getTranslations().items).map(
@@ -79,5 +52,39 @@ export default class Translation implements CompletionProvider {
                 return completionItem;
             },
         );
+    }
+
+    private getParameterCompletionItems(
+        func: CompletionItemFunction,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+    ): vscode.CompletionItem[] {
+        if (!func.param.isKey) {
+            return [];
+        }
+
+        // Parameters autocomplete
+        return Object.entries(getTranslations().items)
+            .filter(([key, value]) => key === func.parameters[0])
+            .map(([key, value]) => {
+                return value.default.params
+                    .filter((param) => {
+                        return !func.param.keys.includes(param);
+                    })
+                    .map((param) => {
+                        let completionItem = new vscode.CompletionItem(
+                            param,
+                            vscode.CompletionItemKind.Variable,
+                        );
+
+                        completionItem.range = document.getWordRangeAtPosition(
+                            position,
+                            wordMatchRegex,
+                        );
+
+                        return completionItem;
+                    });
+            })
+            .flat();
     }
 }

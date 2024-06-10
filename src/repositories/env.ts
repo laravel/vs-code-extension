@@ -43,7 +43,7 @@ export const getEnv = repository<EnvItem>(
     () =>
         new Promise<EnvItem>((resolve, reject) => {
             try {
-                return load();
+                resolve(load());
             } catch (error) {
                 reject(error);
             }
