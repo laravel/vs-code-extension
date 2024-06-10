@@ -8,13 +8,13 @@ import {
     HoverProvider as vsHoverProvider,
 } from "vscode";
 import { HoverProvider as ProviderFunc } from "..";
-import appBinding from "./AppBinding";
-import config from "./Config";
-import env from "./Env";
-import inertia from "./Inertia";
-import mix from "./Mix";
-import translation from "./Translation";
-import view from "./View";
+import appBinding from "./appBinding";
+import config from "./config";
+import env from "./env";
+import inertia from "./inertia";
+import mix from "./mix";
+import translation from "./translation";
+import view from "./view";
 
 export default class HoverProvider implements vsHoverProvider {
     private providers: ProviderFunc[] = [
