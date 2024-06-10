@@ -7,14 +7,14 @@ import {
     DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
 import { LinkProvider as LinkProviderType } from "..";
-import appBinding from "./AppBinding";
-import asset from "./Asset";
-import config from "./Config";
-import env from "./Env";
-import inertia from "./Inertia";
-import mix from "./Mix";
-import translation from "./Translation";
-import view from "./View";
+import appBinding from "./appBinding";
+import asset from "./asset";
+import config from "./config";
+import env from "./env";
+import inertia from "./inertia";
+import mix from "./mix";
+import translation from "./translation";
+import view from "./view";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     private providers: LinkProviderType[] = [
