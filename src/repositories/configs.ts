@@ -23,8 +23,7 @@ const getFilePath = (key: string): vscode.Uri | undefined => {
 };
 
 const collectConfigs = (conf: Config, topLevel = false): ConfigItem[] => {
-    // TODO: Boo?
-    let result: any[] = [];
+    let result: ConfigItem[] = [];
 
     let uri = undefined;
 
@@ -35,7 +34,13 @@ const collectConfigs = (conf: Config, topLevel = false): ConfigItem[] => {
             cachedFilePaths.set(key, uri);
         }
 
-        result.push(getConfigValue(conf, key, uri));
+        const val = getConfigValue(conf, key, uri);
+
+        if (val instanceof Array) {
+            result.push(...val);
+        } else {
+            result.push(val);
+        }
     }
 
     return result.flat();
