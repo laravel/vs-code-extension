@@ -49,7 +49,6 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "get",
-            class: "Route",
             fqn: "Route",
             param: getParam(),
             parameters: [],
@@ -66,7 +65,6 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "get",
-            class: "User",
             fqn: "User",
             param: getParam(),
             parameters: [],
@@ -85,7 +83,6 @@ suite("Parser Test Suite", () => {
 
         const expected = {
             function: "find",
-            class: "User",
             fqn: "User",
             param: getParam(),
             parameters: [],
@@ -126,7 +123,6 @@ suite("Parser Test Suite", () => {
         $user->where('name', 'something')->find('`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "find",
             param: getParam(),
@@ -147,7 +143,6 @@ suite("Parser Test Suite", () => {
         $user->where('name', 'something')->find('`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "find",
             param: getParam(),
@@ -185,7 +180,6 @@ suite("Parser Test Suite", () => {
         $user->where('name', 'something')->find('`;
 
         const expected = {
-            class: "User",
             fqn: "App\\Models\\User",
             function: "find",
             param: getParam(),
@@ -204,7 +198,6 @@ suite("Parser Test Suite", () => {
         User::where('`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam(),
@@ -225,7 +218,6 @@ suite("Parser Test Suite", () => {
         User::where('`;
 
         const expected = {
-            class: "User",
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
@@ -245,7 +237,6 @@ suite("Parser Test Suite", () => {
         UserModel::where('`;
 
         const expected = {
-            class: "User",
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
@@ -266,7 +257,6 @@ suite("Parser Test Suite", () => {
         UserModel::where('`;
 
         const expected = {
-            class: "User",
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
@@ -285,7 +275,6 @@ suite("Parser Test Suite", () => {
         User::where('first', '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -306,7 +295,6 @@ suite("Parser Test Suite", () => {
         User::where(['what' => 'ok'], '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -327,7 +315,6 @@ suite("Parser Test Suite", () => {
         User::where('first', ['what' => 'ok'], '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -350,7 +337,6 @@ suite("Parser Test Suite", () => {
         }, '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -371,7 +357,6 @@ suite("Parser Test Suite", () => {
         User::where(fn($thing) => $thing, '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -394,7 +379,6 @@ suite("Parser Test Suite", () => {
         }, ['hi' => 'there'], '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -421,7 +405,6 @@ suite("Parser Test Suite", () => {
         User::where('ok', ['`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -444,7 +427,6 @@ suite("Parser Test Suite", () => {
         User::where('ok', ['sure' => 'thing', '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -468,7 +450,6 @@ suite("Parser Test Suite", () => {
         User::where('ok', ['sure', '`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
@@ -492,7 +473,6 @@ suite("Parser Test Suite", () => {
         User::where('ok', ['sure', ['`;
 
         const expected = {
-            class: "User",
             fqn: "User",
             function: "where",
             param: getParam({
