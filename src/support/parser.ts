@@ -317,34 +317,37 @@ const getInitialResult = (
             continue;
         }
 
-        if (value === "(") {
-            if (closedParens === 0) {
-                const {
-                    class: cls,
-                    func,
-                    fqn,
-                } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
-
-                let result = parsingResultDefaultObject();
-
-                if (cls) {
-                    result.class = cls;
-                }
-
-                if (func) {
-                    result.function = func;
-                }
-
-                if (fqn) {
-                    result.fqn = fqn;
-                }
-
-                return [result, params];
-            }
-
-            closedParens--;
+        if (value !== "(") {
+            params.push(nextToken);
+            continue;
         }
 
+        // We've found the opening parenthesis
+        if (closedParens === 0) {
+            const {
+                class: cls,
+                func,
+                fqn,
+            } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
+
+            let result = parsingResultDefaultObject();
+
+            if (cls) {
+                result.class = cls;
+            }
+
+            if (func) {
+                result.function = func;
+            }
+
+            if (fqn) {
+                result.fqn = fqn;
+            }
+
+            return [result, params];
+        }
+
+        closedParens--;
         params.push(nextToken);
     }
 
