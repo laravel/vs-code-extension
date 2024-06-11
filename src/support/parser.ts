@@ -92,69 +92,6 @@ const extractClassAndFunction = (
     for (let i in tokens) {
         const [type, value, line] = tokens[i];
 
-        if (variableToFind) {
-            if (type === "T_VARIABLE" && value === variableToFind) {
-                const nextToken = getToken(tokens, i, 1);
-                const previousToken = getToken(tokens, i, -1);
-
-                if (
-                    nextToken[0] === "T_STRING" ||
-                    nextToken[0] === "T_NAME_QUALIFIED"
-                ) {
-                    const cls = nextToken[1];
-
-                    // Type hinted, we got the class
-                    return {
-                        ...getFqn(tokens, cls),
-                        func: func,
-                    };
-                }
-
-                if (
-                    nextToken[1] === "(" &&
-                    getToken(tokens, i, 2)[0] === "T_FUNCTION"
-                ) {
-                    // It was a param in a function, no type hint, no class
-                    return {
-                        func,
-                    };
-                }
-
-                if (previousToken[1] === "=") {
-                    if (
-                        getToken(tokens, i, -2)[0] === "T_NEW" &&
-                        (getToken(tokens, i, -3)[0] === "T_STRING" ||
-                            getToken(tokens, i, -3)[0] === "T_NAME_QUALIFIED")
-                    ) {
-                        const cls = getToken(tokens, i, -3)[1];
-
-                        return {
-                            ...getFqn(tokens, cls),
-                            func,
-                        };
-                    }
-
-                    if (
-                        getToken(tokens, i, -2)[0] === "T_STRING" ||
-                        getToken(tokens, i, -2)[0] === "T_NAME_QUALIFIED"
-                    ) {
-                        const cls = getToken(tokens, i, -2)[1];
-
-                        return {
-                            ...getFqn(tokens, cls),
-                            func,
-                        };
-                    }
-
-                    return {
-                        func,
-                    };
-                }
-            }
-
-            continue;
-        }
-
         if (type === "T_DOUBLE_COLON") {
             const cls = getToken(tokens, i, 1)[1];
 
@@ -170,6 +107,78 @@ const extractClassAndFunction = (
             if (nextToken[0] === "T_VARIABLE") {
                 variableToFind = nextToken[1];
             }
+        }
+
+        if (variableToFind === null) {
+            continue;
+        }
+
+        // At this point we're on the hunt for a variable
+        if (type !== "T_VARIABLE") {
+            continue;
+        }
+
+        if (value !== variableToFind) {
+            continue;
+        }
+
+        const nextToken = getToken(tokens, i, 1);
+        const previousToken = getToken(tokens, i, -1);
+
+        if (
+            nextToken[0] === "T_STRING" ||
+            nextToken[0] === "T_NAME_QUALIFIED"
+        ) {
+            const cls = nextToken[1];
+
+            // Type hinted, we got the class
+            return {
+                ...getFqn(tokens, cls),
+                func: func,
+            };
+        }
+
+        if (
+            nextToken[1] === "(" &&
+            getToken(tokens, i, 2)[0] === "T_FUNCTION"
+        ) {
+            // It was a param in a function, no type hint, no class
+            return {
+                func,
+            };
+        }
+
+        if (previousToken[1] === "=") {
+            if (
+                getToken(tokens, i, -2)[0] === "T_NEW" &&
+                ["T_STRING", "T_NAME_QUALIFIED"].includes(
+                    getToken(tokens, i, -3)[0],
+                )
+            ) {
+                const cls = getToken(tokens, i, -3)[1];
+
+                return {
+                    ...getFqn(tokens, cls),
+                    func,
+                };
+            }
+
+            if (
+                ["T_STRING", "T_NAME_QUALIFIED"].includes(
+                    getToken(tokens, i, -2)[0],
+                )
+            ) {
+                const cls = getToken(tokens, i, -2)[1];
+
+                return {
+                    ...getFqn(tokens, cls),
+                    func,
+                };
+            }
+
+            return {
+                func,
+            };
         }
     }
 
