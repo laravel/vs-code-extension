@@ -140,7 +140,10 @@ export default class Validation implements CompletionProvider {
             return [];
         }
 
-        if (func.class === "Request" && func.param.index === 0) {
+        if (
+            func.fqn === "Illuminate\\Support\\Facades\\Request" &&
+            func.param.index === 0
+        ) {
             return this.getRules(document, position);
         }
 
@@ -152,7 +155,10 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         func: CompletionItemFunction,
     ): vscode.CompletionItem[] | undefined {
-        if (func.class === "Validator" && func.param.index === 1) {
+        if (
+            func.fqn === "Illuminate\\Support\\Facades\\Validator" &&
+            func.param.index === 1
+        ) {
             return this.getRules(document, position);
         }
     }

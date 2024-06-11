@@ -12,7 +12,6 @@ interface Tag {
 }
 
 interface CompletionItemFunction {
-    class: string | null;
     fqn: string | null;
     function: string | null;
     parameters: string[];

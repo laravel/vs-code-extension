@@ -32,7 +32,7 @@ export default class Route implements CompletionProvider {
     }
 
     autoCompleteAction(func: CompletionItemFunction): boolean {
-        if (func.class !== "Route") {
+        if (func.fqn !== "Illuminate\\Support\\Facades\\Route") {
             return false;
         }
 

@@ -20,14 +20,12 @@ const getFqn = (
     cls: string,
 ): {
     fqn?: string | null;
-    class: string;
 } => {
     const tokensReversed = [...tokens].reverse();
     const firstUse = tokensReversed.findIndex((token) => token[0] === "T_USE");
 
     if (firstUse === -1) {
         return {
-            class: cls.split("\\").pop() ?? cls,
             fqn: cls,
         };
     }
@@ -43,14 +41,12 @@ const getFqn = (
 
         if (fqnCandidate[1] === cls) {
             return {
-                class: cls.split("\\").pop() ?? cls,
                 fqn: fqnCandidate[1],
             };
         }
 
         if (fqnCandidate[1].endsWith(`\\${cls}`)) {
             return {
-                class: cls,
                 fqn: fqnCandidate[1],
             };
         }
@@ -65,14 +61,13 @@ const getFqn = (
 
         if (alias[1] === cls) {
             return {
-                class: fqnCandidate[1].split("\\").pop() ?? fqnCandidate[1],
                 fqn: fqnCandidate[1],
             };
         }
     }
 
     return {
-        class: cls,
+        fqn: cls,
     };
 };
 
@@ -286,12 +281,10 @@ const getClassDefinition = (
         classDefinition: [namespace, className[1]]
             .filter((i) => !!i)
             .join("\\"),
-        classExtends: classExtends?.fqn ?? classExtends?.class,
-        classImplements: classImplements.map((i) => {
-            const fqn = getFqn(tokens, i);
-
-            return fqn.fqn ?? fqn.class;
-        }),
+        classExtends: classExtends?.fqn ?? undefined,
+        classImplements: classImplements
+            .map((i) => getFqn(tokens, i).fqn ?? "")
+            .filter((i) => i !== ""),
     };
 };
 
@@ -495,6 +488,19 @@ const getFunctionDefinition = (
             return nextToken[1];
         }
     }
+};
+
+export const getNormalizedTokens = (code: string): TokenFormatted[] => {
+    return parser
+        .tokenGetAll(code)
+        .map((token: Token) => {
+            if (typeof token === "string") {
+                return ["T_CUSTOM_STRING", token, -1];
+            }
+
+            return token;
+        })
+        .filter((token: Token) => token[0] !== "T_WHITESPACE");
 };
 
 export const parse = (code: string): ParsingResult | null => {
