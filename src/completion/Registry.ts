@@ -1,9 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider } from "..";
+import { CompletionItemFunction, CompletionProvider, ParsingResult } from "..";
 import { info } from "../support/logger";
-import { ParsingResult, parse } from "./../support/parser";
+import { parse } from "./../support/parser";
 
 export default class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];
@@ -32,10 +32,22 @@ export default class Registry implements vscode.CompletionItemProvider {
             return [];
         }
 
-        const provider = this.getProviderFromResult(parseResult);
+        let provider = this.getProviderFromResult(parseResult);
+        let additionalInfo = null;
+
+        if (!provider) {
+            [provider, additionalInfo] = this.getProviderByFallback(
+                parseResult,
+                docUntilPosition,
+            );
+        }
 
         if (!provider) {
             return [];
+        }
+
+        if (additionalInfo) {
+            parseResult.additionalInfo = additionalInfo;
         }
 
         return provider.provideCompletionItems(
@@ -59,6 +71,7 @@ export default class Registry implements vscode.CompletionItemProvider {
             functionDefinition: parseResult.functionDefinition || null,
             classExtends: parseResult.classExtends || null,
             classImplements: parseResult.classImplements || [],
+            additionalInfo: parseResult.additionalInfo || null,
         };
     }
 
@@ -94,27 +107,29 @@ export default class Registry implements vscode.CompletionItemProvider {
 
     private getProviderByFallback(
         parseResult: ParsingResult,
-    ): CompletionProvider | null {
-        return (
-            this.providers.find((provider) =>
-                typeof provider.customCheck !== "undefined"
-                    ? provider.customCheck(
-                          this.parsingResultToCompletionItemFunction(
-                              parseResult,
-                          ),
-                      )
-                    : null,
-            ) || null
-        );
+        document: string,
+    ): [CompletionProvider | null, any] {
+        for (const provider of this.providers) {
+            if (!provider.customCheck) {
+                continue;
+            }
+
+            const result = provider.customCheck(
+                this.parsingResultToCompletionItemFunction(parseResult),
+                document,
+            );
+
+            if (result !== false) {
+                return [provider, result];
+            }
+        }
+
+        return [null, null];
     }
 
     private getProviderFromResult(
         parseResult: ParsingResult,
     ): CompletionProvider | null {
-        return (
-            this.getProviderByClassOrFunction(parseResult) ??
-            this.getProviderByFallback(parseResult) ??
-            null
-        );
+        return this.getProviderByClassOrFunction(parseResult);
     }
 }

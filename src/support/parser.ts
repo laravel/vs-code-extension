@@ -1,4 +1,5 @@
 import engine from "php-parser";
+import { ParsingResult } from "..";
 
 // TODO: Problem?
 // @ts-ignore
@@ -199,24 +200,6 @@ const extractClassAndFunction = (
     };
 };
 
-export interface ParsingResult {
-    class?: string;
-    fqn?: string;
-    function?: string;
-    classDefinition?: string;
-    classExtends?: string;
-    classImplements?: string[];
-    functionDefinition?: string;
-    param: {
-        index: number;
-        isArray: boolean;
-        isKey: boolean;
-        key: string | null;
-        keys: string[];
-    };
-    parameters: string[];
-}
-
 export const getTokens = (code: string): Token[] => {
     return parser.tokenGetAll(code);
 };
@@ -324,9 +307,11 @@ const parsingResultDefaultObject = (): ParsingResult => {
 
 const getInitialResult = (
     tokens: TokenFormatted[],
+    depth = 0,
 ): [ParsingResult | null, TokenFormatted[]] => {
     let params = [];
     let closedParens = 0;
+    let currentDepth = 0;
 
     for (let i in tokens) {
         const nextToken = tokens[i];
@@ -346,6 +331,11 @@ const getInitialResult = (
         if (closedParens > 0) {
             closedParens--;
             params.push(nextToken);
+            continue;
+        }
+
+        if (currentDepth !== depth) {
+            currentDepth++;
             continue;
         }
 
@@ -528,7 +518,7 @@ export const getNormalizedTokens = (code: string): TokenFormatted[] => {
         .filter((token: Token) => token[0] !== "T_WHITESPACE");
 };
 
-export const parse = (code: string): ParsingResult | null => {
+export const parse = (code: string, depth = 0): ParsingResult | null => {
     const tokens = parser
         .tokenGetAll(code)
         .map((token: Token) => {
@@ -560,7 +550,7 @@ export const parse = (code: string): ParsingResult | null => {
         return null;
     }
 
-    let [result, params] = getInitialResult(tokens);
+    let [result, params] = getInitialResult(tokens, depth);
 
     const classDefinition = getClassDefinition(tokens);
 
