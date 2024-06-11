@@ -565,12 +565,8 @@ export const parse = (code: string): ParsingResult | null => {
     const classDefinition = getClassDefinition(tokens);
 
     if (classDefinition) {
-        if (!result) {
-            result = parsingResultDefaultObject();
-        }
-
         result = {
-            ...result,
+            ...(result ?? parsingResultDefaultObject()),
             ...classDefinition,
             functionDefinition: getFunctionDefinition(tokens),
         };
