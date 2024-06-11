@@ -41,43 +41,20 @@ export default class Eloquent implements CompletionProvider {
         "firstWhere",
         "max",
         "sum",
+        "select",
+        "update",
+        "whereColumn",
     ];
+
+    private anyParamMethods = ["firstOrNew", "firstOrCreate"];
 
     tags(): Tags {
         return getModels().items.map((model) => ({
             class: model.fqn,
-            functions: this.relationMethods.concat(this.firstParamMethods),
+            functions: this.relationMethods
+                .concat(this.firstParamMethods)
+                .concat(this.anyParamMethods),
         }));
-
-        /**
-        update,         $flights->each->update(['departed' => false]);
-
-        Destination::addSelect(['last_flight' => Flight::select('name')
-        ->whereColumn('destination_id', 'destinations.id')
-        ->orderByDesc('arrived_at')
-
-        // Retrieve flight by name or create it if it doesn't exist...
-$flight = Flight::firstOrCreate([
-    'name' => 'London to Paris'
-]);
-
-// Retrieve flight by name or create it with the name, delayed, and arrival_time attributes...
-$flight = Flight::firstOrCreate(
-    ['name' => 'London to Paris'],
-    ['delayed' => 1, 'arrival_time' => '11:30']
-);
-
-// Retrieve flight by name or instantiate a new Flight instance...
-$flight = Flight::firstOrNew([
-    'name' => 'London to Paris'
-]);
-
-// Retrieve flight by name or instantiate with the name, delayed, and arrival_time attributes...
-$flight = Flight::firstOrNew(
-    ['name' => 'Tokyo to Sydney'],
-    ['delayed' => 1, 'arrival_time' => '11:30']
-);
-        **/
     }
 
     provideCompletionItems(
@@ -87,16 +64,15 @@ $flight = Flight::firstOrNew(
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (!func.fqn) {
-            // If we don't have a fully qualified name, we can't provide completions
-            return [];
-        }
-
         const model = getModels().items.find((model) => model.fqn === func.fqn);
 
         // If we can't find the model, we can't provide completions
         if (!model) {
             return [];
+        }
+
+        if (this.anyParamMethods.includes(func.function || "")) {
+            return this.getAttributeCompletionItems(document, position, model);
         }
 
         if (this.firstParamMethods.includes(func.function || "")) {
@@ -158,10 +134,6 @@ $flight = Flight::firstOrNew(
                 vscode.CompletionItemKind.Constant,
             ),
         );
-
-        // .concat(
-        //     this.getRelationshipCompletionItems(document, position, model),
-        // );
     }
 
     getCompletionItems(
