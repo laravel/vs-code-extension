@@ -89,10 +89,12 @@ const extractClassAndFunction = (
 
     let variableToFind = null;
 
+    let closedParens = 0;
+
     for (let i in tokens) {
         const [type, value, line] = tokens[i];
 
-        if (type === "T_DOUBLE_COLON") {
+        if (variableToFind === null && type === "T_DOUBLE_COLON") {
             const cls = getToken(tokens, i, 1)[1];
 
             return {
@@ -101,12 +103,22 @@ const extractClassAndFunction = (
             };
         }
 
-        if (type === "T_OBJECT_OPERATOR") {
+        if (variableToFind === null && type === "T_OBJECT_OPERATOR") {
             const nextToken = getToken(tokens, i, 1);
 
             if (nextToken[0] === "T_VARIABLE") {
                 variableToFind = nextToken[1];
             }
+        }
+
+        if (value === ")") {
+            closedParens++;
+            continue;
+        }
+
+        if (value === "(" && closedParens > 0) {
+            closedParens--;
+            continue;
         }
 
         if (variableToFind === null) {
