@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider } from "..";
+import { CompletionItemFunction, CompletionProvider } from "..";
 import { info } from "../support/logger";
 import { ParsingResult, parse } from "./../support/parser";
 
@@ -39,16 +39,7 @@ export default class Registry implements vscode.CompletionItemProvider {
         }
 
         return provider.provideCompletionItems(
-            {
-                fqn: parseResult.fqn || null,
-                function: parseResult.function || null,
-                parameters: parseResult.parameters,
-                param: parseResult.param,
-                classDefinition: parseResult.classDefinition || null,
-                functionDefinition: parseResult.functionDefinition || null,
-                classExtends: parseResult.classExtends || null,
-                classImplements: parseResult.classImplements || [],
-            },
+            this.parsingResultToCompletionItemFunction(parseResult),
             document,
             position,
             token,
@@ -56,7 +47,22 @@ export default class Registry implements vscode.CompletionItemProvider {
         );
     }
 
-    private getProviderFromResult(
+    private parsingResultToCompletionItemFunction(
+        parseResult: ParsingResult,
+    ): CompletionItemFunction {
+        return {
+            fqn: parseResult.fqn || null,
+            function: parseResult.function || null,
+            parameters: parseResult.parameters,
+            param: parseResult.param,
+            classDefinition: parseResult.classDefinition || null,
+            functionDefinition: parseResult.functionDefinition || null,
+            classExtends: parseResult.classExtends || null,
+            classImplements: parseResult.classImplements || [],
+        };
+    }
+
+    private getProviderByClassOrFunction(
         parseResult: ParsingResult,
     ): CompletionProvider | null {
         return (
@@ -73,18 +79,6 @@ export default class Registry implements vscode.CompletionItemProvider {
                         );
                 }
 
-                // if (parseResult.classExtends) {
-                //     return provider
-                //         .tags()
-                //         .find(
-                //             (tag) =>
-                //                 tag.class === parseResult.classDefinition && (tag.function || []).find(
-                //                     (fn) => fn === parseResult.function,
-                //                 ),
-                //         );
-                //         );
-                // }
-
                 return provider
                     .tags()
                     .find(
@@ -95,6 +89,32 @@ export default class Registry implements vscode.CompletionItemProvider {
                             ),
                     );
             }) || null
+        );
+    }
+
+    private getProviderByFallback(
+        parseResult: ParsingResult,
+    ): CompletionProvider | null {
+        return (
+            this.providers.find((provider) =>
+                typeof provider.customCheck !== "undefined"
+                    ? provider.customCheck(
+                          this.parsingResultToCompletionItemFunction(
+                              parseResult,
+                          ),
+                      )
+                    : null,
+            ) || null
+        );
+    }
+
+    private getProviderFromResult(
+        parseResult: ParsingResult,
+    ): CompletionProvider | null {
+        return (
+            this.getProviderByClassOrFunction(parseResult) ??
+            this.getProviderByFallback(parseResult) ??
+            null
         );
     }
 }

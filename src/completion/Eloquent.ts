@@ -2,6 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionItemFunction, CompletionProvider, Model, Tags } from "..";
+import { info } from "../support/logger";
 import { getModels } from "./../repositories/models";
 import { config } from "./../support/config";
 import { wordMatchRegex } from "./../support/patterns";
@@ -55,6 +56,12 @@ export default class Eloquent implements CompletionProvider {
                 .concat(this.firstParamMethods)
                 .concat(this.anyParamMethods),
         }));
+    }
+
+    customCheck(func: CompletionItemFunction): boolean {
+        info("got to the custom check in Eloquent.ts...");
+
+        return true;
     }
 
     provideCompletionItems(

@@ -55,6 +55,7 @@ interface ConfigItem {
 
 interface CompletionProvider {
     tags(): Tags;
+    customCheck?(func: CompletionItemFunction): boolean;
     provideCompletionItems(
         func: CompletionItemFunction,
         document: vscode.TextDocument,
