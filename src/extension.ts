@@ -20,6 +20,7 @@ import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
+import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
 import LinkProvider from "./link/LinkProvider";
@@ -124,6 +125,11 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
             new BladeCompletion(),
             "@",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            LANGUAGES,
+            new VoltCompletion(),
+            ...TRIGGER_CHARACTERS.concat(["$"]),
         ),
         vscode.languages.registerDocumentLinkProvider(
             LANGUAGES,
