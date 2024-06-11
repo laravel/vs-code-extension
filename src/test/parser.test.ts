@@ -114,6 +114,29 @@ suite("Parser Test Suite", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("it will not get sidetracked by other variables in unrelated closures", () => {
+        const code = `<?php
+
+        Route::get('/', function (User $user) {
+
+        $user->where(function($q) {
+            $q->where('something', 'something else');
+        })->find('');
+
+        $user->where('name', 'something')->find('`;
+
+        const expected = {
+            fqn: "User",
+            function: "find",
+            param: getParam(),
+            parameters: [],
+        };
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("variable of instantiated class and method", () => {
         const code = `<?php
 
