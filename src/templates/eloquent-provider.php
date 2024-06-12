@@ -1,65 +1,112 @@
 <?php
-foreach (__VSCODE_LARAVEL_MODEL_PATHS__ as $modelPath) {
-    if (is_dir(base_path($modelPath))) {
-        foreach (scandir(base_path($modelPath)) as $sourceFile) {
-            if (substr($sourceFile, -4) === '.php' && is_file(base_path("$modelPath/$sourceFile"))) {
-                include_once base_path("$modelPath/$sourceFile");
+collect(glob(base_path('**/Models/*.php')))
+        ->each(fn ($file) => include_once($file));
+
+    $models = collect(get_declared_classes())
+        ->filter(function ($class) {
+            return is_subclass_of($class, 'Illuminate\Database\Eloquent\Model');
+        })
+        ->filter(function ($class) {
+            return !in_array($class, [\Illuminate\Database\Eloquent\Relations\Pivot::class, \Illuminate\Foundation\Auth\User::class]);
+        })
+        ->values()
+        ->flatMap(function ($class) {
+            return [$class => new \ReflectionClass($class)];
+        })
+        ->map(function (ReflectionClass $reflection, string $className) {
+
+            $shortName = $reflection->getShortName();
+            $pluralName = \Illuminate\Support\Str::plural($shortName);
+
+            $output = [
+                'name' => $shortName,
+                'camelCase' => \Illuminate\Support\Str::camel($shortName),
+                'snakeCase' => \Illuminate\Support\Str::snake($shortName),
+                'pluralCamelCase' => \Illuminate\Support\Str::camel($pluralName),
+                'pluralSnakeCase' => \Illuminate\Support\Str::snake($pluralName),
+                'attributes' => [],
+                'accessors' => [],
+                'relations' => []
+            ];
+
+            try {
+                $model = app($className);
+
+                $output['attributes'] = collect(
+                    $model->getFillable(),
+                    $model->getAttributes(),
+                    $model->getGuarded(),
+                )
+                    ->filter(function ($attr) {
+                        return $attr !== '*';
+                    })
+                    ->unique()
+                    ->sort()
+                    ->values()
+                    ->map(function ($attribute) {
+                        return [
+                            'default' => $attribute,
+                            'snake' => Illuminate\Support\Str::snake($attribute),
+                            'camel' => Illuminate\Support\Str::camel($attribute),
+                        ];
+                    })
+                    ->toArray();
+            } catch (\Throwable $e) {
             }
-        }
-    }
-}
 
-$modelClasses = array_values(array_filter(get_declared_classes(), function ($declaredClass) {
-    return is_subclass_of($declaredClass, 'Illuminate\Database\Eloquent\Model') && $declaredClass != 'Illuminate\Database\Eloquent\Relations\Pivot' && $declaredClass != 'Illuminate\Foundation\Auth\User';
-}));
-
-$output = [];
-
-foreach ($modelClasses as $modelClass) {
-    $classReflection = new \ReflectionClass($modelClass);
-    $output[$modelClass] = [
-        'name' => $classReflection->getShortName(),
-        'camelCase' => Illuminate\Support\Str::camel($classReflection->getShortName()),
-        'snakeCase' => Illuminate\Support\Str::snake($classReflection->getShortName()),
-        'pluralCamelCase' => Illuminate\Support\Str::camel(Illuminate\Support\Str::plural($classReflection->getShortName())),
-        'pluralSnakeCase' => Illuminate\Support\Str::snake(Illuminate\Support\Str::plural($classReflection->getShortName())),
-        'attributes' => [],
-        'accessors' => [],
-        'relations' => []
-    ];
-
-    try {
-        $modelInstance = $modelClass::first();
-        $attributes = array_values(array_unique(array_merge(app($modelClass)->getFillable(), array_keys($modelInstance ? $modelInstance->getAttributes() : []))));
-        $output[$modelClass]['attributes'] = array_map(function ($attribute) {
-            return ['default' => $attribute, 'snake' => Illuminate\Support\Str::snake($attribute), 'camel' => Illuminate\Support\Str::camel($attribute)];
-        }, $attributes);
-    } catch (\Throwable $e) {
-    }
-
-    foreach ($classReflection->getMethods() as $classMethod) {
-        try {
-            if (
-                $classMethod->isStatic() == false &&
-                $classMethod->isPublic() == true &&
-                substr($classMethod->getName(), 0, 3) != 'get' &&
-                substr($classMethod->getName(), 0, 3) != 'set' &&
-                count($classMethod->getParameters()) == 0 &&
-                preg_match('/belongsTo|hasMany|hasOne|morphOne|morphMany|morphTo/', implode('', array_slice(file($classMethod->getFileName()), $classMethod->getStartLine(), $classMethod->getEndLine() - $classMethod->getStartLine() - 1)))
-            ) {
-                $output[$modelClass]['relations'][] = $classMethod->getName();
-            } elseif (
-                substr($classMethod->getName(), 0, 3) == 'get' &&
-                substr($classMethod->getName(), -9) == 'Attribute' &&
-                !empty(substr($classMethod->getName(), 3, -9))
-            ) {
-                $attributeName = substr($classMethod->getName(), 3, -9);
-                $output[$modelClass]['accessors'][] = ['default' => $attributeName, 'snake' => Illuminate\Support\Str::snake($attributeName), 'camel' => Illuminate\Support\Str::camel($attributeName)];
+            try {
+                $output['relations'] = collect($reflection->getMethods())
+                    ->filter(function ($method) {
+                        return $method->isStatic() === false && $method->isPublic() === false;
+                    })
+                    ->filter(function ($method) {
+                        return !in_array(substr($method->getName(), 0, 3), ['get', 'set']);
+                    })
+                    ->filter(function ($method) {
+                        return count($method->getParameters()) === 0;
+                    })
+                    ->filter(function ($method) {
+                        // TODO: Whoa now fix this up, what in the world
+                        return preg_match(
+                            '/belongsTo|hasMany|hasOne|morphOne|morphMany|morphTo/',
+                            implode('', array_slice(file($method->getFileName()), $method->getStartLine(), $method->getEndLine() - $method->getStartLine() - 1)),
+                        );
+                    })
+                    ->map(function ($method) {
+                        return $method->getName();
+                    })
+                    ->sort()
+                    ->values()
+                    ->toArray();
+            } catch (\Throwable $e) {
             }
-        } catch (\Throwable $e) {
-        }
-    }
-    sort($output[$modelClass]['attributes']);
-    sort($output[$modelClass]['relations']);
-}
-echo json_encode($output);
+
+            try {
+                $output['accessors'] = collect($reflection->getMethods())
+                    ->filter(function ($method) {
+                        return substr($method->getName(), 0, 3) === 'get';
+                    })
+                    ->filter(function ($method) {
+                        return substr($method->getName(), -9) === 'Attribute';
+                    })
+                    ->filter(function ($method) {
+                        return !empty(substr($method->getName(), 3, -9));
+                    })
+                    ->map(function ($method) {
+                        $attributeName = substr($method->getName(), 3, -9);
+
+                        return [
+                            'default' => $attributeName,
+                            'snake' => \Illuminate\Support\Str::snake($attributeName),
+                            'camel' => \Illuminate\Support\Str::camel($attributeName),
+                        ];
+                    })
+                    ->values()
+                    ->toArray();
+            } catch (\Throwable $e) {
+            }
+
+            return $output;
+        });
+
+echo $models;
