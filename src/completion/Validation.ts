@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Validation implements CompletionProvider {
@@ -111,18 +111,18 @@ export default class Validation implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (func.function === "validate") {
-            return this.handleValidateMethod(document, position, func);
+        if (result.function === "validate") {
+            return this.handleValidateMethod(document, position, result);
         }
 
-        if (func.function === "sometimes") {
-            return this.validatorValidation(document, position, func) || [];
+        if (result.function === "sometimes") {
+            return this.validatorValidation(document, position, result) || [];
         }
 
         // TODO: Deal with FormRequest@rules method
@@ -133,31 +133,31 @@ export default class Validation implements CompletionProvider {
     private handleValidateMethod(
         document: vscode.TextDocument,
         position: vscode.Position,
-        func: CompletionItemFunction,
+        result: ParsingResult,
     ): vscode.CompletionItem[] {
-        if (func.param.isKey) {
+        if (result.param.isKey) {
             // We only fill in values for the validate method, abort
             return [];
         }
 
         if (
-            func.fqn === "Illuminate\\Support\\Facades\\Request" &&
-            func.param.index === 0
+            result.fqn === "Illuminate\\Support\\Facades\\Request" &&
+            result.param.index === 0
         ) {
             return this.getRules(document, position);
         }
 
-        return this.validatorValidation(document, position, func) || [];
+        return this.validatorValidation(document, position, result) || [];
     }
 
     private validatorValidation(
         document: vscode.TextDocument,
         position: vscode.Position,
-        func: CompletionItemFunction,
+        result: ParsingResult,
     ): vscode.CompletionItem[] | undefined {
         if (
-            func.fqn === "Illuminate\\Support\\Facades\\Validator" &&
-            func.param.index === 1
+            result.fqn === "Illuminate\\Support\\Facades\\Validator" &&
+            result.param.index === 1
         ) {
             return this.getRules(document, position);
         }

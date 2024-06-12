@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, ParsingResult } from "..";
+import { CompletionProvider, ParsingResult } from "..";
 import { info } from "../support/logger";
 import { parse } from "./../support/parser";
 
@@ -51,28 +51,12 @@ export default class Registry implements vscode.CompletionItemProvider {
         }
 
         return provider.provideCompletionItems(
-            this.parsingResultToCompletionItemFunction(parseResult),
+            parseResult,
             document,
             position,
             token,
             context,
         );
-    }
-
-    private parsingResultToCompletionItemFunction(
-        parseResult: ParsingResult,
-    ): CompletionItemFunction {
-        return {
-            fqn: parseResult.fqn || null,
-            function: parseResult.function || null,
-            parameters: parseResult.parameters,
-            param: parseResult.param,
-            classDefinition: parseResult.classDefinition || null,
-            functionDefinition: parseResult.functionDefinition || null,
-            classExtends: parseResult.classExtends || null,
-            classImplements: parseResult.classImplements || [],
-            additionalInfo: parseResult.additionalInfo || null,
-        };
     }
 
     private getProviderByClassOrFunction(
@@ -114,10 +98,7 @@ export default class Registry implements vscode.CompletionItemProvider {
                 continue;
             }
 
-            const result = provider.customCheck(
-                this.parsingResultToCompletionItemFunction(parseResult),
-                document,
-            );
+            const result = provider.customCheck(parseResult, document);
 
             if (result !== false) {
                 return [provider, result];

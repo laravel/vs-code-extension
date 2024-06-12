@@ -2,7 +2,7 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { getInertiaViews } from "./../repositories/inertia";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -17,7 +17,7 @@ export default class Inertia implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -25,7 +25,7 @@ export default class Inertia implements CompletionProvider {
     ): vscode.CompletionItem[] {
         const views = getInertiaViews().items;
 
-        if (func.param.index === 0) {
+        if (result.param.index === 0) {
             return Object.entries(views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -42,14 +42,14 @@ export default class Inertia implements CompletionProvider {
         }
 
         if (
-            typeof views[func.parameters[0]] === "undefined" ||
-            !func.param.isKey
+            typeof views[result.parameters[0]] === "undefined" ||
+            !result.param.isKey
         ) {
             return [];
         }
 
         let viewContent = fs.readFileSync(
-            views[func.parameters[0]].uri.path,
+            views[result.parameters[0]].uri.path,
             "utf8",
         );
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { getMixManifest } from "../repositories/mix";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -13,7 +13,7 @@ export default class Mix implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

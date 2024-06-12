@@ -18,7 +18,7 @@ const getTemplate = (name: string) => {
     }
 
     templates[name] = fs.readFileSync(
-        `${__dirname}/../templates/${name}.template`,
+        `${__dirname}/../templates/${name}.php`,
         "utf8",
     );
 

@@ -2,7 +2,7 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { getViews } from "./../repositories/views";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -38,7 +38,7 @@ export default class View implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -46,12 +46,15 @@ export default class View implements CompletionProvider {
     ): vscode.CompletionItem[] {
         const views = getViews().items;
 
-        if (func.function && ["@section", "@push"].includes(func.function)) {
-            return this.getYields(func.function, document.getText());
+        if (
+            result.function &&
+            ["@section", "@push"].includes(result.function)
+        ) {
+            return this.getYields(result.function, document.getText());
         }
 
-        if (["renderWhen", "renderUnless"].find((f) => f === func.function)) {
-            if (func.param.index !== 1) {
+        if (["renderWhen", "renderUnless"].find((f) => f === result.function)) {
+            if (result.param.index !== 1) {
                 return [];
             }
 
@@ -70,7 +73,7 @@ export default class View implements CompletionProvider {
             });
         }
 
-        if (func.param.index === 0) {
+        if (result.param.index === 0) {
             return Object.entries(views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -87,14 +90,14 @@ export default class View implements CompletionProvider {
         }
 
         if (
-            typeof views[func.parameters[0]] === "undefined" ||
-            !func.param.isKey
+            typeof views[result.parameters[0]] === "undefined" ||
+            !result.param.isKey
         ) {
             return [];
         }
 
         let viewContent = fs.readFileSync(
-            views[func.parameters[0]].uri.path,
+            views[result.parameters[0]].uri.path,
             "utf8",
         );
 

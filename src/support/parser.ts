@@ -285,7 +285,7 @@ const getClassDefinition = (
         classDefinition: [namespace, className[1]]
             .filter((i) => !!i)
             .join("\\"),
-        classExtends: classExtends?.fqn ?? undefined,
+        classExtends: classExtends?.fqn ?? null,
         classImplements: classImplements
             .map((i) => getFqn(tokens, i).fqn ?? "")
             .filter((i) => i !== ""),
@@ -294,6 +294,14 @@ const getClassDefinition = (
 
 const parsingResultDefaultObject = (): ParsingResult => {
     return {
+        class: null,
+        fqn: null,
+        function: null,
+        classDefinition: null,
+        classExtends: null,
+        classImplements: [],
+        functionDefinition: null,
+        additionalInfo: null,
         param: {
             index: 0,
             isArray: false,
@@ -558,7 +566,7 @@ export const parse = (code: string, depth = 0): ParsingResult | null => {
         result = {
             ...(result ?? parsingResultDefaultObject()),
             ...classDefinition,
-            functionDefinition: getFunctionDefinition(tokens),
+            functionDefinition: getFunctionDefinition(tokens) || null,
         };
     }
 

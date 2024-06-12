@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { getControllers } from "../repositories/controllers";
 import { getMiddleware } from "../repositories/middleware";
 import { getRoutes } from "../repositories/routes";
@@ -31,12 +31,12 @@ export default class Route implements CompletionProvider {
         ];
     }
 
-    autoCompleteAction(func: CompletionItemFunction): boolean {
-        if (func.fqn !== "Illuminate\\Support\\Facades\\Route") {
+    autoCompleteAction(result: ParsingResult): boolean {
+        if (result.fqn !== "Illuminate\\Support\\Facades\\Route") {
             return false;
         }
 
-        if (func.function === null) {
+        if (result.function === null) {
             return false;
         }
 
@@ -49,19 +49,19 @@ export default class Route implements CompletionProvider {
             "options",
             "any",
             "match",
-        ].includes(func.function);
+        ].includes(result.function);
     }
 
-    autoCompleteActionParam(func: CompletionItemFunction): boolean {
-        if (func.function === "match") {
-            return func.param.index === 2;
+    autoCompleteActionParam(result: ParsingResult): boolean {
+        if (result.function === "match") {
+            return result.param.index === 2;
         }
 
-        return func.param.index === 1;
+        return result.param.index === 1;
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -70,8 +70,8 @@ export default class Route implements CompletionProvider {
         // TODO: maybe something like this?
         // this.autoCompleteAction(func) || this.autoCompleteMiddleware() || this.autoCompleteRoute()
 
-        if (this.autoCompleteAction(func)) {
-            if (!this.autoCompleteActionParam(func)) {
+        if (this.autoCompleteAction(result)) {
+            if (!this.autoCompleteActionParam(result)) {
                 return [];
             }
 
@@ -96,7 +96,7 @@ export default class Route implements CompletionProvider {
                 });
         }
 
-        if (func.function === "middleware") {
+        if (result.function === "middleware") {
             return Object.entries(getMiddleware().items).map(([key, value]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -114,10 +114,10 @@ export default class Route implements CompletionProvider {
             });
         }
 
-        if (func.param.index === 1) {
+        if (result.param.index === 1) {
             // Route parameters autocomplete
             return getRoutes()
-                .items.filter((route) => route.name === func.parameters[0])
+                .items.filter((route) => route.name === result.parameters[0])
                 .map((route) => {
                     return route.parameters.map((parameter: string) => {
                         let completionItem = new vscode.CompletionItem(

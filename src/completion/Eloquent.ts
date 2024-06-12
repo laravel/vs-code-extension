@@ -1,13 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {
-    CompletionItemFunction,
-    CompletionProvider,
-    Model,
-    ParsingResult,
-    Tags,
-} from "..";
+import { CompletionProvider, Model, ParsingResult, Tags } from "..";
 import { info } from "../support/logger";
 import { parse } from "../support/parser";
 import { getModels } from "./../repositories/models";
@@ -64,42 +58,75 @@ export default class Eloquent implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction<ParsingResult[]>,
+        result: ParsingResult<ParsingResult[]>,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        const model = getModels().items.find((model) => model.fqn === func.fqn);
+        let finalResult = result.additionalInfo?.pop() || result;
 
-        info("func tho", func);
+        const model = getModels().items.find(
+            (model) => model.fqn === finalResult.fqn,
+        );
 
         // If we can't find the model, we can't provide completions
         if (!model) {
             return [];
         }
 
-        if (this.anyParamMethods.includes(func.function || "")) {
+        if (this.anyParamMethods.includes(finalResult.function || "")) {
             return this.getAttributeCompletionItems(document, position, model);
         }
 
-        if (this.firstParamMethods.includes(func.function || "")) {
-            if (func.param.index > 0) {
+        if (this.firstParamMethods.includes(finalResult.function || "")) {
+            if (finalResult.param.index > 0) {
                 return [];
             }
 
             return this.getAttributeCompletionItems(document, position, model);
         }
 
-        if (this.relationMethods.includes(func.function || "")) {
-            if (func.param.index > 0) {
+        if (this.relationMethods.includes(finalResult.function || "")) {
+            if (finalResult.param.index > 0) {
                 return [];
             }
 
-            return this.getRelationshipCompletionItems(
+            if (finalResult.param.isKey) {
+                return this.getRelationshipCompletionItems(
+                    document,
+                    position,
+                    model,
+                );
+            }
+
+            const relationKey = finalResult.param.keys.pop();
+
+            info("relationKey", relationKey, finalResult.param.keys);
+
+            if (!relationKey) {
+                return [];
+            }
+
+            const relation = getModels().items.find((m) =>
+                [
+                    m.camelCase,
+                    m.snakeCase,
+                    m.pluralCamelCase,
+                    m.pluralSnakeCase,
+                ].includes(relationKey),
+            );
+
+            info("relation", relation, relationKey);
+
+            if (!relation) {
+                return [];
+            }
+
+            return this.getAttributeCompletionItems(
                 document,
                 position,
-                model,
+                relation,
             );
         }
 
@@ -107,26 +134,22 @@ export default class Eloquent implements CompletionProvider {
     }
 
     customCheck(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: string,
     ): ParsingResult[] | false {
         let results: ParsingResult[] = [];
-        let result: ParsingResult | null;
+        let customResult: ParsingResult | null;
 
         do {
-            result = parse(document, results.length);
+            customResult = parse(document, results.length);
 
-            info("got a result", result, results.length);
-
-            if (result) {
-                results.push(result);
+            if (customResult) {
+                results.push(customResult);
             }
-        } while (this.isValidResult(result));
+        } while (this.isValidResult(customResult));
 
         // We've added one that caused it to stop, remove it
         results.pop();
-
-        info("got all results", results);
 
         return results.length === 0 ? false : results;
     }

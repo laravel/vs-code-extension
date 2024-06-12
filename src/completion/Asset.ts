@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionItemFunction, CompletionProvider, Tags } from "..";
+import { CompletionProvider, ParsingResult, Tags } from "..";
 import { getAssets } from "../repositories/asset";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -15,7 +15,7 @@ export default class Asset implements CompletionProvider {
     }
 
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

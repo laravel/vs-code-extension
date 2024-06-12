@@ -11,14 +11,15 @@ interface Tag {
     classImplements?: string;
 }
 
-interface CompletionItemFunction {
+interface ParsingResult<AdditionalInfo = any> {
+    class: string | null;
     fqn: string | null;
     function: string | null;
-    parameters: string[];
     classDefinition: string | null;
-    functionDefinition: string | null;
     classExtends: string | null;
     classImplements: string[];
+    functionDefinition: string | null;
+    additionalInfo: AdditionalInfo;
     param: {
         index: number;
         isArray: boolean;
@@ -26,6 +27,7 @@ interface CompletionItemFunction {
         key: string | null;
         keys: string[];
     };
+    parameters: string[];
 }
 
 interface Model {
@@ -55,9 +57,9 @@ interface ConfigItem {
 
 interface CompletionProvider {
     tags(): Tags;
-    customCheck?(func: CompletionItemFunction): boolean;
+    customCheck?(result: ParsingResult, document: string): any;
     provideCompletionItems(
-        func: CompletionItemFunction,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
