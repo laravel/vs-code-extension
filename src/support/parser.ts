@@ -95,20 +95,22 @@ const extractClassAndFunction = (
     for (let i in tokens) {
         const [type, value, line] = tokens[i];
 
-        if (variableToFind === null && type === "T_DOUBLE_COLON") {
-            const cls = getToken(tokens, i, 1)[1];
+        if (variableToFind === null) {
+            if (type === "T_DOUBLE_COLON") {
+                const cls = getToken(tokens, i, 1)[1];
 
-            return {
-                ...getFqn(tokens, cls),
-                func,
-            };
-        }
+                return {
+                    ...getFqn(tokens, cls),
+                    func,
+                };
+            }
 
-        if (variableToFind === null && type === "T_OBJECT_OPERATOR") {
-            const nextToken = getToken(tokens, i, 1);
+            if (type === "T_OBJECT_OPERATOR") {
+                const nextToken = getToken(tokens, i, 1);
 
-            if (nextToken[0] === "T_VARIABLE") {
-                variableToFind = nextToken[1];
+                if (nextToken[0] === "T_VARIABLE") {
+                    variableToFind = nextToken[1];
+                }
             }
         }
 
