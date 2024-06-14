@@ -147,7 +147,9 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "copy-files": "copyfiles -u 1 src/templates/*.php out",
+    "postbuild": "npm run copy-files"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -157,6 +159,7 @@
     "@typescript-eslint/parser": "^7.7.1",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.3.9",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },

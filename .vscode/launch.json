@@ -14,7 +14,6 @@
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js",
-				"${workspaceFolder}/out/**/*.template"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
 		}
