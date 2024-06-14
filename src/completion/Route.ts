@@ -28,6 +28,10 @@ export default class Route implements CompletionProvider {
             {
                 functions: ["route", "signedRoute"],
             },
+            {
+                class: "Illuminate\\Support\\Facades\\Redirect",
+                functions: ["route", "signedRoute"],
+            },
         ];
     }
 
