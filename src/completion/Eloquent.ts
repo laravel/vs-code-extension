@@ -7,7 +7,6 @@ import {
     ParsingResult,
     Tags,
 } from "..";
-import { info } from "../support/logger";
 import { parse } from "../support/parser";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
@@ -50,6 +49,8 @@ export default class Eloquent implements CompletionProvider {
         "select",
         "update",
         "whereColumn",
+        "create",
+        "make",
     ];
 
     private anyParamMethods = ["firstOrNew", "firstOrCreate"];
@@ -86,6 +87,14 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
+            if (["create", "make"].includes(finalResult.function)) {
+                return this.getFillableAttributeCompletionItems(
+                    document,
+                    position,
+                    model,
+                );
+            }
+
             return this.getAttributeCompletionItems(document, position, model);
         }
 
@@ -104,8 +113,6 @@ export default class Eloquent implements CompletionProvider {
 
             const relationKey = finalResult.param.keys.pop();
 
-            info("relationKey", relationKey, finalResult.param.keys);
-
             if (!relationKey) {
                 return [];
             }
@@ -113,8 +120,6 @@ export default class Eloquent implements CompletionProvider {
             const relation = model.relations.find(
                 (relation) => relation.name === relationKey,
             );
-
-            info("relation", relation, relationKey);
 
             if (!relation) {
                 return [];
@@ -205,6 +210,20 @@ export default class Eloquent implements CompletionProvider {
             document,
             position,
             model.attributes.map((attribute) => attribute.name),
+        );
+    }
+
+    private getFillableAttributeCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        model: EloquentType.Model,
+    ): vscode.CompletionItem[] {
+        return this.getCompletionItems(
+            document,
+            position,
+            model.attributes
+                .filter((attribute) => attribute.fillable)
+                .map((attribute) => attribute.name),
         );
     }
 
