@@ -42,9 +42,9 @@ export default class Gate implements CompletionProvider {
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         if (result.param.index === 1) {
-            return getModels().items.map((model) => {
+            return Object.entries(getModels().items).map(([key, model]) => {
                 let completeItem = new vscode.CompletionItem(
-                    model.fqn.replace(/\\/g, "\\\\"),
+                    model.class.replace(/\\/g, "\\\\"),
                     vscode.CompletionItemKind.Value,
                 );
 
