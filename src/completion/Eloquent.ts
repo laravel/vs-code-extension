@@ -87,7 +87,7 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
-            if (["create", "make"].includes(finalResult.function)) {
+            if (["create", "make"].includes(finalResult.function || "")) {
                 return this.getFillableAttributeCompletionItems(
                     document,
                     position,
