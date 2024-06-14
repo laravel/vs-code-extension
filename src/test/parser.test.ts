@@ -2,6 +2,26 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { parse } from "../support/parser";
 
+const getResult = (obj = {}) => ({
+    class: null,
+    fqn: null,
+    function: null,
+    classDefinition: null,
+    classExtends: null,
+    classImplements: [],
+    functionDefinition: null,
+    additionalInfo: null,
+    param: {
+        index: 0,
+        isArray: false,
+        isKey: false,
+        key: null,
+        keys: [],
+    },
+    parameters: [],
+    ...obj,
+});
+
 const getParam = (obj = {}) => ({
     index: 0,
     isArray: false,
@@ -31,11 +51,11 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         config('`;
 
-        const expected = {
+        const expected = getResult({
             function: "config",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -47,12 +67,12 @@ suite("Parser Test Suite", () => {
 
         Route::get('`;
 
-        const expected = {
+        const expected = getResult({
             function: "get",
             fqn: "Route",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -63,12 +83,12 @@ suite("Parser Test Suite", () => {
         const code = `<?php
         User::where('name', 'something')->get('`;
 
-        const expected = {
+        const expected = getResult({
             function: "get",
             fqn: "User",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -81,12 +101,12 @@ suite("Parser Test Suite", () => {
         Route::get('/', function (User $user) {
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             function: "find",
             fqn: "User",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -103,11 +123,11 @@ suite("Parser Test Suite", () => {
         Route::get('/', function ($user) {
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -125,12 +145,12 @@ suite("Parser Test Suite", () => {
 
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -145,12 +165,12 @@ suite("Parser Test Suite", () => {
         $user = new User();
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -165,12 +185,12 @@ suite("Parser Test Suite", () => {
         $user = User::make();
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -184,11 +204,11 @@ suite("Parser Test Suite", () => {
         $user = $anotherThing;
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -202,12 +222,12 @@ suite("Parser Test Suite", () => {
         $user = App\\Models\\User::make();
         $user->where('name', 'something')->find('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "App\\Models\\User",
             function: "find",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -220,12 +240,12 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -240,12 +260,12 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -259,12 +279,12 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         UserModel::where('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -279,12 +299,12 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         UserModel::where('`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "App\\Models\\User",
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -297,14 +317,14 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('first', '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
                 index: 1,
             }),
             parameters: ["first"],
-        };
+        });
 
         const result = parse(code);
 
@@ -317,14 +337,14 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where(['what' => 'ok'], '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
                 index: 1,
             }),
             parameters: ["['what'=>'ok']"],
-        };
+        });
 
         const result = parse(code);
 
@@ -337,14 +357,14 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('first', ['what' => 'ok'], '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
                 index: 2,
             }),
             parameters: ["first", "['what'=>'ok']"],
-        };
+        });
 
         const result = parse(code);
 
@@ -359,14 +379,14 @@ suite("Parser Test Suite", () => {
             return $thing;
         }, '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
                 index: 1,
             }),
             parameters: ["function($thing){return $thing;}"],
-        };
+        });
 
         const result = parse(code);
 
@@ -379,14 +399,14 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where(fn($thing) => $thing, '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
                 index: 1,
             }),
             parameters: ["fn($thing)=>$thing"],
-        };
+        });
 
         const result = parse(code);
 
@@ -401,7 +421,7 @@ suite("Parser Test Suite", () => {
             return $thing;
         }, ['hi' => 'there'], '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
@@ -414,7 +434,7 @@ suite("Parser Test Suite", () => {
                 "function($thing){return $thing;}",
                 "['hi'=>'there']",
             ],
-        };
+        });
 
         const result = parse(code);
 
@@ -427,7 +447,7 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('ok', ['`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
@@ -436,7 +456,7 @@ suite("Parser Test Suite", () => {
                 isKey: true,
             }),
             parameters: ["ok"],
-        };
+        });
 
         const result = parse(code);
 
@@ -449,7 +469,7 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('ok', ['sure' => 'thing', '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
@@ -459,7 +479,7 @@ suite("Parser Test Suite", () => {
                 keys: ["sure"],
             }),
             parameters: ["ok"],
-        };
+        });
 
         const result = parse(code);
 
@@ -472,7 +492,7 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('ok', ['sure', '`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
@@ -482,7 +502,7 @@ suite("Parser Test Suite", () => {
                 keys: ["sure"],
             }),
             parameters: ["ok"],
-        };
+        });
 
         const result = parse(code);
 
@@ -495,7 +515,7 @@ suite("Parser Test Suite", () => {
         Route::get('/', function () {
         User::where('ok', ['sure', ['`;
 
-        const expected = {
+        const expected = getResult({
             fqn: "User",
             function: "where",
             param: getParam({
@@ -505,7 +525,7 @@ suite("Parser Test Suite", () => {
                 keys: ["sure"],
             }),
             parameters: ["ok"],
-        };
+        });
 
         const result = parse(code);
 
@@ -524,7 +544,7 @@ suite("Parser Test Suite", () => {
             public function something() {
                 return $this->where('`;
 
-        const expected = {
+        const expected = getResult({
             classDefinition: "App\\Models\\User",
             classExtends: "Illuminate\\Database\\Eloquent\\Model",
             classImplements: [
@@ -535,7 +555,7 @@ suite("Parser Test Suite", () => {
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
@@ -554,7 +574,7 @@ suite("Parser Test Suite", () => {
             public function something() {
                 return $this->where('`;
 
-        const expected = {
+        const expected = getResult({
             classDefinition: "App\\Models\\User",
             classExtends: "Illuminate\\Database\\Eloquent\\Model",
             classImplements: [
@@ -565,7 +585,7 @@ suite("Parser Test Suite", () => {
             function: "where",
             param: getParam(),
             parameters: [],
-        };
+        });
 
         const result = parse(code);
 
