@@ -1,5 +1,31 @@
 <?php
 
+function vsCodeTranslationValue($key, $value, $file, $lines): array
+{
+    $lineNumber = 1;
+    $keys = explode('.', $key);
+    $index = 0;
+    $currentKey = array_shift($keys);
+
+    while ($currentKey !== null && $index < count($lines)) {
+        $line = $lines[$index][1];
+
+        if (strpos($line, '"' . $currentKey . '"', 0) !== false || strpos($line, "'" . $currentKey . "'", 0) !== false) {
+            $lineNumber = $lines[$index][0];
+            $currentKey = array_shift($keys);
+        }
+
+        $index++;
+    }
+
+    return [
+        'value' => $value,
+        'path' => $file,
+        'line' => $lineNumber,
+        'params' => preg_match_all('/\:([A-Za-z0-9_]+)/', $value, $matches) ? $matches[1] : [],
+    ];
+}
+
 function vscodeCollectTranslations(string $path, string $namespace = null)
 {
     return collect(glob("{$path}/**/*.{php,json}", GLOB_BRACE))->map(function ($file) use ($path, $namespace) {
@@ -11,27 +37,43 @@ function vscodeCollectTranslations(string $path, string $namespace = null)
 
         $lang = collect(explode('/', str_replace($path, '', $file)))->filter()->first();
 
-        $lineNumbers = collect(token_get_all(file_get_contents($file)))
-            ->filter(function ($token) {
-                return is_array($token) && $token[0] === T_CONSTANT_ENCAPSED_STRING;
-            })
-            ->flatMap(function ($token) {
-                return [
-                    trim($token[1], '\'"') => $token[2]
-                ];
-            });
+        $fileLines = explode(PHP_EOL, file_get_contents($file));
+        $lines = [];
+        $inComment = false;
+
+        foreach ($fileLines as $index => $line) {
+            $trimmed = trim($line);
+
+            if (substr($trimmed, 0, 2) === '/*') {
+                $inComment = true;
+                continue;
+            }
+
+            if ($inComment) {
+                if (substr($trimmed, -2) !== '*/') {
+                    continue;
+                }
+
+                $inComment = false;
+            }
+
+            if (substr($trimmed, 0, 2) === '//') {
+                continue;
+            }
+
+            $lines[] = [$index + 1, $trimmed];
+        }
 
         return [
             'key' => $key,
             'lang' => $lang,
-            'values' => collect(__($key, [], $lang))->map(function ($value) use ($file, $lineNumbers) {
-                return [
-                    'value' => $value,
-                    'path' => $file,
-                    'line' => $lineNumbers->offsetExists($value) ? $lineNumbers[$value] : 1,
-                    'params' => preg_match_all('/\:([A-Za-z0-9_]+)/', $value, $matches) ? $matches[1] : [],
-                ];
-            }),
+            'values' => collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)))->map(function ($value, $key) use ($file, $lines) {
+                if (is_array($value)) {
+                    return null;
+                }
+
+                return vsCodeTranslationValue($key, $value, $file, $lines);
+            })->filter(),
         ];
     });
 }
@@ -55,10 +97,9 @@ foreach ($default->merge($namespaced) as $value) {
             $final[$dotKey] = [];
         }
 
-
         $final[$dotKey][$value['lang']] = $v;
 
-        if ($value['lang'] === App::currentLocale()) {
+        if ($value['lang'] === \Illuminate\Support\Facades\App::currentLocale()) {
             $final[$dotKey]['default'] = $v;
         }
     }
