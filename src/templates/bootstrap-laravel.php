@@ -21,17 +21,10 @@ class VsCodeLaravel extends \Illuminate\Support\ServiceProvider
 
 $app->register(new VsCodeLaravel($app));
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$status = $kernel->handle(
-    $input = new Symfony\Component\Console\Input\ArgvInput,
-    new Symfony\Component\Console\Output\ConsoleOutput
-);
+$kernel->bootstrap();
 
-if ($status === 0) {
-    echo '__VSCODE_LARAVEL_START_OUTPUT__';
-    __VSCODE_LARAVEL_OUTPUT__;
-    echo '__VSCODE_LARAVEL_END_OUTPUT__';
-}
+echo '__VSCODE_LARAVEL_START_OUTPUT__';
+__VSCODE_LARAVEL_OUTPUT__;
+echo '__VSCODE_LARAVEL_END_OUTPUT__';
 
-$kernel->terminate($input, $status);
-
-exit($status);
+exit(0);
