@@ -30,21 +30,6 @@ interface ParsingResult<AdditionalInfo = any> {
     parameters: string[];
 }
 
-interface Model {
-    fqn: string;
-    attributes: {
-        default: string;
-        camel: string;
-        snake: string;
-    }[];
-    accessors: string[];
-    relations: string[];
-    camelCase: string;
-    snakeCase: string;
-    pluralCamelCase: string;
-    pluralSnakeCase: string;
-}
-
 interface Config {
     [key: string]: any;
 }
@@ -79,3 +64,49 @@ type HoverProvider = (
 ) => vscode.ProviderResult<vscode.Hover>;
 
 type LinkProvider = (doc: vscode.TextDocument) => vscode.DocumentLink[];
+
+declare namespace Eloquent {
+    interface Models {
+        [key: string]: Model;
+    }
+
+    interface Model {
+        class: string;
+        database: string;
+        table: string;
+        policy: string | null;
+        attributes: Attribute[];
+        relations: Relation[];
+        events: Event[];
+        observers: Observer[];
+    }
+
+    interface Attribute {
+        name: string;
+        type: string;
+        increments: boolean;
+        nullable: boolean;
+        default: string | null;
+        unique: boolean;
+        fillable: boolean;
+        hidden: boolean;
+        appended: null;
+        cast: string | null;
+    }
+
+    interface Relation {
+        name: string;
+        type: string;
+        related: string;
+    }
+
+    interface Event {
+        event: string;
+        class: string;
+    }
+
+    interface Observer {
+        event: string;
+        observer: string[];
+    }
+}

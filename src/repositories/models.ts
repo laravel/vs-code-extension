@@ -1,28 +1,21 @@
 import { repository } from ".";
-import { Model } from "..";
+import { Eloquent } from "..";
 import { config } from "../support/config";
 import { runInLaravel, template } from "./../support/php";
 
 const modelPaths = config<string[]>("modelsPaths", ["app", "app/Models"]);
 
 const load = () => {
-    return runInLaravel<{
-        [key: string]: Omit<Model, "fqn">;
-    }>(
+    return runInLaravel<Eloquent.Models>(
         template("eloquent-provider", {
             model_paths: JSON.stringify(modelPaths),
         }),
         "Eloquent Attributes and Relations",
-    ).then((result) => {
-        return Object.entries(result).map(([key, value]) => ({
-            ...value,
-            fqn: key,
-        }));
-    });
+    );
 };
 
-export const getModels = repository<Model[]>(
+export const getModels = repository<Eloquent.Models>(
     load,
     modelPaths.concat(["database/migrations"]).map((path) => `${path}/*.php`),
-    [],
+    {},
 );

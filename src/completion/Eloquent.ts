@@ -1,11 +1,15 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, Model, ParsingResult, Tags } from "..";
+import {
+    CompletionProvider,
+    Eloquent as EloquentType,
+    ParsingResult,
+    Tags,
+} from "..";
 import { info } from "../support/logger";
 import { parse } from "../support/parser";
 import { getModels } from "./../repositories/models";
-import { config } from "./../support/config";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Eloquent implements CompletionProvider {
@@ -51,8 +55,8 @@ export default class Eloquent implements CompletionProvider {
     private anyParamMethods = ["firstOrNew", "firstOrCreate"];
 
     tags(): Tags {
-        return getModels().items.map((model) => ({
-            class: model.fqn,
+        return Object.entries(getModels().items).map(([key]) => ({
+            class: key,
             functions: this.getAllFunctions(),
         }));
     }
@@ -66,9 +70,7 @@ export default class Eloquent implements CompletionProvider {
     ): vscode.CompletionItem[] {
         let finalResult = result.additionalInfo?.pop() || result;
 
-        const model = getModels().items.find(
-            (model) => model.fqn === finalResult.fqn,
-        );
+        const model = getModels().items[finalResult.fqn || ""];
 
         // If we can't find the model, we can't provide completions
         if (!model) {
@@ -108,13 +110,8 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
-            const relation = getModels().items.find((m) =>
-                [
-                    m.camelCase,
-                    m.snakeCase,
-                    m.pluralCamelCase,
-                    m.pluralSnakeCase,
-                ].includes(relationKey),
+            const relation = model.relations.find(
+                (relation) => relation.name === relationKey,
             );
 
             info("relation", relation, relationKey);
@@ -123,10 +120,12 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
+            const relationModel = getModels().items[relation.related];
+
             return this.getAttributeCompletionItems(
                 document,
                 position,
-                relation,
+                relationModel,
             );
         }
 
@@ -187,12 +186,12 @@ export default class Eloquent implements CompletionProvider {
     private getRelationshipCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
-        model: Model,
+        model: EloquentType.Model,
     ): vscode.CompletionItem[] {
         return this.getCompletionItems(
             document,
             position,
-            model.relations,
+            model.relations.map((relation) => relation.name),
             vscode.CompletionItemKind.Value,
         );
     }
@@ -200,25 +199,12 @@ export default class Eloquent implements CompletionProvider {
     private getAttributeCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
-        model: Model,
+        model: EloquentType.Model,
     ): vscode.CompletionItem[] {
         return this.getCompletionItems(
             document,
             position,
-            model.attributes.map(
-                (attr: any) =>
-                    attr[config<string>("modelAttributeCase", "default")],
-            ),
-        ).concat(
-            this.getCompletionItems(
-                document,
-                position,
-                model.accessors.map(
-                    (attr: any) =>
-                        attr[config<string>("modelAccessorCase", "snake")],
-                ),
-                vscode.CompletionItemKind.Constant,
-            ),
+            model.attributes.map((attribute) => attribute.name),
         );
     }
 
