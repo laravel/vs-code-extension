@@ -591,4 +591,29 @@ suite("Parser Test Suite", () => {
 
         assert.deepStrictEqual(result, expected);
     });
+
+    test("it will be able to figure out fqn of property", () => {
+        const code = `<?php
+
+        use App\\Models\\User;
+
+        class Whatever {
+            protected User $user;
+
+            public function something() {
+                return $this->user->where('`;
+
+        const expected = getResult({
+            classDefinition: "Whatever",
+            functionDefinition: "something",
+            function: "where",
+            fqn: "App\\Models\\User",
+            param: getParam(),
+            parameters: [],
+        });
+
+        const result = parse(code);
+
+        assert.deepStrictEqual(result, expected);
+    });
 });
