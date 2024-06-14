@@ -51,6 +51,7 @@ export default class Eloquent implements CompletionProvider {
         "whereColumn",
         "create",
         "make",
+        "fill",
     ];
 
     private anyParamMethods = ["firstOrNew", "firstOrCreate"];
@@ -79,7 +80,19 @@ export default class Eloquent implements CompletionProvider {
         }
 
         if (this.anyParamMethods.includes(finalResult.function || "")) {
-            return this.getAttributeCompletionItems(document, position, model);
+            if (finalResult.param.index === 0) {
+                return this.getAttributeCompletionItems(
+                    document,
+                    position,
+                    model,
+                );
+            }
+
+            return this.getFillableAttributeCompletionItems(
+                document,
+                position,
+                model,
+            );
         }
 
         if (this.firstParamMethods.includes(finalResult.function || "")) {
@@ -87,7 +100,9 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
-            if (["create", "make"].includes(finalResult.function || "")) {
+            if (
+                ["create", "make", "fill"].includes(finalResult.function || "")
+            ) {
                 return this.getFillableAttributeCompletionItems(
                     document,
                     position,
