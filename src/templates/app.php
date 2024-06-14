@@ -1,6 +1,6 @@
 <?php
 
-collect(app()->getBindings())
+echo collect(app()->getBindings())
     ->filter(fn ($binding) => ($binding['concrete'] ?? null) !== null)
     ->flatMap(function ($binding, $key) {
         $boundTo = new ReflectionFunction($binding['concrete']);
