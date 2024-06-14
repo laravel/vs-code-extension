@@ -246,7 +246,7 @@ export default class Eloquent implements CompletionProvider {
         document: vscode.TextDocument,
         position: vscode.Position,
         items: string[],
-        type: vscode.CompletionItemKind = vscode.CompletionItemKind.Property,
+        type: vscode.CompletionItemKind = vscode.CompletionItemKind.Field,
     ): vscode.CompletionItem[] {
         return items.map((item) => {
             let completeItem = new vscode.CompletionItem(item, type);
