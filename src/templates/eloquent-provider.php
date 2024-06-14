@@ -9,21 +9,20 @@ echo collect(get_declared_classes())
         return !in_array($class, [\Illuminate\Database\Eloquent\Relations\Pivot::class, \Illuminate\Foundation\Auth\User::class]);
     })
     ->values()
-    ->flatMap(function ($class) {
-        return [$class => new \ReflectionClass($class)];
-    })
-    ->map(function (ReflectionClass $reflection, string $className) {
+    ->flatMap(function (string $className) {
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
 
-        Artisan::call(
-            'model:show',
+        \Illuminate\Support\Facades\Artisan::call(
+            "model:show",
             [
-                'model' => $className,
-                '--json' => 'true',
+                "model" => $className,
+                "--json" => true,
             ],
             $output
         );
 
-        return json_decode($output->fetch(), true);
+        return [
+            $className => json_decode($output->fetch(), true),
+        ];
     })
     ->toJson();
