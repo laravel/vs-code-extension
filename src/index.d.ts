@@ -1,6 +1,14 @@
 import * as vscode from "vscode";
+import Common from "./Common";
 
 type Tags = Tag[];
+
+interface RegisterCommand {
+    name: string;
+    action: Common;
+    method?: string;
+    args?: any[];
+}
 
 interface Tag {
     class?: string;

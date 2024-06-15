@@ -139,6 +139,466 @@
           }
         }
       }
+    ],
+    "menus": {
+      "artisan.make.app": [
+        {
+          "command": "artisan.make.auth"
+        },
+        {
+          "command": "artisan.make.command"
+        },
+        {
+          "command": "artisan.make.cast"
+        },
+        {
+          "command": "artisan.make.component"
+        },
+        {
+          "command": "artisan.make.controller"
+        },
+        {
+          "command": "artisan.make.event"
+        },
+        {
+          "command": "artisan.make.job"
+        },
+        {
+          "command": "artisan.make.listener"
+        },
+        {
+          "command": "artisan.make.mail"
+        },
+        {
+          "command": "artisan.make.middleware"
+        },
+        {
+          "command": "artisan.make.migration"
+        },
+        {
+          "command": "artisan.make.model"
+        },
+        {
+          "command": "artisan.make.notification"
+        },
+        {
+          "command": "artisan.make.observer"
+        },
+        {
+          "command": "artisan.make.policy"
+        },
+        {
+          "command": "artisan.make.provider"
+        },
+        {
+          "command": "artisan.make.request"
+        },
+        {
+          "command": "artisan.make.rule"
+        },
+        {
+          "command": "artisan.make.channel"
+        }
+      ],
+      "artisan.server.app": [
+        {
+          "command": "artisan.startServerUseDefaults"
+        },
+        {
+          "command": "artisan.startServer"
+        },
+        {
+          "command": "artisan.stopServer"
+        },
+        {
+          "command": "artisan.restartServer"
+        }
+      ],
+      "artisan.make.database": [
+        {
+          "command": "artisan.make.factory"
+        },
+        {
+          "command": "artisan.make.resource"
+        },
+        {
+          "command": "artisan.make.seeder"
+        }
+      ],
+      "artisan.migrate.database": [
+        {
+          "command": "artisan.migrate"
+        },
+        {
+          "command": "artisan.migrate.fresh"
+        },
+        {
+          "command": "artisan.migrate.install"
+        },
+        {
+          "command": "artisan.migrate.refresh"
+        },
+        {
+          "command": "artisan.migrate.reset"
+        },
+        {
+          "command": "artisan.migrate.rollback"
+        },
+        {
+          "command": "artisan.migrate.status"
+        }
+      ],
+      "artisan.routes": [
+        {
+          "command": "artisan.route.cache"
+        },
+        {
+          "command": "artisan.route.clear"
+        },
+        {
+          "command": "artisan.route.list"
+        }
+      ],
+      "artisan.misc": [
+        {
+          "command": "artisan.config.cache"
+        },
+        {
+          "command": "artisan.config.clear"
+        },
+        {
+          "command": "artisan.optimize"
+        },
+        {
+          "command": "artisan.clearCompiled"
+        },
+        {
+          "command": "artisan.cache.clear"
+        },
+        {
+          "command": "artisan.cache.table"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resource =~ /.+?\\/app/iu",
+          "submenu": "artisan.make.app",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?/iu",
+          "submenu": "artisan.misc",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/app/iu",
+          "submenu": "artisan.server.app",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/database/iu",
+          "submenu": "artisan.make.database",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/database/iu",
+          "submenu": "artisan.migrate.database",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/tests/iu",
+          "command": "artisan.make.test",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/resource/iu",
+          "command": "artisan.make.resource",
+          "group": "0_artisan"
+        },
+        {
+          "when": "resource =~ /.+?\\/routes/iu",
+          "submenu": "artisan.routes",
+          "group": "0_artisan"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "artisan.make.app",
+        "label": "Artisan Make"
+      },
+      {
+        "id": "artisan.misc",
+        "label": "Artisan Misc"
+      },
+      {
+        "id": "artisan.server.app",
+        "label": "Artisan Server"
+      },
+      {
+        "id": "artisan.make.database",
+        "label": "Artisan Make"
+      },
+      {
+        "id": "artisan.migrate.database",
+        "label": "Artisan Migrate"
+      },
+      {
+        "id": "artisan.routes",
+        "label": "Artisan Routes"
+      }
+    ],
+    "commands": [
+      {
+        "command": "artisan.run.command",
+        "title": "Artisan: Run Command",
+        "shortTitle": "Run Command"
+      },
+      {
+        "command": "artisan.make.channel",
+        "title": "Artisan: Make Channel",
+        "shortTitle": "Make Channel"
+      },
+      {
+        "command": "artisan.make.auth",
+        "title": "Artisan: Make Auth",
+        "shortTitle": "Make Auth"
+      },
+      {
+        "command": "artisan.make.command",
+        "title": "Artisan: Make Command",
+        "shortTitle": "Make Command"
+      },
+      {
+        "command": "artisan.make.cast",
+        "title": "Artisan: Make Cast",
+        "shortTitle": "Make Cast"
+      },
+      {
+        "command": "artisan.make.rule",
+        "title": "Artisan: Make Rule",
+        "shortTitle": "Make Rule"
+      },
+      {
+        "command": "artisan.make.component",
+        "title": "Artisan: Make Component",
+        "shortTitle": "Make Component"
+      },
+      {
+        "command": "artisan.make.controller",
+        "title": "Artisan: Make Controller",
+        "shortTitle": "Make Controller"
+      },
+      {
+        "command": "artisan.make.event",
+        "title": "Artisan: Make Event",
+        "shortTitle": "Make Event"
+      },
+      {
+        "command": "artisan.make.factory",
+        "title": "Artisan: Make Factory",
+        "shortTitle": "Make Factory"
+      },
+      {
+        "command": "artisan.make.job",
+        "title": "Artisan: Make Job",
+        "shortTitle": "Make Job"
+      },
+      {
+        "command": "artisan.make.listener",
+        "title": "Artisan: Make Listener",
+        "shortTitle": "Make Listener"
+      },
+      {
+        "command": "artisan.make.mail",
+        "title": "Artisan: Make Mail",
+        "shortTitle": "Make Mail"
+      },
+      {
+        "command": "artisan.make.middleware",
+        "title": "Artisan: Make Middleware",
+        "shortTitle": "Make Middleware"
+      },
+      {
+        "command": "artisan.make.migration",
+        "title": "Artisan: Make Migration",
+        "shortTitle": "Make Migration"
+      },
+      {
+        "command": "artisan.make.model",
+        "title": "Artisan: Make Model",
+        "shortTitle": "Make Model"
+      },
+      {
+        "command": "artisan.make.notification",
+        "title": "Artisan: Make Notification",
+        "shortTitle": "Make Notification"
+      },
+      {
+        "command": "artisan.make.observer",
+        "title": "Artisan: Make Observer",
+        "shortTitle": "Make Observer"
+      },
+      {
+        "command": "artisan.make.policy",
+        "title": "Artisan: Make Policy",
+        "shortTitle": "Make Policy"
+      },
+      {
+        "command": "artisan.make.provider",
+        "title": "Artisan: Make Provider",
+        "shortTitle": "Make Provider"
+      },
+      {
+        "command": "artisan.make.request",
+        "title": "Artisan: Make Request",
+        "shortTitle": "Make Request"
+      },
+      {
+        "command": "artisan.make.resource",
+        "title": "Artisan: Make Resource",
+        "shortTitle": "Make Resource"
+      },
+      {
+        "command": "artisan.make.seeder",
+        "title": "Artisan: Make Seeder",
+        "shortTitle": "Make Seeder"
+      },
+      {
+        "command": "artisan.make.test",
+        "title": "Artisan: Make Test",
+        "shortTitle": "Make Test"
+      },
+      {
+        "command": "artisan.migrate",
+        "title": "Artisan: Migrate",
+        "shortTitle": "Migrate"
+      },
+      {
+        "command": "artisan.migrate.install",
+        "title": "Artisan: Migrate Install",
+        "shortTitle": "Migrate Install"
+      },
+      {
+        "command": "artisan.migrate.fresh",
+        "title": "Artisan: Migrate Fresh",
+        "shortTitle": "Migrate Fresh"
+      },
+      {
+        "command": "artisan.migrate.refresh",
+        "title": "Artisan: Migrate Refresh",
+        "shortTitle": "Migrate Refresh"
+      },
+      {
+        "command": "artisan.migrate.reset",
+        "title": "Artisan: Migrate Reset",
+        "shortTitle": "Migrate Reset"
+      },
+      {
+        "command": "artisan.migrate.rollback",
+        "title": "Artisan: Migrate Rollback",
+        "shortTitle": "Migrate Rollback"
+      },
+      {
+        "command": "artisan.migrate.status",
+        "title": "Artisan: Migrate Status",
+        "shortTitle": "Migrate Status"
+      },
+      {
+        "command": "artisan.clearCompiled",
+        "title": "Artisan: Clear Compiled",
+        "shortTitle": "Clear Compiled"
+      },
+      {
+        "command": "artisan.optimize",
+        "title": "Artisan: Optimize",
+        "shortTitle": "Optimize"
+      },
+      {
+        "command": "artisan.startServer",
+        "title": "Artisan: Start Server",
+        "shortTitle": "Start Server"
+      },
+      {
+        "command": "artisan.startServerUseDefaults",
+        "title": "Artisan: Start Server (Default Host and Port)",
+        "shortTitle": "Start Server (Default Host and Port)"
+      },
+      {
+        "command": "artisan.stopServer",
+        "title": "Artisan: Stop Server",
+        "shortTitle": "Stop Server"
+      },
+      {
+        "command": "artisan.restartServer",
+        "title": "Artisan: Restart Server",
+        "shortTitle": "Restart Server"
+      },
+      {
+        "command": "artisan.list",
+        "title": "Artisan: List Commands",
+        "shortTitle": "List Commands"
+      },
+      {
+        "command": "artisan.cache.clear",
+        "title": "Artisan: Cache Clear",
+        "shortTitle": "Cache Clear"
+      },
+      {
+        "command": "artisan.cache.table",
+        "title": "Artisan: Cache Table",
+        "shortTitle": "Cache Table"
+      },
+      {
+        "command": "artisan.route.cache",
+        "title": "Artisan: Route Cache",
+        "shortTitle": "Route Cache"
+      },
+      {
+        "command": "artisan.route.clear",
+        "title": "Artisan: Route Cache Clear",
+        "shortTitle": "Route Cache Clear"
+      },
+      {
+        "command": "artisan.route.refresh",
+        "title": "Artisan: Route Cache Refresh",
+        "shortTitle": "Route Cache Refresh"
+      },
+      {
+        "command": "artisan.route.list",
+        "title": "Artisan: Route List",
+        "shortTitle": "Route List"
+      },
+      {
+        "command": "artisan.config.cache",
+        "title": "Artisan: Config Cache",
+        "shortTitle": "Config Cache"
+      },
+      {
+        "command": "artisan.config.clear",
+        "title": "Artisan: Config Cache Clear",
+        "shortTitle": "Config Cache Clear"
+      },
+      {
+        "command": "artisan.config.refresh",
+        "title": "Artisan: Config Cache Refresh",
+        "shortTitle": "Config Cache Refresh"
+      },
+      {
+        "command": "artisan.key.generate",
+        "title": "Artisan: Key generation",
+        "shortTitle": "Key generation"
+      },
+      {
+        "command": "artisan.view.clear",
+        "title": "Artisan: Views Clear",
+        "shortTitle": "Views Clear"
+      },
+      {
+        "command": "artisan.event.generate",
+        "title": "Artisan: Generate Events",
+        "shortTitle": "Generate Events"
+      }
     ]
   },
   "scripts": {
