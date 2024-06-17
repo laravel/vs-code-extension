@@ -58,11 +58,15 @@ export default class Common {
         let list = this.artisanFileList.concat(
             (additionalLocations || []).map((i) => Uri.parse(i)),
         );
+
         if (list.length === 1 && list[0].fsPath.length) {
             return list[0].fsPath;
-        } else if (list.length === 0) {
+        }
+
+        if (list.length === 0) {
             return "artisan";
         }
+
         let artisanToUse = await Common.getListInput(
             "Which artisan should execute this command?",
             list
@@ -73,6 +77,7 @@ export default class Common {
                 // Remove Duplicates
                 .filter((v, i, a) => a.indexOf(v) === i),
         );
+
         return artisanToUse;
     }
     /**
