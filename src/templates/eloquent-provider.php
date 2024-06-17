@@ -1,4 +1,5 @@
 <?php
+
 collect(glob(base_path('**/Models/*.php')))->each(fn ($file) => include_once($file));
 
 echo collect(get_declared_classes())
@@ -21,8 +22,43 @@ echo collect(get_declared_classes())
             $output
         );
 
+        $data = json_decode($output->fetch(), true);
+
+        if ($data === null) {
+            return null;
+        }
+
+        $data['attributes'] = collect($data['attributes'])
+            ->map(function ($attrs) {
+                return array_merge($attrs, [
+                    'title_case' => str_replace('_', '', \Illuminate\Support\Str::title($attrs['name'])),
+                ]);
+            })
+            ->toArray();
+
+        $reflection = (new \ReflectionClass($className));
+
+        $data['scopes'] = collect($reflection->getMethods())
+            ->filter(function ($method) {
+                return $method->isPublic() && !$method->isStatic() && $method->name !== '__construct';
+            })
+            ->filter(function ($method) {
+                return str_starts_with($method->name, 'scope');
+            })
+            ->map(function ($method) {
+                return str_replace('scope', '', $method->name);
+            })
+            ->map(function ($method) {
+                return strtolower(substr($method, 0, 1)) . substr($method, 1);
+            })
+            ->values()
+            ->toArray();
+
+        $data['uri'] = $reflection->getFileName();
+
         return [
-            $className => json_decode($output->fetch(), true),
+            $className => $data,
         ];
     })
+    ->filter()
     ->toJson();

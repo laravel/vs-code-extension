@@ -1,6 +1,7 @@
 import { repository } from ".";
 import { Eloquent } from "..";
 import { config } from "../support/config";
+import { writeEloquentDocBlocks } from "../support/docblocks";
 import { runInLaravel, template } from "./../support/php";
 
 const modelPaths = config<string[]>("modelsPaths", ["app", "app/Models"]);
@@ -11,7 +12,12 @@ const load = () => {
             model_paths: JSON.stringify(modelPaths),
         }),
         "Eloquent Attributes and Relations",
-    );
+    ).then((models) => {
+        // info("Models loaded", models);
+        writeEloquentDocBlocks(models);
+
+        return models;
+    });
 };
 
 export const getModels = repository<Eloquent.Models>(
