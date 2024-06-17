@@ -163,6 +163,7 @@ const getActualType = (type: string): string => {
         datetime: "\\Illuminate\\Support\\Carbon",
         "boolean(1)": "bool",
         "boolean(0)": "bool",
+        boolean: "bool",
         text: "string",
         integer: "int",
         attribute: "mixed",
