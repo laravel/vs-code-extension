@@ -87,6 +87,7 @@ declare namespace Eloquent {
         relations: Relation[];
         events: Event[];
         observers: Observer[];
+        scopes: string[];
     }
 
     interface Attribute {
@@ -100,6 +101,7 @@ declare namespace Eloquent {
         hidden: boolean;
         appended: null;
         cast: string | null;
+        title_case: string;
     }
 
     interface Relation {

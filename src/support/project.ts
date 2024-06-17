@@ -3,6 +3,18 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
 
+export const internalVendorPath = (path = ""): string => {
+    return projectPath(`vendor/_laravel_ide/${path}`);
+};
+
+export const ensureInternalVendorDirectoryExists = (): string => {
+    let vendorPath = internalVendorPath();
+
+    if (!fs.existsSync(vendorPath)) {
+        fs.mkdirSync(vendorPath, { recursive: true });
+    }
+};
+
 export const projectPath = (path = "", forCode = false): string => {
     if (path[0] === "/") {
         path = path.substring(1);
