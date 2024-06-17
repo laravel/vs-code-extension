@@ -1,66 +1,35 @@
 import fs from "fs";
 import { Eloquent } from "..";
-import { projectPath, projectPathExists } from "./project";
+import {
+    ensureInternalVendorDirectoryExists,
+    internalVendorPath,
+} from "./project";
 import { indent } from "./util";
+
+interface ClassBlock {
+    namespace: string;
+    className: string;
+    blocks: string[];
+}
 
 // TODO: Chunk into several files if we have a lot of models?
 // TODO: Check if doc block is already in model file, skip if it is
 export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
-    if (!projectPathExists("vendor/_laravel_ide")) {
-        // Create directory
-        fs.mkdirSync(projectPath("vendor/_laravel_ide"), {
-            recursive: true,
-        });
-    }
+    ensureInternalVendorDirectoryExists();
 
-    const blocks = Object.values(models).map((model) => {
+    const blocks: ClassBlock[] = Object.values(models).map((model) => {
         const pathParts = model.class.split("\\");
         const cls = pathParts.pop();
 
         return {
             namespace: pathParts.join("\\"),
-            className: cls,
-            blocks: model.attributes
-                .map((attr) => getAttributeBlocks(attr, cls || ""))
-                .concat(
-                    [...model.scopes, "newModelQuery", "newQuery", "query"].map(
-                        (method) => {
-                            return `@method static \\Illuminate\\Database\\Eloquent\\Builder|${cls} ${method}()`;
-                        },
-                    ),
-                )
-                .concat(
-                    model.relations.map((relation) =>
-                        getRelationBlocks(relation),
-                    ),
-                )
-                .flat()
-                .map((block) => ` * ${block}`)
-                .sort((a, b) => {
-                    if (a.includes("@property-read")) {
-                        if (b.includes("@property")) {
-                            return 1;
-                        }
-
-                        if (b.includes("@method")) {
-                            return -1;
-                        }
-
-                        return 0;
-                    }
-
-                    if (a.includes("@property")) {
-                        return -1;
-                    }
-
-                    return 0;
-                }),
+            className: cls || "",
+            blocks: getBlocks(model, cls || ""),
         };
     });
 
     const namespaced: {
-        // TODO: Fix any type
-        [namespace: string]: any[];
+        [namespace: string]: ClassBlock[];
     } = {};
 
     blocks.forEach((block) => {
@@ -76,7 +45,6 @@ export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
             return [
                 `namespace ${namespace} {`,
                 ...blocks.map((block) => classToDocBlock(block, namespace)),
-                "",
                 "}",
             ].join("\n\n");
         },
@@ -85,9 +53,43 @@ export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
     finalContent.unshift("<?php");
 
     fs.writeFileSync(
-        projectPath(`vendor/_laravel_ide/_model_helpers.php`),
+        internalVendorPath("_model_helpers.php"),
         finalContent.join("\n\n"),
     );
+};
+
+const getBlocks = (model: Eloquent.Model, className: string): string[] => {
+    return model.attributes
+        .map((attr) => getAttributeBlocks(attr, className))
+        .concat(
+            [...model.scopes, "newModelQuery", "newQuery", "query"].map(
+                (method) => {
+                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder|${className} ${method}()`;
+                },
+            ),
+        )
+        .concat(model.relations.map((relation) => getRelationBlocks(relation)))
+        .flat()
+        .map((block) => ` * ${block}`)
+        .sort((a, b) => {
+            if (a.includes("@property-read")) {
+                if (b.includes("@property")) {
+                    return 1;
+                }
+
+                if (b.includes("@method")) {
+                    return -1;
+                }
+
+                return 0;
+            }
+
+            if (a.includes("@property")) {
+                return -1;
+            }
+
+            return 0;
+        });
 };
 
 const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
@@ -109,7 +111,7 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     return [`@property-read \\${relation.related} $${relation.name}`];
 };
 
-const classToDocBlock = (block: any, namespace: string) => {
+const classToDocBlock = (block: ClassBlock, namespace: string) => {
     return [
         `/**`,
         ` * ${namespace}\\${block.className}`,
