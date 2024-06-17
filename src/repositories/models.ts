@@ -13,7 +13,6 @@ const load = () => {
         }),
         "Eloquent Attributes and Relations",
     ).then((models) => {
-        // info("Models loaded", models);
         writeEloquentDocBlocks(models);
 
         return models;
