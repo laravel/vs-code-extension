@@ -10,6 +10,7 @@ import { LinkProvider as LinkProviderType } from "..";
 import appBinding from "./appBinding";
 import asset from "./asset";
 import config from "./config";
+import controllerAction from "./controllerAction";
 import env from "./env";
 import inertia from "./inertia";
 import mix from "./mix";
@@ -28,6 +29,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         mix,
         translation,
         route,
+        controllerAction,
     ];
 
     public provideDocumentLinks(

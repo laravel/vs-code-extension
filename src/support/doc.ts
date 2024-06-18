@@ -23,16 +23,22 @@ export const findLinksInDoc = (
     doc: TextDocument,
     regex: string,
     cb: (match: RegExpExecArray) => Uri | null,
+    matchIndex: number = 0,
 ): DocumentLink[] => {
-    return findMatchesInDoc(doc, regex, (match, range) => {
-        const item = cb(match);
+    return findMatchesInDoc(
+        doc,
+        regex,
+        (match, range) => {
+            const item = cb(match);
 
-        if (item === null) {
-            return null;
-        }
+            if (item === null) {
+                return null;
+            }
 
-        return new DocumentLink(range, item);
-    });
+            return new DocumentLink(range, item);
+        },
+        matchIndex,
+    );
 };
 
 // TODO: This doesn't really belong here, it has to do with Hovering, but fine for now
@@ -86,18 +92,22 @@ export const findMatchesInDoc = <T>(
     doc: TextDocument,
     regex: string,
     cb: (match: RegExpExecArray, range: Range) => T | null,
+    matchIndex: number = 0,
 ): T[] => {
     let items: T[] = [];
     let index = 0;
 
     while (index < doc.lineCount) {
-        let finalRegex = new RegExp(regex, "g");
+        let finalRegex = new RegExp(regex, "gd");
         let line = doc.lineAt(index);
         let match = finalRegex.exec(line.text);
 
         if (match !== null) {
-            let start = new Position(line.lineNumber, match.index);
-            let end = start.translate(0, match[0].length);
+            let start = new Position(
+                line.lineNumber,
+                match.indices?.[matchIndex][0] || match.index,
+            );
+            let end = start.translate(0, match[matchIndex].length);
 
             let item = cb(match, new Range(start, end));
 
