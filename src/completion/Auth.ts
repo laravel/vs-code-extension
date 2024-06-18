@@ -2,17 +2,10 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, ParsingResult, Tags } from "..";
-import { getModels } from "./../repositories/models";
-import { wordMatchRegex } from "./../support/patterns";
-import { runInLaravel, template } from "./../support/php";
+import { getPolicies } from "../repositories/auth";
+import { wordMatchRegex } from "../support/patterns";
 
 export default class Gate implements CompletionProvider {
-    private abilities: any[] = [];
-
-    constructor() {
-        this.load();
-    }
-
     tags(): Tags {
         return [
             {
@@ -29,7 +22,15 @@ export default class Gate implements CompletionProvider {
                 ],
             },
             {
-                functions: ["can", "@can", "@cannot", "@canany"],
+                class: "Illuminate\\Support\\Facades\\Route",
+                functions: ["can", "cannot"],
+            },
+            {
+                class: "Illuminate\\Support\\Facades\\Auth",
+                functions: ["can", "cannot"],
+            },
+            {
+                functions: ["@can", "@cannot", "@canany"],
             },
         ];
     }
@@ -41,43 +42,30 @@ export default class Gate implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.param.index === 1) {
-            return Object.entries(getModels().items).map(([key, model]) => {
-                let completeItem = new vscode.CompletionItem(
-                    model.class.replace(/\\/g, "\\\\"),
-                    vscode.CompletionItemKind.Value,
-                );
-
-                completeItem.range = document.getWordRangeAtPosition(
-                    position,
-                    wordMatchRegex,
-                );
-
-                return completeItem;
-            });
+        if (result.param.index > 0) {
+            return [];
         }
 
-        return this.abilities.map((ability) => {
+        return Object.entries(getPolicies().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
-                ability,
+                value[0].key,
                 vscode.CompletionItemKind.Value,
             );
+
             completeItem.range = document.getWordRangeAtPosition(
                 position,
                 wordMatchRegex,
             );
 
+            const policyClasses = value
+                .map((item) => item.policy_class)
+                .filter(String);
+
+            if (policyClasses.length > 0) {
+                completeItem.detail = policyClasses.join("\n\n");
+            }
+
             return completeItem;
         });
-    }
-
-    load() {
-        runInLaravel<any[]>(template("auth"), "Auth Data")
-            .then((result) => {
-                this.abilities = result;
-            })
-            .catch((exception) => {
-                console.error(exception);
-            });
     }
 }

@@ -26,6 +26,16 @@ export const configMatchRegex = (() => {
     return funcRegex(["config", "Config::get"]);
 })();
 
+export const authMatchRegex = (() => {
+    return funcRegex([
+        "Gate::(?:has|allows|denies|check|any|none|authorize|inspect)",
+        "can",
+        "@can",
+        "@cannot",
+        "@canany",
+    ]);
+})();
+
 export const assetMatchRegex = (() => {
     return funcRegex(["asset"]);
 })();

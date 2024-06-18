@@ -8,11 +8,11 @@ import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider
 import { initClient } from "./blade/client";
 import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
+import GateCompletion from "./completion/Auth";
 import BladeCompletion from "./completion/Blade";
 import ConfigCompletion from "./completion/Config";
 import EloquentCompletion from "./completion/Eloquent";
 import EnvCompletion from "./completion/Env";
-import GateCompletion from "./completion/Gate";
 import InertiaCompletion from "./completion/Inertia";
 import MixCompletion from "./completion/Mix";
 import Registry from "./completion/Registry";

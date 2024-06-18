@@ -20,16 +20,16 @@ import view from "./view";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     private providers: LinkProviderType[] = [
-        config,
-        view,
-        inertia,
         appBinding,
-        env,
         asset,
-        mix,
-        translation,
-        route,
+        config,
         controllerAction,
+        env,
+        inertia,
+        mix,
+        route,
+        translation,
+        view,
     ];
 
     public provideDocumentLinks(

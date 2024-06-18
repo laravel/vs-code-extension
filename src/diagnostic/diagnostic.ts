@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import appBinding from "./appBinding";
 import asset from "./asset";
+import auth from "./auth";
 import config from "./config";
 import controllerAction from "./controllerAction";
 import env from "./env";
@@ -16,6 +17,7 @@ const collection = vscode.languages.createDiagnosticCollection("laravel");
 const providers = [
     appBinding,
     asset,
+    auth,
     config,
     controllerAction,
     env,

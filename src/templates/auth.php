@@ -1,30 +1,43 @@
 <?php
 
-echo json_encode(
-    array_merge(
-        array_keys(Illuminate\Support\Facades\Gate::abilities()),
-        array_values(
-            array_filter(
-                array_unique(
-                    Illuminate\Support\Arr::flatten(
-                        array_map(
-                            function ($val, $key) {
-                                return array_map(
-                                    function ($rm) {
-                                        return $rm->getName();
-                                    },
-                                    (new ReflectionClass($val))->getMethods()
-                                );
-                            },
-                            Illuminate\Support\Facades\Gate::policies(),
-                            array_keys(Illuminate\Support\Facades\Gate::policies())
-                        )
-                    )
-                ),
-                function ($an) {
-                    return !in_array($an, ['allow', 'deny']);
-                }
-            )
-        )
+echo collect(\Illuminate\Support\Facades\Gate::abilities())
+    ->map(function ($policy, $key) {
+        $reflection = new \ReflectionFunction($policy);
+
+        $policyClass = null;
+
+        if (get_class($reflection->getClosureThis()) === \Illuminate\Auth\Access\Gate::class) {
+            $vars = $reflection->getClosureUsedVariables();
+
+            if (isset($vars['callback'])) {
+                [$policyClass, $method] = explode('@', $vars['callback']);
+
+                $reflection = new \ReflectionMethod($policyClass, $method);
+            }
+        }
+        return [
+            'key' => $key,
+            'uri' => $reflection->getFileName(),
+            'policy_class' => $policyClass,
+            'lineNumber' => $reflection->getStartLine(),
+        ];
+    })
+    ->merge(
+        collect(\Illuminate\Support\Facades\Gate::policies())->flatMap(function ($policy, $model) {
+            $methods = (new ReflectionClass($policy))->getMethods();
+
+            return collect($methods)->map(function (ReflectionMethod $method) use ($policy) {
+                return [
+                    'key' => $method->getName(),
+                    'uri' => $method->getFileName(),
+                    'policy_class' => $policy,
+                    'lineNumber' => $method->getStartLine(),
+                ];
+            })->filter(function ($ability) {
+                return !in_array($ability['key'], ['allow', 'deny']);
+            });
+        }),
     )
-);
+    ->values()
+    ->groupBy('key')
+    ->toJson();
