@@ -50,7 +50,9 @@ export const routeMatchRegex = (() => {
     return funcRegex(["route", "signedRoute"]);
 })();
 
-export const controllerActionRegex = `Route::(.+)\\(['"](.+)['"],\\s?\\[(.+)\\]`;
+// Route::get('/profile', [ProfileController::class, 'edit'])
+// Route::get('/profile', 'ProfileController@edit')
+export const controllerActionRegex = `Route::(.+)\\(['"](.+)['"],\\s?[\\['"](.+)['"\\]]\\)`;
 
 export const envMatchRegex = (() => {
     return funcRegex(["env"]);
