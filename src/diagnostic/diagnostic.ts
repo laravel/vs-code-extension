@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import appBinding from "./appBinding";
 import asset from "./asset";
 import config from "./config";
+import controllerAction from "./controllerAction";
 import env from "./env";
 import inertia from "./inertia";
 import middleware from "./middleware";
@@ -16,13 +17,14 @@ const providers = [
     appBinding,
     asset,
     config,
+    controllerAction,
     env,
     inertia,
-    view,
     middleware,
-    route,
     mix,
+    route,
     translation,
+    view,
 ];
 
 export const updateDiagnostics = (

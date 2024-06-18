@@ -13,10 +13,16 @@ export const findWarningsInDoc = (
     doc: TextDocument,
     regex: string,
     cb: (match: RegExpExecArray, range: Range) => Promise<Diagnostic | null>,
+    matchIndex: number = 0,
 ): Promise<Diagnostic[]> => {
-    return findMatchesInDocAsync(doc, regex, (match, range) => {
-        return cb(match, range);
-    }).then((items) => items.filter((item) => item !== null));
+    return findMatchesInDocAsync(
+        doc,
+        regex,
+        (match, range) => {
+            return cb(match, range);
+        },
+        matchIndex,
+    ).then((items) => items.filter((item) => item !== null));
 };
 
 export const findLinksInDoc = (
@@ -62,18 +68,22 @@ export const findMatchesInDocAsync = async <T>(
     doc: TextDocument,
     regex: string,
     cb: (match: RegExpExecArray, range: Range) => Promise<T | null>,
+    matchIndex: number = 0,
 ): Promise<T[]> => {
     let items: T[] = [];
     let index = 0;
 
     while (index < doc.lineCount) {
-        let finalRegex = new RegExp(regex, "g");
+        let finalRegex = new RegExp(regex, "gd");
         let line = doc.lineAt(index);
         let match = finalRegex.exec(line.text);
 
         if (match !== null) {
-            let start = new Position(line.lineNumber, match.index);
-            let end = start.translate(0, match[0].length);
+            let start = new Position(
+                line.lineNumber,
+                match.indices?.[matchIndex][0] || match.index,
+            );
+            let end = start.translate(0, match[matchIndex].length);
 
             let item = await cb(match, new Range(start, end));
 

@@ -17,11 +17,15 @@ export const repository = <T>(
         () => {
             load()
                 .then((result) => {
+                    if (typeof result === "undefined") {
+                        throw new Error("Failed to load items");
+                    }
+
                     items = result;
                     loaded = true;
                 })
-                .catch(() => {
-                    console.error("Failed to load items");
+                .catch((e) => {
+                    console.error(e);
                 });
         },
         pattern,
@@ -36,7 +40,9 @@ export const repository = <T>(
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        return callback(items);
+        if (loaded) {
+            return callback(items);
+        }
     };
 
     return () => ({

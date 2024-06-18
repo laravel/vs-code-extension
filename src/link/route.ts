@@ -10,7 +10,7 @@ const provider: LinkProvider = (
     return findLinksInDoc(doc, routeMatchRegex, (match) => {
         const route = getRoutes().items.find((item) => item.name === match[0]);
 
-        if (!route) {
+        if (!route || !route.filename || !route.line) {
             return null;
         }
 

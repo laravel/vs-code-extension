@@ -4,18 +4,6 @@ import { getRoutes } from "../repositories/routes";
 import { findLinksInDoc } from "../support/doc";
 import { controllerActionRegex } from "../support/patterns";
 
-const getFullAction = (action: string): string | null => {
-    if (!action.includes("@")) {
-        // Intelliphense can take it from here
-        return null;
-    }
-
-    return action
-        .substring(1)
-        .slice(0, -1)
-        .replace("App\\Http\\Controllers\\", "");
-};
-
 const provider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
@@ -25,17 +13,16 @@ const provider: LinkProvider = (
         (match) => {
             const action = match[3];
 
-            const fullAction = getFullAction(action);
-
-            if (!fullAction) {
+            if (!action.includes("@")) {
+                // Intelliphense can take it from here
                 return null;
             }
 
             const route = getRoutes().items.find(
-                (item) => item.action === fullAction,
+                (item) => item.action === action,
             );
 
-            if (!route) {
+            if (!route || !route.filename || !route.line) {
                 return null;
             }
 

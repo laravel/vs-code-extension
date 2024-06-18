@@ -12,7 +12,7 @@ const provider: HoverProvider = (
     return findHoverMatchesInDoc(doc, pos, routeMatchRegex, (match) => {
         const item = getRoutes().items.find((item) => item.name === match);
 
-        if (!item) {
+        if (!item || !item.filename || !item.line) {
             return null;
         }
 
