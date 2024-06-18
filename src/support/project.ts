@@ -7,7 +7,7 @@ export const internalVendorPath = (path = ""): string => {
     return projectPath(`vendor/_laravel_ide/${path}`);
 };
 
-export const ensureInternalVendorDirectoryExists = (): string => {
+export const ensureInternalVendorDirectoryExists = () => {
     let vendorPath = internalVendorPath();
 
     if (!fs.existsSync(vendorPath)) {

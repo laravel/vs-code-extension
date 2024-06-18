@@ -159,7 +159,7 @@ export default class Route implements CompletionProvider {
 
                 completionItem.detail = [
                     route.action,
-                    `${route.method}:${route.uri}`,
+                    `[${route.method}] ${route.uri}`,
                 ].join("\n\n");
 
                 return completionItem;

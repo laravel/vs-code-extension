@@ -7,6 +7,8 @@ interface RouteItem {
     name: string;
     action: string;
     parameters: string[];
+    filename: string;
+    line: number;
 }
 
 export const getRoutes = repository<RouteItem[]>(

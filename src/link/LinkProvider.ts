@@ -13,6 +13,7 @@ import config from "./config";
 import env from "./env";
 import inertia from "./inertia";
 import mix from "./mix";
+import route from "./route";
 import translation from "./translation";
 import view from "./view";
 
@@ -26,6 +27,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         asset,
         mix,
         translation,
+        route,
     ];
 
     public provideDocumentLinks(
