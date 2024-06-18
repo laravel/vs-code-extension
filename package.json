@@ -139,6 +139,41 @@
           }
         }
       }
+    ],
+    "commands": [
+      {
+        "command": "laravel.run-test",
+        "title": "Laravel: run test"
+      },
+      {
+        "command": "laravel.run-test-file",
+        "title": "Laravel: run test file"
+      },
+      {
+        "command": "laravel.run-test-suite",
+        "title": "Laravel: run test suite"
+      },
+      {
+        "command": "laravel.run-test-previous",
+        "title": "Laravel: run previous test"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "cmd+k cmd+r",
+        "command": "laravel.run",
+        "when": "editorLangId == php"
+      },
+      {
+        "key": "cmd+k cmd+f",
+        "command": "laravel.run-file",
+        "when": "editorLangId == php"
+      },
+      {
+        "key": "cmd+k cmd+p",
+        "command": "laravel.run-previous",
+        "when": "editorLangId == php"
+      }
     ]
   },
   "scripts": {
