@@ -1,5 +1,4 @@
-<?php
-
+export default `
 echo collect(app()->getBindings())
     ->filter(fn ($binding) => ($binding['concrete'] ?? null) !== null)
     ->flatMap(function ($binding, $key) {
@@ -15,3 +14,4 @@ echo collect(app()->getBindings())
             ],
         ];
     })->toJson();
+`;

@@ -1,5 +1,4 @@
-<?php
-
+export default `
 function vsCodeTranslationValue($key, $value, $file, $lines): array
 {
     $lineNumber = 1;
@@ -22,7 +21,7 @@ function vsCodeTranslationValue($key, $value, $file, $lines): array
         'value' => $value,
         'path' => $file,
         'line' => $lineNumber,
-        'params' => preg_match_all('/\:([A-Za-z0-9_]+)/', $value, $matches) ? $matches[1] : [],
+        'params' => preg_match_all('/\\:([A-Za-z0-9_]+)/', $value, $matches) ? $matches[1] : [],
     ];
 }
 
@@ -67,7 +66,7 @@ function vscodeCollectTranslations(string $path, string $namespace = null)
         return [
             'key' => $key,
             'lang' => $lang,
-            'values' => collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)))->map(function ($value, $key) use ($file, $lines) {
+            'values' => collect(\\Illuminate\\Support\\Arr::dot(__($key, [], $lang)))->map(function ($value, $key) use ($file, $lines) {
                 if (is_array($value)) {
                     return null;
                 }
@@ -99,10 +98,11 @@ foreach ($default->merge($namespaced) as $value) {
 
         $final[$dotKey][$value['lang']] = $v;
 
-        if ($value['lang'] === \Illuminate\Support\Facades\App::currentLocale()) {
+        if ($value['lang'] === \\Illuminate\\Support\\Facades\\App::currentLocale()) {
             $final[$dotKey]['default'] = $v;
         }
     }
 }
 
 echo json_encode($final);
+`;

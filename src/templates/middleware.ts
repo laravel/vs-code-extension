@@ -1,7 +1,6 @@
-<?php
-
-echo collect(app('Illuminate\Contracts\Http\Kernel')->getMiddlewareGroups())
-    ->merge(app('Illuminate\Contracts\Http\Kernel')->getRouteMiddleware())
+export default `
+echo collect(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups())
+    ->merge(app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware())
     ->map(function ($middleware, $key) {
         if (is_array($middleware)) {
             return null;
@@ -19,3 +18,4 @@ echo collect(app('Illuminate\Contracts\Http\Kernel')->getMiddlewareGroups())
         return $parameters === '' ? null : $parameters;
     })
     ->toJson();
+`;

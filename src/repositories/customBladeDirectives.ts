@@ -9,7 +9,7 @@ interface CustomDirectiveItem {
 export const getCustomBladeDirectives = repository<CustomDirectiveItem[]>(
     () =>
         runInLaravel<CustomDirectiveItem[]>(
-            template("blade-directives"),
+            template("bladeDirectives"),
             "Custom Blade Directives",
         ),
     "app/{,*,**/*}Provider.php",

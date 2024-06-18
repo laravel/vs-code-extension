@@ -1,8 +1,7 @@
-<?php
-
-echo collect(app(Illuminate\View\Compilers\BladeCompiler::class)->getCustomDirectives())
+export default `
+echo collect(app(Illuminate\\View\\Compilers\\BladeCompiler::class)->getCustomDirectives())
     ->map(function ($customDirective, $name) {
-        if ($customDirective instanceof \Closure) {
+        if ($customDirective instanceof \\Closure) {
             return [
                 'name' => $name,
                 'hasParams' => (new ReflectionFunction($customDirective))->getNumberOfParameters() >= 1,
@@ -20,4 +19,5 @@ echo collect(app(Illuminate\View\Compilers\BladeCompiler::class)->getCustomDirec
     })
     ->filter()
     ->values()
-    ->toJson()
+    ->toJson();
+`;
