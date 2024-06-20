@@ -69,42 +69,64 @@ export default class Inertia implements CompletionProvider {
     private getPropAutoComplete(viewContent: string): string[] {
         let variableNames = new Set<string>([]);
 
-        let match = viewContent.match(/defineProps<({.+})>/s);
+        const regexes = [
+            {
+                regex: /defineProps<({[^}>]+})>/s,
+                getPropsString: (match: RegExpMatchArray) =>
+                    match[0]
+                        .replace("defineProps<", "")
+                        .replace(">", "")
+                        .replace(/\?\:/g, ":")
+                        // Remove all whitespace
+                        .replace(/\s/g, ""),
+            },
+            {
+                regex: /defineProps\(({[^})]+})\)/s,
+                getPropsString: (match: RegExpMatchArray) =>
+                    match[0]
+                        .replace("defineProps(", "")
+                        .replace(")", "")
+                        .replace(/\?\:/g, ":")
+                        // Remove all whitespace
+                        .replace(/\s/g, ""),
+            },
+        ];
 
-        if (!match) {
-            return [];
+        for (let { regex, getPropsString } of regexes) {
+            let match = viewContent.match(regex);
+
+            if (!match) {
+                continue;
+            }
+
+            let props = getPropsString(match);
+
+            // Chop off the starting and ending curly braces
+            props = props.substring(1, props.length - 1);
+
+            let nestedLevel = 0;
+
+            props.split(";").forEach((prop) => {
+                if (prop.includes("{")) {
+                    nestedLevel++;
+                }
+
+                if (prop.includes("}")) {
+                    nestedLevel--;
+                }
+
+                if (nestedLevel > 0 || !prop.includes(":")) {
+                    return;
+                }
+
+                let [key] = prop.split(":");
+
+                variableNames.add(key);
+            });
+
+            return [...variableNames];
         }
 
-        let props = match[0]
-            .replace("defineProps<", "")
-            .replace(">", "")
-            .replace(/\?\:/g, ":")
-            // Remove all whitespace
-            .replace(/\s/g, "");
-
-        // Chop off the starting and ending curly braces
-        props = props.substring(1, props.length - 1);
-
-        let nestedLevel = 0;
-
-        props.split(";").forEach((prop) => {
-            if (prop.includes("{")) {
-                nestedLevel++;
-            }
-
-            if (prop.includes("}")) {
-                nestedLevel--;
-            }
-
-            if (nestedLevel > 0 || !prop.includes(":")) {
-                return;
-            }
-
-            let [key] = prop.split(":");
-
-            variableNames.add(key);
-        });
-
-        return [...variableNames];
+        return [];
     }
 }
