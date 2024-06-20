@@ -118,7 +118,7 @@ export default class Eloquent implements CompletionProvider {
                 return [];
             }
 
-            if (finalResult.param.isKey) {
+            if (!finalResult.param.isArray || finalResult.param.isKey) {
                 return this.getRelationshipCompletionItems(
                     document,
                     position,
