@@ -143,19 +143,20 @@
     "commands": [
       {
         "command": "laravel.run-test",
-        "title": "Laravel: run test"
+        "title": "Laravel: Run Test at Cursor",
+        "icon": "$(play)"
       },
       {
         "command": "laravel.run-test-file",
-        "title": "Laravel: run test file"
+        "title": "Laravel: Run Tests in File"
       },
       {
         "command": "laravel.run-test-suite",
-        "title": "Laravel: run test suite"
+        "title": "Laravel: Run Test Suite"
       },
       {
         "command": "laravel.run-test-previous",
-        "title": "Laravel: run previous test"
+        "title": "Laravel: Run Previous Test"
       }
     ],
     "keybindings": [
@@ -177,13 +178,14 @@
     ]
   },
   "scripts": {
-    "compile": "npm run check-types && node esbuild.js",
-    "check-types": "tsc --noEmit",
-    "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "vscode:prepublish": "npm run package",
-    "package": "npm run check-types && node esbuild.js --production"
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "copy-files": "copyfiles -u 1 src/templates/*.php out",
+    "postbuild": "npm run copy-files"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
