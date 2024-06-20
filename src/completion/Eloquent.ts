@@ -224,7 +224,14 @@ export default class Eloquent implements CompletionProvider {
         return this.getCompletionItems(
             document,
             position,
-            model.attributes.map((attribute) => attribute.name),
+            model.attributes
+                .filter(
+                    (attribute) =>
+                        !["accessor", "attribute"].includes(
+                            attribute.cast || "",
+                        ),
+                )
+                .map((attribute) => attribute.name),
         );
     }
 
