@@ -167,9 +167,6 @@ export default class Eloquent implements CompletionProvider {
             }
         } while (this.isValidResult(customResult));
 
-        // We've added one that caused it to stop, remove it
-        results.pop();
-
         return results.length === 0 ? false : results;
     }
 
