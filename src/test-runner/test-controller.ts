@@ -8,6 +8,15 @@ export const controller = vscode.tests.createTestController(
     "Laravel Tests",
 );
 
+type TestRunner = "pest" | "phpunit";
+
+interface TestData {
+    type: "directory" | "file" | "test";
+    testRunner?: TestRunner;
+}
+
+const testData = new WeakMap<vscode.TestItem, TestData>();
+
 // First, create the `resolveHandler`. This may initially be called with
 // "undefined" to ask for all tests in the workspace to be discovered, usually
 // when the user opens the Test Explorer for the first time.
@@ -56,6 +65,8 @@ function getOrCreateFile(uri: vscode.Uri) {
 
         items.add(item);
 
+        testData.set(item, { type: "directory" });
+
         items = item.children;
     });
 
@@ -73,7 +84,14 @@ function getOrCreateFile(uri: vscode.Uri) {
 
     file.canResolveChildren = true;
 
+    // file.range = new vscode.Range(
+    //     new vscode.Position(0, 0),
+    //     new vscode.Position(0, 0),
+    // );
+
     items.add(file);
+
+    testData.set(file, { type: "file" });
 
     return file;
 }
@@ -105,19 +123,47 @@ async function parseTestsInFileContents(
         file.children.delete(child.id);
     });
 
+    const regexes: {
+        testRunner: TestRunner;
+        regex: RegExp;
+    }[] = [
+        {
+            testRunner: "pest",
+            regex: /^\s*(?:it|test)\(([^,)]+)/m,
+        },
+        {
+            testRunner: "phpunit",
+            regex: /^\s*(?:public|private|protected)?\s*function\s*(\w+)\s*\(.*$/,
+        },
+    ];
+
     for (let index in lines) {
-        const match = lines[index].match(/^\s*(?:it|test)\(([^,)]+)/m);
+        for (let { regex, testRunner } of regexes) {
+            const match = lines[index].match(regex);
 
-        if (match) {
-            const lineNumber = parseInt(index) + 1;
+            if (match) {
+                const lineNumber = parseInt(index) + 1;
 
-            const test = controller.createTestItem(
-                `${file.uri}/${match[1]}`,
-                trimQuotes(match[1]),
-                file.uri?.with({ fragment: `L${lineNumber}` }),
-            );
+                const test = controller.createTestItem(
+                    `${file.uri}/${match[1]}`,
+                    trimQuotes(match[1]),
+                    file.uri,
+                );
 
-            file.children.add(test);
+                test.range = new vscode.Range(
+                    new vscode.Position(lineNumber - 1, 0),
+                    new vscode.Position(lineNumber - 1, 0),
+                );
+
+                info("test range", test.uri, test.range);
+
+                file.children.add(test);
+
+                testData.set(test, {
+                    type: "test",
+                    testRunner,
+                });
+            }
         }
     }
 }
@@ -173,6 +219,7 @@ const runHandler = async (
     if (request.include) {
         request.include.forEach((test) => queue.push(test));
     } else {
+        // TODO: Recursively add all tests to the queue
         controller.items.forEach((test) => queue.push(test));
     }
 
@@ -188,40 +235,53 @@ const runHandler = async (
         }
 
         const start = Date.now();
+
         try {
+            const data = testData.get(test);
+
+            const binary = data?.testRunner || "phpunit";
+
+            // const binary = (() => {
+            //     info("got to binary....", test.label);
+            //     if (data?.type === "test") {
+            //         return data?.testRunner === "pest" ? "pest" : "phpunit";
+            //     }
+
+            //     // Keep finding children until we find a test
+            //     let current = test;
+
+            //     while (current.children.size > 0) {
+            //         // @ts-ignore
+            //         current = [...current.children][0];
+            //     }
+
+            //     info("got to current....", current);
+
+            //     return testData.get(current)?.testRunner === "pest"
+            //         ? "pest"
+            //         : "phpunit";
+            // })();
+
+            let args = "";
+
+            if (data?.type === "test") {
+                args = `--filter '${test.label}'`;
+            }
+
             const task = new vscode.Task(
                 { type: "testrunner", task: "run" },
                 vscode.TaskScope.Workspace,
                 "run",
                 "testrunner",
                 new vscode.ShellExecution(
-                    `/Users/joetannenbaum/Herd/blip/vendor/bin/pest ${test.uri?.fsPath} --filter '${test.label}'`,
+                    `${projectPath(`vendor/bin/${binary}`)} ${
+                        test.uri?.fsPath
+                    } ${args}`,
                 ),
                 "$testrunner",
             );
 
-            // vscode.tasks.onDidEndTaskProcess((e) => {
-            //     let task = e.execution.task;
-            //     if (task) {
-            //         info(
-            //             "Task finished: " +
-            //                 task.name +
-            //                 " " +
-            //                 task.definition.type,
-            //         );
-
-            //         bigInfo("exit code", e.exitCode);
-            //         // const definition: MyTaskDefinition = <any>task.definition;
-            //         // // ensure this is the relevant task
-            //         // if (definition.myRelevantProperty) {
-            //         //     log.debug("The test task returned " + e.exitCode);
-            //         // }
-            //     }
-            // });
-
             const result = await vscode.tasks.executeTask(task);
-
-            info("hm", result.task.execution);
 
             run.passed(test, Date.now() - start);
         } catch (e: any) {
