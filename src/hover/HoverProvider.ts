@@ -9,6 +9,7 @@ import {
 } from "vscode";
 import { HoverProvider as ProviderFunc } from "..";
 import appBinding from "./appBinding";
+import auth from "./auth";
 import config from "./config";
 import env from "./env";
 import inertia from "./inertia";
@@ -19,14 +20,15 @@ import view from "./view";
 
 export default class HoverProvider implements vsHoverProvider {
     private providers: ProviderFunc[] = [
-        config,
-        view,
-        inertia,
         appBinding,
+        auth,
+        config,
         env,
+        inertia,
         mix,
-        translation,
         route,
+        translation,
+        view,
     ];
 
     provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {

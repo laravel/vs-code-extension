@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { relativePath } from "./project";
 
 /**
  * Get indent space based on user configuration
@@ -15,3 +16,7 @@ export const indent = (text: string = "", repeat: number = 1): string => {
 
 export const trimQuotes = (text: string): string =>
     text.substring(1, text.length - 1);
+
+export const relativeMarkdownLink = (uri: vscode.Uri): string => {
+    return `[${relativePath(uri.path)}](${uri})`;
+};
