@@ -27,6 +27,7 @@ import LinkProvider from "./link/LinkProvider";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import DocumentHighlight from "./syntax/DocumentHighlight";
 import { testRunnerCommands } from "./test-runner";
+import { controller as testController } from "./test-runner/test-controller";
 
 let client: LanguageClient;
 
@@ -138,6 +139,7 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
         ...testRunnerCommands,
+        testController,
     );
 }
 
