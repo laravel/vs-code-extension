@@ -1,3 +1,4 @@
+import { spawn } from "child_process";
 import * as vscode from "vscode";
 import { info } from "../support/logger";
 import { projectPath, relativePath } from "../support/project";
@@ -84,10 +85,11 @@ function getOrCreateFile(uri: vscode.Uri) {
 
     file.canResolveChildren = true;
 
-    // file.range = new vscode.Range(
-    //     new vscode.Position(0, 0),
-    //     new vscode.Position(0, 0),
-    // );
+    // TODO: If it's a PHPUnit test, put it at the class declaration
+    file.range = new vscode.Range(
+        new vscode.Position(0, 0),
+        new vscode.Position(0, 0),
+    );
 
     items.add(file);
 
@@ -146,7 +148,7 @@ async function parseTestsInFileContents(
 
                 const test = controller.createTestItem(
                     `${file.uri}/${match[1]}`,
-                    trimQuotes(match[1]),
+                    testRunner === "pest" ? trimQuotes(match[1]) : match[1],
                     file.uri,
                 );
 
@@ -154,8 +156,6 @@ async function parseTestsInFileContents(
                     new vscode.Position(lineNumber - 1, 0),
                     new vscode.Position(lineNumber - 1, 0),
                 );
-
-                info("test range", test.uri, test.range);
 
                 file.children.add(test);
 
@@ -207,8 +207,104 @@ async function discoverAllFilesInWorkspace() {
     );
 }
 
+const findTests = (item: vscode.TestItem) => {
+    const tests: vscode.TestItem[] = [];
+
+    if (item.children.size === 0) {
+        tests.push(item);
+    } else {
+        item.children.forEach((child) => {
+            tests.push(...findTests(child));
+        });
+    }
+
+    return tests;
+};
+
+// const processLine = (line: string, command: Command) => {
+const processLine = (line: string) => {
+    info("processing line", line);
+    // if (line.includes("FAIL")) {
+    //     info("test failed", line);
+    //     throw new Error("Test failed");
+    // }
+    // const result = problemMatcher.parse(line);
+
+    // if (result) {
+    //     const mappingResult = command.mapping(result);
+    //     if ("kind" in result) {
+    //         this.trigger(result.kind, mappingResult);
+    //     }
+
+    //     this.trigger(TestRunnerEvent.result, mappingResult);
+    // }
+
+    // this.trigger(TestRunnerEvent.line, line);
+};
+
+const runTest = async (test: vscode.TestItem) => {
+    return new Promise<void>((resolve, reject) => {
+        // TODO: Make this dynamic based on the test
+        const binary = "pest"; //data?.testRunner || "phpunit";
+
+        let args = [test.uri?.fsPath!];
+
+        // if (data?.type === "test") {
+        args.push("--filter");
+        args.push(test.label);
+        // }
+
+        info("running test", projectPath(`vendor/bin/${binary}`), args);
+
+        const proc = spawn(projectPath(`vendor/bin/${binary}`), args);
+
+        // const proc = spawn(
+        //     `${projectPath(`vendor/bin/${binary}`)} ${
+        //         test.uri?.fsPath
+        //     } ${args}`,
+        // );
+
+        let temp = "";
+        let output = "";
+
+        const processOutput = (data: string) => {
+            const out = data.toString();
+            info("process output", out);
+            output += out;
+            temp += out;
+            const lines = temp.split(/\r\n|\n/);
+            while (lines.length > 1) {
+                processLine(lines.shift()!);
+                // this.processLine(lines.shift()!, command);
+            }
+            temp = lines.shift()!;
+        };
+
+        proc.stdout!.on("data", processOutput);
+        proc.stderr!.on("data", processOutput);
+        proc.stdout!.on("end", () => processLine(temp));
+
+        proc.on("error", (err: Error) => {
+            const error = err.stack ?? err.message;
+            info("process error", error);
+            // this.trigger(TestRunnerEvent.error, error);
+            // this.trigger(TestRunnerEvent.close, 2);
+            reject("unfortunately, the test runner has failed");
+        });
+
+        proc.on("close", (code) => {
+            info("process closed", code);
+            // const eventName = this.isTestRunning(output)
+            //     ? TestRunnerEvent.output
+            //     : TestRunnerEvent.error;
+            // this.trigger(eventName, output);
+            // this.trigger(TestRunnerEvent.close, code);
+            resolve();
+        });
+    });
+};
+
 const runHandler = async (
-    shouldDebug: boolean,
     request: vscode.TestRunRequest,
     token: vscode.CancellationToken,
 ) => {
@@ -217,10 +313,9 @@ const runHandler = async (
 
     // Loop through all included tests, or all known tests, and add them to our queue
     if (request.include) {
-        request.include.forEach((test) => queue.push(test));
+        request.include.map((test) => queue.push(...findTests(test)));
     } else {
-        // TODO: Recursively add all tests to the queue
-        controller.items.forEach((test) => queue.push(test));
+        controller.items.forEach((test) => queue.push(...findTests(test)));
     }
 
     // For every test that was queued, try to run it. Call run.passed() or run.failed().
@@ -239,49 +334,7 @@ const runHandler = async (
         try {
             const data = testData.get(test);
 
-            const binary = data?.testRunner || "phpunit";
-
-            // const binary = (() => {
-            //     info("got to binary....", test.label);
-            //     if (data?.type === "test") {
-            //         return data?.testRunner === "pest" ? "pest" : "phpunit";
-            //     }
-
-            //     // Keep finding children until we find a test
-            //     let current = test;
-
-            //     while (current.children.size > 0) {
-            //         // @ts-ignore
-            //         current = [...current.children][0];
-            //     }
-
-            //     info("got to current....", current);
-
-            //     return testData.get(current)?.testRunner === "pest"
-            //         ? "pest"
-            //         : "phpunit";
-            // })();
-
-            let args = "";
-
-            if (data?.type === "test") {
-                args = `--filter '${test.label}'`;
-            }
-
-            const task = new vscode.Task(
-                { type: "testrunner", task: "run" },
-                vscode.TaskScope.Workspace,
-                "run",
-                "testrunner",
-                new vscode.ShellExecution(
-                    `${projectPath(`vendor/bin/${binary}`)} ${
-                        test.uri?.fsPath
-                    } ${args}`,
-                ),
-                "$testrunner",
-            );
-
-            const result = await vscode.tasks.executeTask(task);
+            await runTest(test);
 
             run.passed(test, Date.now() - start);
         } catch (e: any) {
@@ -324,19 +377,10 @@ const runHandler = async (
 };
 
 const runProfile = controller.createRunProfile(
-    "Run Laravel Ish",
+    "Run Tests",
     vscode.TestRunProfileKind.Run,
     (request, token) => {
-        runHandler(false, request, token);
-    },
-    true,
-);
-
-const debugProfile = controller.createRunProfile(
-    "Debug",
-    vscode.TestRunProfileKind.Debug,
-    (request, token) => {
-        runHandler(true, request, token);
+        runHandler(request, token);
     },
     true,
 );
