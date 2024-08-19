@@ -1,7 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getPolicies } from "../repositories/auth";
 import { wordMatchRegex } from "../support/patterns";
 
@@ -42,7 +43,7 @@ export default class Gate implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.param.index > 0) {
+        if (result.paramCount() > 0) {
             return [];
         }
 

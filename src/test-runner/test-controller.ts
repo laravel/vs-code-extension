@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
 import * as vscode from "vscode";
-import { info } from "../support/logger";
 import { projectPath, relativePath } from "../support/project";
 import { trimQuotes } from "../support/util";
 
@@ -223,11 +222,15 @@ const findTests = (item: vscode.TestItem) => {
 
 // const processLine = (line: string, command: Command) => {
 const processLine = (line: string) => {
-    info("processing line", line);
-    // if (line.includes("FAIL")) {
-    //     info("test failed", line);
-    //     throw new Error("Test failed");
-    // }
+    console.log("processing line", line);
+
+    if (line.includes("FAIL")) {
+        console.log("test failed", line);
+        return false;
+    }
+
+    return true;
+
     // const result = problemMatcher.parse(line);
 
     // if (result) {
@@ -242,8 +245,8 @@ const processLine = (line: string) => {
     // this.trigger(TestRunnerEvent.line, line);
 };
 
-const runTest = async (test: vscode.TestItem) => {
-    return new Promise<void>((resolve, reject) => {
+const runTest = async (test: vscode.TestItem, run: vscode.TestRun) => {
+    return new Promise<string>((resolve, reject) => {
         // TODO: Make this dynamic based on the test
         const binary = "pest"; //data?.testRunner || "phpunit";
 
@@ -254,52 +257,88 @@ const runTest = async (test: vscode.TestItem) => {
         args.push(test.label);
         // }
 
-        info("running test", projectPath(`vendor/bin/${binary}`), args);
+        args.push("--colors=always");
+
+        console.log("running test", projectPath(`vendor/bin/${binary}`), args);
 
         const proc = spawn(projectPath(`vendor/bin/${binary}`), args);
 
-        // const proc = spawn(
-        //     `${projectPath(`vendor/bin/${binary}`)} ${
-        //         test.uri?.fsPath
-        //     } ${args}`,
-        // );
-
         let temp = "";
         let output = "";
+        let failed = false;
 
-        const processOutput = (data: string) => {
+        const processOutput = (data) => {
             const out = data.toString();
-            info("process output", out);
-            output += out;
             temp += out;
+
             const lines = temp.split(/\r\n|\n/);
+
             while (lines.length > 1) {
-                processLine(lines.shift()!);
-                // this.processLine(lines.shift()!, command);
+                const line = lines.shift()!;
+                output += line + "\r\n";
+                const lineResult = processLine(line);
+
+                if (!failed) {
+                    failed = !lineResult;
+                }
             }
+
             temp = lines.shift()!;
         };
 
         proc.stdout!.on("data", processOutput);
         proc.stderr!.on("data", processOutput);
-        proc.stdout!.on("end", () => processLine(temp));
+        proc.stdout!.on("end", () => {
+            processLine(temp);
+
+            const lines = output.split("\n");
+
+            const failedLineIndex = lines.findIndex((line) =>
+                line.includes("FAILED"),
+            );
+
+            const pattern = [
+                "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+                "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))",
+            ].join("|");
+
+            const ansiRegex = new RegExp(pattern, "g");
+
+            const failedReason = lines[failedLineIndex + 1]
+                .replace(ansiRegex, "")
+                .trim();
+
+            if (failed) {
+                reject({
+                    message: failedReason,
+                    output,
+                });
+            }
+        });
 
         proc.on("error", (err: Error) => {
             const error = err.stack ?? err.message;
-            info("process error", error);
+            console.log("process error", error);
             // this.trigger(TestRunnerEvent.error, error);
             // this.trigger(TestRunnerEvent.close, 2);
             reject("unfortunately, the test runner has failed");
         });
 
         proc.on("close", (code) => {
-            info("process closed", code);
+            console.log("process closed", code);
+
+            run.appendOutput(output);
+
+            if (output.includes("1 skipped")) {
+                resolve("skipped");
+            } else {
+                resolve("passed");
+            }
             // const eventName = this.isTestRunning(output)
             //     ? TestRunnerEvent.output
             //     : TestRunnerEvent.error;
             // this.trigger(eventName, output);
             // this.trigger(TestRunnerEvent.close, code);
-            resolve();
         });
     });
 };
@@ -318,11 +357,14 @@ const runHandler = async (
         controller.items.forEach((test) => queue.push(...findTests(test)));
     }
 
+    queue.forEach((q) => run.enqueued(q));
+
     // For every test that was queued, try to run it. Call run.passed() or run.failed().
     // The `TestMessage` can contain extra information, like a failing location or
     // a diff output. But here we'll just give it a textual message.
     while (queue.length > 0 && !token.isCancellationRequested) {
         const test = queue.pop()!;
+        run.started(test);
 
         // Skip tests the user asked to exclude
         if (request.exclude?.includes(test)) {
@@ -334,15 +376,21 @@ const runHandler = async (
         try {
             const data = testData.get(test);
 
-            await runTest(test);
+            const result = await runTest(test, run);
 
-            run.passed(test, Date.now() - start);
+            if (result === "skipped") {
+                run.skipped(test);
+            } else {
+                run.passed(test, Date.now() - start);
+            }
         } catch (e: any) {
             run.failed(
                 test,
                 new vscode.TestMessage(e.message),
                 Date.now() - start,
             );
+
+            run.appendOutput(e.output);
         }
 
         // switch (getType(test)) {

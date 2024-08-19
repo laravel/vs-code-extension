@@ -1,7 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getAppBindings } from "../repositories/appBinding";
 import { wordMatchRegex } from "./../support/patterns";
 

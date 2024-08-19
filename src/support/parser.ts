@@ -1,5 +1,8 @@
+import * as cp from "child_process";
+import * as os from "os";
 import engine from "php-parser";
-import { ParsingResult } from "..";
+import ParsingResult from "../parser/ParsingResult";
+import { info } from "./logger";
 
 // TODO: Problem?
 // @ts-ignore
@@ -528,61 +531,131 @@ export const getNormalizedTokens = (code: string): TokenFormatted[] => {
         .filter((token: Token) => token[0] !== "T_WHITESPACE");
 };
 
-export const parse = (code: string, depth = 0): ParsingResult | null => {
-    const tokens = parser
-        .tokenGetAll(code)
-        .map((token: Token) => {
-            if (typeof token === "string") {
-                return ["T_CUSTOM_STRING", token, -1];
-            }
+export const parseFaultTolerant = (code: string): Promise<ParsingResult> => {
+    // const path = __dirname + "/../../current-code.txt";
+    // fs.writeFileSync(path, code);
 
-            return token;
-        })
-        .filter((token: Token) => token[0] !== "T_WHITESPACE")
-        .reverse();
-
-    const firstToken = tokens.shift();
-
-    // TODO: What about other triggers? Like blade or variable auto complete?
-    if (
-        firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
-        firstToken[1] !== '"'
-    ) {
-        // We are only concerned with ' and " as the trigger
-        return null;
-    }
+    // TODO: Make sure all of these replacements are necessary
+    // (also is there no escape quotes/backslashes function in JS?)
+    let replacements: [string | RegExp, string][] = [
+        // [/\<\?php/g, ""],
+        [/;;/g, ";"],
+    ];
 
     if (
-        firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
-        ![",", "(", "["].includes(tokens[0][1])
+        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+            os.platform().includes(unixPlatforms),
+        )
     ) {
-        // This is the closing quote, we are not interested in this
-        return null;
+        replacements.push([/\$/g, "\\$"]);
+        replacements.push([/\\'/g, "\\\\'"]);
+        replacements.push([/\\"/g, '\\\\"']);
     }
 
-    let [result, params] = getInitialResult(tokens, depth);
+    replacements.push([/\"/g, '\\"']);
 
-    const classDefinition = getClassDefinition(tokens);
+    replacements.forEach((replacement) => {
+        code = code.replace(replacement[0], replacement[1]);
+    });
 
-    if (classDefinition) {
-        result = {
-            ...(result ?? parsingResultDefaultObject()),
-            ...classDefinition,
-            functionDefinition: getFunctionDefinition(tokens) || null,
-        };
+    let command = `php /Users/joetannenbaum/Dev/vs-code/parser/parse-cli.php "${code}"`;
+
+    info("ft command ", command);
+
+    const result = cp.execSync(command).toString();
+
+    info("ft result ", result);
+
+    return new Promise<ParsingResult>(function (resolve, error) {
+        cp.exec(
+            command,
+            {
+                cwd: __dirname,
+            },
+            (err, stdout, stderr) => {
+                if (err === null) {
+                    console.log("parsing result", JSON.parse(stdout));
+                    return resolve(new ParsingResult(JSON.parse(stdout)));
+                }
+
+                const errorOutput = stderr.length > 0 ? stderr : stdout;
+
+                error(errorOutput);
+            },
+        );
+    });
+};
+
+// export const parse = (code: string, depth = 0): ParsingResult | null => {
+//     return parseFaultTolerant(code);
+
+const currentlyParsing = new Map<string, Promise<ParsingResult>>();
+
+export const parse = (code: string, depth = 0): Promise<ParsingResult> => {
+    if (currentlyParsing.has(code)) {
+        return currentlyParsing.get(code) as Promise<ParsingResult>;
     }
 
-    if (!result) {
-        return null;
-    }
+    const promise = parseFaultTolerant(code);
 
-    const finalParams = parseParamsFromResults(params);
+    currentlyParsing.set(code, promise);
 
-    result.parameters = finalParams.parameters;
-    result.param.index = finalParams.parameters.length;
-    result.param.keys = finalParams.keys;
-    result.param.isArray = finalParams.isArray;
-    result.param.isKey = finalParams.isKey;
+    return promise;
 
-    return result;
+    // const tokens = parser
+    //     .tokenGetAll(code)
+    //     .map((token: Token) => {
+    //         if (typeof token === "string") {
+    //             return ["T_CUSTOM_STRING", token, -1];
+    //         }
+
+    //         return token;
+    //     })
+    //     .filter((token: Token) => token[0] !== "T_WHITESPACE")
+    //     .reverse();
+
+    // const firstToken = tokens.shift();
+
+    // // TODO: What about other triggers? Like blade or variable auto complete?
+    // if (
+    //     firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
+    //     firstToken[1] !== '"'
+    // ) {
+    //     // We are only concerned with ' and " as the trigger
+    //     return null;
+    // }
+
+    // if (
+    //     firstToken[0] === "T_CONSTANT_ENCAPSED_STRING" &&
+    //     ![",", "(", "["].includes(tokens[0][1])
+    // ) {
+    //     // This is the closing quote, we are not interested in this
+    //     return null;
+    // }
+
+    // let [result, params] = getInitialResult(tokens, depth);
+
+    // const classDefinition = getClassDefinition(tokens);
+
+    // if (classDefinition) {
+    //     result = {
+    //         ...(result ?? parsingResultDefaultObject()),
+    //         ...classDefinition,
+    //         functionDefinition: getFunctionDefinition(tokens) || null,
+    //     };
+    // }
+
+    // if (!result) {
+    //     return null;
+    // }
+
+    // const finalParams = parseParamsFromResults(params);
+
+    // result.parameters = finalParams.parameters;
+    // result.param.index = finalParams.parameters.length;
+    // result.param.keys = finalParams.keys;
+    // result.param.isArray = finalParams.isArray;
+    // result.param.isKey = finalParams.isKey;
+
+    // return result;
 };

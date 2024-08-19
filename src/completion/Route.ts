@@ -1,7 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getControllers } from "../repositories/controllers";
 import { getMiddleware } from "../repositories/middleware";
 import { getRoutes } from "../repositories/routes";
@@ -36,11 +37,11 @@ export default class Route implements CompletionProvider {
     }
 
     autoCompleteAction(result: ParsingResult): boolean {
-        if (result.fqn !== "Illuminate\\Support\\Facades\\Route") {
+        if (result.class() !== "Illuminate\\Support\\Facades\\Route") {
             return false;
         }
 
-        if (result.function === null) {
+        if (result.func() === null) {
             return false;
         }
 
@@ -53,15 +54,16 @@ export default class Route implements CompletionProvider {
             "options",
             "any",
             "match",
-        ].includes(result.function);
+        ].includes(result.func()!);
     }
 
     autoCompleteActionParam(result: ParsingResult): boolean {
-        if (result.function === "match") {
-            return result.param.index === 2;
+        // TODO: This is a bit confusing, maybe we include in the result the index of the parameter we're on?
+        if (result.func() === "match") {
+            return result.isParamIndex(2);
         }
 
-        return result.param.index === 1;
+        return result.isParamIndex(1);
     }
 
     provideCompletionItems(
@@ -100,7 +102,7 @@ export default class Route implements CompletionProvider {
                 });
         }
 
-        if (result.function === "middleware") {
+        if (result.func() === "middleware") {
             return Object.entries(getMiddleware().items).map(([key, value]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -118,10 +120,10 @@ export default class Route implements CompletionProvider {
             });
         }
 
-        if (result.param.index === 1) {
+        if (result.isParamIndex(1)) {
             // Route parameters autocomplete
             return getRoutes()
-                .items.filter((route) => route.name === result.parameters[0])
+                .items.filter((route) => route.name === result.param(0).value)
                 .map((route) => {
                     return route.parameters.map((parameter: string) => {
                         let completionItem = new vscode.CompletionItem(

@@ -1,8 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getTranslations } from "../repositories/translations";
+import { info } from "../support/logger";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Translation implements CompletionProvider {
@@ -31,7 +33,8 @@ export default class Translation implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.param.index === 1) {
+        if (result.isParamIndex(1)) {
+            info("Translation", "Parameter index 1");
             return this.getParameterCompletionItems(result, document, position);
         }
 
@@ -59,17 +62,20 @@ export default class Translation implements CompletionProvider {
         document: vscode.TextDocument,
         position: vscode.Position,
     ): vscode.CompletionItem[] {
-        if (!result.param.isKey) {
+        info("is key", result.fillingInArrayKey());
+        if (!result.fillingInArrayKey()) {
             return [];
         }
 
         // Parameters autocomplete
         return Object.entries(getTranslations().items)
-            .filter(([key, value]) => key === result.parameters[0])
+            .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
                 return value.default.params
                     .filter((param) => {
-                        return !result.param.keys.includes(param);
+                        return true;
+                        // TODO: Fix this....
+                        // return !result.param.keys.includes(param);
                     })
                     .map((param) => {
                         let completionItem = new vscode.CompletionItem(

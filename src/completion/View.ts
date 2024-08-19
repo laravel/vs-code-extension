@@ -2,7 +2,8 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getViews } from "./../repositories/views";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -46,15 +47,12 @@ export default class View implements CompletionProvider {
     ): vscode.CompletionItem[] {
         const views = getViews().items;
 
-        if (
-            result.function &&
-            ["@section", "@push"].includes(result.function)
-        ) {
-            return this.getYields(result.function, document.getText());
+        if (result.func() && ["@section", "@push"].includes(result.func()!)) {
+            return this.getYields(result.func()!, document.getText());
         }
 
-        if (["renderWhen", "renderUnless"].find((f) => f === result.function)) {
-            if (result.param.index !== 1) {
+        if (["renderWhen", "renderUnless"].find((f) => f === result.func())) {
+            if (!result.isParamIndex(1)) {
                 return [];
             }
 
@@ -73,7 +71,7 @@ export default class View implements CompletionProvider {
             });
         }
 
-        if (result.param.index === 0) {
+        if (result.isParamIndex(0)) {
             return Object.entries(views).map(([key]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -90,14 +88,14 @@ export default class View implements CompletionProvider {
         }
 
         if (
-            typeof views[result.parameters[0]] === "undefined" ||
-            !result.param.isKey
+            typeof views[result.param(0).value] === "undefined" ||
+            !result.fillingInArrayKey()
         ) {
             return [];
         }
 
         let viewContent = fs.readFileSync(
-            views[result.parameters[0]].uri.path,
+            views[result.param(0).value].uri.path,
             "utf8",
         );
 

@@ -18,6 +18,8 @@ export const showErrorPopup = (...errors: string[]) => {
 
     lastErrorMessageShownAt = Date.now() / 1000;
 
+    return;
+
     vscode.window
         .showErrorMessage(
             "Laravel VS Code error",

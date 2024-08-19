@@ -1,13 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {
-    CompletionProvider,
-    Eloquent as EloquentType,
-    ParsingResult,
-    Tags,
-} from "..";
-import { parse } from "../support/parser";
+import { CompletionProvider, Eloquent as EloquentType, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -64,23 +59,44 @@ export default class Eloquent implements CompletionProvider {
     }
 
     provideCompletionItems(
-        result: ParsingResult<ParsingResult[]>,
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let finalResult = result.additionalInfo?.pop() || result;
+        const info = result.getInfo("eloquent");
 
-        const model = getModels().items[finalResult.fqn || ""];
+        console.log("Eloquent info", info);
+
+        const className = info?.class || result.class();
+
+        if (className && !result.func() && getModels().items[className]) {
+            if (result.currentParamIsArray() && result.fillingInArrayKey()) {
+                return this.getFillableAttributeCompletionItems(
+                    result,
+                    document,
+                    position,
+                    getModels().items[className],
+                );
+            }
+
+            return [];
+        }
+
+        if (!className || !result.func()) {
+            return [];
+        }
+
+        const model = getModels().items[className];
 
         // If we can't find the model, we can't provide completions
         if (!model) {
             return [];
         }
 
-        if (this.anyParamMethods.includes(finalResult.function || "")) {
-            if (finalResult.param.index === 0) {
+        if (this.anyParamMethods.includes(result.func()!)) {
+            if (result.isParamIndex(0)) {
                 return this.getAttributeCompletionItems(
                     document,
                     position,
@@ -89,44 +105,54 @@ export default class Eloquent implements CompletionProvider {
             }
 
             return this.getFillableAttributeCompletionItems(
+                result,
                 document,
                 position,
                 model,
             );
         }
 
-        if (this.firstParamMethods.includes(finalResult.function || "")) {
-            if (finalResult.param.index > 0) {
+        if (this.firstParamMethods.includes(result.func()!)) {
+            if (result.paramIndex() > 0) {
                 return [];
             }
 
-            if (
-                ["create", "make", "fill"].includes(finalResult.function || "")
-            ) {
-                return this.getFillableAttributeCompletionItems(
-                    document,
-                    position,
-                    model,
-                );
+            if (["create", "make", "fill"].includes(result.func()!)) {
+                if (
+                    result.currentParamIsArray() &&
+                    result.fillingInArrayKey()
+                ) {
+                    return this.getFillableAttributeCompletionItems(
+                        result,
+                        document,
+                        position,
+                        model,
+                    );
+                }
+
+                return [];
             }
 
             return this.getAttributeCompletionItems(document, position, model);
         }
 
-        if (this.relationMethods.includes(finalResult.function || "")) {
-            if (finalResult.param.index > 0) {
+        if (this.relationMethods.includes(result.func()!)) {
+            if (result.paramIndex() > 0) {
                 return [];
             }
 
-            if (!finalResult.param.isArray || finalResult.param.isKey) {
+            if (!result.currentParamIsArray() || result.fillingInArrayKey()) {
                 return this.getRelationshipCompletionItems(
+                    result,
                     document,
                     position,
                     model,
                 );
             }
 
-            const relationKey = finalResult.param.keys.pop();
+            const relationKey = result.param().value;
+
+            info("Relation key", relationKey);
 
             if (!relationKey) {
                 return [];
@@ -155,19 +181,73 @@ export default class Eloquent implements CompletionProvider {
     customCheck(
         result: ParsingResult,
         document: string,
-    ): ParsingResult[] | false {
-        let results: ParsingResult[] = [];
-        let customResult: ParsingResult | null;
+    ): ParsingResult | false {
+        const func = result.func();
 
-        do {
-            customResult = parse(document, results.length);
-
-            if (customResult) {
-                results.push(customResult);
+        if (!func) {
+            if (result.class() && getModels().items[result.class()!]) {
+                // We are probably in an object instantiation
+                return result;
             }
-        } while (this.isValidResult(customResult));
 
-        return results.length === 0 ? false : results;
+            return false;
+        }
+
+        if (!this.getAllFunctions().includes(func)) {
+            return false;
+        }
+
+        let foundClass = null;
+
+        // We have a method we're interested in, let's see if we can find a class
+        result.loop((context) => {
+            if (context.classUsed === null) {
+                return true;
+            }
+
+            if (getModels().items[context.classUsed]) {
+                console.log("Found class", context.classUsed);
+
+                if (
+                    context.methodUsed &&
+                    this.relationMethods.includes(context.methodUsed)
+                ) {
+                    const lastArg =
+                        context.methodExistingArgs[
+                            context.methodExistingArgs.length - 1
+                        ].value;
+
+                    if (Array.isArray(lastArg) && lastArg.length > 0) {
+                        const relationKey =
+                            lastArg[lastArg.length - 1].key.value;
+
+                        if (relationKey) {
+                            const relation = getModels().items[
+                                context.classUsed
+                            ].relations.find(
+                                (relation) => relation.name === relationKey,
+                            );
+
+                            if (relation) {
+                                foundClass = relation.related;
+                            }
+                        }
+                    }
+                } else {
+                    foundClass = context.classUsed;
+                }
+            }
+
+            return false;
+        });
+
+        if (foundClass) {
+            result.addInfo("eloquent", { class: foundClass });
+
+            return result;
+        }
+
+        return false;
     }
 
     private getAllFunctions(): string[] {
@@ -181,13 +261,13 @@ export default class Eloquent implements CompletionProvider {
             return false;
         }
 
-        if (!result.function) {
+        if (!result.func()) {
             return false;
         }
 
         return (
             typeof this.tags().find((tag) => {
-                if (result.fqn && tag.class !== result.fqn) {
+                if (result.func() && tag.class !== result.func()) {
                     return false;
                 }
 
@@ -195,20 +275,27 @@ export default class Eloquent implements CompletionProvider {
                     return false;
                 }
 
-                return tag.functions.includes(result.function || "");
+                return tag.functions.includes(result.func() || "");
             }) !== "undefined"
         );
     }
 
     private getRelationshipCompletionItems(
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         model: EloquentType.Model,
     ): vscode.CompletionItem[] {
+        console.log("we here...");
+        console.log("current keys", result.currentParamArrayKeys());
         return this.getCompletionItems(
             document,
             position,
-            model.relations.map((relation) => relation.name),
+            model.relations
+                .map((relation) => relation.name)
+                .filter(
+                    (name) => !result.currentParamArrayKeys().includes(name),
+                ),
             vscode.CompletionItemKind.Value,
         );
     }
@@ -233,6 +320,7 @@ export default class Eloquent implements CompletionProvider {
     }
 
     private getFillableAttributeCompletionItems(
+        result: ParsingResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         model: EloquentType.Model,
@@ -242,7 +330,10 @@ export default class Eloquent implements CompletionProvider {
             position,
             model.attributes
                 .filter((attribute) => attribute.fillable)
-                .map((attribute) => attribute.name),
+                .map((attribute) => attribute.name)
+                .filter(
+                    (name) => !result.currentParamArrayKeys().includes(name),
+                ),
         );
     }
 

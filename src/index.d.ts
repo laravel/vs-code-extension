@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import ParsingResult from "./parser/ParsingResult";
 
 type Tags = Tag[];
 

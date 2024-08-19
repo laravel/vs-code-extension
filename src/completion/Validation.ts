@@ -1,7 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult, Tags } from "..";
+import { CompletionProvider, Tags } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Validation implements CompletionProvider {
@@ -117,11 +118,11 @@ export default class Validation implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.function === "validate") {
+        if (result.isFunc("validate")) {
             return this.handleValidateMethod(document, position, result);
         }
 
-        if (result.function === "sometimes") {
+        if (result.isFunc("sometimes")) {
             return this.validatorValidation(document, position, result) || [];
         }
 
@@ -135,14 +136,14 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: ParsingResult,
     ): vscode.CompletionItem[] {
-        if (result.param.isKey) {
+        if (result.fillingInArrayKey()) {
             // We only fill in values for the validate method, abort
             return [];
         }
 
         if (
-            result.fqn === "Illuminate\\Support\\Facades\\Request" &&
-            result.param.index === 0
+            result.isClass("Illuminate\\Support\\Facades\\Request") &&
+            result.isParamIndex(0)
         ) {
             return this.getRules(document, position);
         }
@@ -156,8 +157,8 @@ export default class Validation implements CompletionProvider {
         result: ParsingResult,
     ): vscode.CompletionItem[] | undefined {
         if (
-            result.fqn === "Illuminate\\Support\\Facades\\Validator" &&
-            result.param.index === 1
+            result.isClass("Illuminate\\Support\\Facades\\Validator") &&
+            result.isParamIndex(1)
         ) {
             return this.getRules(document, position);
         }

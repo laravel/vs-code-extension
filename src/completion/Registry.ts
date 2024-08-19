@@ -1,8 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, ParsingResult } from "..";
-import { info } from "../support/logger";
+import { CompletionProvider } from "..";
+import ParsingResult from "../parser/ParsingResult";
 import { parse } from "./../support/parser";
 
 export default class Registry implements vscode.CompletionItemProvider {
@@ -24,39 +24,32 @@ export default class Registry implements vscode.CompletionItemProvider {
             new vscode.Range(0, 0, position.line, position.character),
         );
 
-        const parseResult = parse(docUntilPosition);
+        return parse(docUntilPosition).then((parseResult) => {
+            if (parseResult === null) {
+                return [];
+            }
 
-        info("Parse result", parseResult);
+            let provider = this.getProviderFromResult(parseResult);
 
-        if (parseResult === null) {
-            return [];
-        }
+            if (!provider) {
+                provider = this.getProviderByFallback(
+                    parseResult,
+                    docUntilPosition,
+                );
+            }
 
-        let provider = this.getProviderFromResult(parseResult);
-        let additionalInfo = null;
+            if (!provider) {
+                return [];
+            }
 
-        if (!provider) {
-            [provider, additionalInfo] = this.getProviderByFallback(
+            return provider.provideCompletionItems(
                 parseResult,
-                docUntilPosition,
+                document,
+                position,
+                token,
+                context,
             );
-        }
-
-        if (!provider) {
-            return [];
-        }
-
-        if (additionalInfo) {
-            parseResult.additionalInfo = additionalInfo;
-        }
-
-        return provider.provideCompletionItems(
-            parseResult,
-            document,
-            position,
-            token,
-            context,
-        );
+        });
     }
 
     private getProviderByClassOrFunction(
@@ -64,14 +57,14 @@ export default class Registry implements vscode.CompletionItemProvider {
     ): CompletionProvider | null {
         return (
             this.providers.find((provider) => {
-                if (parseResult.fqn) {
+                if (parseResult.class()) {
                     return provider
                         .tags()
                         .find(
                             (tag) =>
-                                tag.class === parseResult.fqn &&
+                                tag.class === parseResult.class() &&
                                 (tag.functions || []).find(
-                                    (fn) => fn === parseResult.function,
+                                    (fn) => fn === parseResult.func(),
                                 ),
                         );
                 }
@@ -82,7 +75,7 @@ export default class Registry implements vscode.CompletionItemProvider {
                         (tag) =>
                             !tag.class &&
                             (tag.functions || []).find(
-                                (fn) => fn === parseResult.function,
+                                (fn) => fn === parseResult.func(),
                             ),
                     );
             }) || null
@@ -92,7 +85,7 @@ export default class Registry implements vscode.CompletionItemProvider {
     private getProviderByFallback(
         parseResult: ParsingResult,
         document: string,
-    ): [CompletionProvider | null, any] {
+    ): CompletionProvider | null {
         for (const provider of this.providers) {
             if (!provider.customCheck) {
                 continue;
@@ -101,11 +94,11 @@ export default class Registry implements vscode.CompletionItemProvider {
             const result = provider.customCheck(parseResult, document);
 
             if (result !== false) {
-                return [provider, result];
+                return provider;
             }
         }
 
-        return [null, null];
+        return null;
     }
 
     private getProviderFromResult(
