@@ -1,212 +1,322 @@
 {
-  "name": "laravel",
-  "displayName": "Laravel",
-  "description": "Official VS Code extension for Laravel",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.89.0"
-  },
-  "homepage": "https://github.com/laravel/vs-code-extension",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/laravel/vs-code-extension"
-  },
-  "bugs": {
-    "url": "https://github.com/laravel/vs-code-extension/issues"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onLanguage:php"
-  ],
-  "main": "./out/extension.js",
-  "grammars": [
-    {
-      "language": "blade",
-      "scopeName": "text.html.php.blade",
-      "path": "./syntaxes/blade.tmLanguage.json",
-      "embeddedLanguages": {
-        "source.php": "php",
-        "source.css": "css",
-        "source.js": "javascript"
-      }
-    }
-  ],
-  "contributes": {
-    "languages": [
-      {
-        "id": "blade",
-        "aliases": [
-          "Blade",
-          "blade"
-        ],
-        "extensions": [
-          ".blade.php"
-        ],
-        "configuration": "./blade.configuration.json"
-      }
+    "name": "laravel",
+    "publisher": "Laravel",
+    "displayName": "Laravel",
+    "description": "Official VS Code extension for Laravel",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.89.0"
+    },
+    "homepage": "https://github.com/laravel/vs-code-extension",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/laravel/vs-code-extension"
+    },
+    "bugs": {
+        "url": "https://github.com/laravel/vs-code-extension/issues"
+    },
+    "categories": [
+        "Other"
     ],
+    "activationEvents": [
+        "onLanguage:php"
+    ],
+    "main": "./out/extension.js",
     "grammars": [
-      {
-        "language": "blade",
-        "scopeName": "text.html.php.blade",
-        "path": "./syntaxes/blade.tmLanguage.json",
-        "embeddedLanguages": {
-          "source.php": "php",
-          "source.css": "css",
-          "source.js": "javascript"
+        {
+            "language": "blade",
+            "scopeName": "text.html.php.blade",
+            "path": "./syntaxes/blade.tmLanguage.json",
+            "embeddedLanguages": {
+                "source.php": "php",
+                "source.css": "css",
+                "source.js": "javascript"
+            }
         }
-      }
     ],
-    "configuration": [
-      {
-        "title": "Laravel",
-        "type": "object",
-        "properties": {
-          "Laravel.customValidationRules": {
-            "type": "object",
-            "default": {},
-            "description": "Custom validation rules snippets."
-          },
-          "Laravel.viewDirectorySeparator": {
-            "type": "string",
-            "default": ".",
-            "description": ". or /"
-          },
-          "Laravel.phpCommand": {
-            "type": "string",
-            "default": "php -r \"{code}\"",
-            "description": "PHP Command using to run PHP codes"
-          },
-          "Laravel.basePath": {
-            "type": "string",
-            "description": "Base path using to read files."
-          },
-          "Laravel.basePathForCode": {
-            "type": "string",
-            "description": "This base path using for require_once inside PHP code."
-          },
-          "Laravel.modelsPaths": {
-            "type": "array",
-            "default": [
-              "app",
-              "app/Models"
-            ],
-            "description": "Path of models you put your model codes."
-          },
-          "Laravel.modelVariables": {
-            "type": "object",
-            "default": {
-              "user": "App\\Models\\User"
+    "contributes": {
+        "languages": [
+            {
+                "id": "blade",
+                "aliases": [
+                    "Blade",
+                    "blade"
+                ],
+                "extensions": [
+                    ".blade.php"
+                ],
+                "configuration": "./blade.configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "blade",
+                "scopeName": "text.html.php.blade",
+                "path": "./syntaxes/blade.tmLanguage.json",
+                "embeddedLanguages": {
+                    "source.php": "php",
+                    "source.css": "css",
+                    "source.js": "javascript"
+                }
+            }
+        ],
+        "configuration": {
+            "title": "Laravel",
+            "properties": {
+                "Laravel.somethingElse": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable the somethingElse feature."
+                },
+                "Laravel.appBinding.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for appBinding."
+                },
+                "Laravel.appBinding.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for appBinding."
+                },
+                "Laravel.appBinding.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for appBinding."
+                },
+                "Laravel.asset.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for asset."
+                },
+                "Laravel.asset.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for asset."
+                },
+                "Laravel.asset.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for asset."
+                },
+                "Laravel.auth.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for auth."
+                },
+                "Laravel.auth.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for auth."
+                },
+                "Laravel.auth.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for auth."
+                },
+                "Laravel.config.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for config."
+                },
+                "Laravel.config.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for config."
+                },
+                "Laravel.config.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for config."
+                },
+                "Laravel.controllerAction.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for controllerAction."
+                },
+                "Laravel.controllerAction.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for controllerAction."
+                },
+                "Laravel.controllerAction.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for controllerAction."
+                },
+                "Laravel.env.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for env."
+                },
+                "Laravel.env.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for env."
+                },
+                "Laravel.env.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for env."
+                },
+                "Laravel.inertia.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for inertia."
+                },
+                "Laravel.inertia.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for inertia."
+                },
+                "Laravel.inertia.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for inertia."
+                },
+                "Laravel.middleware.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for middleware."
+                },
+                "Laravel.middleware.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for middleware."
+                },
+                "Laravel.middleware.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for middleware."
+                },
+                "Laravel.mix.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for mix."
+                },
+                "Laravel.mix.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for mix."
+                },
+                "Laravel.mix.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for mix."
+                },
+                "Laravel.route.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for route."
+                },
+                "Laravel.route.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for route."
+                },
+                "Laravel.route.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for route."
+                },
+                "Laravel.translation.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for translation."
+                },
+                "Laravel.translation.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for translation."
+                },
+                "Laravel.translation.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for translation."
+                },
+                "Laravel.view.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable diagnostics for view."
+                },
+                "Laravel.view.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable hover information for view."
+                },
+                "Laravel.view.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable linking for view."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "laravel.run-test",
+                "title": "Laravel: Run Test at Cursor",
+                "icon": "$(play)"
             },
-            "description": "Variables that should provide model autocomplete."
-          },
-          "Laravel.modelAttributeCase": {
-            "type": "string",
-            "enum": [
-              "default",
-              "snake",
-              "camel"
-            ],
-            "default": "default",
-            "description": "Change attribute name case to snake or camel."
-          },
-          "Laravel.modelAccessorCase": {
-            "type": "string",
-            "enum": [
-              "default",
-              "snake",
-              "camel"
-            ],
-            "default": "snake",
-            "description": "Change accessor name case to snake or camel."
-          },
-          "Laravel.disableBlade": {
-            "type": "boolean",
-            "default": false,
-            "description": "If you want to disable blade directives autocomplete set this to true."
-          },
-          "Laravel.disableAuth": {
-            "type": "boolean",
-            "default": false,
-            "description": "If you want to disable authorization autocomplete set this to true."
-          },
-          "Laravel.disableErrorAlert": {
-            "type": "boolean",
-            "default": false,
-            "description": "Hide error alerts when extension can't get data from your application."
-          }
-        }
-      }
-    ],
-    "commands": [
-      {
-        "command": "laravel.run-test",
-        "title": "Laravel: Run Test at Cursor",
-        "icon": "$(play)"
-      },
-      {
-        "command": "laravel.run-test-file",
-        "title": "Laravel: Run Tests in File"
-      },
-      {
-        "command": "laravel.run-test-suite",
-        "title": "Laravel: Run Test Suite"
-      },
-      {
-        "command": "laravel.run-test-previous",
-        "title": "Laravel: Run Previous Test"
-      }
-    ],
-    "keybindings": [
-      {
-        "key": "cmd+k cmd+r",
-        "command": "laravel.run",
-        "when": "editorLangId == php"
-      },
-      {
-        "key": "cmd+k cmd+f",
-        "command": "laravel.run-file",
-        "when": "editorLangId == php"
-      },
-      {
-        "key": "cmd+k cmd+p",
-        "command": "laravel.run-previous",
-        "when": "editorLangId == php"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test",
-    "copy-files": "copyfiles -u 1 src/templates/*.php out",
-    "postbuild": "npm run copy-files"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.6",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.89.0",
-    "@typescript-eslint/eslint-plugin": "^7.7.1",
-    "@typescript-eslint/parser": "^7.7.1",
-    "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.3.9",
-    "copyfiles": "^2.4.1",
-    "esbuild": "^0.21.5",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "glob": "^10.4.1",
-    "npm-run-all": "^4.1.5",
-    "php-parser": "^3.1.5",
-    "vscode-html-languageservice": "^5.2.0",
-    "vscode-languageclient": "^9.0.1",
-    "vscode-languageserver-textdocument": "^1.0.11",
-    "vscode-languageserver-types": "^3.17.5"
-  }
+            {
+                "command": "laravel.run-test-file",
+                "title": "Laravel: Run Tests in File"
+            },
+            {
+                "command": "laravel.run-test-suite",
+                "title": "Laravel: Run Test Suite"
+            },
+            {
+                "command": "laravel.run-test-previous",
+                "title": "Laravel: Run Previous Test"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "cmd+k cmd+r",
+                "command": "laravel.run",
+                "when": "editorLangId == php"
+            },
+            {
+                "key": "cmd+k cmd+f",
+                "command": "laravel.run-file",
+                "when": "editorLangId == php"
+            },
+            {
+                "key": "cmd+k cmd+p",
+                "command": "laravel.run-previous",
+                "when": "editorLangId == php"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "vscode-test",
+        "copy-files": "copyfiles -u 1 src/templates/*.php out",
+        "postbuild": "npm run copy-files"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.6",
+        "@types/node": "18.x",
+        "@types/vscode": "^1.89.0",
+        "@typescript-eslint/eslint-plugin": "^7.7.1",
+        "@typescript-eslint/parser": "^7.7.1",
+        "@vscode/test-cli": "^0.0.9",
+        "@vscode/test-electron": "^2.3.9",
+        "copyfiles": "^2.4.1",
+        "esbuild": "^0.21.5",
+        "eslint": "^8.57.0",
+        "typescript": "^5.4.5"
+    },
+    "dependencies": {
+        "glob": "^10.4.1",
+        "npm-run-all": "^4.1.5",
+        "php-parser": "^3.1.5",
+        "vscode-html-languageservice": "^5.2.0",
+        "vscode-languageclient": "^9.0.1",
+        "vscode-languageserver-textdocument": "^1.0.11",
+        "vscode-languageserver-types": "^3.17.5"
+    }
 }

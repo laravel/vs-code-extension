@@ -1,0 +1,38 @@
+[
+    {
+        "type": "appBinding"
+    },
+    {
+        "type": "asset"
+    },
+    {
+        "type": "auth"
+    },
+    {
+        "type": "config"
+    },
+    {
+        "type": "controllerAction"
+    },
+    {
+        "type": "env"
+    },
+    {
+        "type": "inertia"
+    },
+    {
+        "type": "middleware"
+    },
+    {
+        "type": "mix"
+    },
+    {
+        "type": "route"
+    },
+    {
+        "type": "translation"
+    },
+    {
+        "type": "view"
+    }
+]
