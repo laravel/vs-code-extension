@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { config } from "./config";
 
 export const internalVendorPath = (path = ""): string => {
     return projectPath(`vendor/_laravel_ide/${path}`);
@@ -20,13 +19,15 @@ export const projectPath = (path = "", forCode = false): string => {
         path = path.substring(1);
     }
 
-    let basePath = config<string>("basePath", "");
+    let basePath = "";
+    // let basePath = config<string>("basePath", "");
 
     if (forCode === false && basePath.length > 0) {
         return resolvePath(basePath, path);
     }
 
-    let basePathForCode = config<string>("basePathForCode", "");
+    let basePathForCode = "";
+    // let basePathForCode = config<string>("basePathForCode", "");
 
     if (forCode && basePathForCode.length > 0) {
         return resolvePath(basePathForCode, path);

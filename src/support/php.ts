@@ -1,7 +1,6 @@
 import * as cp from "child_process";
 import * as os from "os";
 import { TemplateName, getTemplate } from "../templates";
-import { config } from "./config";
 import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import { getWorkspaceFolders, projectPath, projectPathExists } from "./project";
@@ -96,7 +95,8 @@ export const runPhp = (
     });
 
     // TODO: Command template includes {code} placeholder? Hm. Why?
-    let commandTemplate = config<string>("phpCommand", 'php -r "{code}"');
+    let commandTemplate = 'php -r "{code}"';
+    // let commandTemplate = config<string>("phpCommand", 'php -r "{code}"');
 
     let command = commandTemplate.replace("{code}", code);
 

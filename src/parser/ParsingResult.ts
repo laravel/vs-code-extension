@@ -32,6 +32,7 @@ export default class ParsingResult {
             return [];
         }
 
+        // @ts-ignore
         return param.value
             .map((item) => item.key.value)
             .filter((val) => val !== null);

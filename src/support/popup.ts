@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { config } from "./config";
 import { channel, error } from "./logger";
 
-let disableErrorPopup = config<boolean>("disableErrorAlert", false);
+let disableErrorPopup = false;
+// let disableErrorPopup = config<boolean>("disableErrorAlert", false);
 let lastErrorMessageShownAt = 0;
 
 export const showErrorPopup = (...errors: string[]) => {

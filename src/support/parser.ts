@@ -227,157 +227,157 @@ const getNamespace = (tokens: Token[]): string | undefined => {
     return ns[1];
 };
 
-const getClassDefinition = (
-    tokens: TokenFormatted[],
-):
-    | Pick<
-          ParsingResult,
-          "classDefinition" | "classExtends" | "classImplements"
-      >
-    | undefined => {
-    const definitionIndex = tokens.findIndex((token) => token[0] === "T_CLASS");
+// const getClassDefinition = (
+//     tokens: TokenFormatted[],
+// ):
+//     | Pick<
+//           ParsingResult,
+//           "classDefinition" | "classExtends" | "classImplements"
+//       >
+//     | undefined => {
+//     const definitionIndex = tokens.findIndex((token) => token[0] === "T_CLASS");
 
-    if (definitionIndex === -1) {
-        return;
-    }
+//     if (definitionIndex === -1) {
+//         return;
+//     }
 
-    const className = tokens[definitionIndex - 1];
+//     const className = tokens[definitionIndex - 1];
 
-    if (className[0] !== "T_STRING") {
-        return;
-    }
+//     if (className[0] !== "T_STRING") {
+//         return;
+//     }
 
-    const namespace = getNamespace(tokens);
-    const tokensPastClassDefinition = tokens
-        .slice(0, definitionIndex - 1)
-        .reverse();
-    const firstBrace = tokensPastClassDefinition.findIndex(
-        (token) => token[1] === "{",
-    );
+//     const namespace = getNamespace(tokens);
+//     const tokensPastClassDefinition = tokens
+//         .slice(0, definitionIndex - 1)
+//         .reverse();
+//     const firstBrace = tokensPastClassDefinition.findIndex(
+//         (token) => token[1] === "{",
+//     );
 
-    const extendsOrImplements = tokensPastClassDefinition.slice(0, firstBrace);
+//     const extendsOrImplements = tokensPastClassDefinition.slice(0, firstBrace);
 
-    let index = 0;
-    let classExtends;
-    let classImplements: string[] = [];
+//     let index = 0;
+//     let classExtends;
+//     let classImplements: string[] = [];
 
-    while (index < extendsOrImplements.length) {
-        if (extendsOrImplements[index][0] === "T_EXTENDS") {
-            classExtends = getFqn(tokens, extendsOrImplements[index + 1][1]);
-        }
+//     while (index < extendsOrImplements.length) {
+//         if (extendsOrImplements[index][0] === "T_EXTENDS") {
+//             classExtends = getFqn(tokens, extendsOrImplements[index + 1][1]);
+//         }
 
-        if (extendsOrImplements[index][0] === "T_IMPLEMENTS") {
-            let implementsIndex = index + 1;
+//         if (extendsOrImplements[index][0] === "T_IMPLEMENTS") {
+//             let implementsIndex = index + 1;
 
-            while (
-                extendsOrImplements[implementsIndex] &&
-                extendsOrImplements[implementsIndex][0] !== "T_EXTENDS"
-            ) {
-                if (extendsOrImplements[implementsIndex][0] === "T_STRING") {
-                    classImplements.push(
-                        extendsOrImplements[implementsIndex][1],
-                    );
-                }
+//             while (
+//                 extendsOrImplements[implementsIndex] &&
+//                 extendsOrImplements[implementsIndex][0] !== "T_EXTENDS"
+//             ) {
+//                 if (extendsOrImplements[implementsIndex][0] === "T_STRING") {
+//                     classImplements.push(
+//                         extendsOrImplements[implementsIndex][1],
+//                     );
+//                 }
 
-                implementsIndex++;
-            }
-        }
+//                 implementsIndex++;
+//             }
+//         }
 
-        index++;
-    }
+//         index++;
+//     }
 
-    return {
-        classDefinition: [namespace, className[1]]
-            .filter((i) => !!i)
-            .join("\\"),
-        classExtends: classExtends?.fqn ?? null,
-        classImplements: classImplements
-            .map((i) => getFqn(tokens, i).fqn ?? "")
-            .filter((i) => i !== ""),
-    };
-};
+//     return {
+//         classDefinition: [namespace, className[1]]
+//             .filter((i) => !!i)
+//             .join("\\"),
+//         classExtends: classExtends?.fqn ?? null,
+//         classImplements: classImplements
+//             .map((i) => getFqn(tokens, i).fqn ?? "")
+//             .filter((i) => i !== ""),
+//     };
+// };
 
-const parsingResultDefaultObject = (): ParsingResult => {
-    return {
-        class: null,
-        fqn: null,
-        function: null,
-        classDefinition: null,
-        classExtends: null,
-        classImplements: [],
-        functionDefinition: null,
-        additionalInfo: null,
-        param: {
-            index: 0,
-            isArray: false,
-            isKey: false,
-            key: null,
-            keys: [],
-        },
-        parameters: [],
-    };
-};
+// const parsingResultDefaultObject = (): ParsingResult => {
+//     return {
+//         class: null,
+//         fqn: null,
+//         function: null,
+//         classDefinition: null,
+//         classExtends: null,
+//         classImplements: [],
+//         functionDefinition: null,
+//         additionalInfo: null,
+//         param: {
+//             index: 0,
+//             isArray: false,
+//             isKey: false,
+//             key: null,
+//             keys: [],
+//         },
+//         parameters: [],
+//     };
+// };
 
-const getInitialResult = (
-    tokens: TokenFormatted[],
-    depth = 0,
-): [ParsingResult | null, TokenFormatted[]] => {
-    let params = [];
-    let closedParens = 0;
-    let currentDepth = 0;
+// const getInitialResult = (
+//     tokens: TokenFormatted[],
+//     depth = 0,
+// ): [ParsingResult | null, TokenFormatted[]] => {
+//     let params = [];
+//     let closedParens = 0;
+//     let currentDepth = 0;
 
-    for (let i in tokens) {
-        const nextToken = tokens[i];
-        const [type, value, line] = nextToken;
+//     for (let i in tokens) {
+//         const nextToken = tokens[i];
+//         const [type, value, line] = nextToken;
 
-        if (value === ")") {
-            closedParens++;
-            params.push(nextToken);
-            continue;
-        }
+//         if (value === ")") {
+//             closedParens++;
+//             params.push(nextToken);
+//             continue;
+//         }
 
-        if (value !== "(") {
-            params.push(nextToken);
-            continue;
-        }
+//         if (value !== "(") {
+//             params.push(nextToken);
+//             continue;
+//         }
 
-        if (closedParens > 0) {
-            closedParens--;
-            params.push(nextToken);
-            continue;
-        }
+//         if (closedParens > 0) {
+//             closedParens--;
+//             params.push(nextToken);
+//             continue;
+//         }
 
-        if (currentDepth !== depth) {
-            currentDepth++;
-            continue;
-        }
+//         if (currentDepth !== depth) {
+//             currentDepth++;
+//             continue;
+//         }
 
-        // We've found the opening parenthesis
-        const {
-            class: cls,
-            func,
-            fqn,
-        } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
+//         // We've found the opening parenthesis
+//         const {
+//             class: cls,
+//             func,
+//             fqn,
+//         } = extractClassAndFunction(tokens.slice(parseInt(i) + 1));
 
-        let result = parsingResultDefaultObject();
+//         let result = parsingResultDefaultObject();
 
-        if (cls) {
-            result.class = cls;
-        }
+//         if (cls) {
+//             result.class = cls;
+//         }
 
-        if (func) {
-            result.function = func;
-        }
+//         if (func) {
+//             result.function = func;
+//         }
 
-        if (fqn) {
-            result.fqn = fqn;
-        }
+//         if (fqn) {
+//             result.fqn = fqn;
+//         }
 
-        return [result, params];
-    }
+//         return [result, params];
+//     }
 
-    return [null, []];
-};
+//     return [null, []];
+// };
 
 const parseParamsFromResults = (
     params: TokenFormatted[],
@@ -586,12 +586,12 @@ export const parseFaultTolerant = (code: string): Promise<ParsingResult> => {
     });
 };
 
-// export const parse = (code: string, depth = 0): ParsingResult | null => {
-//     return parseFaultTolerant(code);
-
 const currentlyParsing = new Map<string, Promise<ParsingResult>>();
 
-export const parse = (code: string, depth = 0): Promise<ParsingResult> => {
+export const parse = (
+    code: string,
+    depth = 0,
+): Promise<ParsingResult | null> => {
     if (currentlyParsing.has(code)) {
         return currentlyParsing.get(code) as Promise<ParsingResult>;
     }
@@ -616,13 +616,15 @@ export const parse = (code: string, depth = 0): Promise<ParsingResult> => {
 
     // const firstToken = tokens.shift();
 
+    // console.log("firstToken", firstToken);
+
     // // TODO: What about other triggers? Like blade or variable auto complete?
     // if (
     //     firstToken[0] !== "T_CONSTANT_ENCAPSED_STRING" &&
     //     firstToken[1] !== '"'
     // ) {
     //     // We are only concerned with ' and " as the trigger
-    //     return null;
+    //     return Promise.resolve(null);
     // }
 
     // if (
@@ -630,8 +632,14 @@ export const parse = (code: string, depth = 0): Promise<ParsingResult> => {
     //     ![",", "(", "["].includes(tokens[0][1])
     // ) {
     //     // This is the closing quote, we are not interested in this
-    //     return null;
+    //     return Promise.resolve(null);
     // }
+
+    // const promise = parseFaultTolerant(code);
+
+    // currentlyParsing.set(code, promise);
+
+    // return promise;
 
     // let [result, params] = getInitialResult(tokens, depth);
 

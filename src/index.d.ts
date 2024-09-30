@@ -12,25 +12,6 @@ interface Tag {
     classImplements?: string;
 }
 
-interface ParsingResult<AdditionalInfo = any> {
-    class: string | null;
-    fqn: string | null;
-    function: string | null;
-    classDefinition: string | null;
-    classExtends: string | null;
-    classImplements: string[];
-    functionDefinition: string | null;
-    additionalInfo: AdditionalInfo;
-    param: {
-        index: number;
-        isArray: boolean;
-        isKey: boolean;
-        key: string | null;
-        keys: string[];
-    };
-    parameters: string[];
-}
-
 interface Config {
     [key: string]: any;
 }

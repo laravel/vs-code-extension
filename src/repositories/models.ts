@@ -1,10 +1,9 @@
 import { repository } from ".";
 import { Eloquent } from "..";
-import { config } from "../support/config";
 import { writeEloquentDocBlocks } from "../support/docblocks";
 import { runInLaravel, template } from "./../support/php";
 
-const modelPaths = config<string[]>("modelsPaths", ["app", "app/Models"]);
+const modelPaths = ["app", "app/Models"];
 
 const load = () => {
     return runInLaravel<Eloquent.Models>(

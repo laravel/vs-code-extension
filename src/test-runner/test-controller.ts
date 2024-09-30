@@ -258,6 +258,8 @@ const runTest = async (test: vscode.TestItem, run: vscode.TestRun) => {
         // }
 
         args.push("--colors=always");
+        args.push("--configuration");
+        args.push(projectPath("phpunit.xml"));
 
         console.log("running test", projectPath(`vendor/bin/${binary}`), args);
 
@@ -267,6 +269,7 @@ const runTest = async (test: vscode.TestItem, run: vscode.TestRun) => {
         let output = "";
         let failed = false;
 
+        // @ts-ignore
         const processOutput = (data) => {
             const out = data.toString();
             temp += out;

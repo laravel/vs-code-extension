@@ -37,9 +37,11 @@ const collectConfigs = (conf: Config, topLevel = false): ConfigItem[] => {
         const val = getConfigValue(conf, key, uri);
 
         if (val instanceof Array) {
-            result.push(...val);
+            result.push(...val.filter((c) => Number.isNaN(parseInt(c.name))));
         } else {
-            result.push(val);
+            if (Number.isNaN(parseInt(val.name))) {
+                result.push(val);
+            }
         }
     }
 
@@ -75,6 +77,6 @@ export const getConfigs = repository<ConfigItem[]>(
             "Configs",
         ).then((result) => collectConfigs(result, true));
     },
-    "config/{,*,**/*}.php",
+    ["config/{,*,**/*}.php", ".env"],
     [],
 );

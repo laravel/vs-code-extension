@@ -6,6 +6,8 @@ import { info } from "console";
 import { LanguageClient } from "vscode-languageclient/node";
 import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
 import { initClient } from "./blade/client";
+import { Env, openFileCommand } from "./codeAction/env";
+import { Inertia } from "./codeAction/inertia";
 import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
 import GateCompletion from "./completion/Auth";
@@ -140,6 +142,13 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
         ...testRunnerCommands,
         testController,
+        vscode.languages.registerCodeActionsProvider(LANGUAGES, new Inertia(), {
+            providedCodeActionKinds: Inertia.providedCodeActionKinds,
+        }),
+        vscode.languages.registerCodeActionsProvider(LANGUAGES, new Env(), {
+            providedCodeActionKinds: Env.providedCodeActionKinds,
+        }),
+        vscode.commands.registerCommand("laravel.open", openFileCommand),
     );
 }
 
