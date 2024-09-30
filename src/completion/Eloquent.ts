@@ -286,8 +286,6 @@ export default class Eloquent implements CompletionProvider {
         position: vscode.Position,
         model: EloquentType.Model,
     ): vscode.CompletionItem[] {
-        console.log("we here...");
-        console.log("current keys", result.currentParamArrayKeys());
         return this.getCompletionItems(
             document,
             position,

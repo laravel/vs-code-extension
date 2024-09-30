@@ -13,7 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("Env", match[0], range);
+            return notFound("Env", match[0], range, "env");
         });
     });
 };

@@ -43,6 +43,7 @@ export default class Inertia implements CompletionProvider {
         }
 
         if (
+            // @ts-ignore
             typeof views[result.param(0).value] === "undefined" ||
             !result.fillingInArrayKey()
         ) {
@@ -50,21 +51,27 @@ export default class Inertia implements CompletionProvider {
         }
 
         let viewContent = fs.readFileSync(
+            // @ts-ignore
             views[result.param(0).value].uri.path,
             "utf8",
         );
 
-        return this.getPropAutoComplete(viewContent).map((variableName) => {
-            let variablecompletionItem = new vscode.CompletionItem(
-                variableName,
-                vscode.CompletionItemKind.Constant,
-            );
-            variablecompletionItem.range = document.getWordRangeAtPosition(
-                position,
-                wordMatchRegex,
-            );
-            return variablecompletionItem;
-        });
+        return this.getPropAutoComplete(viewContent)
+            .filter(
+                (variableName) =>
+                    !result.currentParamArrayKeys().includes(variableName),
+            )
+            .map((variableName) => {
+                let variablecompletionItem = new vscode.CompletionItem(
+                    variableName,
+                    vscode.CompletionItemKind.Constant,
+                );
+                variablecompletionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+                return variablecompletionItem;
+            });
     }
 
     private getPropAutoComplete(viewContent: string): string[] {

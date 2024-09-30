@@ -13,7 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("View", match[0], range);
+            return notFound("View", match[0], range, "view");
         });
     });
 };

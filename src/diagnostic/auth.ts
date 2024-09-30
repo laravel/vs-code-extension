@@ -11,7 +11,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("Policy", match[0], range);
+            return notFound("Policy", match[0], range, "auth");
         });
     });
 };

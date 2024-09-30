@@ -13,7 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("Middleware", match[0], range);
+            return notFound("Middleware", match[0], range, "middleware");
         });
     });
 };

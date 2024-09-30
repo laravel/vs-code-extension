@@ -23,7 +23,12 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                     return null;
                 }
 
-                return notFound("Controller/Method", match[3], range);
+                return notFound(
+                    "Controller/Method",
+                    match[3],
+                    range,
+                    "controllerAction",
+                );
             });
         },
         3,

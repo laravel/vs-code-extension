@@ -16,7 +16,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                     return null;
                 }
 
-                return notFound("Translation", match[0], range);
+                return notFound("Translation", match[0], range, "translation");
             });
         },
     );

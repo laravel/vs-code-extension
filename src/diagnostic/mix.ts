@@ -13,7 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("Mix manifest item", match[0], range);
+            return notFound("Mix manifest item", match[0], range, "mix");
         });
     });
 };

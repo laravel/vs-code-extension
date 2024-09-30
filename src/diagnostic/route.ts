@@ -13,7 +13,7 @@ const provider = (doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> => {
                 return null;
             }
 
-            return notFound("Route", match[0], range);
+            return notFound("Route", match[0], range, "route");
         });
     });
 };
