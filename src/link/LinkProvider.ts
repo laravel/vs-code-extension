@@ -1,25 +1,25 @@
 "use strict";
 
+import { linkProvider as appBinding } from "@/features/appBinding";
+import { linkProvider as asset } from "@/features/asset";
+import { linkProvider as auth } from "@/features/auth";
+import { linkProvider as config } from "@/features/config";
+import { linkProvider as controllerAction } from "@/features/controllerAction";
+import { linkProvider as env } from "@/features/env";
+import { linkProvider as inertia } from "@/features/inertia";
+import { linkProvider as mix } from "@/features/mix";
+import { linkProvider as route } from "@/features/route";
+import { linkProvider as translation } from "@/features/translation";
+import { linkProvider as view } from "@/features/view";
+import { LinkProvider as LinkProviderType } from "@/index";
+import { config as getConfig } from "@/support/config";
+import { ConfigKey } from "@/support/generated-config";
 import {
     DocumentLink,
     ProviderResult,
     TextDocument,
     DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
-import { LinkProvider as LinkProviderType } from "..";
-import { ConfigKey } from "../support/generated-config";
-import { linkProvider as appBinding } from "./../features/appBinding";
-import { config as getConfig } from "./../support/config";
-import asset from "./asset";
-import auth from "./auth";
-import config from "./config";
-import controllerAction from "./controllerAction";
-import env from "./env";
-import inertia from "./inertia";
-import mix from "./mix";
-import route from "./route";
-import translation from "./translation";
-import view from "./view";
 
 export default class LinkProvider implements vsDocumentLinkProvider {
     private providers: {

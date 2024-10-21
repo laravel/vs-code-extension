@@ -1,5 +1,5 @@
+import { projectPath } from "@/support/project";
 import * as vscode from "vscode";
-import { projectPath } from "../support/project";
 
 export class Inertia implements vscode.CodeActionProvider {
     public static readonly providedCodeActionKinds = [

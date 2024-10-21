@@ -1,18 +1,18 @@
+import { diagnosticProvider as appBinding } from "@/features/appBinding";
+import { diagnosticProvider as asset } from "@/features/asset";
+import { diagnosticProvider as auth } from "@/features/auth";
+import { diagnosticProvider as config } from "@/features/config";
+import { diagnosticProvider as controllerAction } from "@/features/controllerAction";
+import { diagnosticProvider as env } from "@/features/env";
+import { diagnosticProvider as inertia } from "@/features/inertia";
+import { diagnosticProvider as middleware } from "@/features/middleware";
+import { diagnosticProvider as mix } from "@/features/mix";
+import { diagnosticProvider as route } from "@/features/route";
+import { diagnosticProvider as translation } from "@/features/translation";
+import { diagnosticProvider as view } from "@/features/view";
+import { config as getConfig } from "@/support/config";
+import { ConfigKey } from "@/support/generated-config";
 import * as vscode from "vscode";
-import { ConfigKey } from "../support/generated-config";
-import { diagnosticProvider as appBinding } from "./../features/appBinding";
-import { config as getConfig } from "./../support/config";
-import asset from "./asset";
-import auth from "./auth";
-import config from "./config";
-import controllerAction from "./controllerAction";
-import env from "./env";
-import inertia from "./inertia";
-import middleware from "./middleware";
-import mix from "./mix";
-import route from "./route";
-import translation from "./translation";
-import view from "./view";
 
 const collection = vscode.languages.createDiagnosticCollection("laravel");
 

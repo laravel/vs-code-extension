@@ -1,6 +1,6 @@
+import { getEnvExample } from "@/repositories/env-example";
+import { projectPath } from "@/support/project";
 import * as vscode from "vscode";
-import { getEnvExample } from "../repositories/env-example";
-import { projectPath } from "../support/project";
 
 export const openFileCommand = (
     uri: vscode.Uri,

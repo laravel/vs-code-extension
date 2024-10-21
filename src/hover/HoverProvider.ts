@@ -1,5 +1,16 @@
 "use strict";
 
+import { hoverProvider as appBinding } from "@/features/appBinding";
+import { hoverProvider as auth } from "@/features/auth";
+import { hoverProvider as config } from "@/features/config";
+import { hoverProvider as env } from "@/features/env";
+import { hoverProvider as inertia } from "@/features/inertia";
+import { hoverProvider as mix } from "@/features/mix";
+import { hoverProvider as route } from "@/features/route";
+import { hoverProvider as translation } from "@/features/translation";
+import { hoverProvider as view } from "@/features/view";
+import { config as getConfig } from "@/support/config";
+import { ConfigKey } from "@/support/generated-config";
 import {
     Hover,
     Position,
@@ -8,17 +19,6 @@ import {
     HoverProvider as vsHoverProvider,
 } from "vscode";
 import { HoverProvider as ProviderFunc } from "..";
-import { ConfigKey } from "../support/generated-config";
-import { hoverProvider as appBinding } from "./../features/appBinding";
-import { config as getConfig } from "./../support/config";
-import auth from "./auth";
-import config from "./config";
-import env from "./env";
-import inertia from "./inertia";
-import mix from "./mix";
-import route from "./route";
-import translation from "./translation";
-import view from "./view";
 
 export default class HoverProvider implements vsHoverProvider {
     private providers: {
