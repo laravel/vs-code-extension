@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { ConfigKey } from "../support/generated-config";
+import { diagnosticProvider as appBinding } from "./../features/appBinding";
 import { config as getConfig } from "./../support/config";
-import appBinding from "./appBinding";
 import asset from "./asset";
 import auth from "./auth";
 import config from "./config";

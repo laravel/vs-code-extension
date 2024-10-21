@@ -9,8 +9,8 @@ import {
 } from "vscode";
 import { HoverProvider as ProviderFunc } from "..";
 import { ConfigKey } from "../support/generated-config";
+import { hoverProvider as appBinding } from "./../features/appBinding";
 import { config as getConfig } from "./../support/config";
-import appBinding from "./appBinding";
 import auth from "./auth";
 import config from "./config";
 import env from "./env";
