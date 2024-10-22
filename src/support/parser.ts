@@ -24,14 +24,16 @@ let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
 
 export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
     downloadBinary(context).then((path) => {
-        parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+        if (path) {
+            parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+        }
     });
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "2.0.0-beta.2";
-    const filename = `inertia-${binaryVersion}.zip`;
-    const uri = `https://github.com/inertiajs/inertia/archive/refs/tags/v${binaryVersion}.zip`;
+    const binaryVersion = "0.1.0";
+    const filename = `php-parser-${binaryVersion}`;
+    const uri = `/Users/joetannenbaum/Dev/vs-code/parser-zero/bin/${filename}`;
 
     const fileDownloader: FileDownloader = await getApi();
 
@@ -60,17 +62,24 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
         "Downloading binary for Laravel extension",
     );
 
-    const file: vscode.Uri = await fileDownloader.downloadFile(
-        vscode.Uri.parse(uri),
-        filename,
-        context,
-    );
+    try {
+        const file: vscode.Uri = await fileDownloader.downloadFile(
+            vscode.Uri.parse(uri),
+            filename,
+            context,
+        );
 
-    vscode.window.showInformationMessage(
-        "Binary downloaded for Laravel extension",
-    );
+        vscode.window.showInformationMessage(
+            "Binary downloaded for Laravel extension",
+        );
 
-    return file.fsPath;
+        return file.fsPath;
+    } catch (e) {
+        console.log(e);
+        vscode.window.showErrorMessage(
+            "Failed to download binary for Laravel extension",
+        );
+    }
 };
 
 export const getTokens = (code: string): Token[] => {
