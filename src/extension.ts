@@ -8,7 +8,7 @@ import { info } from "console";
 import { LanguageClient } from "vscode-languageclient/node";
 import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
 import { initClient } from "./blade/client";
-import { CodeActionProvider } from "./codeAction/codeActionprovider";
+import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
 import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
