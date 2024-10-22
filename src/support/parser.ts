@@ -1,7 +1,9 @@
+import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
+import ParsingResult from "@src/parser/ParsingResult";
 import * as cp from "child_process";
 import * as os from "os";
 import engine from "php-parser";
-import ParsingResult from "../parser/ParsingResult";
+import * as vscode from "vscode";
 import { info } from "./logger";
 
 // TODO: Problem?
@@ -20,8 +22,55 @@ type Token = string | TokenFormatted;
 
 let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
 
-export const setParserBinaryPath = (path: string) => {
-    parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
+    downloadBinary(context).then((path) => {
+        parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+    });
+};
+
+const downloadBinary = async (context: vscode.ExtensionContext) => {
+    const binaryVersion = "2.0.0-beta.2";
+    const filename = `inertia-${binaryVersion}.zip`;
+    const uri = `https://github.com/inertiajs/inertia/archive/refs/tags/v${binaryVersion}.zip`;
+
+    const fileDownloader: FileDownloader = await getApi();
+
+    const downloadedFiles: vscode.Uri[] =
+        await fileDownloader.listDownloadedItems(context);
+
+    for (const file of downloadedFiles) {
+        // Clean up after ourselves
+        if (!file.fsPath.includes(filename)) {
+            const filename = file.path.split("/").pop();
+
+            if (filename !== undefined) {
+                await fileDownloader.deleteItem(filename, context);
+            }
+        }
+    }
+
+    const downloadedFile: vscode.Uri | undefined =
+        await fileDownloader.tryGetItem(filename, context);
+
+    if (downloadedFile !== undefined) {
+        return downloadedFile.fsPath;
+    }
+
+    vscode.window.showInformationMessage(
+        "Downloading binary for Laravel extension",
+    );
+
+    const file: vscode.Uri = await fileDownloader.downloadFile(
+        vscode.Uri.parse(uri),
+        filename,
+        context,
+    );
+
+    vscode.window.showInformationMessage(
+        "Binary downloaded for Laravel extension",
+    );
+
+    return file.fsPath;
 };
 
 export const getTokens = (code: string): Token[] => {
