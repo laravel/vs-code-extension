@@ -19,7 +19,7 @@ export const viewMatchRegex = (() => {
 })();
 
 export const inertiaMatchRegex = (() => {
-    return funcRegex(["Inertia::(?:render|modal)"]);
+    return funcRegex(["inertia", "Inertia::(?:render|modal)"]);
 })();
 
 export const configMatchRegex = (() => {

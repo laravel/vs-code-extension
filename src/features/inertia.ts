@@ -1,3 +1,4 @@
+import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import { HoverProvider, LinkProvider } from "@src/index";
 import { getInertiaViews } from "@src/repositories/inertia";
@@ -7,10 +8,10 @@ import {
     findWarningsInDoc,
 } from "@src/support/doc";
 import { inertiaMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 
-const linkProvider: LinkProvider = (
+export const linkProvider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
     return findLinksInDoc(doc, inertiaMatchRegex, (match) => {
@@ -18,7 +19,7 @@ const linkProvider: LinkProvider = (
     });
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -37,7 +38,7 @@ const hoverProvider: HoverProvider = (
     });
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return findWarningsInDoc(doc, inertiaMatchRegex, (match, range) => {
@@ -53,4 +54,49 @@ const diagnosticProvider = (
     });
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const codeActionProvider = async (
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (diagnostic.code !== "inertia") {
+        return [];
+    }
+
+    const missingFilename = document.getText(diagnostic.range);
+
+    if (!missingFilename) {
+        return [];
+    }
+
+    const fileUri = vscode.Uri.file(
+        projectPath(`resources/js/Pages/${missingFilename}.vue`),
+    );
+
+    const action = new vscode.CodeAction(
+        "Create missing Inertia view",
+        vscode.CodeActionKind.QuickFix,
+    );
+    action.edit = getEdit(fileUri);
+    action.diagnostics = [diagnostic];
+    action.isPreferred = true;
+    action.command = openFile(fileUri, 1, 0);
+
+    return [action];
+};
+
+const getEdit = (uri: vscode.Uri): vscode.WorkspaceEdit => {
+    const edit = new vscode.WorkspaceEdit();
+
+    edit.createFile(uri, {
+        overwrite: false,
+        contents: Buffer.from(
+            ["<script setup>", "</script>", "<template>", "</template>"].join(
+                "\n\n",
+            ),
+        ),
+    });
+
+    return edit;
+};

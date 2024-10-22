@@ -3,6 +3,13 @@ import ParsingResult from "./parser/ParsingResult";
 
 type Tags = Tag[];
 
+type CodeActionProviderFunction = (
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+) => Promise<vscode.CodeAction[]>;
+
 interface Tag {
     class?: string;
     functions?: string[];

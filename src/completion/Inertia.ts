@@ -14,6 +14,9 @@ export default class Inertia implements CompletionProvider {
                 class: "Inertia\\Inertia",
                 functions: ["render", "modal"],
             },
+            {
+                functions: ["inertia"],
+            },
         ];
     }
 
