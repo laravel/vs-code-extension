@@ -66,6 +66,10 @@ export const testRunnerCommands = [
 
     vscode.tasks.registerTaskProvider("phpunit", {
         provideTasks: () => {
+            if (!globalCommand) {
+                return [];
+            }
+
             return [
                 new vscode.Task(
                     { type: "phpunit", task: "run" },
