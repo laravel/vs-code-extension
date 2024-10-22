@@ -1,7 +1,7 @@
-import { notFound } from "@/diagnostic";
-import { getAssets } from "@/repositories/asset";
-import { findLinksInDoc, findWarningsInDoc } from "@/support/doc";
-import { assetMatchRegex } from "@/support/patterns";
+import { notFound } from "@src/diagnostic";
+import { getAssets } from "@src/repositories/asset";
+import { findLinksInDoc, findWarningsInDoc } from "@src/support/doc";
+import { assetMatchRegex } from "@src/support/patterns";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
 

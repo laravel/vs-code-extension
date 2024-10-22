@@ -1,7 +1,7 @@
-import { notFound } from "@/diagnostic";
-import { getMiddleware } from "@/repositories/middleware";
-import { findWarningsInDoc } from "@/support/doc";
-import { middlewareMatchRegex } from "@/support/patterns";
+import { notFound } from "@src/diagnostic";
+import { getMiddleware } from "@src/repositories/middleware";
+import { findWarningsInDoc } from "@src/support/doc";
+import { middlewareMatchRegex } from "@src/support/patterns";
 import * as vscode from "vscode";
 
 const diagnosticProvider = (

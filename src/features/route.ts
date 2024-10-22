@@ -1,12 +1,12 @@
-import { notFound } from "@/diagnostic";
-import { getRoutes } from "@/repositories/routes";
+import { notFound } from "@src/diagnostic";
+import { getRoutes } from "@src/repositories/routes";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { routeMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { routeMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 

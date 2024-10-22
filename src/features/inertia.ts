@@ -1,13 +1,13 @@
-import { notFound } from "@/diagnostic";
-import { HoverProvider, LinkProvider } from "@/index";
-import { getInertiaViews } from "@/repositories/inertia";
+import { notFound } from "@src/diagnostic";
+import { HoverProvider, LinkProvider } from "@src/index";
+import { getInertiaViews } from "@src/repositories/inertia";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { inertiaMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { inertiaMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 
 const linkProvider: LinkProvider = (

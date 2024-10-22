@@ -1,13 +1,13 @@
-import { notFound } from "@/diagnostic";
-import { getConfigs } from "@/repositories/configs";
+import { notFound } from "@src/diagnostic";
+import { getConfigs } from "@src/repositories/configs";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { getTokens } from "@/support/parser";
-import { configMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { getTokens } from "@src/support/parser";
+import { configMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";

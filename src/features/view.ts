@@ -1,13 +1,13 @@
-import { notFound } from "@/diagnostic";
-import { HoverProvider, LinkProvider } from "@/index";
-import { getViews } from "@/repositories/views";
+import { notFound } from "@src/diagnostic";
+import { HoverProvider, LinkProvider } from "@src/index";
+import { getViews } from "@src/repositories/views";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { viewMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { viewMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 
 const linkProvider: LinkProvider = (

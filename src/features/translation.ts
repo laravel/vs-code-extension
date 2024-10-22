@@ -1,12 +1,12 @@
-import { notFound } from "@/diagnostic";
-import { getTranslations } from "@/repositories/translations";
+import { notFound } from "@src/diagnostic";
+import { getTranslations } from "@src/repositories/translations";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { translationBindingMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { translationBindingMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 

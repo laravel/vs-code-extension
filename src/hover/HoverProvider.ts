@@ -1,16 +1,16 @@
 "use strict";
 
-import { hoverProvider as appBinding } from "@/features/appBinding";
-import { hoverProvider as auth } from "@/features/auth";
-import { hoverProvider as config } from "@/features/config";
-import { hoverProvider as env } from "@/features/env";
-import { hoverProvider as inertia } from "@/features/inertia";
-import { hoverProvider as mix } from "@/features/mix";
-import { hoverProvider as route } from "@/features/route";
-import { hoverProvider as translation } from "@/features/translation";
-import { hoverProvider as view } from "@/features/view";
-import { config as getConfig } from "@/support/config";
-import { ConfigKey } from "@/support/generated-config";
+import { hoverProvider as appBinding } from "@src/features/appBinding";
+import { hoverProvider as auth } from "@src/features/auth";
+import { hoverProvider as config } from "@src/features/config";
+import { hoverProvider as env } from "@src/features/env";
+import { hoverProvider as inertia } from "@src/features/inertia";
+import { hoverProvider as mix } from "@src/features/mix";
+import { hoverProvider as route } from "@src/features/route";
+import { hoverProvider as translation } from "@src/features/translation";
+import { hoverProvider as view } from "@src/features/view";
+import { config as getConfig } from "@src/support/config";
+import { ConfigKey } from "@src/support/generated-config";
 import {
     Hover,
     Position,

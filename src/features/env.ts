@@ -1,12 +1,12 @@
-import { notFound } from "@/diagnostic";
-import { getEnv } from "@/repositories/env";
+import { notFound } from "@src/diagnostic";
+import { getEnv } from "@src/repositories/env";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { envMatchRegex } from "@/support/patterns";
-import { projectPath } from "@/support/project";
+} from "@src/support/doc";
+import { envMatchRegex } from "@src/support/patterns";
+import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 

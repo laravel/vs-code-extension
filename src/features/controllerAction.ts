@@ -1,5 +1,5 @@
-import { notFound } from "@/diagnostic";
-import { findWarningsInDoc } from "@/support/doc";
+import { notFound } from "@src/diagnostic";
+import { findWarningsInDoc } from "@src/support/doc";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
 import { getRoutes } from "../repositories/routes";

@@ -1,5 +1,7 @@
 "use strict";
 
+require("module-alias/register");
+
 import * as vscode from "vscode";
 
 import { info } from "console";

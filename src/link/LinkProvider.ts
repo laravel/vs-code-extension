@@ -1,19 +1,19 @@
 "use strict";
 
-import { linkProvider as appBinding } from "@/features/appBinding";
-import { linkProvider as asset } from "@/features/asset";
-import { linkProvider as auth } from "@/features/auth";
-import { linkProvider as config } from "@/features/config";
-import { linkProvider as controllerAction } from "@/features/controllerAction";
-import { linkProvider as env } from "@/features/env";
-import { linkProvider as inertia } from "@/features/inertia";
-import { linkProvider as mix } from "@/features/mix";
-import { linkProvider as route } from "@/features/route";
-import { linkProvider as translation } from "@/features/translation";
-import { linkProvider as view } from "@/features/view";
-import { LinkProvider as LinkProviderType } from "@/index";
-import { config as getConfig } from "@/support/config";
-import { ConfigKey } from "@/support/generated-config";
+import { linkProvider as appBinding } from "@src/features/appBinding";
+import { linkProvider as asset } from "@src/features/asset";
+import { linkProvider as auth } from "@src/features/auth";
+import { linkProvider as config } from "@src/features/config";
+import { linkProvider as controllerAction } from "@src/features/controllerAction";
+import { linkProvider as env } from "@src/features/env";
+import { linkProvider as inertia } from "@src/features/inertia";
+import { linkProvider as mix } from "@src/features/mix";
+import { linkProvider as route } from "@src/features/route";
+import { linkProvider as translation } from "@src/features/translation";
+import { linkProvider as view } from "@src/features/view";
+import { LinkProvider as LinkProviderType } from "@src/index";
+import { config as getConfig } from "@src/support/config";
+import { ConfigKey } from "@src/support/generated-config";
 import {
     DocumentLink,
     ProviderResult,

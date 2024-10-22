@@ -1,5 +1,5 @@
+import { projectPathExists, readFileInProject } from "@src/support/project";
 import { repository } from ".";
-import { projectPathExists, readFileInProject } from "../support/project";
 
 const filename = ".env.example";
 

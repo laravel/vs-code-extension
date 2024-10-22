@@ -1,12 +1,12 @@
-import { notFound } from "@/diagnostic";
-import { getMixManifest } from "@/repositories/mix";
+import { notFound } from "@src/diagnostic";
+import { getMixManifest } from "@src/repositories/mix";
 import {
     findHoverMatchesInDoc,
     findLinksInDoc,
     findWarningsInDoc,
-} from "@/support/doc";
-import { mixManifestMatchRegex } from "@/support/patterns";
-import { relativePath } from "@/support/project";
+} from "@src/support/doc";
+import { mixManifestMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 

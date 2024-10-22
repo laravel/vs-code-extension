@@ -1,8 +1,8 @@
-import { notFound } from "@/diagnostic";
-import { getPolicies } from "@/repositories/auth";
-import { findHoverMatchesInDoc, findLinksInDoc } from "@/support/doc";
-import { authMatchRegex } from "@/support/patterns";
-import { relativeMarkdownLink } from "@/support/util";
+import { notFound } from "@src/diagnostic";
+import { getPolicies } from "@src/repositories/auth";
+import { findHoverMatchesInDoc, findLinksInDoc } from "@src/support/doc";
+import { authMatchRegex } from "@src/support/patterns";
+import { relativeMarkdownLink } from "@src/support/util";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 import { findWarningsInDoc } from "../support/doc";
