@@ -10,7 +10,7 @@ import {
 import { envMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import { CodeActionProviderFunction, HoverProvider, LinkProvider } from "..";
 
 export const linkProvider: LinkProvider = (
     doc: vscode.TextDocument,
@@ -59,7 +59,7 @@ export const diagnosticProvider = (
     });
 };
 
-export const codeActionProvider = async (
+export const codeActionProvider: CodeActionProviderFunction = async (
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,

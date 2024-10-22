@@ -1,6 +1,10 @@
 import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
-import { HoverProvider, LinkProvider } from "@src/index";
+import {
+    CodeActionProviderFunction,
+    HoverProvider,
+    LinkProvider,
+} from "@src/index";
 import { getInertiaViews } from "@src/repositories/inertia";
 import {
     findHoverMatchesInDoc,
@@ -54,7 +58,7 @@ export const diagnosticProvider = (
     });
 };
 
-export const codeActionProvider = async (
+export const codeActionProvider: CodeActionProviderFunction = async (
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
