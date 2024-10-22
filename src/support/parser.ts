@@ -558,7 +558,9 @@ export const parseFaultTolerant = (code: string): Promise<ParsingResult> => {
         code = code.replace(replacement[0], replacement[1]);
     });
 
-    let command = `php /Users/joetannenbaum/Dev/vs-code/parser/parse-cli.php "${code}"`;
+    const binaryPath = process.env.PHP_PARSER_BINARY_PATH;
+
+    let command = `${binaryPath} parse "${code}"`;
 
     info("ft command ", command);
 
