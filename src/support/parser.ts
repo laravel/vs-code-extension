@@ -16,6 +16,12 @@ const parser = new engine({
 type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
 
+let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
+
+export const setParserBinaryPath = (path: string) => {
+    parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+};
+
 const getToken = (tokens: TokenFormatted[], index: string, offset: number) =>
     tokens[parseInt(index) + offset];
 
@@ -531,7 +537,9 @@ export const getNormalizedTokens = (code: string): TokenFormatted[] => {
         .filter((token: Token) => token[0] !== "T_WHITESPACE");
 };
 
-export const parseFaultTolerant = (code: string): Promise<ParsingResult> => {
+export const parseFaultTolerant = async (
+    code: string,
+): Promise<ParsingResult> => {
     // const path = __dirname + "/../../current-code.txt";
     // fs.writeFileSync(path, code);
 
@@ -558,9 +566,21 @@ export const parseFaultTolerant = (code: string): Promise<ParsingResult> => {
         code = code.replace(replacement[0], replacement[1]);
     });
 
-    const binaryPath = process.env.PHP_PARSER_BINARY_PATH;
+    if (!parserBinaryPath) {
+        const waitForPath = async () => {
+            if (!parserBinaryPath) {
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 500);
+                });
 
-    let command = `${binaryPath} parse "${code}"`;
+                return waitForPath();
+            }
+        };
+
+        await waitForPath();
+    }
+
+    let command = `${parserBinaryPath} parse "${code}"`;
 
     info("ft command ", command);
 

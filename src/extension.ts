@@ -4,6 +4,7 @@ require("module-alias/register");
 
 import * as vscode from "vscode";
 
+import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
 import { info } from "console";
 import { LanguageClient } from "vscode-languageclient/node";
 import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
@@ -28,6 +29,7 @@ import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
 import LinkProvider from "./link/LinkProvider";
+import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import DocumentHighlight from "./syntax/DocumentHighlight";
 import { testRunnerCommands } from "./test-runner";
@@ -63,6 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "blade" },
         { scheme: "file", language: "laravel-blade" },
     ];
+
+    downloadBinary(context).then((path) => {
+        setParserBinaryPath(path);
+    });
 
     const TRIGGER_CHARACTERS = ["'", '"'];
 
@@ -155,6 +161,51 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand("laravel.open", openFileCommand),
     );
 }
+
+const downloadBinary = async (context: vscode.ExtensionContext) => {
+    const binaryVersion = "2.0.0-beta.2";
+    const filename = `inertia-${binaryVersion}.zip`;
+    const uri = `https://github.com/inertiajs/inertia/archive/refs/tags/v${binaryVersion}.zip`;
+
+    const fileDownloader: FileDownloader = await getApi();
+
+    const downloadedFiles: vscode.Uri[] =
+        await fileDownloader.listDownloadedItems(context);
+
+    for (const file of downloadedFiles) {
+        // Clean up after ourselves
+        if (!file.fsPath.includes(filename)) {
+            const filename = file.path.split("/").pop();
+
+            if (filename !== undefined) {
+                await fileDownloader.deleteItem(filename, context);
+            }
+        }
+    }
+
+    const downloadedFile: vscode.Uri | undefined =
+        await fileDownloader.tryGetItem(filename, context);
+
+    if (downloadedFile !== undefined) {
+        return downloadedFile.fsPath;
+    }
+
+    vscode.window.showInformationMessage(
+        "Downloading binary for Laravel extension",
+    );
+
+    const file: vscode.Uri = await fileDownloader.downloadFile(
+        vscode.Uri.parse(uri),
+        filename,
+        context,
+    );
+
+    vscode.window.showInformationMessage(
+        "Binary downloaded for Laravel extension",
+    );
+
+    return file.fsPath;
+};
 
 export function deactivate() {
     info("Stopped");
