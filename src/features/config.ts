@@ -27,6 +27,7 @@ const linkProvider: LinkProvider = (
         // TODO: This should also be in hover
         const configKeyPath = match[0].split(".");
 
+        // TODO: Replace with cli parser
         const tokens = getTokens(fs.readFileSync(uri.fsPath, "utf8"))
             .filter((token) => typeof token !== "string")
             .filter((token) => token[0] === "T_CONSTANT_ENCAPSED_STRING");
