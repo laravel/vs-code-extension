@@ -1,16 +1,5 @@
-import { Uri } from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
-
-interface TranslationItem {
-    [key: string]: {
-        [key: string]: {
-            value: string;
-            uri: Uri;
-            params: string[];
-        };
-    };
-}
 
 interface TranslationGroupResult {
     [key: string]: {
