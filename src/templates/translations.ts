@@ -77,10 +77,18 @@ function vscodeCollectTranslations(string $path, string $namespace = null)
     });
 }
 
-$namespaces = app('translator')->getLoader()->namespaces();
-$path = app()->langPath();
+$loader = app("translator")->getLoader();
+$namespaces = $loader->namespaces();
 
-$default = vscodeCollectTranslations($path);
+$reflection = new ReflectionClass($loader);
+$property = $reflection->getProperty("paths");
+$property->setAccessible(true);
+
+$paths = $property->getValue($loader);
+
+$default = collect($paths)->flatMap(function ($path) {
+  return vscodeCollectTranslations($path);
+});
 
 $namespaced = collect($namespaces)->flatMap(function ($path, $namespace) {
     return vscodeCollectTranslations($path, $namespace);
