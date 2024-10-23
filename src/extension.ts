@@ -4,7 +4,6 @@ require("module-alias/register");
 
 import * as vscode from "vscode";
 
-import { info } from "console";
 import { LanguageClient } from "vscode-languageclient/node";
 import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
 import { initClient } from "./blade/client";
@@ -28,10 +27,10 @@ import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
 import LinkProvider from "./link/LinkProvider";
+import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import DocumentHighlight from "./syntax/DocumentHighlight";
-import { testRunnerCommands } from "./test-runner";
 import { controller as testController } from "./test-runner/test-controller";
 
 let client: LanguageClient;
@@ -49,9 +48,12 @@ function shouldActivate(): boolean {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log("Activating Laravel Extension...");
+    info("Activating Laravel Extension...");
 
     if (!shouldActivate()) {
+        info(
+            'Not activating Laravel Extension because "shouldActivate" returned false',
+        );
         return;
     }
 
@@ -145,7 +147,8 @@ export function activate(context: vscode.ExtensionContext) {
             new LinkProvider(),
         ),
         vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
-        ...testRunnerCommands,
+        // TODO: Including this is breaking the extension... why
+        // ...testRunnerCommands,
         testController,
         vscode.languages.registerCodeActionsProvider(
             LANGUAGES,
