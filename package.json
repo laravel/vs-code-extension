@@ -3,7 +3,7 @@
     "publisher": "Laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -294,8 +294,7 @@
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
         "test": "vscode-test",
-        "copy-files": "copyfiles -u 1 src/templates/*.php out",
-        "postbuild": "npm run copy-files"
+        "package": "vsce package"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.6",
@@ -305,14 +304,13 @@
         "@typescript-eslint/parser": "^7.7.1",
         "@vscode/test-cli": "^0.0.9",
         "@vscode/test-electron": "^2.3.9",
-        "copyfiles": "^2.4.1",
         "esbuild": "^0.21.5",
         "eslint": "^8.57.0",
         "typescript": "^5.4.5"
     },
     "dependencies": {
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
-        "glob": "^10.4.1",
+        "glob": "^11.0.0",
         "module-alias": "^2.2.3",
         "npm-run-all": "^4.1.5",
         "php-parser": "^3.1.5",
