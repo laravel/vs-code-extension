@@ -26,6 +26,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
     downloadBinary(context).then((path) => {
         if (path) {
             parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+            parserBinaryPath = path.replace(" ", "\\ ");
         }
     });
 };
@@ -33,7 +34,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 const downloadBinary = async (context: vscode.ExtensionContext) => {
     const binaryVersion = "0.1.0";
     const filename = `php-parser-${binaryVersion}`;
-    const uri = `/Users/joetannenbaum/Dev/vs-code/parser-zero/bin/${filename}`;
+    const uri = `https://github.com/joetannenbaum/php-parser-cli/raw/refs/heads/main/bin/${filename}`;
 
     const fileDownloader: FileDownloader = await getApi();
 
@@ -68,6 +69,8 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             filename,
             context,
         );
+
+        cp.execSync(`chmod +x ${file.fsPath.replace(" ", "\\ ")}`);
 
         vscode.window.showInformationMessage(
             "Binary downloaded for Laravel extension",
