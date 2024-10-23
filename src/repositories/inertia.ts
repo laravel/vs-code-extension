@@ -36,11 +36,11 @@ const collectViews = (path: string, basePath: string): View[] => {
                 return collectViews(`${path}/${file}`, basePath);
             }
 
-            if (!file.match(/\.vue|\.tsx|\.jsx$/)) {
+            if (!file.match(/\.vue|\.tsx|\.jsx|\.svelte$/)) {
                 return [];
             }
 
-            const name = file.replace(/\.(vue|tsx|jsx)$/, "");
+            const name = file.replace(/\.(vue|tsx|jsx|svelte)$/, "");
 
             return {
                 name: relativePath(`${path}/${name}`).replace(

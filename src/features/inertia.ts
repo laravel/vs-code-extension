@@ -74,33 +74,39 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         return [];
     }
 
+    const items = getInertiaViews().items;
+    let extension = "vue";
+
+    for (const item in items) {
+        extension = items[item].uri.path.split(".").pop() ?? "vue";
+        break;
+    }
+
     const fileUri = vscode.Uri.file(
-        projectPath(`resources/js/Pages/${missingFilename}.vue`),
+        projectPath(`resources/js/Pages/${missingFilename}.${extension}`),
     );
+
+    const edit = new vscode.WorkspaceEdit();
+
+    const mapping: Record<string, string> = {
+        vue: ["<script setup>", "</script>", "<template>", "</template>"].join(
+            "\n\n",
+        ),
+    };
+
+    edit.createFile(fileUri, {
+        overwrite: false,
+        contents: Buffer.from(mapping[extension] ?? ""),
+    });
 
     const action = new vscode.CodeAction(
         "Create missing Inertia view",
         vscode.CodeActionKind.QuickFix,
     );
-    action.edit = getEdit(fileUri);
+    action.edit = edit;
     action.diagnostics = [diagnostic];
     action.isPreferred = true;
     action.command = openFile(fileUri, 1, 0);
 
     return [action];
-};
-
-const getEdit = (uri: vscode.Uri): vscode.WorkspaceEdit => {
-    const edit = new vscode.WorkspaceEdit();
-
-    edit.createFile(uri, {
-        overwrite: false,
-        contents: Buffer.from(
-            ["<script setup>", "</script>", "<template>", "</template>"].join(
-                "\n\n",
-            ),
-        ),
-    });
-
-    return edit;
 };
