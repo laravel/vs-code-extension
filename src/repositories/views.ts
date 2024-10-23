@@ -1,9 +1,9 @@
+import { View } from "@src/index";
+import { runInLaravel } from "@src/support/php";
+import { projectPath } from "@src/support/project";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { repository } from ".";
-import { View } from "..";
-import { runInLaravel } from "../support/php";
-import { projectPath } from "../support/project";
 
 interface ViewItem {
     [key: string]: View;
@@ -26,7 +26,7 @@ const load = () => {
                 path.replace(projectPath("/", true), projectPath("/")),
             )
             .forEach((path: string) => {
-                collectViews(path).forEach((view) => {
+                collectViews(path, path).forEach((view) => {
                     views[view.name] = view;
                 });
             });
@@ -37,7 +37,7 @@ const load = () => {
                     path.replace(projectPath("/", true), projectPath("/")),
                 )
                 .forEach((path) => {
-                    collectViews(path).forEach((view) => {
+                    collectViews(path, path).forEach((view) => {
                         views[`${namespace}::${view.name}`] = view;
                     });
                 });
@@ -47,7 +47,7 @@ const load = () => {
     });
 };
 
-const collectViews = (path: string): View[] => {
+const collectViews = (path: string, basePath: string): View[] => {
     if (path.substring(-1) === "/" || path.substring(-1) === "\\") {
         path = path.substring(0, path.length - 1);
     }
@@ -60,7 +60,7 @@ const collectViews = (path: string): View[] => {
         .readdirSync(path)
         .map((file: string) => {
             if (fs.lstatSync(`${path}/${file}`).isDirectory()) {
-                return collectViews(`${path}/${file}`);
+                return collectViews(`${path}/${file}`, basePath);
             }
 
             if (!file.includes("blade.php")) {
@@ -68,9 +68,13 @@ const collectViews = (path: string): View[] => {
             }
 
             const name = file.replace(".blade.php", "");
+            const prefix =
+                path === basePath
+                    ? ""
+                    : path.replace(`${basePath}/`, "").replace("/", ".");
 
             return {
-                name,
+                name: prefix === "" ? name : `${prefix}.${name}`,
                 relativePath: `${path}/${name}`.replace(projectPath(""), ""),
                 uri: vscode.Uri.file(`${path}/${file}`),
             };
