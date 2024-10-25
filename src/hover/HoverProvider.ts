@@ -5,6 +5,7 @@ import { hoverProvider as auth } from "@src/features/auth";
 import { hoverProvider as config } from "@src/features/config";
 import { hoverProvider as env } from "@src/features/env";
 import { hoverProvider as inertia } from "@src/features/inertia";
+import { hoverProvider as middleware } from "@src/features/middleware";
 import { hoverProvider as mix } from "@src/features/mix";
 import { hoverProvider as route } from "@src/features/route";
 import { hoverProvider as translation } from "@src/features/translation";
@@ -30,6 +31,7 @@ export default class HoverProvider implements vsHoverProvider {
         { provider: config, configKey: "config.hover" },
         { provider: env, configKey: "env.hover" },
         { provider: inertia, configKey: "inertia.hover" },
+        { provider: middleware, configKey: "middleware.hover" },
         { provider: mix, configKey: "mix.hover" },
         { provider: route, configKey: "route.hover" },
         { provider: translation, configKey: "translation.hover" },

@@ -7,6 +7,7 @@ import { linkProvider as config } from "@src/features/config";
 import { linkProvider as controllerAction } from "@src/features/controllerAction";
 import { linkProvider as env } from "@src/features/env";
 import { linkProvider as inertia } from "@src/features/inertia";
+import { linkProvider as middleware } from "@src/features/middleware";
 import { linkProvider as mix } from "@src/features/mix";
 import { linkProvider as route } from "@src/features/route";
 import { linkProvider as translation } from "@src/features/translation";
@@ -33,6 +34,7 @@ export default class LinkProvider implements vsDocumentLinkProvider {
         { provider: controllerAction, configKey: "controllerAction.link" },
         { provider: env, configKey: "env.link" },
         { provider: inertia, configKey: "inertia.link" },
+        { provider: middleware, configKey: "middleware.link" },
         { provider: mix, configKey: "mix.link" },
         { provider: route, configKey: "route.link" },
         { provider: translation, configKey: "translation.link" },

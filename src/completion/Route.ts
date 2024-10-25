@@ -24,6 +24,7 @@ export default class Route implements CompletionProvider {
                     "options",
                     "any",
                     "match",
+                    "middleware",
                 ],
             },
             {
@@ -109,7 +110,7 @@ export default class Route implements CompletionProvider {
                     vscode.CompletionItemKind.Enum,
                 );
 
-                completionItem.detail = value ?? "";
+                completionItem.detail = value.parameters ?? "";
 
                 completionItem.range = document.getWordRangeAtPosition(
                     position,

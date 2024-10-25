@@ -57,7 +57,7 @@ export const translationBindingMatchRegex = (() => {
 })();
 
 export const middlewareMatchRegex = (() => {
-    return funcRegex(["middleware"]);
+    return funcRegex(["middleware", "withoutMiddleware"]);
 })();
 
 export const routeMatchRegex = (() => {
