@@ -17,6 +17,10 @@ interface ClassBlock {
 export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
     ensureInternalVendorDirectoryExists();
 
+    if (!models) {
+        return;
+    }
+
     const blocks: ClassBlock[] = Object.values(models).map((model) => {
         const pathParts = model.class.split("\\");
         const cls = pathParts.pop();
