@@ -22,6 +22,10 @@ export const inertiaMatchRegex = (() => {
     return funcRegex(["inertia", "Inertia::(?:render|modal)"]);
 })();
 
+export const inertiaRouteMatchRegex = (() => {
+    return `Route::(?:inertia\\(['"](.+)['"],\\s?['"](.+)['"])`;
+})();
+
 export const configMatchRegex = (() => {
     return funcRegex(["config", "Config::get"]);
 })();

@@ -11,7 +11,10 @@ import {
     findLinksInDoc,
     findWarningsInDoc,
 } from "@src/support/doc";
-import { inertiaMatchRegex } from "@src/support/patterns";
+import {
+    inertiaMatchRegex,
+    inertiaRouteMatchRegex,
+} from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 
@@ -45,17 +48,35 @@ export const hoverProvider: HoverProvider = (
 export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, inertiaMatchRegex, (match, range) => {
-        return getInertiaViews().whenLoaded((items) => {
-            const view = items[match[0]];
+    return Promise.all([
+        findWarningsInDoc(doc, inertiaMatchRegex, (match, range) => {
+            return getInertiaViews().whenLoaded((items) => {
+                const view = items[match[0]];
 
-            if (view) {
-                return null;
-            }
+                if (view || match.input.includes("Route::")) {
+                    return null;
+                }
 
-            return notFound("Inertia view", match[0], range, "inertia");
-        });
-    });
+                return notFound("Inertia view", match[0], range, "inertia");
+            });
+        }),
+        findWarningsInDoc(
+            doc,
+            inertiaRouteMatchRegex,
+            (match, range) => {
+                return getInertiaViews().whenLoaded((items) => {
+                    const view = items[match[2]];
+
+                    if (view) {
+                        return null;
+                    }
+
+                    return notFound("Inertia view", match[2], range, "inertia");
+                });
+            },
+            2,
+        ),
+    ]).then((items) => items.filter((item) => item !== null).flat());
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
