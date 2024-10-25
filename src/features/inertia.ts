@@ -21,28 +21,70 @@ import * as vscode from "vscode";
 export const linkProvider: LinkProvider = (
     doc: vscode.TextDocument,
 ): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, inertiaMatchRegex, (match) => {
-        return getInertiaViews().items[match[0]]?.uri ?? null;
-    });
+    const items: [string, number][] = [
+        [inertiaRouteMatchRegex, 1],
+        [inertiaMatchRegex, 0],
+    ];
+
+    const links = [];
+
+    for (const [regex, index] of items) {
+        const matches = findLinksInDoc(
+            doc,
+            regex,
+            (match) => {
+                return getInertiaViews().items[match[index]]?.uri ?? null;
+            },
+            index,
+        );
+
+        if (matches.length) {
+            links.push(...matches);
+        }
+    }
+
+    return links;
 };
 
 export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, inertiaMatchRegex, (match) => {
-        const item = getInertiaViews().items[match];
+    return (
+        findHoverMatchesInDoc(doc, pos, inertiaRouteMatchRegex, (match) => {
+            const regex = new RegExp(inertiaRouteMatchRegex);
+            const matches = regex.exec(match);
 
-        if (!item) {
-            return null;
-        }
+            if (!matches) {
+                return null;
+            }
 
-        return new vscode.Hover(
-            new vscode.MarkdownString(
-                `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
-            ),
-        );
-    });
+            const item = getInertiaViews().items[matches[1]];
+
+            if (!item) {
+                return null;
+            }
+
+            return new vscode.Hover(
+                new vscode.MarkdownString(
+                    `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
+                ),
+            );
+        }) ||
+        findHoverMatchesInDoc(doc, pos, inertiaMatchRegex, (match) => {
+            const item = getInertiaViews().items[match];
+
+            if (!item) {
+                return null;
+            }
+
+            return new vscode.Hover(
+                new vscode.MarkdownString(
+                    `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
+                ),
+            );
+        })
+    );
 };
 
 export const diagnosticProvider = (
@@ -65,16 +107,16 @@ export const diagnosticProvider = (
             inertiaRouteMatchRegex,
             (match, range) => {
                 return getInertiaViews().whenLoaded((items) => {
-                    const view = items[match[2]];
+                    const view = items[match[1]];
 
                     if (view) {
                         return null;
                     }
 
-                    return notFound("Inertia view", match[2], range, "inertia");
+                    return notFound("Inertia view", match[1], range, "inertia");
                 });
             },
-            2,
+            1,
         ),
     ]).then((items) => items.filter((item) => item !== null).flat());
 };

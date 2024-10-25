@@ -23,7 +23,7 @@ export const inertiaMatchRegex = (() => {
 })();
 
 export const inertiaRouteMatchRegex = (() => {
-    return `Route::(?:inertia\\(['"](.+)['"],\\s?['"](.+)['"])`;
+    return `Route::(?:inertia\\(['"](?:.+)['"],\\s?['"](.+)['"])`;
 })();
 
 export const configMatchRegex = (() => {
