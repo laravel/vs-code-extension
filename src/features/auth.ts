@@ -53,6 +53,11 @@ const linkProvider: LinkProvider = (
     return findLinksInDoc(doc, authMatchRegex, (match) => {
         const items = getPolicies().items[match[0]];
 
+        if (!items) {
+            // TODO: Investigate why this is happening
+            return null;
+        }
+
         if (items.length === 1 && items[0].uri) {
             return vscode.Uri.file(items[0].uri).with({
                 fragment: `L${items[0].lineNumber}`,
