@@ -11,7 +11,7 @@ import { hoverProvider as route } from "@src/features/route";
 import { hoverProvider as translation } from "@src/features/translation";
 import { hoverProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
-import { ConfigKey } from "@src/support/generated-config";
+import { GeneratedConfigKey } from "@src/support/generated-config";
 import {
     Hover,
     Position,
@@ -24,7 +24,7 @@ import { HoverProvider as ProviderFunc } from "..";
 export default class HoverProvider implements vsHoverProvider {
     private providers: {
         provider: ProviderFunc;
-        configKey: ConfigKey;
+        configKey: GeneratedConfigKey;
     }[] = [
         { provider: appBinding, configKey: "appBinding.hover" },
         { provider: auth, configKey: "auth.hover" },

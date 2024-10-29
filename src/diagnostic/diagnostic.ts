@@ -11,14 +11,14 @@ import { diagnosticProvider as route } from "@src/features/route";
 import { diagnosticProvider as translation } from "@src/features/translation";
 import { diagnosticProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
-import { ConfigKey } from "@src/support/generated-config";
+import { GeneratedConfigKey } from "@src/support/generated-config";
 import * as vscode from "vscode";
 
 const collection = vscode.languages.createDiagnosticCollection("laravel");
 
 const providers: {
     provider: (doc: vscode.TextDocument) => Promise<vscode.Diagnostic[]>;
-    configKey: ConfigKey;
+    configKey: GeneratedConfigKey;
 }[] = [
     { provider: appBinding, configKey: "appBinding.diagnostics" },
     { provider: asset, configKey: "asset.diagnostics" },

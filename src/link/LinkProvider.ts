@@ -14,7 +14,7 @@ import { linkProvider as translation } from "@src/features/translation";
 import { linkProvider as view } from "@src/features/view";
 import { LinkProvider as LinkProviderType } from "@src/index";
 import { config as getConfig } from "@src/support/config";
-import { ConfigKey } from "@src/support/generated-config";
+import { GeneratedConfigKey } from "@src/support/generated-config";
 import {
     DocumentLink,
     ProviderResult,
@@ -25,7 +25,7 @@ import {
 export default class LinkProvider implements vsDocumentLinkProvider {
     private providers: {
         provider: LinkProviderType;
-        configKey: ConfigKey;
+        configKey: GeneratedConfigKey;
     }[] = [
         { provider: appBinding, configKey: "appBinding.link" },
         { provider: asset, configKey: "asset.link" },
