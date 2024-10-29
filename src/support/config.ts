@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
-import { ConfigKey } from "./generated-config";
+import { GeneratedConfigKey } from "./generated-config";
+
+type ConfigKey = GeneratedConfigKey | "phpCommand";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);

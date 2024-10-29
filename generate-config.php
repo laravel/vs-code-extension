@@ -1,11 +1,6 @@
 <?php
 
-if (!file_exists(__DIR__ . '/previously-generated.json')) {
-    file_put_contents(__DIR__ . '/previously-generated.json', json_encode([]));
-}
-
 $items = json_decode(file_get_contents(__DIR__ . '/generatable.json'), true);
-$previousItems = json_decode(file_get_contents(__DIR__ . '/previously-generated.json'), true);
 $packageJson = json_decode(file_get_contents(__DIR__ . '/package.json'), true);
 
 $config = [];
@@ -22,6 +17,7 @@ foreach ($items as $item) {
         $config["Laravel.{$type}.{$feature}"] = [
             'type' => 'boolean',
             'default' => true,
+            'generated' => true,
             'description' => match($feature) {
                 'diagnostics' => "Enable diagnostics for {$type}.",
                 'hover' => "Enable hover information for {$type}.",
@@ -34,18 +30,16 @@ foreach ($items as $item) {
 
 $currentConfig = $packageJson['contributes']['configuration']['properties'] ?? [];
 
-$customConfig = array_filter($currentConfig, function($value, $key) use ($previousItems) {
-    return !in_array($key, array_keys($previousItems));
+$customConfig = array_filter($currentConfig, function($value, $key) {
+    return ($value['generated'] ?? false) === false;
 }, ARRAY_FILTER_USE_BOTH);
 
 $packageJson['contributes']['configuration']['properties'] = array_merge($customConfig, $config);
 
 file_put_contents(__DIR__ . '/package.json', json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-file_put_contents(__DIR__ . '/previously-generated.json', json_encode($config));
-
 $keys = array_map(function($key) {
     return str_replace('Laravel.', '', $key);
 }, array_keys($config));
 
-file_put_contents(__DIR__ . '/src/support/generated-config.ts', "export type ConfigKey = '" . implode("' | '", $keys) . "';");
+file_put_contents(__DIR__ . '/src/support/generated-config.ts', "export type GeneratedConfigKey = '" . implode("' | '", $keys) . "';");

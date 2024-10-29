@@ -63,189 +63,225 @@
         "configuration": {
             "title": "Laravel",
             "properties": {
-                "Laravel.somethingElse": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable/disable the somethingElse feature."
+                "Laravel.phpCommand": {
+                    "type": "string",
+                    "default": "php -r {code}",
+                    "description": "Template for running PHP code."
                 },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for appBinding."
                 },
                 "Laravel.appBinding.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for appBinding."
                 },
                 "Laravel.appBinding.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for appBinding."
                 },
                 "Laravel.asset.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for asset."
                 },
                 "Laravel.asset.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for asset."
                 },
                 "Laravel.asset.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for asset."
                 },
                 "Laravel.auth.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for auth."
                 },
                 "Laravel.auth.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for auth."
                 },
                 "Laravel.auth.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for auth."
                 },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for config."
                 },
                 "Laravel.config.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for config."
                 },
                 "Laravel.config.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for config."
                 },
                 "Laravel.controllerAction.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for controllerAction."
                 },
                 "Laravel.controllerAction.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for controllerAction."
                 },
                 "Laravel.controllerAction.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for controllerAction."
                 },
                 "Laravel.env.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for env."
                 },
                 "Laravel.env.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for env."
                 },
                 "Laravel.env.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for env."
                 },
                 "Laravel.inertia.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for inertia."
                 },
                 "Laravel.inertia.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for inertia."
                 },
                 "Laravel.inertia.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for inertia."
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for middleware."
                 },
                 "Laravel.middleware.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for middleware."
                 },
                 "Laravel.middleware.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for middleware."
                 },
                 "Laravel.mix.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for mix."
                 },
                 "Laravel.mix.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for mix."
                 },
                 "Laravel.mix.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for mix."
                 },
                 "Laravel.route.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for route."
                 },
                 "Laravel.route.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for route."
                 },
                 "Laravel.route.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for route."
                 },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for translation."
                 },
                 "Laravel.translation.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for translation."
                 },
                 "Laravel.translation.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for translation."
                 },
                 "Laravel.view.diagnostics": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable diagnostics for view."
                 },
                 "Laravel.view.hover": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable hover information for view."
                 },
                 "Laravel.view.link": {
                     "type": "boolean",
                     "default": true,
+                    "generated": true,
                     "description": "Enable linking for view."
                 }
             }
