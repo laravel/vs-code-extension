@@ -1,12 +1,55 @@
 import * as cp from "child_process";
 import * as os from "os";
 import { TemplateName, getTemplate } from "../templates";
+import { config } from "./config";
 import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import { getWorkspaceFolders, projectPath, projectPathExists } from "./project";
 
 const toTemplateVar = (str: string) => {
     return `__VSCODE_LARAVEL_${str.toUpperCase()}__`;
+};
+
+let defaultPhpCommand: string | null = null;
+
+const getPhpCommand = (): string => {
+    const options = [
+        {
+            check: "which herd",
+            command: '{result} php -r "{code}"',
+        },
+        {
+            check: "which php",
+            command: '{result} -r "{code}"',
+        },
+        {
+            check: "which sail",
+            command: '{result} php -r "{code}"',
+        },
+    ];
+
+    for (const option of options) {
+        try {
+            const result = cp.execSync(option.check).toString().trim();
+
+            if (result !== "") {
+                return option.command.replace(
+                    "{result}",
+                    result.replace(/ /g, "\\ "),
+                );
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    return `php -r "{code}"`;
+};
+
+const getDefaultPhpCommand = (): string => {
+    defaultPhpCommand ??= getPhpCommand();
+
+    return defaultPhpCommand;
 };
 
 export const template = (
@@ -94,18 +137,16 @@ export const runPhp = (
         code = code.replace(replacement[0], replacement[1]);
     });
 
-    // TODO: Command template includes {code} placeholder? Hm. Why?
-    let commandTemplate = 'php -r "{code}"';
-    // let commandTemplate = config<string>("phpCommand", 'php -r "{code}"');
+    const commandTemplate =
+        config<string>("phpCommand", getDefaultPhpCommand()) ||
+        getDefaultPhpCommand();
 
-    let command = commandTemplate.replace("{code}", code);
+    const command = commandTemplate.replace("{code}", code);
 
-    let out = new Promise<string>(function (resolve, error) {
+    const out = new Promise<string>(function (resolve, error) {
         if (description !== null) {
             info("Command started: " + description);
         }
-
-        // Logger.info(command);
 
         cp.exec(
             command,
