@@ -16,15 +16,15 @@ const getPhpCommand = (): string => {
     const options = [
         {
             check: "which herd",
-            command: '{result} php -r "{code}"',
+            command: '{binaryPath} php -r "{code}"',
         },
         {
             check: "which php",
-            command: '{result} -r "{code}"',
+            command: '{binaryPath} -r "{code}"',
         },
         {
             check: "which sail",
-            command: '{result} php -r "{code}"',
+            command: '{binaryPath} php -r "{code}"',
         },
     ];
 
@@ -34,7 +34,7 @@ const getPhpCommand = (): string => {
 
             if (result !== "") {
                 return option.command.replace(
-                    "{result}",
+                    "{binaryPath}",
                     result.replace(/ /g, "\\ "),
                 );
             }
