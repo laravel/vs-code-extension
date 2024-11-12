@@ -1,3 +1,4 @@
+import { config } from "@src/support/config";
 import * as vscode from "vscode";
 import DockerPhpUnitCommand from "./docker-phpunit-command";
 import PhpUnitCommand from "./phpunit-command";
@@ -36,11 +37,11 @@ const setGlobalCommandInstance = (commandInstance: Command) => {
 };
 
 const resolveTestRunnerCommand = (options = {}): Command => {
-    if (vscode.workspace.getConfiguration("laravel").get("docker.enable")) {
+    if (config<boolean>("tests.docker.enabled", false)) {
         return new DockerPhpUnitCommand(options);
     }
 
-    if (vscode.workspace.getConfiguration("laravel").get("ssh.enable")) {
+    if (config<boolean>("tests.ssh.enabled", false)) {
         return new RemotePhpUnitCommand(options);
     }
 
