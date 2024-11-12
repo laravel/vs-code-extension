@@ -31,6 +31,7 @@ import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import DocumentHighlight from "./syntax/DocumentHighlight";
+import { testRunnerCommands } from "./test-runner";
 import { controller as testController } from "./test-runner/test-controller";
 
 let client: LanguageClient;
@@ -147,8 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
             new LinkProvider(),
         ),
         vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
-        // TODO: Including this is breaking the extension... why
-        // ...testRunnerCommands,
+        ...testRunnerCommands,
         testController,
         vscode.languages.registerCodeActionsProvider(
             LANGUAGES,
