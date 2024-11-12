@@ -288,8 +288,7 @@
         "commands": [
             {
                 "command": "laravel.run-test",
-                "title": "Laravel: Run Test at Cursor",
-                "icon": "$(play)"
+                "title": "Laravel: Run Test at Cursor"
             },
             {
                 "command": "laravel.run-test-file",
@@ -345,6 +344,7 @@
     },
     "dependencies": {
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
+        "find-up": "^7.0.0",
         "glob": "^11.0.0",
         "module-alias": "^2.2.3",
         "npm-run-all": "^4.1.5",
