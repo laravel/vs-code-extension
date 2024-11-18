@@ -14,7 +14,10 @@ interface ClassBlock {
 
 // TODO: Chunk into several files if we have a lot of models?
 // TODO: Check if doc block is already in model file, skip if it is
-export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
+export const writeEloquentDocBlocks = (
+    models: Eloquent.Models,
+    builderMethods: Eloquent.BuilderMethod[],
+) => {
     ensureInternalVendorDirectoryExists();
 
     if (!models) {
@@ -28,7 +31,7 @@ export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
         return {
             namespace: pathParts.join("\\"),
             className: cls || "",
-            blocks: getBlocks(model, cls || ""),
+            blocks: getBlocks(model, cls || "", builderMethods),
         };
     });
 
@@ -62,7 +65,36 @@ export const writeEloquentDocBlocks = (models: Eloquent.Models) => {
     );
 };
 
-const getBlocks = (model: Eloquent.Model, className: string): string[] => {
+const getBuilderReturnType = (
+    method: Eloquent.BuilderMethod,
+    className: string,
+): string => {
+    const returnType = method.return
+        .replace(
+            "$this",
+            `\\Illuminate\\Database\\Eloquent\\Builder|${className}`,
+        )
+        .replace("\\TReturn", "mixed")
+        .replace("TReturn", "mixed")
+        .replace("\\TValue", "mixed")
+        .replace("TValue", "mixed");
+
+    if (["static", "self"].includes(method.return)) {
+        return `\\Illuminate\\Database\\Eloquent\\Builder|${className}`;
+    }
+
+    if (method.return === "never") {
+        return "void";
+    }
+
+    return returnType;
+};
+
+const getBlocks = (
+    model: Eloquent.Model,
+    className: string,
+    builderMethods: Eloquent.BuilderMethod[],
+): string[] => {
     return model.attributes
         .map((attr) => getAttributeBlocks(attr, className))
         .concat(
@@ -93,7 +125,17 @@ const getBlocks = (model: Eloquent.Model, className: string): string[] => {
             }
 
             return 0;
-        });
+        })
+        .concat(
+            builderMethods.map((method) => {
+                return ` * @method static ${getBuilderReturnType(
+                    method,
+                    className,
+                )} ${method.name}(${method.parameters
+                    .map((p) => p.replace("\\TValue", "mixed"))
+                    .join(", ")})`;
+            }),
+        );
 };
 
 const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
@@ -121,6 +163,7 @@ const classToDocBlock = (block: ClassBlock, namespace: string) => {
         ` * ${namespace}\\${block.className}`,
         " *",
         ...block.blocks,
+        " * @mixin \\Illuminate\\Database\\Query\\Builder",
         " */",
         `class ${block.className} extends \\Illuminate\\Database\\Eloquent\\Model`,
         `{`,
@@ -169,6 +212,8 @@ const getActualType = (type: string): string => {
         "boolean(0)": "bool",
         boolean: "bool",
         text: "string",
+        bigint: "int",
+        "bigint unsigned": "int",
         integer: "int",
         attribute: "mixed",
         accessor: "mixed",
@@ -179,7 +224,11 @@ const getActualType = (type: string): string => {
         encrypted: "mixed",
     };
 
-    const finalType = mapping[type] || type;
+    let finalType = mapping[type] || type;
+
+    if (finalType.match(/varchar\(\d+\)/)) {
+        finalType = "string";
+    }
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;

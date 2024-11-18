@@ -6,15 +6,15 @@ import { runInLaravel, template } from "./../support/php";
 const modelPaths = ["app", "app/Models"];
 
 const load = () => {
-    return runInLaravel<Eloquent.Models>(
+    return runInLaravel<Eloquent.Result>(
         template("eloquentProvider", {
             model_paths: JSON.stringify(modelPaths),
         }),
         "Eloquent Attributes and Relations",
-    ).then((models) => {
-        writeEloquentDocBlocks(models);
+    ).then((result) => {
+        writeEloquentDocBlocks(result.models, result.builderMethods);
 
-        return models;
+        return result.models;
     });
 };
 

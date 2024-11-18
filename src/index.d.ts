@@ -55,6 +55,17 @@ type HoverProvider = (
 type LinkProvider = (doc: vscode.TextDocument) => vscode.DocumentLink[];
 
 declare namespace Eloquent {
+    interface Result {
+        models: Models;
+        builderMethods: BuilderMethod[];
+    }
+
+    interface BuilderMethod {
+        name: string;
+        parameters: string[];
+        return: string;
+    }
+
     interface Models {
         [key: string]: Model;
     }

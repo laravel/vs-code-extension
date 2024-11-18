@@ -1,7 +1,60 @@
 export default `
 collect(glob(base_path('**/Models/*.php')))->each(fn ($file) => include_once($file));
 
-echo collect(get_declared_classes())
+if (class_exists('\\phpDocumentor\\Reflection\\DocBlockFactory')) {
+    $factory = \\phpDocumentor\\Reflection\\DocBlockFactory::createInstance();
+} else {
+    $factory = null;
+}
+
+$reflection = new \\ReflectionClass(\\Illuminate\\Database\\Query\\Builder::class);
+$builderMethods = collect($reflection->getMethods(\\ReflectionMethod::IS_PUBLIC))
+    ->filter(function (ReflectionMethod $method) {
+        return !str_starts_with($method->getName(), "__");
+    })
+  ->map(function (\\ReflectionMethod $method) use ($factory) {
+    if ($factory === null) {
+         $params =  collect($method->getParameters())
+             ->map(function (\\ReflectionParameter $param) {
+               $types = match ($param?->getType()) {
+                 null => [],
+                 default => method_exists($param->getType(), "getTypes")
+                   ? $param->getType()->getTypes()
+                   : [$param->getType()]
+               };
+
+               return [
+                 "name" => $param->getName(),
+                 "types" => collect($types)
+                   ->filter()
+                   ->values()
+                   ->map(function ($t) use ($types, $param) {
+                     return $t->getName();
+                   })
+                   ->all()
+               ];
+             })
+             ->all();
+
+        $return = $method->getReturnType()?->getName();
+    } else {
+        $docblock = $factory->create($method->getDocComment());
+        $params = collect($docblock->getTagsByName("param"))->map(fn($p) => (string) $p)->all();
+        $return = (string) $docblock->getTagsByName("return")[0] ?? null;
+    }
+
+    return [
+      "name" => $method->getName(),
+      "parameters" => $params,
+      "return" => $return,
+    ];
+  })
+  ->filter()
+  ->values();
+
+echo collect([
+'builderMethods' => $builderMethods,
+'models' => collect(get_declared_classes())
     ->filter(function ($class) {
         return is_subclass_of($class, \\Illuminate\\Database\\Eloquent\\Model::class);
     })
@@ -59,6 +112,6 @@ echo collect(get_declared_classes())
             $className => $data,
         ];
     })
-    ->filter()
-    ->toJson();
+    ->filter(),
+])->toJson();
 `;
