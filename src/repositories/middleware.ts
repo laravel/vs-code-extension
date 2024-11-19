@@ -8,6 +8,11 @@ interface MiddlewareResultItem {
         uri: string | null;
         startLine: number | null;
         parameters: string | null;
+        groups: {
+            class: string;
+            uri: string | null;
+            startLine: number | null;
+        }[];
     };
 }
 
@@ -17,6 +22,11 @@ interface MiddlewareItem {
         uri: vscode.Uri | null;
         startLine: number | null;
         parameters: string | null;
+        groups: {
+            class: string;
+            uri: vscode.Uri | null;
+            startLine: number | null;
+        }[];
     };
 }
 
@@ -39,6 +49,16 @@ export const getMiddleware = repository<MiddlewareItem>(
                               }),
                     startLine: result[key].startLine,
                     parameters: result[key].parameters,
+                    groups: result[key].groups.map((group) => ({
+                        class: group.class,
+                        uri:
+                            group.uri === null
+                                ? null
+                                : vscode.Uri.file(group.uri).with({
+                                      fragment: `L${group.startLine ?? 0}`,
+                                  }),
+                        startLine: group.startLine,
+                    })),
                 };
             }
 

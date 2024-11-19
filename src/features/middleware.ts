@@ -49,6 +49,18 @@ export const hoverProvider: HoverProvider = (
         const item = getMiddleware().items[match];
 
         if (!item || !item.uri) {
+            if (item.groups.length > 0) {
+                const text = item.groups.map((i) =>
+                    i.uri
+                        ? `[${relativePath(i.uri.path)}](${i.uri.toString()})`
+                        : i.class,
+                );
+
+                return new vscode.Hover(
+                    new vscode.MarkdownString(text.join("\n\n")),
+                );
+            }
+
             return null;
         }
 
