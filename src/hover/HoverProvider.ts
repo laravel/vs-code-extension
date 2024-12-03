@@ -44,10 +44,6 @@ export default class HoverProvider implements vsHoverProvider {
                 .filter((provider) => getConfig(provider.configKey, true))
                 .map((provider) => provider.provider(doc, pos)),
         ).then((result) => {
-            console.log(
-                "hover result",
-                result.flat().find((i) => i !== null),
-            );
             return result.flat().find((i) => i !== null);
         });
     }

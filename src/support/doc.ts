@@ -118,7 +118,9 @@ export const findHoverMatchesInDoc = (
             return null;
         },
         validParamTypes,
-    ).then((results) => results.find((result) => result !== null) || null);
+    ).then(
+        (results) => results.flat().find((result) => result !== null) || null,
+    );
 };
 
 // TODO: This is a duplication of findMatchesInDocAsync, but I don't want to change it right now
