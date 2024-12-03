@@ -1,59 +1,81 @@
+import { detectedRange, detectInDoc } from "@src/support/parser";
+import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 import { notFound } from "../diagnostic";
 import { getAppBindings } from "../repositories/appBinding";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "../support/doc";
-import { appBindingMatchRegex } from "../support/patterns";
+import { findHoverMatchesInDoc } from "../support/doc";
 import { relativePath } from "../support/project";
+
+const toFind = [
+    { class: facade("App"), method: "make" },
+    { class: null, method: "app" },
+];
+
+const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getAppBindings,
+        ({ param }) => {
+            const appBinding = getAppBindings().items[param.value];
+
+            if (!appBinding) {
+                return null;
+            }
+
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                appBinding.uri,
+            );
+        },
+    );
+};
 
 const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, appBindingMatchRegex, (match) => {
-        const item = getAppBindings().items[match];
+    return findHoverMatchesInDoc(doc, pos, toFind, getAppBindings, (match) => {
+        const binding = getAppBindings().items[match];
 
-        if (!item) {
+        if (!binding) {
             return null;
         }
 
         return new vscode.Hover(
             new vscode.MarkdownString(
                 [
-                    "`" + item.class + "`",
-                    `[${relativePath(item.uri.path)}](${item.uri})`,
+                    "`" + binding.class + "`",
+                    `[${relativePath(binding.uri.path)}](${binding.uri})`,
                 ].join("\n\n"),
             ),
         );
     });
 };
 
-const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, appBindingMatchRegex, (match) => {
-        return getAppBindings().items[match[0]]?.uri ?? null;
-    });
-};
-
 const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, appBindingMatchRegex, (match, range) => {
-        return getAppBindings().whenLoaded((items) => {
-            const appBinding = items[match[0]];
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getAppBindings,
+        ({ param }) => {
+            const appBinding = getAppBindings().items[param.value];
 
             if (appBinding) {
                 return null;
             }
 
-            return notFound("App binding", match[0], range, "appBinding");
-        });
-    });
+            return notFound(
+                "App binding",
+                param.value,
+                detectedRange(param),
+                "appBinding",
+            );
+        },
+    );
 };
 
 export { diagnosticProvider, hoverProvider, linkProvider };

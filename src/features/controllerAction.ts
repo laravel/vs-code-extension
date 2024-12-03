@@ -1,71 +1,98 @@
 import { notFound } from "@src/diagnostic";
-import { findWarningsInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
+import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { DetectResult, LinkProvider } from "..";
 import { getRoutes } from "../repositories/routes";
-import { findLinksInDoc } from "../support/doc";
-import { controllerActionRegex } from "../support/patterns";
 
-const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(
+const toFind = {
+    class: facade("Route"),
+    method: [
+        "get",
+        "post",
+        "patch",
+        "put",
+        "delete",
+        "options",
+        "any",
+        "match",
+        "fallback",
+        "addRoute",
+        "newRoute",
+    ],
+};
+
+const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
+    const indices: Record<string, number> = {
+        fallback: 0,
+        match: 2,
+        newRoute: 2,
+        addRoute: 2,
+    };
+
+    return index === (indices[item.method] ?? 1);
+};
+
+const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
         doc,
-        controllerActionRegex,
-        (match) => {
-            const action = match[3];
-
-            if (!action.includes("@")) {
-                // Intelliphense can take it from here
+        toFind,
+        getRoutes,
+        ({ param, item, index }) => {
+            if (!isCorrectIndexForMethod(item, index)) {
                 return null;
             }
 
             const route = getRoutes().items.find(
-                (item) => item.action === action,
+                (route) => route.action === param.value,
             );
 
             if (!route || !route.filename || !route.line) {
                 return null;
             }
 
-            return vscode.Uri.file(route.filename).with({
-                fragment: `L${route.line}`,
-            });
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(route.filename).with({
+                    fragment: `L${route.line}`,
+                }),
+            );
         },
-        3,
     );
 };
 
 const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(
+    return detectInDoc<vscode.Diagnostic, "string">(
         doc,
-        controllerActionRegex,
-        (match, range) => {
-            return getRoutes().whenLoaded((items) => {
-                const action = match[3];
+        toFind,
+        getRoutes,
+        ({ param, item, index }) => {
+            if (!isCorrectIndexForMethod(item, index)) {
+                return null;
+            }
 
-                if (!action.includes("@")) {
-                    // Intelliphense can take it from here
-                    return null;
-                }
+            const action = param.value;
 
-                const item = items.find((item) => item.action === action);
+            if (!action.includes("@")) {
+                // Intelliphense can take it from here
+                return null;
+            }
 
-                if (item) {
-                    return null;
-                }
+            const route = getRoutes().items.find((r) => r.action === action);
 
-                return notFound(
-                    "Controller/Method",
-                    match[3],
-                    range,
-                    "controllerAction",
-                );
-            });
+            if (route) {
+                return null;
+            }
+
+            return notFound(
+                "Controller/Method",
+                param.value,
+                detectedRange(param),
+                "controllerAction",
+            );
         },
-        3,
     );
 };
 

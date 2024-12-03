@@ -10,7 +10,7 @@ export default class Config implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\Config",
+                class: facade("Config"),
                 functions: ["get"],
             },
             {

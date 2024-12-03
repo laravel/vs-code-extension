@@ -1,5 +1,6 @@
 "use strict";
 
+import { facade } from "@src/support/util";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
@@ -11,7 +12,7 @@ export default class View implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\View",
+                class: facade("View"),
                 functions: [
                     "make",
                     "first",
@@ -20,6 +21,10 @@ export default class View implements CompletionProvider {
                     "renderEach",
                     "exists",
                 ],
+            },
+            {
+                class: facade("Route"),
+                functions: ["view"],
             },
             {
                 // TODO: Some of these belong to other classes...
@@ -49,6 +54,26 @@ export default class View implements CompletionProvider {
 
         if (result.func() && ["@section", "@push"].includes(result.func()!)) {
             return this.getYields(result.func()!, document.getText());
+        }
+
+        if (result.class() === facade("Route")) {
+            if (result.func() === "view" && result.isParamIndex(1)) {
+                return Object.entries(views).map(([key]) => {
+                    let completionItem = new vscode.CompletionItem(
+                        key,
+                        vscode.CompletionItemKind.Constant,
+                    );
+
+                    completionItem.range = document.getWordRangeAtPosition(
+                        position,
+                        wordMatchRegex,
+                    );
+
+                    return completionItem;
+                });
+            }
+
+            return [];
         }
 
         if (["renderWhen", "renderUnless"].find((f) => f === result.func())) {

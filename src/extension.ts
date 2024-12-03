@@ -1,11 +1,8 @@
 "use strict";
 
-require("module-alias/register");
-
 import * as vscode from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/node";
-import { BladeFormattingEditProvider } from "./blade/BladeFormattingEditProvider";
 import { initClient } from "./blade/client";
 import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
@@ -30,7 +27,6 @@ import LinkProvider from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
-import DocumentHighlight from "./syntax/DocumentHighlight";
 import { testRunnerCommands } from "./test-runner";
 import { controller as testController } from "./test-runner/test-controller";
 
@@ -106,18 +102,18 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
         }),
-        vscode.languages.registerDocumentHighlightProvider(
-            documentSelector,
-            new DocumentHighlight(),
-        ),
-        vscode.languages.registerDocumentFormattingEditProvider(
-            documentSelector,
-            new BladeFormattingEditProvider(),
-        ),
-        vscode.languages.registerDocumentRangeFormattingEditProvider(
-            documentSelector,
-            new BladeFormattingEditProvider(),
-        ),
+        // vscode.languages.registerDocumentHighlightProvider(
+        //     documentSelector,
+        //     new DocumentHighlight(),
+        // ),
+        // vscode.languages.registerDocumentFormattingEditProvider(
+        //     documentSelector,
+        //     new BladeFormattingEditProvider(),
+        // ),
+        // vscode.languages.registerDocumentRangeFormattingEditProvider(
+        //     documentSelector,
+        //     new BladeFormattingEditProvider(),
+        // ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             delegatedRegistry,

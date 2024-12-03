@@ -10,7 +10,7 @@ export default class Gate implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\Gate",
+                class: facade("Gate"),
                 functions: [
                     "has",
                     "allows",
@@ -23,11 +23,11 @@ export default class Gate implements CompletionProvider {
                 ],
             },
             {
-                class: "Illuminate\\Support\\Facades\\Route",
+                class: facade("Route"),
                 functions: ["can", "cannot"],
             },
             {
-                class: "Illuminate\\Support\\Facades\\Auth",
+                class: facade("Auth"),
                 functions: ["can", "cannot"],
             },
             {

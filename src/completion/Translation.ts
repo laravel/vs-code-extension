@@ -11,7 +11,7 @@ export default class Translation implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\Lang",
+                class: facade("Lang"),
                 functions: [
                     "has",
                     "hasForLocale",

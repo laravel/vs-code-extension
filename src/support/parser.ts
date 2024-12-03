@@ -1,10 +1,19 @@
 import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
 import ParsingResult from "@src/parser/ParsingResult";
+import { repository } from "@src/repositories";
 import * as cp from "child_process";
 import * as os from "os";
 import engine from "php-parser";
 import * as vscode from "vscode";
+import {
+    DetectResult,
+    DetectResultParam,
+    DetectResultStringParam,
+    DocFindParams,
+    ValidDetectParamTypes,
+} from "..";
 import { info } from "./logger";
+import { toArray } from "./util";
 
 // TODO: Problem?
 // @ts-ignore
@@ -16,6 +25,7 @@ const parser = new engine({
 });
 
 const currentlyParsing = new Map<string, Promise<ParsingResult>>();
+const detected = new Map<string, Promise<DetectResult[]>>();
 
 type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
@@ -23,6 +33,10 @@ type Token = string | TokenFormatted;
 let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
 
 export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
+    if (parserBinaryPath) {
+        return;
+    }
+
     downloadBinary(context).then((path) => {
         if (path) {
             parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
@@ -141,9 +155,9 @@ export const parseFaultTolerant = async (
 
     info("ft command ", command);
 
-    const result = cp.execSync(command).toString();
+    // const result = cp.execSync(command).toString();
 
-    info("ft result ", result);
+    // info("ft result ", result);
 
     return new Promise<ParsingResult>(function (resolve, error) {
         cp.exec(
@@ -165,6 +179,74 @@ export const parseFaultTolerant = async (
     });
 };
 
+export const detect = async (code: string): Promise<DetectResult[]> => {
+    // We're about to modify the code for the command, but the key should be the original code
+    const originalCode = code;
+
+    if (detected.has(originalCode)) {
+        return detected.get(originalCode) as Promise<DetectResult[]>;
+    }
+
+    let replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
+
+    if (
+        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+            os.platform().includes(unixPlatforms),
+        )
+    ) {
+        replacements.push([/\$/g, "\\$"]);
+        replacements.push([/\\'/g, "\\\\'"]);
+        replacements.push([/\\"/g, '\\\\"']);
+    }
+
+    replacements.push([/\"/g, '\\"']);
+
+    replacements.forEach((replacement) => {
+        code = code.replace(replacement[0], replacement[1]);
+    });
+
+    if (!parserBinaryPath) {
+        const waitForPath = async () => {
+            if (!parserBinaryPath) {
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 500);
+                });
+
+                return waitForPath();
+            }
+        };
+
+        await waitForPath();
+    }
+
+    let command = `${parserBinaryPath} detect "${code}"`;
+
+    // console.log("detect command ", command);
+
+    const promise = new Promise<DetectResult[]>(function (resolve, error) {
+        cp.exec(
+            command,
+            {
+                cwd: __dirname,
+            },
+            (err, stdout, stderr) => {
+                if (err === null) {
+                    // console.log("detect result", JSON.parse(stdout));
+                    return resolve(JSON.parse(stdout));
+                }
+
+                const errorOutput = stderr.length > 0 ? stderr : stdout;
+
+                error(errorOutput);
+            },
+        );
+    });
+
+    detected.set(originalCode, promise);
+
+    return promise;
+};
+
 export const parse = (
     code: string,
     depth = 0,
@@ -178,4 +260,70 @@ export const parse = (
     currentlyParsing.set(code, promise);
 
     return promise;
+};
+
+export const detectInDoc = <T, U extends ValidDetectParamTypes>(
+    doc: vscode.TextDocument,
+    toFind: DocFindParams | DocFindParams[],
+    repo: ReturnType<typeof repository>,
+    cb: (arg: {
+        param: Extract<DetectResultParam, { type: U }>;
+        index: number;
+        item: DetectResult;
+    }) => T[] | T | null,
+    validParamTypes: ValidDetectParamTypes[] = ["string"],
+): Promise<T[]> => {
+    return detect(doc.getText().trim()).then((results) => {
+        return Promise.all(
+            results
+                .filter((result) => {
+                    return toArray(toFind).some((toFind) => {
+                        return (
+                            toArray(toFind.class).includes(result.class) &&
+                            toArray(toFind.method).includes(result.method)
+                        );
+                    });
+                })
+                .map((item) => {
+                    return repo().whenLoaded(() =>
+                        item.params
+                            .map((param, index) => {
+                                if (validParamTypes.includes(param.type)) {
+                                    // Come on, TypeScript
+                                    const finalParam = param as Extract<
+                                        DetectResultParam,
+                                        { type: U }
+                                    >;
+
+                                    return toArray<T | T[] | null>(
+                                        cb({ param: finalParam, index, item }),
+                                    );
+                                }
+
+                                return null;
+                            })
+                            .flat(2)
+                            .filter((item) => item !== null),
+                    );
+                }),
+        );
+    });
+};
+
+export const isInHoverRange = (
+    range: vscode.Range,
+    param: DetectResultStringParam,
+): boolean => {
+    return (
+        param.start.line === range.start.line &&
+        param.start.column === range.start.character &&
+        param.end.column + 2 === range.end.character
+    );
+};
+
+export const detectedRange = (param: DetectResultStringParam): vscode.Range => {
+    return new vscode.Range(
+        new vscode.Position(param.start.line, param.start.column + 1),
+        new vscode.Position(param.end.line, param.end.column + 1),
+    );
 };

@@ -6,119 +6,111 @@ import {
     LinkProvider,
 } from "@src/index";
 import { getInertiaViews } from "@src/repositories/inertia";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import {
-    inertiaMatchRegex,
-    inertiaRouteMatchRegex,
-} from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
 import { projectPath, relativePath } from "@src/support/project";
+import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 
-export const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    const items: [string, number][] = [
-        [inertiaRouteMatchRegex, 1],
-        [inertiaMatchRegex, 0],
-    ];
+const toFind = [
+    {
+        class: facade("Route"),
+        method: "inertia",
+    },
+    {
+        class: "Inertia\\Inertia",
+        method: ["render", "modal"],
+    },
+    {
+        class: null,
+        method: "inertia",
+    },
+];
 
-    const links = [];
-
-    for (const [regex, index] of items) {
-        const matches = findLinksInDoc(
-            doc,
-            regex,
-            (match) => {
-                return getInertiaViews().items[match[index]]?.uri ?? null;
-            },
-            index,
-        );
-
-        if (matches.length) {
-            links.push(...matches);
-        }
+const isCorrectMethodIndex = (item: any, index: number) => {
+    if (item.class === facade("Route") && item.method === "inertia") {
+        return index === 1;
     }
 
-    return links;
+    return index === 0;
+};
+
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getInertiaViews,
+        ({ param, item, index }) => {
+            if (!isCorrectMethodIndex(item, index)) {
+                return null;
+            }
+
+            const view = getInertiaViews().items[param.value];
+
+            if (!view) {
+                return null;
+            }
+
+            return new vscode.DocumentLink(detectedRange(param), view.uri);
+        },
+    );
 };
 
 export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return (
-        findHoverMatchesInDoc(doc, pos, inertiaRouteMatchRegex, (match) => {
-            const regex = new RegExp(inertiaRouteMatchRegex);
-            const matches = regex.exec(match);
-
-            if (!matches) {
+    return findHoverMatchesInDoc(
+        doc,
+        pos,
+        toFind,
+        getInertiaViews,
+        (match, { item, index }) => {
+            if (!isCorrectMethodIndex(item, index)) {
                 return null;
             }
 
-            const item = getInertiaViews().items[matches[1]];
+            const found = getInertiaViews().items[match];
 
-            if (!item) {
-                return null;
-            }
-
-            return new vscode.Hover(
-                new vscode.MarkdownString(
-                    `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
-                ),
-            );
-        }) ||
-        findHoverMatchesInDoc(doc, pos, inertiaMatchRegex, (match) => {
-            const item = getInertiaViews().items[match];
-
-            if (!item) {
+            if (!found) {
                 return null;
             }
 
             return new vscode.Hover(
                 new vscode.MarkdownString(
-                    `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
+                    `[${relativePath(found.uri.path)}](${found.uri.fsPath})`,
                 ),
             );
-        })
+        },
     );
 };
 
 export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return Promise.all([
-        findWarningsInDoc(doc, inertiaMatchRegex, (match, range) => {
-            return getInertiaViews().whenLoaded((items) => {
-                const view = items[match[0]];
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getInertiaViews,
+        ({ param, item, index }) => {
+            if (!isCorrectMethodIndex(item, index)) {
+                return null;
+            }
 
-                if (view || match.input.includes("Route::")) {
-                    return null;
-                }
+            const view = getInertiaViews().items[param.value];
 
-                return notFound("Inertia view", match[0], range, "inertia");
-            });
-        }),
-        findWarningsInDoc(
-            doc,
-            inertiaRouteMatchRegex,
-            (match, range) => {
-                return getInertiaViews().whenLoaded((items) => {
-                    const view = items[match[1]];
+            if (view) {
+                return null;
+            }
 
-                    if (view) {
-                        return null;
-                    }
-
-                    return notFound("Inertia view", match[1], range, "inertia");
-                });
-            },
-            1,
-        ),
-    ]).then((items) => items.filter((item) => item !== null).flat());
+            return notFound(
+                "Inertia view",
+                param.value,
+                detectedRange(param),
+                "inertia",
+            );
+        },
+    );
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (

@@ -26,9 +26,10 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
         return [
           "class" => $m,
           "uri" => $reflected->getFileName(),
-            $reflectedMethod->getFileName() === $reflected->getFileName()
+          "startLine" =>
+              $reflectedMethod->getFileName() === $reflected->getFileName()
               ? $reflectedMethod->getStartLine()
-              : null,
+              : null
         ];
       })->all();
 

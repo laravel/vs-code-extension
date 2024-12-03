@@ -1,45 +1,51 @@
 import { notFound } from "@src/diagnostic";
 import { getRoutes } from "@src/repositories/routes";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import { routeMatchRegex } from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
 import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 
-const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, routeMatchRegex, (match) => {
-        const route = getRoutes().items.find((item) => item.name === match[0]);
+const toFind = { class: null, method: ["route", "signedRoute", "to_route"] };
 
-        if (!route || !route.filename || !route.line) {
-            return null;
-        }
+const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getRoutes,
+        ({ param }) => {
+            const route = getRoutes().items.find(
+                (route) => route.name === param.value,
+            );
 
-        return vscode.Uri.file(route.filename).with({
-            fragment: `L${route.line}`,
-        });
-    });
+            if (!route || !route.filename || !route.line) {
+                return null;
+            }
+
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(route.filename).with({
+                    fragment: `L${route.line}`,
+                }),
+            );
+        },
+    );
 };
 
 const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, routeMatchRegex, (match) => {
-        const item = getRoutes().items.find((item) => item.name === match);
+    return findHoverMatchesInDoc(doc, pos, toFind, getRoutes, (match) => {
+        const routeItem = getRoutes().items.find((r) => r.name === match);
 
-        if (!item || !item.filename || !item.line) {
+        if (!routeItem || !routeItem.filename || !routeItem.line) {
             return null;
         }
 
         const text = [
-            item.action === "Closure" ? "[Closure]" : item.action,
-            `[${relativePath(item.filename)}](${item.filename})`,
+            routeItem.action === "Closure" ? "[Closure]" : routeItem.action,
+            `[${relativePath(routeItem.filename)}](${routeItem.filename})`,
         ];
 
         return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
@@ -49,17 +55,25 @@ const hoverProvider: HoverProvider = (
 const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, routeMatchRegex, (match, range) => {
-        return getRoutes().whenLoaded((items) => {
-            const item = items.find((item) => item.name === match[0]);
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getRoutes,
+        ({ param }) => {
+            const item = getRoutes().items.find((r) => r.name === param.value);
 
             if (item) {
                 return null;
             }
 
-            return notFound("Route", match[0], range, "route");
-        });
-    });
+            return notFound(
+                "Route",
+                param.value,
+                detectedRange(param),
+                "route",
+            );
+        },
+    );
 };
 
 export { diagnosticProvider, hoverProvider, linkProvider };

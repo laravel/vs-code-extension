@@ -15,7 +15,7 @@ export default class Inertia implements CompletionProvider {
                 functions: ["render", "modal"],
             },
             {
-                class: "Illuminate\\Support\\Facades\\Route",
+                class: facade("Route"),
                 functions: ["inertia"],
             },
             {
@@ -33,7 +33,7 @@ export default class Inertia implements CompletionProvider {
     ): vscode.CompletionItem[] {
         const views = getInertiaViews().items;
 
-        if (result.class() === "Illuminate\\Support\\Facades\\Route") {
+        if (result.class() === facade("Route")) {
             if (result.isParamIndex(1)) {
                 return Object.entries(views).map(([key]) => {
                     let completionItem = new vscode.CompletionItem(

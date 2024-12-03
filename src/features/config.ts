@@ -1,109 +1,173 @@
 import { notFound } from "@src/diagnostic";
 import { getConfigs } from "@src/repositories/configs";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import { getTokens } from "@src/support/parser";
-import { configMatchRegex } from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc, getTokens } from "@src/support/parser";
 import { relativePath } from "@src/support/project";
+import { facade } from "@src/support/util";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import { DetectResult, HoverProvider, LinkProvider } from "..";
 
-const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, configMatchRegex, (match) => {
-        const uri =
-            getConfigs().items.find((item) => item.name === match[0])?.uri ??
-            null;
+const toFind = [
+    { class: null, method: "config" },
+    {
+        class: [facade("Config"), "config"],
+        method: [
+            "get",
+            "getMany",
+            "string",
+            "integer",
+            "boolean",
+            "float",
+            "array",
+            "prepend",
+            "push",
+        ],
+    },
+];
 
-        if (!uri) {
-            return null;
-        }
+const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
+    if (["prepend", "push"].includes(item.method)) {
+        return index === 0;
+    }
 
-        // TODO: This should also be in hover
-        const configKeyPath = match[0].split(".");
+    return true;
+};
 
-        // TODO: Replace with cli parser
-        const tokens = getTokens(fs.readFileSync(uri.fsPath, "utf8"))
-            .filter((token) => typeof token !== "string")
-            .filter((token) => token[0] === "T_CONSTANT_ENCAPSED_STRING");
-
-        // We don't need the first key, it's the file name
-        configKeyPath.shift();
-
-        let lineNumber: number | null = null;
-
-        for (const token of tokens) {
-            if (
-                [`'${configKeyPath[0]}'`, `"${configKeyPath[0]}"`].includes(
-                    token[1],
-                )
-            ) {
-                configKeyPath.shift();
+const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getConfigs,
+        ({ param, item, index }) => {
+            if (!isCorrectIndexForMethod(item, index)) {
+                return null;
             }
 
-            if (configKeyPath.length === 0) {
-                // @ts-ignore
-                lineNumber = token[2];
-                break;
+            const uri = getConfigs().items.find(
+                (config) => config.name === param.value,
+            )?.uri;
+
+            if (!uri) {
+                return null;
             }
-        }
 
-        if (lineNumber === null) {
-            return uri;
-        }
+            // TODO: This should also be in hover
+            const configKeyPath = param.value.split(".");
 
-        return uri.with({ fragment: `L${lineNumber}` });
-    });
+            // TODO: Replace with cli parser
+            const tokens = getTokens(fs.readFileSync(uri.fsPath, "utf8"))
+                .filter((token) => typeof token !== "string")
+                .filter((token) => token[0] === "T_CONSTANT_ENCAPSED_STRING");
+
+            // We don't need the first key, it's the file name
+            configKeyPath.shift();
+
+            let lineNumber: number | null = null;
+
+            for (const token of tokens) {
+                if (
+                    [`'${configKeyPath[0]}'`, `"${configKeyPath[0]}"`].includes(
+                        token[1],
+                    )
+                ) {
+                    configKeyPath.shift();
+                }
+
+                if (configKeyPath.length === 0) {
+                    // @ts-ignore
+                    lineNumber = token[2];
+                    break;
+                }
+            }
+
+            if (lineNumber === null) {
+                return new vscode.DocumentLink(detectedRange(param), uri);
+            }
+
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                uri.with({ fragment: `L${lineNumber}` }),
+            );
+        },
+    );
 };
 
 const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, configMatchRegex, (match) => {
-        const item = getConfigs().items.find((config) => config.name === match);
+    return findHoverMatchesInDoc(
+        doc,
+        pos,
+        toFind,
+        getConfigs,
+        (match, { index, item }) => {
+            if (!isCorrectIndexForMethod(item, index)) {
+                return null;
+            }
 
-        if (!item) {
-            return null;
-        }
+            const configItem = getConfigs().items.find(
+                (config) => config.name === match,
+            );
 
-        const text = [];
+            if (!configItem) {
+                return null;
+            }
 
-        if (item.value !== null) {
-            text.push("`" + item.value + "`");
-        }
+            const text = [];
 
-        if (item.uri) {
-            text.push(`[${relativePath(item.uri.path)}](${item.uri.fsPath})`);
-        }
+            if (configItem.value !== null) {
+                text.push("`" + configItem.value + "`");
+            }
 
-        if (text.length === 0) {
-            return null;
-        }
+            if (configItem.uri) {
+                text.push(
+                    `[${relativePath(configItem.uri.path)}](${
+                        configItem.uri.fsPath
+                    })`,
+                );
+            }
 
-        return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
-    });
+            if (text.length === 0) {
+                return null;
+            }
+
+            return new vscode.Hover(
+                new vscode.MarkdownString(text.join("\n\n")),
+            );
+        },
+    );
 };
 
 const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, configMatchRegex, (match, range) => {
-        return getConfigs().whenLoaded((items) => {
-            const config = items.find((item) => item.name === match[0]);
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getConfigs,
+        ({ param, item, index }) => {
+            if (!isCorrectIndexForMethod(item, index)) {
+                return null;
+            }
+
+            const config = getConfigs().items.find(
+                (c) => c.name === param.value,
+            );
 
             if (config) {
                 return null;
             }
 
-            return notFound("Config", match[0], range, "config");
-        });
-    });
+            return notFound(
+                "Config",
+                param.value,
+                detectedRange(param),
+                "config",
+            );
+        },
+    );
 };
 
 export { diagnosticProvider, hoverProvider, linkProvider };

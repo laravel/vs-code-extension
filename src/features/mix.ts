@@ -1,32 +1,42 @@
 import { notFound } from "@src/diagnostic";
 import { getMixManifest } from "@src/repositories/mix";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import { mixManifestMatchRegex } from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
 import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 
-const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, mixManifestMatchRegex, (match) => {
-        return (
-            getMixManifest().items.find((item) => item.key === match[0])?.uri ??
-            null
-        );
-    });
+const toFind = {
+    class: null,
+    method: "mix",
+};
+
+const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getMixManifest,
+        ({ param }) => {
+            const mixItem = getMixManifest().items.find(
+                (i) => i.key === param.value,
+            );
+
+            if (!mixItem) {
+                return null;
+            }
+
+            return new vscode.DocumentLink(detectedRange(param), mixItem.uri);
+        },
+    );
 };
 
 const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, mixManifestMatchRegex, (match) => {
-        const item = getMixManifest().items.find((item) => item.key === match);
+    const items = getMixManifest().items;
+    return findHoverMatchesInDoc(doc, pos, toFind, getMixManifest, (match) => {
+        const item = items.find((item) => item.key === match);
 
         if (!item) {
             return null;
@@ -43,17 +53,27 @@ const hoverProvider: HoverProvider = (
 const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, mixManifestMatchRegex, (match, range) => {
-        return getMixManifest().whenLoaded((items) => {
-            const item = items.find((item) => item.key === match[0]);
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getMixManifest,
+        ({ param }) => {
+            const item = getMixManifest().items.find(
+                (item) => item.key === param.value,
+            );
 
             if (item) {
                 return null;
             }
 
-            return notFound("Mix manifest item", match[0], range, "mix");
-        });
-    });
+            return notFound(
+                "Mix manifest item",
+                param.value,
+                detectedRange(param),
+                "mix",
+            );
+        },
+    );
 };
 
 export { diagnosticProvider, hoverProvider, linkProvider };

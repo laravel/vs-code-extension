@@ -44,8 +44,12 @@ export default class LinkProvider implements vsDocumentLinkProvider {
     public provideDocumentLinks(
         doc: TextDocument,
     ): ProviderResult<DocumentLink[]> {
-        return this.providers
-            .filter((provider) => getConfig(provider.configKey, true))
-            .flatMap((provider) => provider.provider(doc));
+        return Promise.all(
+            this.providers
+                .filter((provider) => getConfig(provider.configKey, true))
+                .map((provider) => provider.provider(doc)),
+        ).then((result) => {
+            return result.flat(2).filter((i) => i !== null);
+        });
     }
 }

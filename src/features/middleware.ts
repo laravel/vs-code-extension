@@ -1,71 +1,128 @@
 import { notFound } from "@src/diagnostic";
 import { getMiddleware } from "@src/repositories/middleware";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import { middlewareMatchRegex } from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
 import { relativePath } from "@src/support/project";
+import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import {
+    DetectResultParam,
+    DetectResultStringParam,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-export const diagnosticProvider = (
-    doc: vscode.TextDocument,
-): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, middlewareMatchRegex, (match, range) => {
-        return getMiddleware().whenLoaded((items) => {
-            const finalMatch = match[0].split(":").shift() ?? "";
-            const item = items[finalMatch];
-
-            if (item) {
-                return null;
-            }
-
-            return notFound("Middleware", finalMatch, range, "middleware");
-        });
-    });
+const toFind = {
+    class: facade("Route"),
+    method: ["middleware", "withoutMiddleware"],
 };
 
-export const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, middlewareMatchRegex, (match) => {
-        const route = getMiddleware().items[match[0]];
+const getName = (match: string) => {
+    return match.split(":").shift() ?? "";
+};
 
-        if (!route || !route.uri) {
-            return null;
-        }
+const processParam = <T>(
+    param: DetectResultParam,
+    cb: (value: DetectResultStringParam) => T | null,
+) => {
+    if (param.type === "string") {
+        return cb(param);
+    }
 
-        return route.uri;
-    });
+    return param.value
+        .map(({ value }) => {
+            return value.type === "string" ? cb(value) : null;
+        })
+        .filter((i: T | null) => i !== null);
+};
+
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string" | "array">(
+        doc,
+        toFind,
+        getMiddleware,
+        ({ param }) => {
+            const routes = getMiddleware().items;
+
+            return processParam(param, (value) => {
+                const route = routes[getName(value.value)];
+
+                if (!route || !route.uri) {
+                    return null;
+                }
+
+                return new vscode.DocumentLink(detectedRange(value), route.uri);
+            });
+        },
+        ["string", "array"],
+    );
 };
 
 export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, middlewareMatchRegex, (match) => {
-        const item = getMiddleware().items[match];
+    return findHoverMatchesInDoc(
+        doc,
+        pos,
+        toFind,
+        getMiddleware,
+        (match) => {
+            const item = getMiddleware().items[getName(match)];
 
-        if (!item || !item.uri) {
-            if (item.groups.length > 0) {
-                const text = item.groups.map((i) =>
-                    i.uri
-                        ? `[${relativePath(i.uri.path)}](${i.uri.toString()})`
-                        : i.class,
-                );
+            if (item?.uri) {
+                const text = [
+                    `[${relativePath(item.uri.path)}](${item.uri.path})`,
+                ];
 
                 return new vscode.Hover(
                     new vscode.MarkdownString(text.join("\n\n")),
                 );
             }
 
-            return null;
-        }
+            if (item.groups.length === 0) {
+                return null;
+            }
 
-        const text = [`[${relativePath(item.uri.path)}](${item.uri.path})`];
+            const text = item.groups.map((i) =>
+                i.uri
+                    ? `[${relativePath(i.uri.path)}](${i.uri.toString()})`
+                    : i.class,
+            );
 
-        return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
-    });
+            return new vscode.Hover(
+                new vscode.MarkdownString(text.join("\n\n")),
+            );
+        },
+        ["string", "array"],
+    );
+};
+
+export const diagnosticProvider = (
+    doc: vscode.TextDocument,
+): Promise<vscode.Diagnostic[]> => {
+    return detectInDoc<vscode.Diagnostic, "string" | "array">(
+        doc,
+        toFind,
+        getMiddleware,
+        ({ param }) => {
+            const routes = getMiddleware().items;
+
+            return processParam(param, (value) => {
+                const route = routes[getName(value.value)];
+
+                if (route) {
+                    return null;
+                }
+
+                return notFound(
+                    "Middleware",
+                    value.value,
+                    detectedRange(value),
+                    "middleware",
+                );
+            });
+        },
+        ["string", "array"],
+    );
 };

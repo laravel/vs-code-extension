@@ -1,9 +1,14 @@
 import { codeActionProvider as envProvider } from "@src/features/env";
 import { codeActionProvider as inertiaProvider } from "@src/features/inertia";
+import { codeActionProvider as viewProvider } from "@src/features/view";
 import * as vscode from "vscode";
 import { CodeActionProviderFunction } from "..";
 
-const providers: CodeActionProviderFunction[] = [envProvider, inertiaProvider];
+const providers: CodeActionProviderFunction[] = [
+    envProvider,
+    inertiaProvider,
+    viewProvider,
+];
 
 export class CodeActionProvider implements vscode.CodeActionProvider {
     public static readonly providedCodeActionKinds = [

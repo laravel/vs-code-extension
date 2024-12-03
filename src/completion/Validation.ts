@@ -97,11 +97,11 @@ export default class Validation implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\Validator",
+                class: facade("Validator"),
                 functions: ["validate", "sometimes"],
             },
             {
-                class: "Illuminate\\Support\\Facades\\Request",
+                class: facade("Request"),
                 functions: ["validate", "sometimes"],
             },
             {
@@ -141,10 +141,7 @@ export default class Validation implements CompletionProvider {
             return [];
         }
 
-        if (
-            result.isClass("Illuminate\\Support\\Facades\\Request") &&
-            result.isParamIndex(0)
-        ) {
+        if (result.isClass(facade("Request")) && result.isParamIndex(0)) {
             return this.getRules(document, position);
         }
 
@@ -156,10 +153,7 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: ParsingResult,
     ): vscode.CompletionItem[] | undefined {
-        if (
-            result.isClass("Illuminate\\Support\\Facades\\Validator") &&
-            result.isParamIndex(1)
-        ) {
+        if (result.isClass(facade("Validator")) && result.isParamIndex(1)) {
             return this.getRules(document, position);
         }
     }

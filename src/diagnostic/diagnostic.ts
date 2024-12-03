@@ -39,11 +39,7 @@ export const updateDiagnostics = (
 ): void => {
     collection.clear();
 
-    if (!editor) {
-        return;
-    }
-
-    const document = editor.document;
+    const document = editor?.document;
 
     if (!document) {
         return;
@@ -54,6 +50,6 @@ export const updateDiagnostics = (
             .filter((provider) => getConfig(provider.configKey, true))
             .map((provider) => provider.provider(document)),
     ).then((diagnostics) => {
-        collection.set(document.uri, diagnostics.flat());
+        collection.set(document.uri, diagnostics.flat(2));
     });
 };

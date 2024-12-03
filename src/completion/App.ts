@@ -1,5 +1,6 @@
 "use strict";
 
+import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
 import ParsingResult from "../parser/ParsingResult";
@@ -10,7 +11,7 @@ export default class App implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\App",
+                class: facade("App"),
                 functions: ["make", "bound", "isShared"],
             },
             {

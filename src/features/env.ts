@@ -2,37 +2,45 @@ import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import { getEnv } from "@src/repositories/env";
 import { getEnvExample } from "@src/repositories/env-example";
-import {
-    findHoverMatchesInDoc,
-    findLinksInDoc,
-    findWarningsInDoc,
-} from "@src/support/doc";
-import { envMatchRegex } from "@src/support/patterns";
+import { findHoverMatchesInDoc } from "@src/support/doc";
+import { detectedRange, detectInDoc } from "@src/support/parser";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { CodeActionProviderFunction, HoverProvider, LinkProvider } from "..";
 
-export const linkProvider: LinkProvider = (
-    doc: vscode.TextDocument,
-): vscode.DocumentLink[] => {
-    return findLinksInDoc(doc, envMatchRegex, (match) => {
-        const env = getEnv().items[match[0]] ?? null;
+const toFind = { class: null, method: "env" };
 
-        if (!env) {
-            return null;
-        }
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+    return detectInDoc<vscode.DocumentLink, "string">(
+        doc,
+        toFind,
+        getEnv,
+        ({ param, index }) => {
+            if (index > 0) {
+                return null;
+            }
 
-        return vscode.Uri.file(projectPath(".env")).with({
-            fragment: `L${env.lineNumber}`,
-        });
-    });
+            const env = getEnv().items[param.value];
+
+            if (!env) {
+                return null;
+            }
+
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(projectPath(".env")).with({
+                    fragment: `L${env.lineNumber}`,
+                }),
+            );
+        },
+    );
 };
 
 export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, envMatchRegex, (match) => {
+    return findHoverMatchesInDoc(doc, pos, toFind, getEnv, (match) => {
         const item = getEnv().items[match];
 
         if (!item || item.value === "") {
@@ -46,17 +54,24 @@ export const hoverProvider: HoverProvider = (
 export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
-    return findWarningsInDoc(doc, envMatchRegex, (match, range) => {
-        return getEnv().whenLoaded((items) => {
-            const env = items[match[0]];
+    return detectInDoc<vscode.Diagnostic, "string">(
+        doc,
+        toFind,
+        getEnv,
+        ({ param, index }) => {
+            if (index > 0) {
+                return null;
+            }
+
+            const env = getEnv().items[param.value];
 
             if (env) {
                 return null;
             }
 
-            return notFound("Env", match[0], range, "env");
-        });
-    });
+            return notFound("Env", param.value, detectedRange(param), "env");
+        },
+    );
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (

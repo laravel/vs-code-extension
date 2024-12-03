@@ -47,12 +47,60 @@ interface View {
     uri: vscode.Uri;
 }
 
+interface DetectResult {
+    method: string;
+    class: string | null;
+    params: DetectResultParam[];
+}
+
+interface DetectResultArrayValue {
+    key: {
+        type: string;
+        value: string | null;
+    };
+    value:
+        | {
+              type: "unknown";
+              value: null;
+          }
+        | DetectResultStringParam;
+}
+
+interface DetectResultStringParam {
+    type: "string";
+    value: string;
+    start: {
+        line: number;
+        column: number;
+    };
+    end: {
+        line: number;
+        column: number;
+    };
+}
+
+type ValidDetectParamTypes = "string" | "array";
+
+interface DetectResultArrayParam {
+    type: "array";
+    value: DetectResultArrayValue[];
+}
+
+type DetectResultParam = DetectResultArrayParam | DetectResultStringParam;
+
 type HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ) => vscode.ProviderResult<vscode.Hover>;
 
-type LinkProvider = (doc: vscode.TextDocument) => vscode.DocumentLink[];
+type LinkProvider = (
+    doc: vscode.TextDocument,
+) => Promise<(vscode.DocumentLink | null)[]>;
+
+interface DocFindParams {
+    class: string | string[] | null;
+    method: string | string[];
+}
 
 declare namespace Eloquent {
     interface Result {

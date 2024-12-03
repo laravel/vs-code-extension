@@ -39,18 +39,16 @@ export default class HoverProvider implements vsHoverProvider {
     ];
 
     provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {
-        for (const provider of this.providers) {
-            if (!getConfig(provider.configKey, true)) {
-                continue;
-            }
-
-            const hover = provider.provider(doc, pos);
-
-            if (hover) {
-                return hover;
-            }
-        }
-
-        return null;
+        return Promise.all(
+            this.providers
+                .filter((provider) => getConfig(provider.configKey, true))
+                .map((provider) => provider.provider(doc, pos)),
+        ).then((result) => {
+            console.log(
+                "hover result",
+                result.flat().find((i) => i !== null),
+            );
+            return result.flat().find((i) => i !== null);
+        });
     }
 }

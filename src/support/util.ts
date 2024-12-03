@@ -20,3 +20,11 @@ export const trimQuotes = (text: string): string =>
 export const relativeMarkdownLink = (uri: vscode.Uri): string => {
     return `[${relativePath(uri.path)}](${uri})`;
 };
+
+export const toArray = <T>(value: T | T[]): T[] => {
+    return Array.isArray(value) ? value : [value];
+};
+
+export const facade = (className: string): string => {
+    return `Illuminate\\Support\\Facades\\${className}`;
+};

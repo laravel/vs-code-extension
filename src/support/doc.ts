@@ -1,3 +1,4 @@
+import { repository } from "@src/repositories";
 import {
     Diagnostic,
     DocumentLink,
@@ -8,6 +9,13 @@ import {
     TextDocument,
     Uri,
 } from "vscode";
+import {
+    DetectResult,
+    DetectResultStringParam,
+    DocFindParams,
+    ValidDetectParamTypes,
+} from "..";
+import { detectInDoc, isInHoverRange } from "./parser";
 
 export const findWarningsInDoc = (
     doc: TextDocument,
@@ -51,16 +59,66 @@ export const findLinksInDoc = (
 export const findHoverMatchesInDoc = (
     doc: TextDocument,
     pos: Position,
-    regex: string,
-    cb: (match: string) => ProviderResult<Hover>,
+    toFind: DocFindParams | DocFindParams[],
+    repo: ReturnType<typeof repository>,
+    cb: (
+        match: string,
+        arg: {
+            param: DetectResultStringParam;
+            index: number;
+            item: DetectResult;
+        },
+    ) => ProviderResult<Hover>,
+    validParamTypes?: ValidDetectParamTypes[],
 ): ProviderResult<Hover> => {
-    const linkRange = doc.getWordRangeAtPosition(pos, new RegExp(regex));
+    const linkRange = doc.getWordRangeAtPosition(
+        pos,
+        new RegExp(/(['"])(.*?)\1/),
+    );
 
     if (!linkRange) {
         return null;
     }
 
-    return cb(doc.getText(linkRange));
+    return detectInDoc<ProviderResult<Hover>, "string" | "array">(
+        doc,
+        toFind,
+        repo,
+        ({ param, index, item }) => {
+            if (param.type === "string") {
+                if (!isInHoverRange(linkRange, param)) {
+                    return null;
+                }
+
+                return cb(doc.getText(linkRange).replace(/^['"]|['"]$/g, ""), {
+                    param,
+                    index,
+                    item,
+                });
+            }
+
+            if (param.type === "array") {
+                const value = param.value.find(
+                    ({ value }) =>
+                        value.type === "string" &&
+                        isInHoverRange(linkRange, value),
+                ) as DetectResultStringParam | undefined;
+
+                if (!value) {
+                    return null;
+                }
+
+                return cb(doc.getText(linkRange).replace(/^['"]|['"]$/g, ""), {
+                    param: value,
+                    index,
+                    item,
+                });
+            }
+
+            return null;
+        },
+        validParamTypes,
+    ).then((results) => results.find((result) => result !== null) || null);
 };
 
 // TODO: This is a duplication of findMatchesInDocAsync, but I don't want to change it right now

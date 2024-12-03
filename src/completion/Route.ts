@@ -14,7 +14,7 @@ export default class Route implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Facades\\Route",
+                class: facade("Route"),
                 functions: [
                     "get",
                     "post",
@@ -31,14 +31,14 @@ export default class Route implements CompletionProvider {
                 functions: ["route", "signedRoute"],
             },
             {
-                class: "Illuminate\\Support\\Facades\\Redirect",
+                class: facade("Redirect"),
                 functions: ["route", "signedRoute"],
             },
         ];
     }
 
     autoCompleteAction(result: ParsingResult): boolean {
-        if (result.class() !== "Illuminate\\Support\\Facades\\Route") {
+        if (result.class() !== facade("Route")) {
             return false;
         }
 
