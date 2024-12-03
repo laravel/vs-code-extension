@@ -1,5 +1,6 @@
 "use strict";
 
+import { facade } from "@src/support/util";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
