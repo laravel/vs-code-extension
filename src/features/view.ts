@@ -16,10 +16,17 @@ import * as vscode from "vscode";
 const toFind = [
     { class: facade("View"), method: "make" },
     { class: facade("Route"), method: "view" },
-    { class: null, method: ["view", "markdown", "assertViewIs"] },
-    // "@include",
-    // "@extends",
-    // "@component",
+    {
+        class: null,
+        method: [
+            "view",
+            "markdown",
+            "assertViewIs",
+            "@include",
+            "@extends",
+            "@component",
+        ],
+    },
 ];
 
 const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
