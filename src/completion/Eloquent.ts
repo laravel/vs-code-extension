@@ -67,8 +67,6 @@ export default class Eloquent implements CompletionProvider {
     ): vscode.CompletionItem[] {
         const info = result.getInfo("eloquent");
 
-        console.log("Eloquent info", info);
-
         const className = info?.class || result.class();
 
         if (className && !result.func() && getModels().items[className]) {
