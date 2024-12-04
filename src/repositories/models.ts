@@ -12,6 +12,10 @@ const load = () => {
         }),
         "Eloquent Attributes and Relations",
     ).then((result) => {
+        if (!result) {
+            return {};
+        }
+
         writeEloquentDocBlocks(result.models, result.builderMethods);
 
         return result.models;
