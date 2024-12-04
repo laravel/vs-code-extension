@@ -65,14 +65,18 @@ echo collect([
     ->flatMap(function (string $className) {
         $output = new \\Symfony\\Component\\Console\\Output\\BufferedOutput();
 
-        \\Illuminate\\Support\\Facades\\Artisan::call(
-            "model:show",
-            [
-                "model" => $className,
-                "--json" => true,
-            ],
-            $output
-        );
+        try {
+            \\Illuminate\\Support\\Facades\\Artisan::call(
+                "model:show",
+                [
+                    "model" => $className,
+                    "--json" => true,
+                ],
+                $output
+            );
+        } catch (\\Exception | \\Throwable $e) {
+            return null;
+        }
 
         $data = json_decode($output->fetch(), true);
 

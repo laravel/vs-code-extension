@@ -7,7 +7,7 @@ const modelPaths = ["app", "app/Models"];
 
 const load = () => {
     return runInLaravel<Eloquent.Result>(
-        template("eloquentProvider", {
+        template("models", {
             model_paths: JSON.stringify(modelPaths),
         }),
         "Eloquent Attributes and Relations",
