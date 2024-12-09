@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getControllers } from "../repositories/controllers";
 import { getMiddleware } from "../repositories/middleware";
 import { getRoutes } from "../repositories/routes";
@@ -30,16 +30,18 @@ export default class Route implements CompletionProvider {
             },
             {
                 functions: ["route", "signedRoute"],
+                paramIndex: 0,
             },
             {
                 class: facade("Redirect"),
                 functions: ["route", "signedRoute"],
+                paramIndex: 0,
             },
         ];
     }
 
-    autoCompleteAction(result: ParsingResult): boolean {
-        if (result.class() !== facade("Route")) {
+    autoCompleteAction(result: AutocompleteResult): boolean {
+        if (!result.isFacade("Route")) {
             return false;
         }
 
@@ -59,7 +61,7 @@ export default class Route implements CompletionProvider {
         ].includes(result.func()!);
     }
 
-    autoCompleteActionParam(result: ParsingResult): boolean {
+    autoCompleteActionParam(result: AutocompleteResult): boolean {
         // TODO: This is a bit confusing, maybe we include in the result the index of the parameter we're on?
         if (result.func() === "match") {
             return result.isParamIndex(2);
@@ -69,7 +71,7 @@ export default class Route implements CompletionProvider {
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

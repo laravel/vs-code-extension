@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Validation implements CompletionProvider {
@@ -100,10 +100,12 @@ export default class Validation implements CompletionProvider {
             {
                 class: facade("Validator"),
                 functions: ["validate", "sometimes"],
+                paramIndex: 1,
             },
             {
-                class: facade("Request"),
+                class: "Illuminate\\Http\\Request",
                 functions: ["validate", "sometimes"],
+                paramIndex: 0,
             },
             {
                 classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
@@ -113,7 +115,7 @@ export default class Validation implements CompletionProvider {
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -135,14 +137,14 @@ export default class Validation implements CompletionProvider {
     private handleValidateMethod(
         document: vscode.TextDocument,
         position: vscode.Position,
-        result: ParsingResult,
+        result: AutocompleteResult,
     ): vscode.CompletionItem[] {
         if (result.fillingInArrayKey()) {
             // We only fill in values for the validate method, abort
             return [];
         }
 
-        if (result.isClass(facade("Request")) && result.isParamIndex(0)) {
+        if (result.isClass("Illuminate\\Http\\Request")) {
             return this.getRules(document, position);
         }
 
@@ -152,9 +154,9 @@ export default class Validation implements CompletionProvider {
     private validatorValidation(
         document: vscode.TextDocument,
         position: vscode.Position,
-        result: ParsingResult,
+        result: AutocompleteResult,
     ): vscode.CompletionItem[] | undefined {
-        if (result.isClass(facade("Validator")) && result.isParamIndex(1)) {
+        if (result.isClass(facade("Validator"))) {
             return this.getRules(document, position);
         }
     }

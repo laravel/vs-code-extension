@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getMixManifest } from "../repositories/mix";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -9,12 +9,13 @@ export default class Mix implements CompletionProvider {
         return [
             {
                 functions: ["mix"],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

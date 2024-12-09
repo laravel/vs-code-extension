@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, Eloquent as EloquentType, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -59,7 +59,7 @@ export default class Eloquent implements CompletionProvider {
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -177,9 +177,9 @@ export default class Eloquent implements CompletionProvider {
     }
 
     customCheck(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: string,
-    ): ParsingResult | false {
+    ): AutocompleteResult | false {
         const func = result.func();
 
         if (!func) {
@@ -204,8 +204,6 @@ export default class Eloquent implements CompletionProvider {
             }
 
             if (getModels().items[context.classUsed]) {
-                console.log("Found class", context.classUsed);
-
                 if (
                     context.methodUsed &&
                     this.relationMethods.includes(context.methodUsed)
@@ -254,32 +252,8 @@ export default class Eloquent implements CompletionProvider {
             .concat(this.anyParamMethods);
     }
 
-    private isValidResult(result: ParsingResult | null): boolean {
-        if (!result) {
-            return false;
-        }
-
-        if (!result.func()) {
-            return false;
-        }
-
-        return (
-            typeof this.tags().find((tag) => {
-                if (result.func() && tag.class !== result.func()) {
-                    return false;
-                }
-
-                if (!tag.functions) {
-                    return false;
-                }
-
-                return tag.functions.includes(result.func() || "");
-            }) !== "undefined"
-        );
-    }
-
     private getRelationshipCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         model: EloquentType.Model,
@@ -316,7 +290,7 @@ export default class Eloquent implements CompletionProvider {
     }
 
     private getFillableAttributeCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         model: EloquentType.Model,

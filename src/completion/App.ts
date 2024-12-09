@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getAppBindings } from "../repositories/appBinding";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -13,15 +13,17 @@ export default class App implements CompletionProvider {
             {
                 class: facade("App"),
                 functions: ["make", "bound", "isShared"],
+                paramIndex: 0,
             },
             {
                 functions: ["app"],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

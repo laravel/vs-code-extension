@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getAssets } from "../repositories/asset";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -11,12 +11,13 @@ export default class Asset implements CompletionProvider {
         return [
             {
                 functions: ["asset"],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

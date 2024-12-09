@@ -4,10 +4,14 @@ export namespace FTParsing {
         implements: string[];
         extends: string | null;
         methodDefinition: string | null;
-        methodDefinitionParams: string[];
-        methodExistingArgs: Arg[];
-        classUsed: string | null;
-        methodUsed: string | null;
+        parameters: string[];
+        arguments?: {
+            type: "arguments";
+            autocompletingIndex: number;
+            children: Argument[];
+        };
+        className: string | null;
+        methodName: string | null;
         parent: Result | null;
         variables: Variables;
         definedProperties: string[];
@@ -16,26 +20,31 @@ export namespace FTParsing {
         paramIndex: number;
     }
 
-    type Arg = NonArrayArg | ArrayArg;
-
-    interface ArrayValue {
-        key: Arg;
-        value: Arg;
+    interface Argument {
+        type: "argument";
+        children: Result[];
     }
 
-    interface NonArrayArg {
-        type: Exclude<string, "array">;
-        value: string;
-        arguments?: Arg[];
-    }
+    // type Argument = NonArrayArg | ArrayArg;
 
-    interface ArrayArg {
-        type: "array";
-        value: ArrayValue[];
-        arguments?: Arg[];
-    }
+    // interface ArrayValue {
+    //     key: Argument;
+    //     value: Argument;
+    // }
+
+    // interface NonArrayArg {
+    //     type: Exclude<string, "array">;
+    //     value: string;
+    //     arguments?: Argument[];
+    // }
+
+    // interface ArrayArg {
+    //     type: "array";
+    //     value: ArrayValue[];
+    //     arguments?: Argument[];
+    // }
 
     export interface Variables {
-        [key: string]: Arg;
+        [key: string]: Argument;
     }
 }

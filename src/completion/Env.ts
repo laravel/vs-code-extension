@@ -1,8 +1,9 @@
 "use strict";
 
+import { support } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getEnv } from "../repositories/env";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -10,17 +11,19 @@ export default class Env implements CompletionProvider {
     tags(): Tags {
         return [
             {
-                class: "Illuminate\\Support\\Env",
+                class: support("Env"),
                 functions: ["get"],
+                paramIndex: 0,
             },
             {
                 functions: ["env"],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

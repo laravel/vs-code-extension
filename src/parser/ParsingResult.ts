@@ -1,6 +1,7 @@
+import { facade } from "@src/support/util";
 import { FTParsing } from "../types";
 
-export default class ParsingResult {
+export default class AutocompleteResult {
     public result: FTParsing.Result;
 
     private additionalInfo: Record<string, any> = {};
@@ -10,13 +11,11 @@ export default class ParsingResult {
     }
 
     public currentParamIsArray(): boolean {
-        const args = this.result.methodExistingArgs;
+        const currentArg = this.param();
 
-        if (args.length === 0) {
+        if (currentArg === null) {
             return false;
         }
-
-        const currentArg = args[args.length - 1];
 
         return currentArg.type === "array";
     }
@@ -39,23 +38,27 @@ export default class ParsingResult {
     }
 
     public fillingInArrayKey(): boolean {
-        return this.result.fillingInArrayKey;
+        return this.param()?.autocompletingKey ?? false;
     }
 
     public fillingInArrayValue(): boolean {
-        return this.result.fillingInArrayValue;
+        return this.param()?.autocompletingValue ?? false;
     }
 
     public class() {
-        return this.result.classUsed;
+        return this.result.className;
     }
 
     public isClass(className: string) {
         return this.class() === className;
     }
 
+    public isFacade(className: string) {
+        return this.class() === facade(className);
+    }
+
     public func() {
-        return this.result.methodUsed;
+        return this.result.methodName;
     }
 
     public addInfo(key: string, value: any) {
@@ -84,11 +87,15 @@ export default class ParsingResult {
     public param(index?: number) {
         index = index ?? this.paramIndex();
 
-        return this.result.methodExistingArgs[index];
+        if (index === null || typeof index === "undefined") {
+            return null;
+        }
+
+        return this.result.arguments?.children[index].children[0];
     }
 
     public paramIndex() {
-        return this.result.paramIndex;
+        return this.result.arguments?.autocompletingIndex;
     }
 
     public isParamIndex(index: number) {
@@ -96,6 +103,6 @@ export default class ParsingResult {
     }
 
     public paramCount() {
-        return this.result.methodExistingArgs.length;
+        return this.result.arguments?.children.length ?? 0;
     }
 }

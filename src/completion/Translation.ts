@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getTranslations } from "../repositories/translations";
 import { info } from "../support/logger";
 import { wordMatchRegex } from "./../support/patterns";
@@ -20,22 +20,23 @@ export default class Translation implements CompletionProvider {
                     "getForLocale",
                     "choice",
                 ],
+                paramIndex: [0, 1],
             },
             {
                 functions: ["__", "trans", "@lang"],
+                paramIndex: [0, 1],
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
         if (result.isParamIndex(1)) {
-            info("Translation", "Parameter index 1");
             return this.getParameterCompletionItems(result, document, position);
         }
 
@@ -59,7 +60,7 @@ export default class Translation implements CompletionProvider {
     }
 
     private getParameterCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
     ): vscode.CompletionItem[] {

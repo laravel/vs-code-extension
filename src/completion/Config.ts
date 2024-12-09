@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getConfigs } from "../repositories/configs";
 import { wordMatchRegex } from "../support/patterns";
 
@@ -13,15 +13,17 @@ export default class Config implements CompletionProvider {
             {
                 class: facade("Config"),
                 functions: ["get"],
+                paramIndex: 0,
             },
             {
                 functions: ["config"],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

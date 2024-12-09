@@ -1,5 +1,5 @@
 import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
-import ParsingResult from "@src/parser/ParsingResult";
+import AutocompleteResult from "@src/parser/ParsingResult";
 import { repository } from "@src/repositories";
 import * as cp from "child_process";
 import * as os from "os";
@@ -24,7 +24,7 @@ const parser = new engine({
     },
 });
 
-const currentlyParsing = new Map<string, Promise<ParsingResult>>();
+const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
 const detected = new Map<string, Promise<DetectResult[]>>();
 
 type TokenFormatted = [string, string, number];
@@ -118,7 +118,7 @@ export const getNormalizedTokens = (code: string): TokenFormatted[] => {
 
 export const parseFaultTolerant = async (
     code: string,
-): Promise<ParsingResult> => {
+): Promise<AutocompleteResult> => {
     let replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
 
     if (
@@ -159,7 +159,7 @@ export const parseFaultTolerant = async (
 
     // info("ft result ", result);
 
-    return new Promise<ParsingResult>(function (resolve, error) {
+    return new Promise<AutocompleteResult>(function (resolve, error) {
         cp.exec(
             command,
             {
@@ -167,8 +167,8 @@ export const parseFaultTolerant = async (
             },
             (err, stdout, stderr) => {
                 if (err === null) {
-                    console.log("parsing result", JSON.parse(stdout));
-                    return resolve(new ParsingResult(JSON.parse(stdout)));
+                    // console.log("parsing result", JSON.parse(stdout));
+                    return resolve(new AutocompleteResult(JSON.parse(stdout)));
                 }
 
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
@@ -250,9 +250,9 @@ export const detect = async (code: string): Promise<DetectResult[]> => {
 export const parse = (
     code: string,
     depth = 0,
-): Promise<ParsingResult | null> => {
+): Promise<AutocompleteResult | null> => {
     if (currentlyParsing.has(code)) {
-        return currentlyParsing.get(code) as Promise<ParsingResult>;
+        return currentlyParsing.get(code) as Promise<AutocompleteResult>;
     }
 
     const promise = parseFaultTolerant(code);

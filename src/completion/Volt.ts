@@ -4,13 +4,15 @@ import * as vscode from "vscode";
 import { info } from "../support/logger";
 import { getNormalizedTokens } from "../support/parser";
 
-export default class Blade implements vscode.CompletionItemProvider {
+export default class Volt implements vscode.CompletionItemProvider {
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        return [];
+
         let isBlade =
             ["blade", "laravel-blade"].includes(document.languageId) ||
             document.fileName.endsWith(".blade.php");

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import ParsingResult from "./parser/ParsingResult";
+import AutocompleteResult from "./parser/ParsingResult";
 
 type Tags = Tag[];
 
@@ -17,6 +17,7 @@ interface Tag {
     functionDefinition?: string;
     classExtends?: string;
     classImplements?: string;
+    paramIndex?: number | number[];
 }
 
 interface Config {
@@ -31,9 +32,9 @@ interface ConfigItem {
 
 interface CompletionProvider {
     tags(): Tags;
-    customCheck?(result: ParsingResult, document: string): any;
+    customCheck?(result: AutocompleteResult, document: string): any;
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

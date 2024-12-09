@@ -26,5 +26,9 @@ export const toArray = <T>(value: T | T[]): T[] => {
 };
 
 export const facade = (className: string): string => {
-    return `Illuminate\\Support\\Facades\\${className}`;
+    return support(`Facades\\${className}`);
+};
+
+export const support = (className: string): string => {
+    return `Illuminate\\Support\\${className}`;
 };

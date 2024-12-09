@@ -4,7 +4,7 @@ import { facade } from "@src/support/util";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { getViews } from "./../repositories/views";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -21,13 +21,14 @@ export default class View implements CompletionProvider {
                     "renderEach",
                     "exists",
                 ],
+                paramIndex: 0,
             },
             {
                 class: facade("Route"),
                 functions: ["view"],
+                paramIndex: 1,
             },
             {
-                // TODO: Some of these belong to other classes...
                 functions: [
                     "view",
                     "markdown",
@@ -39,12 +40,13 @@ export default class View implements CompletionProvider {
                     "@section",
                     "@push",
                 ],
+                paramIndex: 0,
             },
         ];
     }
 
     provideCompletionItems(
-        result: ParsingResult,
+        result: AutocompleteResult,
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,

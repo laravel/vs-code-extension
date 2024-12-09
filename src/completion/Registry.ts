@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider } from "..";
-import ParsingResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/ParsingResult";
 import { parse } from "./../support/parser";
 
 export default class Registry implements vscode.CompletionItemProvider {
@@ -53,8 +53,24 @@ export default class Registry implements vscode.CompletionItemProvider {
     }
 
     private getProviderByClassOrFunction(
-        parseResult: ParsingResult,
+        parseResult: AutocompleteResult,
     ): CompletionProvider | null {
+        const hasFunc = (funcs: string[]) => {
+            return funcs.find((fn) => fn === parseResult.func());
+        };
+
+        const isParamIndex = (paramIndex: number | number[] | undefined) => {
+            if (typeof paramIndex === "undefined") {
+                return true;
+            }
+
+            if (Array.isArray(paramIndex)) {
+                return paramIndex.includes(parseResult.paramIndex());
+            }
+
+            return paramIndex === parseResult.paramIndex();
+        };
+
         return (
             this.providers.find((provider) => {
                 if (parseResult.class()) {
@@ -63,9 +79,8 @@ export default class Registry implements vscode.CompletionItemProvider {
                         .find(
                             (tag) =>
                                 tag.class === parseResult.class() &&
-                                (tag.functions || []).find(
-                                    (fn) => fn === parseResult.func(),
-                                ),
+                                hasFunc(tag.functions || []) &&
+                                isParamIndex(tag.paramIndex),
                         );
                 }
 
@@ -74,16 +89,15 @@ export default class Registry implements vscode.CompletionItemProvider {
                     .find(
                         (tag) =>
                             !tag.class &&
-                            (tag.functions || []).find(
-                                (fn) => fn === parseResult.func(),
-                            ),
+                            hasFunc(tag.functions || []) &&
+                            isParamIndex(tag.paramIndex),
                     );
             }) || null
         );
     }
 
     private getProviderByFallback(
-        parseResult: ParsingResult,
+        parseResult: AutocompleteResult,
         document: string,
     ): CompletionProvider | null {
         for (const provider of this.providers) {
@@ -102,7 +116,7 @@ export default class Registry implements vscode.CompletionItemProvider {
     }
 
     private getProviderFromResult(
-        parseResult: ParsingResult,
+        parseResult: AutocompleteResult,
     ): CompletionProvider | null {
         return this.getProviderByClassOrFunction(parseResult);
     }
