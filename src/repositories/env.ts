@@ -8,6 +8,12 @@ interface EnvItem {
     };
 }
 
+const getKeyValue = (str: string) => {
+    const parts = str.split("=").map((env) => env.trim());
+
+    return [parts[0], parts.slice(1).join("=")];
+};
+
 const load = () => {
     let items: EnvItem = {};
 
@@ -23,7 +29,7 @@ const load = () => {
         }))
         .filter((env) => !env.line.startsWith("#"))
         .map((env) => ({
-            line: env.line.split("=").map((env) => env.trim()),
+            line: getKeyValue(env.line),
             index: env.index,
         }))
         .filter((env) => env.line.length === 2)
