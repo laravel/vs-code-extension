@@ -37,7 +37,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     "view.link": view,
 };
 
-export const finalLinkProviders: DocumentLinkProvider[] = Object.entries(
+export const linkProviders: DocumentLinkProvider[] = Object.entries(
     allProviders,
 ).map(([configKey, provider]) => ({
     provideDocumentLinks(doc: TextDocument): ProviderResult<DocumentLink[]> {

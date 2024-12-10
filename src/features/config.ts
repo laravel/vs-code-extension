@@ -118,7 +118,12 @@ const hoverProvider: HoverProvider = (
             const text = [];
 
             if (configItem.value !== null) {
-                text.push("`" + configItem.value + "`");
+                const display =
+                    configItem.value === ""
+                        ? "[empty string]"
+                        : configItem.value;
+
+                text.push("`" + display + "`");
             }
 
             if (configItem.uri) {

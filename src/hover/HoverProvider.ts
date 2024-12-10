@@ -14,37 +14,34 @@ import { config as getConfig } from "@src/support/config";
 import { GeneratedConfigKey } from "@src/support/generated-config";
 import {
     Hover,
+    HoverProvider,
     Position,
     ProviderResult,
     TextDocument,
-    HoverProvider as vsHoverProvider,
 } from "vscode";
 import { HoverProvider as ProviderFunc } from "..";
 
-export default class HoverProvider implements vsHoverProvider {
-    private providers: {
-        provider: ProviderFunc;
-        configKey: GeneratedConfigKey;
-    }[] = [
-        { provider: appBinding, configKey: "appBinding.hover" },
-        { provider: auth, configKey: "auth.hover" },
-        { provider: config, configKey: "config.hover" },
-        { provider: env, configKey: "env.hover" },
-        { provider: inertia, configKey: "inertia.hover" },
-        { provider: middleware, configKey: "middleware.hover" },
-        { provider: mix, configKey: "mix.hover" },
-        { provider: route, configKey: "route.hover" },
-        { provider: translation, configKey: "translation.hover" },
-        { provider: view, configKey: "view.hover" },
-    ];
+const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
+    "appBinding.hover": appBinding,
+    "auth.hover": auth,
+    "config.hover": config,
+    "env.hover": env,
+    "inertia.hover": inertia,
+    "middleware.hover": middleware,
+    "mix.hover": mix,
+    "route.hover": route,
+    "translation.hover": translation,
+    "view.hover": view,
+};
 
-    provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {
-        return Promise.all(
-            this.providers
-                .filter((provider) => getConfig(provider.configKey, true))
-                .map((provider) => provider.provider(doc, pos)),
-        ).then((result) => {
-            return result.flat().find((i) => i !== null);
-        });
-    }
-}
+export const hoverProviders: HoverProvider[] = Object.entries(allProviders).map(
+    ([configKey, provider]) => ({
+        provideHover(doc: TextDocument, pos: Position): ProviderResult<Hover> {
+            if (!getConfig(configKey as GeneratedConfigKey, true)) {
+                return null;
+            }
+
+            return provider(doc, pos);
+        },
+    }),
+);

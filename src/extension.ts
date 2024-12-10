@@ -22,8 +22,8 @@ import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
 import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
-import HoverProvider from "./hover/HoverProvider";
-import { finalLinkProviders } from "./link/LinkProvider";
+import { hoverProviders } from "./hover/HoverProvider";
+import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
@@ -139,10 +139,12 @@ export function activate(context: vscode.ExtensionContext) {
             new VoltCompletion(),
             ...TRIGGER_CHARACTERS.concat(["$"]),
         ),
-        ...finalLinkProviders.map((provider) =>
+        ...linkProviders.map((provider) =>
             vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
         ),
-        vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
+        ...hoverProviders.map((provider) =>
+            vscode.languages.registerHoverProvider(LANGUAGES, provider),
+        ),
         ...testRunnerCommands,
         testController,
         vscode.languages.registerCodeActionsProvider(

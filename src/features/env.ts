@@ -43,11 +43,13 @@ export const hoverProvider: HoverProvider = (
     return findHoverMatchesInDoc(doc, pos, toFind, getEnv, (match) => {
         const item = getEnv().items[match];
 
-        if (!item || item.value === "") {
+        if (!item) {
             return null;
         }
 
-        return new vscode.Hover(new vscode.MarkdownString(`\`${item.value}\``));
+        const display = item.value === "" ? "[empty string]" : item.value;
+
+        return new vscode.Hover(new vscode.MarkdownString(`\`${display}\``));
     });
 };
 
