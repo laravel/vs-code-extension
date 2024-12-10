@@ -23,18 +23,11 @@ export default class AutocompleteResult {
     public currentParamArrayKeys(): string[] {
         const param = this.param();
 
-        if (typeof param === "undefined") {
+        if (typeof param === "undefined" || param.type !== "array") {
             return [];
         }
 
-        if (!Array.isArray(param.value)) {
-            return [];
-        }
-
-        // @ts-ignore
-        return param.value
-            .map((item) => item.key.value)
-            .filter((val) => val !== null);
+        return param.children.map((child) => child.key.value);
     }
 
     public fillingInArrayKey(): boolean {
