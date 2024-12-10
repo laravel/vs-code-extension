@@ -7,6 +7,7 @@
     "engines": {
         "vscode": "^1.89.0"
     },
+    "icon": "laravel-vs-code-icon.png",
     "homepage": "https://github.com/laravel/vs-code-extension",
     "repository": {
         "type": "git",

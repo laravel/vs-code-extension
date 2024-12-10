@@ -2,51 +2,52 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, Eloquent as EloquentType, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Eloquent implements CompletionProvider {
     private relationMethods = [
-        "has",
-        "orHas",
-        "whereHas",
-        "orWhereHas",
-        "whereDoesntHave",
-        "orWhereDoesntHave",
         "doesntHave",
-        "orDoesntHave",
-        "hasMorph",
-        "orHasMorph",
         "doesntHaveMorph",
+        "has",
+        "hasMorph",
+        "orDoesntHave",
         "orDoesntHaveMorph",
-        "whereHasMorph",
-        "orWhereHasMorph",
-        "whereDoesntHaveMorph",
+        "orHas",
+        "orHasMorph",
+        "orWhereDoesntHave",
         "orWhereDoesntHaveMorph",
+        "orWhereHas",
+        "orWhereHasMorph",
+        "whereDoesntHave",
+        "whereDoesntHaveMorph",
+        "whereHas",
+        "whereHasMorph",
+        "with",
         "withAggregate",
+        "withAvg",
         "withCount",
         "withMax",
         "withMin",
         "withSum",
-        "withAvg",
-        "with",
     ];
 
     private firstParamMethods = [
-        "where",
-        "orWhere",
+        "create",
+        "fill",
+        "firstWhere",
+        "make",
+        "max",
         "orderBy",
         "orderByDesc",
-        "firstWhere",
-        "max",
-        "sum",
+        "orWhere",
         "select",
+        "sum",
         "update",
+        "where",
         "whereColumn",
-        "create",
-        "make",
-        "fill",
+        "whereIn",
     ];
 
     private anyParamMethods = ["firstOrNew", "firstOrCreate"];
@@ -199,38 +200,41 @@ export default class Eloquent implements CompletionProvider {
 
         // We have a method we're interested in, let's see if we can find a class
         result.loop((context) => {
-            if (context.classUsed === null) {
+            const r = new AutocompleteResult(context);
+
+            if (
+                !r.class() ||
+                r.isClass("Illuminate\\Database\\Eloquent\\Builder")
+            ) {
                 return true;
             }
 
-            if (getModels().items[context.classUsed]) {
-                if (
-                    context.methodUsed &&
-                    this.relationMethods.includes(context.methodUsed)
-                ) {
-                    const lastArg =
-                        context.methodExistingArgs[
-                            context.methodExistingArgs.length - 1
-                        ].value;
+            if (!getModels().items[r.class()]) {
+                return false;
+            }
 
-                    if (Array.isArray(lastArg) && lastArg.length > 0) {
-                        const relationKey =
-                            lastArg[lastArg.length - 1].key.value;
+            if (!r.func() || !this.relationMethods.includes(r.func())) {
+                foundClass = r.class();
 
-                        if (relationKey) {
-                            const relation = getModels().items[
-                                context.classUsed
-                            ].relations.find(
-                                (relation) => relation.name === relationKey,
-                            );
+                return false;
+            }
 
-                            if (relation) {
-                                foundClass = relation.related;
-                            }
-                        }
-                    }
-                } else {
-                    foundClass = context.classUsed;
+            const lastArg = r.param();
+
+            if (lastArg.type === "array" && lastArg.children.length > 0) {
+                const relationKey =
+                    lastArg.children[lastArg.children.length - 1].key.value;
+
+                if (!relationKey) {
+                    return false;
+                }
+
+                const relation = getModels().items[r.class()].relations.find(
+                    (relation) => relation.name === relationKey,
+                );
+
+                if (relation) {
+                    foundClass = relation.related;
                 }
             }
 

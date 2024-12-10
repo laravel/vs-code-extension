@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { wordMatchRegex } from "./../support/patterns";
 
 export default class Validation implements CompletionProvider {

@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getAssets } from "../repositories/asset";
 import { wordMatchRegex } from "./../support/patterns";
 

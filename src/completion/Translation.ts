@@ -3,7 +3,7 @@
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getTranslations } from "../repositories/translations";
 import { info } from "../support/logger";
 import { wordMatchRegex } from "./../support/patterns";

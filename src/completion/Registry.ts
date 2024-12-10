@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { CompletionProvider, Tag } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { parse } from "./../support/parser";
 
 export default class Registry implements vscode.CompletionItemProvider {

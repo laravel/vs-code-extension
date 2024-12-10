@@ -1,12 +1,12 @@
 import { facade } from "@src/support/util";
-import { FTParsing } from "../types";
+import { AutocompleteParsingResult } from "@src/types";
 
 export default class AutocompleteResult {
-    public result: FTParsing.Result;
+    public result: AutocompleteParsingResult.ContextValue;
 
     private additionalInfo: Record<string, any> = {};
 
-    constructor(result: FTParsing.Result) {
+    constructor(result: AutocompleteParsingResult.ContextValue) {
         this.result = result;
     }
 
@@ -27,7 +27,9 @@ export default class AutocompleteResult {
             return [];
         }
 
-        return param.children.map((child) => child.key.value);
+        return (param as AutocompleteParsingResult.ArrayValue).children.map(
+            (child) => child.key.value,
+        );
     }
 
     public fillingInArrayKey(): boolean {
@@ -39,7 +41,8 @@ export default class AutocompleteResult {
     }
 
     public class() {
-        return this.result.className;
+        // @ts-ignore
+        return this.result.className ?? null;
     }
 
     public isClass(className: string) {
@@ -51,6 +54,7 @@ export default class AutocompleteResult {
     }
 
     public func() {
+        // @ts-ignore
         return this.result.methodName;
     }
 
@@ -62,7 +66,9 @@ export default class AutocompleteResult {
         return this.additionalInfo[key];
     }
 
-    public loop(cb: (context: FTParsing.Result) => boolean | void) {
+    public loop(
+        cb: (context: AutocompleteParsingResult.ContextValue) => boolean | void,
+    ) {
         let context = this.result;
         let shouldContinue = true;
 
@@ -84,10 +90,12 @@ export default class AutocompleteResult {
             return null;
         }
 
+        // @ts-ignore
         return this.result.arguments?.children[index]?.children[0];
     }
 
     public paramIndex() {
+        // @ts-ignore
         return this.result.arguments?.autocompletingIndex ?? null;
     }
 
@@ -100,6 +108,7 @@ export default class AutocompleteResult {
     }
 
     public paramCount() {
+        // @ts-ignore
         return this.result.arguments?.children.length ?? 0;
     }
 }

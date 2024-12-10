@@ -1,50 +1,138 @@
-export namespace FTParsing {
-    export interface Result {
-        classDefinition: string | null;
-        implements: string[];
-        extends: string | null;
-        methodDefinition: string | null;
-        parameters: string[];
-        arguments?: {
-            type: "arguments";
-            autocompletingIndex: number;
-            children: Argument[];
-        };
-        className: string | null;
-        methodName: string | null;
-        parent: Result | null;
-        variables: Variables;
-        definedProperties: string[];
-        fillingInArrayKey: boolean;
-        fillingInArrayValue: boolean;
-        paramIndex: number;
-    }
+export namespace AutocompleteParsingResult {
+    export type ContextValue =
+        | Argument
+        | Arguments
+        | ArrayItem
+        | ArrayValue
+        | Assignment
+        | AssignmentValue
+        | Base
+        | ClassDefinition
+        | ClosureValue
+        | MethodCall
+        | MethodDefinition
+        | ObjectValue
+        | Parameter
+        | ParameterValue
+        | Parameters
+        | StringValue;
 
-    interface Argument {
+    export interface Argument {
         type: "argument";
-        children: Result[];
+        parent: ContextValue | null;
+        children: ContextValue[];
+        name: string | null;
     }
 
-    // type Argument = NonArrayArg | ArrayArg;
+    export interface Arguments {
+        type: "arguments";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        autocompletingIndex: number;
+    }
 
-    // interface ArrayValue {
-    //     key: Argument;
-    //     value: Argument;
-    // }
+    export interface ArrayItem {
+        type: "array_item";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        hasKey: boolean;
+        autocompletingValue: boolean;
+        key: StringValue;
+        value: ContextValue;
+    }
 
-    // interface NonArrayArg {
-    //     type: Exclude<string, "array">;
-    //     value: string;
-    //     arguments?: Argument[];
-    // }
+    export interface ArrayValue {
+        type: "array";
+        parent: ContextValue | null;
+        children: ArrayItem[];
+    }
 
-    // interface ArrayArg {
-    //     type: "array";
-    //     value: ArrayValue[];
-    //     arguments?: Argument[];
-    // }
+    export interface Assignment {
+        type: "assignment";
+        parent: ContextValue | null;
+        name: string | null;
+        value: AssignmentValue[];
+    }
 
-    export interface Variables {
-        [key: string]: Argument;
+    export interface AssignmentValue {
+        type: "assignment_value";
+        parent: ContextValue | null;
+        children: ContextValue[];
+    }
+
+    export interface Base {
+        type: "base";
+        parent: ContextValue | null;
+        children: ContextValue[];
+    }
+
+    export interface ClassDefinition {
+        type: "classDefinition";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        className: string | null;
+        extends: string | null;
+        implements: string[];
+        properties: {
+            name: string;
+            types: string[];
+        }[];
+    }
+
+    export interface ClosureValue {
+        type: "closure";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        parameters: Parameters;
+    }
+
+    export interface MethodCall {
+        type: "methodCall";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        methodName: string | null;
+        className: string | null;
+        arguments: Arguments;
+    }
+
+    export interface MethodDefinition {
+        type: "methodDefinition";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        parameters: Parameters;
+        methodName: string | null;
+    }
+
+    export interface ObjectValue {
+        type: "object";
+        parent: ContextValue | null;
+        children: ContextValue[];
+        className: string | null;
+        arguments: Arguments;
+    }
+
+    export interface Parameter {
+        type: "parameter";
+        parent: ContextValue | null;
+        name: string | null;
+        types: string[];
+    }
+
+    export interface ParameterValue {
+        type: "parameter_value";
+        parent: ContextValue | null;
+        children: ContextValue[];
+    }
+
+    export interface Parameters {
+        type: "parameters";
+        parent: ContextValue | null;
+        children: ContextValue[];
+    }
+
+    export interface StringValue {
+        type: "string";
+        parent: ContextValue | null;
+        value: string;
     }
 }

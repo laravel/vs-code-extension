@@ -1,5 +1,5 @@
 import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
-import AutocompleteResult from "@src/parser/ParsingResult";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { repository } from "@src/repositories";
 import * as cp from "child_process";
 import * as os from "os";
@@ -151,13 +151,9 @@ export const parseFaultTolerant = async (
         await waitForPath();
     }
 
-    let command = `${parserBinaryPath} parse "${code}"`;
+    const command = `${parserBinaryPath} autocomplete "${code}"`;
 
     info("ft command ", command);
-
-    // const result = cp.execSync(command).toString();
-
-    // info("ft result ", result);
 
     return new Promise<AutocompleteResult>(function (resolve, error) {
         cp.exec(

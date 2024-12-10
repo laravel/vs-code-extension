@@ -3,7 +3,7 @@
 import { support } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getEnv } from "../repositories/env";
 import { wordMatchRegex } from "./../support/patterns";
 

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getMixManifest } from "../repositories/mix";
 import { wordMatchRegex } from "./../support/patterns";
 

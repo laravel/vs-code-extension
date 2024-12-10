@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import AutocompleteResult from "./parser/ParsingResult";
+import AutocompleteResult from "./parser/AutocompleteResult";
 
 type Tags = Tag[];
 

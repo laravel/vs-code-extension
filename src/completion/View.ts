@@ -4,7 +4,7 @@ import { facade } from "@src/support/util";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { CompletionProvider, Tags } from "..";
-import AutocompleteResult from "../parser/ParsingResult";
+import AutocompleteResult from "../parser/AutocompleteResult";
 import { getViews } from "./../repositories/views";
 import { wordMatchRegex } from "./../support/patterns";
 
