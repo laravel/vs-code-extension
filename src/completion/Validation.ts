@@ -108,6 +108,11 @@ export default class Validation implements CompletionProvider {
                 paramIndex: 0,
             },
             {
+                class: "request",
+                functions: ["validate", "sometimes"],
+                paramIndex: 0,
+            },
+            {
                 classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
                 functionDefinition: "rules",
             },
@@ -144,7 +149,10 @@ export default class Validation implements CompletionProvider {
             return [];
         }
 
-        if (result.isClass("Illuminate\\Http\\Request")) {
+        if (
+            result.isClass("Illuminate\\Http\\Request") ||
+            result.isClass("request")
+        ) {
             return this.getRules(document, position);
         }
 
