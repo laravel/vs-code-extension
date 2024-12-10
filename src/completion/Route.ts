@@ -37,6 +37,11 @@ export default class Route implements CompletionProvider {
                 functions: ["route", "signedRoute"],
                 paramIndex: 0,
             },
+            {
+                class: facade("URL"),
+                functions: ["route", "signedRoute"],
+                paramIndex: 0,
+            },
         ];
     }
 

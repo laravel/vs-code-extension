@@ -10,7 +10,7 @@ import { DetectResult, HoverProvider, LinkProvider } from "..";
 const toFind = [
     { class: null, method: ["route", "signedRoute", "to_route"] },
     {
-        class: facade("Redirect"),
+        class: [facade("Redirect"), facade("URL")],
         method: ["route", "signedRoute", "temporarySignedRoute"],
     },
 ];
