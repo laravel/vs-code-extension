@@ -29,6 +29,10 @@ export default class View implements CompletionProvider {
                 paramIndex: 1,
             },
             {
+                class: "Illuminate\\Mail\\Mailables\\Content",
+                argName: ["view", "markdown"],
+            },
+            {
                 functions: [
                     "view",
                     "markdown",

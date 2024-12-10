@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider } from "..";
+import { CompletionProvider, Tag } from "..";
 import AutocompleteResult from "../parser/ParsingResult";
 import { parse } from "./../support/parser";
 
@@ -56,6 +56,10 @@ export default class Registry implements vscode.CompletionItemProvider {
         parseResult: AutocompleteResult,
     ): CompletionProvider | null {
         const hasFunc = (funcs: string[]) => {
+            if (funcs.length === 0) {
+                return true;
+            }
+
             return funcs.find((fn) => fn === parseResult.func());
         };
 
@@ -71,6 +75,21 @@ export default class Registry implements vscode.CompletionItemProvider {
             return paramIndex === parseResult.paramIndex();
         };
 
+        const isNamedArg = (argName: Tag["argName"]) => {
+            // TODO: Make this work
+            return true;
+
+            // if (typeof argName === "undefined") {
+            //     return true;
+            // }
+
+            // if (Array.isArray(argName)) {
+            //     return argName.includes(parseResult.argName());
+            // }
+
+            // return argName === parseResult.argName();
+        };
+
         return (
             this.providers.find((provider) => {
                 if (parseResult.class()) {
@@ -80,7 +99,8 @@ export default class Registry implements vscode.CompletionItemProvider {
                             (tag) =>
                                 tag.class === parseResult.class() &&
                                 hasFunc(tag.functions || []) &&
-                                isParamIndex(tag.paramIndex),
+                                isParamIndex(tag.paramIndex) &&
+                                isNamedArg(tag.argName),
                         );
                 }
 
@@ -90,7 +110,8 @@ export default class Registry implements vscode.CompletionItemProvider {
                         (tag) =>
                             !tag.class &&
                             hasFunc(tag.functions || []) &&
-                            isParamIndex(tag.paramIndex),
+                            isParamIndex(tag.paramIndex) &&
+                            isNamedArg(tag.argName),
                     );
             }) || null
         );

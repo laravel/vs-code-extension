@@ -13,6 +13,7 @@ type CodeActionProviderFunction = (
 interface Tag {
     class?: string;
     functions?: string[];
+    argName?: string | string[];
     classDefinition?: string;
     functionDefinition?: string;
     classExtends?: string;
@@ -70,6 +71,7 @@ interface DetectResultArrayValue {
 interface DetectResultStringParam {
     type: "string";
     value: string;
+    name: string | null;
     start: {
         line: number;
         column: number;
@@ -100,7 +102,7 @@ type LinkProvider = (
 
 interface DocFindParams {
     class: string | string[] | null;
-    method: string | string[];
+    method: string | string[] | null;
 }
 
 declare namespace Eloquent {

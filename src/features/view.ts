@@ -3,6 +3,7 @@ import { notFound } from "@src/diagnostic";
 import {
     CodeActionProviderFunction,
     DetectResult,
+    DetectResultStringParam,
     HoverProvider,
     LinkProvider,
 } from "@src/index";
@@ -16,6 +17,7 @@ import * as vscode from "vscode";
 const toFind = [
     { class: facade("View"), method: "make" },
     { class: facade("Route"), method: "view" },
+    { class: "Illuminate\\Mail\\Mailables\\Content", method: null },
     {
         class: null,
         method: [
@@ -29,9 +31,21 @@ const toFind = [
     },
 ];
 
-const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
+const isCorrectIndexForMethod = (
+    item: DetectResult,
+    index: number,
+    param: DetectResultStringParam,
+) => {
     if (item.class === facade("Route")) {
         return index === 1;
+    }
+
+    if (item.class === "Illuminate\\Mail\\Mailables\\Content") {
+        if (param.name) {
+            return param.name === "view" || param.name === "markdown";
+        }
+
+        return index === 0 || index === 3;
     }
 
     return true;
@@ -43,7 +57,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         toFind,
         getViews,
         ({ param, item, index }) => {
-            if (!isCorrectIndexForMethod(item, index)) {
+            if (!isCorrectIndexForMethod(item, index, param)) {
                 return null;
             }
 
@@ -85,7 +99,7 @@ const diagnosticProvider = (
         toFind,
         getViews,
         ({ param, item, index }) => {
-            if (!isCorrectIndexForMethod(item, index)) {
+            if (!isCorrectIndexForMethod(item, index, param)) {
                 return null;
             }
 

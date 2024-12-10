@@ -88,7 +88,11 @@ export default class AutocompleteResult {
     }
 
     public paramIndex() {
-        return this.result.arguments?.autocompletingIndex;
+        return this.result.arguments?.autocompletingIndex ?? null;
+    }
+
+    public argName() {
+        return this.param()?.name ?? null;
     }
 
     public isParamIndex(index: number) {
