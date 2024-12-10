@@ -41,11 +41,7 @@ export default class Route implements CompletionProvider {
     }
 
     autoCompleteAction(result: AutocompleteResult): boolean {
-        if (!result.isFacade("Route")) {
-            return false;
-        }
-
-        if (result.func() === null) {
+        if (!result.isFacade("Route") || result.func() === null) {
             return false;
         }
 
@@ -62,6 +58,10 @@ export default class Route implements CompletionProvider {
     }
 
     autoCompleteActionParam(result: AutocompleteResult): boolean {
+        if (result.currentParamIsArray()) {
+            return false;
+        }
+
         // TODO: This is a bit confusing, maybe we include in the result the index of the parameter we're on?
         if (result.func() === "match") {
             return result.isParamIndex(2);

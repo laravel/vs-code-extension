@@ -17,7 +17,7 @@ export default class AutocompleteResult {
             return false;
         }
 
-        return currentArg.type === "array";
+        return currentArg?.type === "array";
     }
 
     public currentParamArrayKeys(): string[] {
@@ -84,7 +84,7 @@ export default class AutocompleteResult {
             return null;
         }
 
-        return this.result.arguments?.children[index].children[0];
+        return this.result.arguments?.children[index]?.children[0];
     }
 
     public paramIndex() {
