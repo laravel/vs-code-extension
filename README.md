@@ -45,6 +45,7 @@ Gate::allows('viewNova');
 ```php
 config('broadcasting.connections.reverb.app_id');
 Config::get('broadcasting.connections.reverb.app_id');
+config()->string('broadcasting.connections.reverb.app_id');
 ```
 
 -   Auto-completion
@@ -146,3 +147,10 @@ new Content(markdown: 'emails.big-sale');
     -   Create view
 -   Hoverable
 -   Prop autocompletion
+
+## On the Roadmap
+
+-   Integration with VS Code test runner
+-   Livewire support
+-   Volt support
+-   Pint support
