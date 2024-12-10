@@ -12,7 +12,6 @@ import {
     DocFindParams,
     ValidDetectParamTypes,
 } from "..";
-import { info } from "./logger";
 import { toArray } from "./util";
 
 // TODO: Problem?
@@ -46,7 +45,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.0";
+    const binaryVersion = "0.1.1";
     const filename = `php-parser-${binaryVersion}`;
     const uri = `https://github.com/joetannenbaum/php-parser-cli/raw/refs/heads/main/bin/${filename}`;
 
@@ -153,7 +152,7 @@ export const parseFaultTolerant = async (
 
     const command = `${parserBinaryPath} autocomplete "${code}"`;
 
-    info("ft command ", command);
+    // console.log("autocomplete command", command);
 
     return new Promise<AutocompleteResult>(function (resolve, error) {
         cp.exec(
@@ -215,9 +214,9 @@ export const detect = async (code: string): Promise<DetectResult[]> => {
         await waitForPath();
     }
 
-    let command = `${parserBinaryPath} detect "${code}"`;
+    const command = `${parserBinaryPath} detect "${code}"`;
 
-    // console.log("detect command ", command);
+    // console.log("detect command", command);
 
     const promise = new Promise<DetectResult[]>(function (resolve, error) {
         cp.exec(
