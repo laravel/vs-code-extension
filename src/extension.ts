@@ -23,7 +23,7 @@ import ViewCompletion from "./completion/View";
 import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import HoverProvider from "./hover/HoverProvider";
-import LinkProvider from "./link/LinkProvider";
+import { finalLinkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
@@ -139,9 +139,8 @@ export function activate(context: vscode.ExtensionContext) {
             new VoltCompletion(),
             ...TRIGGER_CHARACTERS.concat(["$"]),
         ),
-        vscode.languages.registerDocumentLinkProvider(
-            LANGUAGES,
-            new LinkProvider(),
+        ...finalLinkProviders.map((provider) =>
+            vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
         ),
         vscode.languages.registerHoverProvider(LANGUAGES, new HoverProvider()),
         ...testRunnerCommands,

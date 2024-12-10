@@ -17,39 +17,36 @@ import { config as getConfig } from "@src/support/config";
 import { GeneratedConfigKey } from "@src/support/generated-config";
 import {
     DocumentLink,
+    DocumentLinkProvider,
     ProviderResult,
     TextDocument,
-    DocumentLinkProvider as vsDocumentLinkProvider,
 } from "vscode";
 
-export default class LinkProvider implements vsDocumentLinkProvider {
-    private providers: {
-        provider: LinkProviderType;
-        configKey: GeneratedConfigKey;
-    }[] = [
-        { provider: appBinding, configKey: "appBinding.link" },
-        { provider: asset, configKey: "asset.link" },
-        { provider: auth, configKey: "auth.link" },
-        { provider: config, configKey: "config.link" },
-        { provider: controllerAction, configKey: "controllerAction.link" },
-        { provider: env, configKey: "env.link" },
-        { provider: inertia, configKey: "inertia.link" },
-        { provider: middleware, configKey: "middleware.link" },
-        { provider: mix, configKey: "mix.link" },
-        { provider: route, configKey: "route.link" },
-        { provider: translation, configKey: "translation.link" },
-        { provider: view, configKey: "view.link" },
-    ];
+const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
+    "appBinding.link": appBinding,
+    "asset.link": asset,
+    "auth.link": auth,
+    "config.link": config,
+    "controllerAction.link": controllerAction,
+    "env.link": env,
+    "inertia.link": inertia,
+    "middleware.link": middleware,
+    "mix.link": mix,
+    "route.link": route,
+    "translation.link": translation,
+    "view.link": view,
+};
 
-    public provideDocumentLinks(
-        doc: TextDocument,
-    ): ProviderResult<DocumentLink[]> {
-        return Promise.all(
-            this.providers
-                .filter((provider) => getConfig(provider.configKey, true))
-                .map((provider) => provider.provider(doc)),
-        ).then((result) => {
-            return result.flat(2).filter((i) => i !== null);
+export const finalLinkProviders: DocumentLinkProvider[] = Object.entries(
+    allProviders,
+).map(([configKey, provider]) => ({
+    provideDocumentLinks(doc: TextDocument): ProviderResult<DocumentLink[]> {
+        if (!getConfig(configKey as GeneratedConfigKey, true)) {
+            return [];
+        }
+
+        return provider(doc).then((result) => {
+            return result.flat().filter((i) => i !== null);
         });
-    }
-}
+    },
+}));
