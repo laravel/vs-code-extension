@@ -1,9 +1,10 @@
 "use strict";
 
+import AutocompleteResult from "@src/parser/AutocompleteResult";
+import { parse } from "@src/support/parser";
+import { toArray } from "@src/support/util";
 import * as vscode from "vscode";
-import { CompletionProvider, Tag } from "..";
-import AutocompleteResult from "../parser/AutocompleteResult";
-import { parse } from "./../support/parser";
+import { CompletionProvider, FeatureTagParam } from "..";
 
 export default class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];
@@ -55,64 +56,70 @@ export default class Registry implements vscode.CompletionItemProvider {
     private getProviderByClassOrFunction(
         parseResult: AutocompleteResult,
     ): CompletionProvider | null {
-        const hasFunc = (funcs: string[]) => {
-            if (funcs.length === 0) {
+        const hasFunc = (funcs: FeatureTagParam["method"]) => {
+            if (typeof funcs === "undefined" || funcs === null) {
+                return parseResult.func() === null;
+            }
+
+            if (typeof funcs === "string") {
+                return funcs === parseResult.func();
+            }
+
+            return funcs.find((fn) => fn === parseResult.func()) !== undefined;
+        };
+
+        const hasClass = (classes: FeatureTagParam["class"]) => {
+            if (typeof classes === "undefined" || classes === null) {
+                return parseResult.class() === null;
+            }
+
+            if (typeof classes === "string") {
+                return classes === parseResult.class();
+            }
+
+            return (
+                classes.find((fn) => fn === parseResult.class()) !== undefined
+            );
+        };
+
+        const isArgumentIndex = (
+            argumentIndex: number | number[] | undefined,
+        ) => {
+            if (typeof argumentIndex === "undefined") {
                 return true;
             }
 
-            return funcs.find((fn) => fn === parseResult.func());
-        };
-
-        const isParamIndex = (paramIndex: number | number[] | undefined) => {
-            if (typeof paramIndex === "undefined") {
-                return true;
+            if (Array.isArray(argumentIndex)) {
+                return argumentIndex.includes(parseResult.paramIndex());
             }
 
-            if (Array.isArray(paramIndex)) {
-                return paramIndex.includes(parseResult.paramIndex());
-            }
-
-            return paramIndex === parseResult.paramIndex();
+            return argumentIndex === parseResult.paramIndex();
         };
 
-        const isNamedArg = (argName: Tag["argName"]) => {
+        const isNamedArg = (argumentName: FeatureTagParam["argumentName"]) => {
             // TODO: Make this work
             return true;
 
-            // if (typeof argName === "undefined") {
+            // if (typeof argumentName === "undefined") {
             //     return true;
             // }
 
-            // if (Array.isArray(argName)) {
-            //     return argName.includes(parseResult.argName());
+            // if (Array.isArray(argumentName)) {
+            //     return argumentName.includes(parseResult.argumentName());
             // }
 
-            // return argName === parseResult.argName();
+            // return argumentName === parseResult.argumentName();
         };
 
         return (
             this.providers.find((provider) => {
-                if (parseResult.class()) {
-                    return provider
-                        .tags()
-                        .find(
-                            (tag) =>
-                                tag.class === parseResult.class() &&
-                                hasFunc(tag.functions || []) &&
-                                isParamIndex(tag.paramIndex) &&
-                                isNamedArg(tag.argName),
-                        );
-                }
-
-                return provider
-                    .tags()
-                    .find(
-                        (tag) =>
-                            !tag.class &&
-                            hasFunc(tag.functions || []) &&
-                            isParamIndex(tag.paramIndex) &&
-                            isNamedArg(tag.argName),
-                    );
+                return toArray(provider.tags()).find(
+                    (tag) =>
+                        hasClass(tag.class) &&
+                        hasFunc(tag.method) &&
+                        isArgumentIndex(tag.argumentIndex) &&
+                        isNamedArg(tag.argumentName),
+                );
             }) || null
         );
     }
