@@ -42,10 +42,10 @@ const isCorrectIndexForMethod = (
 
     if (item.class === "Illuminate\\Mail\\Mailables\\Content") {
         if (param.name) {
-            return param.name === "view" || param.name === "markdown";
+            return ["view", "markdown"].includes(param.name);
         }
 
-        return index === 0 || index === 3;
+        return [0, 3].includes(index);
     }
 
     return true;
