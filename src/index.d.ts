@@ -1,25 +1,12 @@
 import * as vscode from "vscode";
 import AutocompleteResult from "./parser/AutocompleteResult";
 
-type Tags = Tag[];
-
 type CodeActionProviderFunction = (
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ) => Promise<vscode.CodeAction[]>;
-
-interface Tag {
-    class?: string;
-    functions?: string[];
-    argName?: string | string[];
-    classDefinition?: string;
-    functionDefinition?: string;
-    classExtends?: string;
-    classImplements?: string;
-    paramIndex?: number | number[];
-}
 
 interface Config {
     name: string;
@@ -35,7 +22,7 @@ interface ConfigItem {
 }
 
 interface CompletionProvider {
-    tags(): Tags;
+    tags(): FeatureTag;
     customCheck?(result: AutocompleteResult, document: string): any;
     provideCompletionItems(
         result: AutocompleteResult,
@@ -57,6 +44,8 @@ interface DetectResult {
     class: string | null;
     params: DetectResultParam[];
 }
+
+type FeatureTag = FeatureTagParam | FeatureTagParam[];
 
 interface DetectResultArrayValue {
     key: {
@@ -103,9 +92,15 @@ type LinkProvider = (
     doc: vscode.TextDocument,
 ) => Promise<(vscode.DocumentLink | null)[]>;
 
-interface DocFindParams {
-    class: string | string[] | null;
-    method: string | string[] | null;
+interface FeatureTagParam {
+    class?: string | string[] | null;
+    method?: string | string[] | null;
+    argumentName?: string | string[];
+    classDefinition?: string;
+    methodDefinition?: string;
+    classExtends?: string;
+    classImplements?: string;
+    argumentIndex?: number | number[];
 }
 
 declare namespace Eloquent {
