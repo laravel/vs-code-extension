@@ -14,6 +14,7 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import fs from "fs";
 import * as vscode from "vscode";
 
 const toFind: FeatureTag = [
