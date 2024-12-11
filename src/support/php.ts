@@ -15,8 +15,8 @@ let defaultPhpCommand: string | null = null;
 const getPhpCommand = (): string => {
     const options = [
         {
-            check: "which herd",
-            command: '{binaryPath} php -r "{code}"',
+            check: ["which herd", "{binaryPath} which-php"],
+            command: '{binaryPath} -r "{code}"',
         },
         {
             check: "which php",
@@ -30,7 +30,21 @@ const getPhpCommand = (): string => {
 
     for (const option of options) {
         try {
-            const result = cp.execSync(option.check).toString().trim();
+            const checks = Array.isArray(option.check)
+                ? option.check
+                : [option.check];
+            let check = checks.shift();
+            let result = "";
+
+            while (check) {
+                result = cp
+                    .execSync(check)
+                    .toString()
+                    .trim()
+                    .replace("{binaryPath}", result.replace(/ /g, "\\ "));
+
+                check = checks.shift();
+            }
 
             if (result !== "") {
                 return option.command.replace(
@@ -65,6 +79,10 @@ export const template = (
     return templateString;
 };
 
+const isLaravelProject =
+    projectPathExists("vendor/autoload.php") &&
+    projectPathExists("bootstrap/app.php");
+
 export const runInLaravel = <T>(
     code: string,
     description: string | null = null,
@@ -72,11 +90,8 @@ export const runInLaravel = <T>(
 ): Promise<T> => {
     code = code.replace(/(?:\r\n|\r|\n)/g, " ");
 
-    if (
-        !projectPathExists("vendor/autoload.php") ||
-        !projectPathExists("bootstrap/app.php")
-    ) {
-        return new Promise((resolve, error) => error("Not a Laravel project"));
+    if (!isLaravelProject) {
+        throw new Error("Not a Laravel project");
     }
 
     const command = template("bootstrapLaravel", {
@@ -110,29 +125,29 @@ export const runInLaravel = <T>(
         });
 };
 
+// TODO: Make sure all of these replacements are necessary
+// (also is there no escape quotes/backslashes function in JS?)
+const replacements: [string | RegExp, string][] = [
+    [/\<\?php/g, ""],
+    [/;;/g, ";"],
+];
+
+if (
+    ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+        os.platform().includes(unixPlatforms),
+    )
+) {
+    replacements.push([/\$/g, "\\$"]);
+    replacements.push([/\\'/g, "\\\\'"]);
+    replacements.push([/\\"/g, '\\\\"']);
+}
+
+replacements.push([/\"/g, '\\"']);
+
 export const runPhp = (
     code: string,
     description: string | null = null,
 ): Promise<string> => {
-    // TODO: Make sure all of these replacements are necessary
-    // (also is there no escape quotes/backslashes function in JS?)
-    let replacements: [string | RegExp, string][] = [
-        [/\<\?php/g, ""],
-        [/;;/g, ";"],
-    ];
-
-    if (
-        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
-            os.platform().includes(unixPlatforms),
-        )
-    ) {
-        replacements.push([/\$/g, "\\$"]);
-        replacements.push([/\\'/g, "\\\\'"]);
-        replacements.push([/\\"/g, '\\\\"']);
-    }
-
-    replacements.push([/\"/g, '\\"']);
-
     replacements.forEach((replacement) => {
         code = code.replace(replacement[0], replacement[1]);
     });
@@ -173,6 +188,7 @@ export const runPhp = (
             },
         );
     });
+
     return out;
 };
 
