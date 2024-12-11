@@ -11,7 +11,7 @@ usort($items, function($a, $b) {
 
 foreach ($items as $item) {
     $type = $item['type'];
-    $features = $item['features'] ?? ['diagnostics', 'hover', 'link'];
+    $features = $item['features'] ?? ['diagnostics', 'hover', 'link', 'completion'];
 
     foreach ($features as $feature) {
         $config["Laravel.{$type}.{$feature}"] = [
