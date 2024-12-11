@@ -1,14 +1,22 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigs } from "@src/repositories/configs";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { DetectResult, HoverProvider, LinkProvider } from "..";
+import {
+    CompletionProvider,
+    DetectResult,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-const toFind = [
-    { class: null, method: "config" },
+const toFind: FeatureTag = [
+    { method: "config" },
     {
         class: [facade("Config"), "config"],
         method: [
@@ -22,6 +30,7 @@ const toFind = [
             "prepend",
             "push",
         ],
+        argumentIndex: 0,
     },
 ];
 
@@ -33,7 +42,7 @@ const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
     return true;
 };
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -56,7 +65,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -108,7 +117,7 @@ const hoverProvider: HoverProvider = (
     );
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -138,4 +147,38 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const completionProvider: CompletionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        if (result.func() === "getMany" && !result.currentParamIsArray()) {
+            return [];
+        }
+
+        return getConfigs().items.map((config) => {
+            let completeItem = new vscode.CompletionItem(
+                config.name,
+                vscode.CompletionItemKind.Value,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            if (config.value) {
+                completeItem.detail = config.value.toString();
+            }
+
+            return completeItem;
+        });
+    },
+};

@@ -10,7 +10,6 @@ import AppCompletion from "./completion/App";
 import AssetCompletion from "./completion/Asset";
 import GateCompletion from "./completion/Auth";
 import BladeCompletion from "./completion/Blade";
-import ConfigCompletion from "./completion/Config";
 import EloquentCompletion from "./completion/Eloquent";
 import EnvCompletion from "./completion/Env";
 import InertiaCompletion from "./completion/Inertia";
@@ -22,6 +21,7 @@ import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
 import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
+import { completionProvider as configCompletion } from "./features/config";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
@@ -72,7 +72,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     const delegatedRegistry = new Registry(
         new EloquentCompletion(),
-        new ConfigCompletion(),
+        // new ConfigCompletion(),
+        configCompletion,
         new RouteCompletion(),
         new ViewCompletion(),
         new TranslationCompletion(),
