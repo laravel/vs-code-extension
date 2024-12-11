@@ -121,39 +121,39 @@ export default class View implements CompletionProvider {
         // TODO: Layer this back in (props)
         return [];
 
-        if (
-            // @ts-ignore
-            typeof views[result.param(0).value] === "undefined" ||
-            !result.fillingInArrayKey()
-        ) {
-            return [];
-        }
+        // if (
+        //     // @ts-ignore
+        //     typeof views[result.param(0).value] === "undefined" ||
+        //     !result.fillingInArrayKey()
+        // ) {
+        //     return [];
+        // }
 
-        let viewContent = fs.readFileSync(
-            // @ts-ignore
-            views[result.param(0).value].uri.path,
-            "utf8",
-        );
+        // let viewContent = fs.readFileSync(
+        //     // @ts-ignore
+        //     views[result.param(0).value].uri.path,
+        //     "utf8",
+        // );
 
-        let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
-        let r: RegExpExecArray | null = null;
-        let variableNames = new Set<string>([]);
+        // let variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
+        // let r: RegExpExecArray | null = null;
+        // let variableNames = new Set<string>([]);
 
-        while ((r = variableRegex.exec(viewContent))) {
-            variableNames.add(r[1]);
-        }
+        // while ((r = variableRegex.exec(viewContent))) {
+        //     variableNames.add(r[1]);
+        // }
 
-        return [...variableNames].map((variableName) => {
-            let variablecompletionItem = new vscode.CompletionItem(
-                variableName,
-                vscode.CompletionItemKind.Constant,
-            );
-            variablecompletionItem.range = document.getWordRangeAtPosition(
-                position,
-                wordMatchRegex,
-            );
-            return variablecompletionItem;
-        });
+        // return [...variableNames].map((variableName) => {
+        //     let variablecompletionItem = new vscode.CompletionItem(
+        //         variableName,
+        //         vscode.CompletionItemKind.Constant,
+        //     );
+        //     variablecompletionItem.range = document.getWordRangeAtPosition(
+        //         position,
+        //         wordMatchRegex,
+        //     );
+        //     return variablecompletionItem;
+        // });
     }
 
     getYields(func: string, documentText: string): vscode.CompletionItem[] {
@@ -165,14 +165,13 @@ export default class View implements CompletionProvider {
             return [];
         }
 
-        if (typeof views[regexResult[1]] === "undefined") {
+        const item = views.find((v) => v.key === regexResult![1]);
+
+        if (typeof item === "undefined") {
             return [];
         }
 
-        let parentContent = fs.readFileSync(
-            views[regexResult[1]].uri.path,
-            "utf8",
-        );
+        let parentContent = fs.readFileSync(item.uri.path, "utf8");
         let yieldRegex =
             func === "@push"
                 ? /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g

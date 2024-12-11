@@ -1,9 +1,10 @@
 # Change Log
 
-All notable changes to the "laravel" extension will be documented in this file.
+All notable changes to the Laravel extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.3]
 
-## [Unreleased]
-
-- Initial release
+-   Performance improvements
+-   Remove tests integration (for now)
+-   Added `to_route` completion
+-   Added `redirect()` helper chaining for hovering, linking, and diagnostics

@@ -1,5 +1,14 @@
 # Official Laravel VS Code Extension
 
+## Intro
+
+This is the beta version of the official Laravel VS Code Extension. Below you'll find a list of features as well as a roadmap with features we will be integrating soon.
+
+### Of Note
+
+-   This extension will occasionally boot your app in the background to collect information about your app for use in autocompletion, linking, hovering, and diagnostics
+-   When you first install the extension it will download a small binary to your machine, we use this binary for PHP parsing
+
 A non-exhaustive list of features covered in the extension:
 
 ## App Bindings
@@ -146,7 +155,6 @@ new Content(markdown: 'emails.big-sale');
 -   Warns when view not found, offers quick fixes:
     -   Create view
 -   Hoverable
--   Prop autocompletion
 
 ## On the Roadmap
 

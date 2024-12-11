@@ -27,8 +27,6 @@ import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { hasWorkspace, projectPathExists } from "./support/project";
-import { testRunnerCommands } from "./test-runner";
-import { controller as testController } from "./test-runner/test-controller";
 
 let client: LanguageClient;
 
@@ -145,8 +143,8 @@ export function activate(context: vscode.ExtensionContext) {
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
         ),
-        ...testRunnerCommands,
-        testController,
+        // ...testRunnerCommands,
+        // testController,
         vscode.languages.registerCodeActionsProvider(
             LANGUAGES,
             new CodeActionProvider(),
