@@ -1,14 +1,16 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getRoutes } from "@src/repositories/routes";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { DetectResult, HoverProvider, LinkProvider } from "..";
+import { DetectResult, FeatureTag, HoverProvider, LinkProvider } from "..";
 
-const toFind = [
-    { class: null, method: ["route", "signedRoute", "to_route"] },
+const toFind: FeatureTag = [
+    { method: ["route", "signedRoute", "to_route"] },
     {
         class: [facade("Redirect"), facade("URL"), "redirect"],
         method: ["route", "signedRoute", "temporarySignedRoute"],
@@ -23,7 +25,7 @@ const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
     return true;
 };
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -51,7 +53,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -71,7 +73,7 @@ const hoverProvider: HoverProvider = (
     });
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -99,4 +101,63 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const completionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        if (result.isParamIndex(1)) {
+            // Route parameters autocomplete
+            return getRoutes()
+                .items.filter((route) => route.name === result.param(0).value)
+                .map((route) => {
+                    return route.parameters.map((parameter: string) => {
+                        let completionItem = new vscode.CompletionItem(
+                            parameter,
+                            vscode.CompletionItemKind.Variable,
+                        );
+
+                        completionItem.range = document.getWordRangeAtPosition(
+                            position,
+                            wordMatchRegex,
+                        );
+
+                        return completionItem;
+                    });
+                })
+                .flat();
+        }
+
+        // Route name autocomplete
+        return getRoutes()
+            .items.filter(
+                (route) =>
+                    typeof route.name === "string" && route.name.length > 0,
+            )
+            .map((route) => {
+                let completionItem = new vscode.CompletionItem(
+                    route.name,
+                    vscode.CompletionItemKind.Enum,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+
+                completionItem.detail = [
+                    route.action,
+                    `[${route.method}] ${route.uri}`,
+                ].join("\n\n");
+
+                return completionItem;
+            });
+    },
+};

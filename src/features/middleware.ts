@@ -1,7 +1,9 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getMiddleware } from "@src/repositories/middleware";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
@@ -125,4 +127,34 @@ export const diagnosticProvider = (
         },
         ["string", "array"],
     );
+};
+
+export const completionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return Object.entries(getMiddleware().items).map(([key, value]) => {
+            let completionItem = new vscode.CompletionItem(
+                key,
+                vscode.CompletionItemKind.Enum,
+            );
+
+            completionItem.detail = value.parameters ?? "";
+
+            completionItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            return completionItem;
+        });
+    },
 };

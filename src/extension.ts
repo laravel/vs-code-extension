@@ -10,7 +10,6 @@ import BladeCompletion from "./completion/Blade";
 import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
 import Registry from "./completion/Registry";
-import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
 import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
@@ -67,7 +66,6 @@ export function activate(context: vscode.ExtensionContext) {
     const delegatedRegistry = new Registry(
         ...completionProviders,
         new EloquentCompletion(),
-        new RouteCompletion(),
         new ViewCompletion(),
         new TranslationCompletion(),
     );

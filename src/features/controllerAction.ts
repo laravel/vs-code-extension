@@ -1,9 +1,12 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
+import { getControllers } from "@src/repositories/controllers";
+import { getRoutes } from "@src/repositories/routes";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { DetectResult, LinkProvider } from "..";
-import { getRoutes } from "../repositories/routes";
 
 const toFind = {
     class: facade("Route"),
@@ -33,7 +36,7 @@ const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
     return index === (indices[item.method] ?? 1);
 };
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -61,7 +64,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -96,4 +99,50 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, linkProvider };
+export const completionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        if (result.currentParamIsArray()) {
+            return [];
+        }
+
+        const indexMapping = {
+            match: 2,
+        };
+
+        // @ts-ignore
+        const index = indexMapping[result.func()] ?? 1;
+
+        if (!result.isParamIndex(index)) {
+            return [];
+        }
+
+        return getControllers()
+            .items.filter(
+                (controller) =>
+                    typeof controller === "string" && controller.length > 0,
+            )
+            .map((controller: string) => {
+                let completionItem = new vscode.CompletionItem(
+                    controller,
+                    vscode.CompletionItemKind.Enum,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+
+                return completionItem;
+            });
+    },
+};
