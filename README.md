@@ -24,6 +24,7 @@ asset('my-amazing-jpeg.png')
 -   Links directly to asset
 -   Warns when asset not found
 
+<!--
 ## Auth
 
 ```php
@@ -35,6 +36,7 @@ Gate::allows('viewNova');
 -   Auto-completion
 -   Links directly to gate
 -   Warns when gate not found
+-->
 
 ## Blade
 
@@ -86,7 +88,6 @@ Inertier::render('Pages/Dashboard');
 -   Warns when view not found, offers quick fixes:
     -   Create view
 -   Hoverable
--   Prop autocompletion (Vue only for now)
 
 ## Route
 
@@ -125,10 +126,9 @@ Lang::get('auth.failed');
 ## Validation
 
 ```php
-Validator::validate(['name' => 'required']);
-Request::validate(['name' => 'required']);
-Request::sometimes(['name' => 'required']);
+Validator::validate($input, ['name' => 'required']);
 request()->validate(['name' => 'required']);
+request()->sometimes(['name' => 'required']);
 // etc
 ```
 
