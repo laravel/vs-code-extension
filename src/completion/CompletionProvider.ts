@@ -5,7 +5,7 @@ import { completionProvider as asset } from "@src/features/asset";
 import { completionProvider as auth } from "@src/features/auth";
 import { completionProvider as config } from "@src/features/config";
 import { completionProvider as env } from "@src/features/env";
-// import { completionProvider as inertia } from "@src/features/inertia";
+import { completionProvider as inertia } from "@src/features/inertia";
 // import { completionProvider as middleware } from "@src/features/middleware";
 // import { completionProvider as mix } from "@src/features/mix";
 // import { completionProvider as route } from "@src/features/route";
@@ -21,7 +21,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "config.completion": config,
     "asset.completion": asset,
     "env.completion": env,
-    // "inertia.completion": inertia,
+    "inertia.completion": inertia,
     // "middleware.completion": middleware,
     // "mix.completion": mix,
     // "route.completion": route,
