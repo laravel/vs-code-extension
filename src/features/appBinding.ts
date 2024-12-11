@@ -11,7 +11,7 @@ import { CompletionProvider, HoverProvider, LinkProvider } from "..";
 
 const toFind = [
     {
-        class: facade("App"),
+        class: [facade("App"), "app"],
         method: ["make", "bound", "isShared"],
         argumentIndex: 0,
     },
