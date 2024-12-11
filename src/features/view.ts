@@ -61,7 +61,9 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const uri = getViews().items[param.value]?.uri;
+            const uri = getViews().items.find(
+                (view) => view.key === param.value,
+            )?.uri;
 
             if (!uri) {
                 return null;
@@ -77,7 +79,7 @@ const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match) => {
-        const item = getViews().items[match];
+        const item = getViews().items.find((view) => view.key === match);
 
         if (!item) {
             return null;
@@ -103,7 +105,9 @@ const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViews().items[param.value];
+            const view = getViews().items.find(
+                (view) => view.key === param.value,
+            );
 
             if (view) {
                 return null;

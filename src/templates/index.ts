@@ -7,6 +7,7 @@ import middleware from "./middleware";
 import models from "./models";
 import routes from "./routes";
 import translations from "./translations";
+import views from "./views";
 
 const templates = {
     app,
@@ -18,6 +19,7 @@ const templates = {
     models,
     routes,
     translations,
+    views,
 };
 
 export type TemplateName = keyof typeof templates;

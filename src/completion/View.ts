@@ -64,7 +64,7 @@ export default class View implements CompletionProvider {
 
         if (result.class() === facade("Route")) {
             if (result.func() === "view" && result.isParamIndex(1)) {
-                return Object.entries(views).map(([key]) => {
+                return views.map(({ key }) => {
                     let completionItem = new vscode.CompletionItem(
                         key,
                         vscode.CompletionItemKind.Constant,
@@ -87,7 +87,7 @@ export default class View implements CompletionProvider {
                 return [];
             }
 
-            return Object.entries(views).map(([key]) => {
+            return views.map(({ key }) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
                     vscode.CompletionItemKind.Constant,
@@ -103,7 +103,7 @@ export default class View implements CompletionProvider {
         }
 
         if (result.isParamIndex(0)) {
-            return Object.entries(views).map(([key]) => {
+            return views.map(({ key }) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
                     vscode.CompletionItemKind.Constant,
@@ -117,6 +117,9 @@ export default class View implements CompletionProvider {
                 return completionItem;
             });
         }
+
+        // TODO: Layer this back in (props)
+        return [];
 
         if (
             // @ts-ignore
