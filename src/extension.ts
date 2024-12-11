@@ -11,7 +11,6 @@ import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
 import Registry from "./completion/Registry";
 import ValidationCompletion from "./completion/Validation";
-import ViewCompletion from "./completion/View";
 import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { hoverProviders } from "./hover/HoverProvider";
@@ -65,7 +64,6 @@ export function activate(context: vscode.ExtensionContext) {
     const delegatedRegistry = new Registry(
         ...completionProviders,
         new EloquentCompletion(),
-        new ViewCompletion(),
     );
 
     const validationRegistry = new Registry(new ValidationCompletion());

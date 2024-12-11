@@ -11,7 +11,7 @@ import { completionProvider as middleware } from "@src/features/middleware";
 import { completionProvider as mix } from "@src/features/mix";
 import { completionProvider as route } from "@src/features/route";
 import { completionProvider as translation } from "@src/features/translation";
-// import { completionProvider as view } from "@src/features/view";
+import { completionProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
 import { GeneratedConfigKey } from "@src/support/generated-config";
 import { CompletionProvider } from "..";
@@ -28,7 +28,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "route.completion": route,
     "controllerAction.completion": controllerAction,
     "translation.completion": translation,
-    // "view.completion": view,
+    "view.completion": view,
 };
 
 export const completionProviders = Object.entries(allProviders)
