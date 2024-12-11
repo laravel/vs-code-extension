@@ -86,6 +86,12 @@
                     "generated": true,
                     "description": "Enable linking for appBinding."
                 },
+                "Laravel.appBinding.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.asset.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -103,6 +109,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for asset."
+                },
+                "Laravel.asset.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.auth.diagnostics": {
                     "type": "boolean",
@@ -122,6 +134,12 @@
                     "generated": true,
                     "description": "Enable linking for auth."
                 },
+                "Laravel.auth.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -139,6 +157,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for config."
+                },
+                "Laravel.config.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.controllerAction.diagnostics": {
                     "type": "boolean",
@@ -158,6 +182,12 @@
                     "generated": true,
                     "description": "Enable linking for controllerAction."
                 },
+                "Laravel.controllerAction.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.env.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -175,6 +205,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for env."
+                },
+                "Laravel.env.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.inertia.diagnostics": {
                     "type": "boolean",
@@ -194,6 +230,12 @@
                     "generated": true,
                     "description": "Enable linking for inertia."
                 },
+                "Laravel.inertia.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -211,6 +253,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for middleware."
+                },
+                "Laravel.middleware.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.mix.diagnostics": {
                     "type": "boolean",
@@ -230,6 +278,12 @@
                     "generated": true,
                     "description": "Enable linking for mix."
                 },
+                "Laravel.mix.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.route.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -247,6 +301,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for route."
+                },
+                "Laravel.route.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",
@@ -266,6 +326,12 @@
                     "generated": true,
                     "description": "Enable linking for translation."
                 },
+                "Laravel.translation.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.view.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -283,6 +349,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for view."
+                },
+                "Laravel.view.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 }
             }
         },
