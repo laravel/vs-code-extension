@@ -12,7 +12,7 @@ import {
 import {
     DetectResult,
     DetectResultStringParam,
-    DocFindParams,
+    FeatureTag,
     ValidDetectParamTypes,
 } from "..";
 import { detectInDoc, isInHoverRange } from "./parser";
@@ -59,7 +59,7 @@ export const findLinksInDoc = (
 export const findHoverMatchesInDoc = (
     doc: TextDocument,
     pos: Position,
-    toFind: DocFindParams | DocFindParams[],
+    toFind: FeatureTag,
     repo: ReturnType<typeof repository>,
     cb: (
         match: string,
