@@ -29,7 +29,7 @@ export default class Route implements CompletionProvider {
                 ],
             },
             {
-                functions: ["route", "signedRoute"],
+                functions: ["route", "signedRoute", "to_route"],
                 paramIndex: 0,
             },
             {
