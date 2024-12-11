@@ -16,6 +16,10 @@ A non-exhaustive list of features covered in the extension:
 ```php
 app('auth')
 App::make('auth.driver')
+app()->make('auth.driver')
+App::bound('auth.driver')
+App::isShared('auth.driver')
+// etc
 ```
 
 -   Auto-completion
@@ -56,7 +60,12 @@ Gate::allows('viewNova');
 ```php
 config('broadcasting.connections.reverb.app_id');
 Config::get('broadcasting.connections.reverb.app_id');
+Config::getMany([
+    'broadcasting.connections.reverb.app_id',
+    'broadcasting.connections.reverb.driver',
+]);
 config()->string('broadcasting.connections.reverb.app_id');
+// etc
 ```
 
 -   Auto-completion
@@ -89,7 +98,8 @@ Env::get('REVERB_APP_ID');
 
 ```php
 inertia('Pages/Dashboard');
-Inertier::render('Pages/Dashboard');
+Inertia::render('Pages/Dashboard');
+Route::inertia('/dashboard', 'Pages/Dashboard');
 ```
 
 -   Auto-completion
@@ -108,12 +118,27 @@ Redirect::signedRoute('dashboard');
 URL::route('dashboard');
 URL::signedRoute('dashboard');
 Route::middleware('auth');
+redirect()->route('dashboard');
 // etc
 ```
 
 -   Auto-completion
 -   Links directly to route definition
 -   Warns when route not found
+-   Hoverable
+
+## Middleware
+
+```php
+Route::middleware('auth');
+Route::middleware(['auth', 'web']);
+Route::withoutMiddleware('auth');
+// etc
+```
+
+-   Auto-completion
+-   Links directly to middleware handling
+-   Warns when middleware not found
 -   Hoverable
 
 ## Translation
@@ -147,7 +172,7 @@ request()->sometimes(['name' => 'required']);
 
 ```php
 view('dashboard');
-new Content(markdown: 'emails.big-sale');
+Route::view('/', 'home');
 ```
 
 -   Auto-completion
