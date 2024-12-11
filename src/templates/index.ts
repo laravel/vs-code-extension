@@ -2,6 +2,7 @@ import app from "./app";
 import auth from "./auth";
 import bladeDirectives from "./blade-directives";
 import bootstrapLaravel from "./bootstrap-laravel";
+import configs from "./configs";
 import middleware from "./middleware";
 import models from "./models";
 import routes from "./routes";
@@ -11,10 +12,11 @@ const templates = {
     app,
     auth,
     bladeDirectives,
-    middleware,
-    routes,
     bootstrapLaravel,
+    configs,
+    middleware,
     models,
+    routes,
     translations,
 };
 

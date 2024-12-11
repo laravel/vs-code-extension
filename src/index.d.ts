@@ -22,7 +22,10 @@ interface Tag {
 }
 
 interface Config {
-    [key: string]: any;
+    name: string;
+    value: string;
+    file: string | null;
+    line: string | null;
 }
 
 interface ConfigItem {
