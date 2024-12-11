@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigs } from "@src/repositories/configs";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -159,6 +160,10 @@ export const completionProvider: CompletionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("config.completion", true)) {
+            return [];
+        }
+
         if (result.func() === "getMany" && !result.currentParamIsArray()) {
             return [];
         }

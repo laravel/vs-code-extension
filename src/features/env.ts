@@ -3,6 +3,7 @@ import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getEnv } from "@src/repositories/env";
 import { getEnvExample } from "@src/repositories/env-example";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -204,6 +205,10 @@ export const completionProvider: CompletionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("env.completion", true)) {
+            return [];
+        }
+
         return Object.entries(getEnv().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
                 key,

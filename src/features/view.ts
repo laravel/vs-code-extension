@@ -9,6 +9,7 @@ import {
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getViews } from "@src/repositories/views";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -196,6 +197,10 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("view.completion", true)) {
+            return [];
+        }
+
         const views = getViews().items;
 
         if (result.func() && ["@section", "@push"].includes(result.func()!)) {

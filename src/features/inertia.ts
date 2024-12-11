@@ -9,6 +9,7 @@ import {
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getInertiaViews } from "@src/repositories/inertia";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -185,6 +186,10 @@ export const completionProvider: CompletionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("inertia.completion", true)) {
+            return [];
+        }
+
         const views = getInertiaViews().items;
 
         if (result.class() === facade("Route")) {

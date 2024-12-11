@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getAssets } from "@src/repositories/asset";
+import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import * as vscode from "vscode";
@@ -68,6 +69,10 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("asset.completion", true)) {
+            return [];
+        }
+
         return getAssets().items.map((file) => {
             let completeItem = new vscode.CompletionItem(
                 file.path,

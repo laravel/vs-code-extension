@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getTranslations } from "@src/repositories/translations";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -136,6 +137,10 @@ export const completionProvider = {
         document: vscode.TextDocument,
         position: vscode.Position,
     ): vscode.CompletionItem[] {
+        if (!config("translation.completion", true)) {
+            return [];
+        }
+
         if (!result.fillingInArrayKey()) {
             return [];
         }

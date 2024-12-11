@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getAppBindings } from "@src/repositories/appBinding";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -96,6 +97,10 @@ export const completionProvider: CompletionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("appBinding.completion", true)) {
+            return [];
+        }
+
         return Object.entries(getAppBindings().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
                 key,

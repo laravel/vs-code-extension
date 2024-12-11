@@ -2,6 +2,7 @@ import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getControllers } from "@src/repositories/controllers";
 import { getRoutes } from "@src/repositories/routes";
+import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { facade } from "@src/support/util";
@@ -111,6 +112,10 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("controllerAction.completion", true)) {
+            return [];
+        }
+
         if (result.currentParamIsArray()) {
             return [];
         }

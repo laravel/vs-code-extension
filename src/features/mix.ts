@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getMixManifest } from "@src/repositories/mix";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -97,6 +98,10 @@ export const completionProvider: CompletionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("mix.completion", true)) {
+            return [];
+        }
+
         return getMixManifest().items.map((mix) => {
             let completeItem = new vscode.CompletionItem(
                 mix.key,

@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getMiddleware } from "@src/repositories/middleware";
+import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
@@ -141,6 +142,10 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
+        if (!config("middleware.completion", true)) {
+            return [];
+        }
+
         return Object.entries(getMiddleware().items).map(([key, value]) => {
             let completionItem = new vscode.CompletionItem(
                 key,
