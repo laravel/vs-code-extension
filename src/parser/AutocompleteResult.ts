@@ -55,7 +55,7 @@ export default class AutocompleteResult {
 
     public func() {
         // @ts-ignore
-        return this.result.methodName;
+        return this.result.methodName ?? null;
     }
 
     public addInfo(key: string, value: any) {
@@ -99,7 +99,7 @@ export default class AutocompleteResult {
         return this.result.arguments?.autocompletingIndex ?? null;
     }
 
-    public argName() {
+    public argumentName() {
         return this.param()?.name ?? null;
     }
 
