@@ -12,7 +12,7 @@ import { DetectResult, FeatureTag, HoverProvider, LinkProvider } from "..";
 const toFind: FeatureTag = [
     { method: ["route", "signedRoute", "to_route"] },
     {
-        class: [facade("Redirect"), facade("URL"), "redirect"],
+        class: [facade("Redirect"), facade("URL"), "redirect", "url"],
         method: ["route", "signedRoute", "temporarySignedRoute"],
     },
 ];
