@@ -71,6 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push();
 
     const delegatedRegistry = new Registry(
+        new EloquentCompletion(),
         new ConfigCompletion(),
         new RouteCompletion(),
         new ViewCompletion(),
@@ -82,8 +83,6 @@ export function activate(context: vscode.ExtensionContext) {
         new InertiaCompletion(),
         new AppCompletion(),
     );
-
-    const eloquentRegistry = new Registry(new EloquentCompletion());
 
     const validationRegistry = new Registry(new ValidationCompletion());
 
@@ -116,11 +115,6 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
             delegatedRegistry,
             ...TRIGGER_CHARACTERS,
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            eloquentRegistry,
-            ...TRIGGER_CHARACTERS.concat([">"]),
         ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
