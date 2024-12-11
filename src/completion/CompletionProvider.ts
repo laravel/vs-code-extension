@@ -4,7 +4,7 @@ import { completionProvider as appBinding } from "@src/features/appBinding";
 import { completionProvider as asset } from "@src/features/asset";
 import { completionProvider as auth } from "@src/features/auth";
 import { completionProvider as config } from "@src/features/config";
-// import { completionProvider as env } from "@src/features/env";
+import { completionProvider as env } from "@src/features/env";
 // import { completionProvider as inertia } from "@src/features/inertia";
 // import { completionProvider as middleware } from "@src/features/middleware";
 // import { completionProvider as mix } from "@src/features/mix";
@@ -20,7 +20,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "auth.completion": auth,
     "config.completion": config,
     "asset.completion": asset,
-    // "env.completion": env,
+    "env.completion": env,
     // "inertia.completion": inertia,
     // "middleware.completion": middleware,
     // "mix.completion": mix,
@@ -30,7 +30,5 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
 };
 
 export const completionProviders = Object.entries(allProviders)
-    .filter(([configKey, provider]) =>
-        getConfig(configKey as GeneratedConfigKey, true),
-    )
+    .filter(([configKey]) => getConfig(configKey as GeneratedConfigKey, true))
     .map(([_, provider]) => provider);

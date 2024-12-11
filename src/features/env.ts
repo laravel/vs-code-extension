@@ -1,14 +1,33 @@
 import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getEnv } from "@src/repositories/env";
 import { getEnvExample } from "@src/repositories/env-example";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
+import { support } from "@src/support/util";
 import * as vscode from "vscode";
-import { CodeActionProviderFunction, HoverProvider, LinkProvider } from "..";
+import {
+    CodeActionProviderFunction,
+    CompletionProvider,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-const toFind = { class: null, method: "env" };
+const toFind: FeatureTag = [
+    {
+        class: support("Env"),
+        method: ["get"],
+        argumentIndex: 0,
+    },
+    {
+        method: ["env"],
+        argumentIndex: 0,
+    },
+];
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
@@ -171,4 +190,34 @@ const addFromEnvExample = async (
         diagnostic,
         example[missingVar].value,
     );
+};
+
+export const completionProvider: CompletionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return Object.entries(getEnv().items).map(([key, value]) => {
+            let completeItem = new vscode.CompletionItem(
+                key,
+                vscode.CompletionItemKind.Constant,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            completeItem.detail = value.value;
+
+            return completeItem;
+        });
+    },
 };

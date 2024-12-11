@@ -9,7 +9,6 @@ import { openFileCommand } from "./commands";
 import BladeCompletion from "./completion/Blade";
 import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
-import EnvCompletion from "./completion/Env";
 import InertiaCompletion from "./completion/Inertia";
 import MixCompletion from "./completion/Mix";
 import Registry from "./completion/Registry";
@@ -74,7 +73,6 @@ export function activate(context: vscode.ExtensionContext) {
         new ViewCompletion(),
         new TranslationCompletion(),
         new MixCompletion(),
-        new EnvCompletion(),
         new InertiaCompletion(),
     );
 
