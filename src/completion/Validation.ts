@@ -2,7 +2,7 @@
 
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { CompletionProvider, Tags } from "..";
+import { CompletionProvider } from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -95,26 +95,26 @@ export default class Validation implements CompletionProvider {
         uuid: "uuid",
     };
 
-    tags(): Tags {
+    tags() {
         return [
             {
                 class: facade("Validator"),
-                functions: ["validate", "sometimes"],
-                paramIndex: 1,
+                method: ["validate", "sometimes"],
+                argumentIndex: 1,
             },
             {
                 class: "Illuminate\\Http\\Request",
-                functions: ["validate", "sometimes"],
-                paramIndex: 0,
+                method: ["validate", "sometimes"],
+                argumentIndex: 0,
             },
             {
                 class: "request",
-                functions: ["validate", "sometimes"],
-                paramIndex: 0,
+                method: ["validate", "sometimes"],
+                argumentIndex: 0,
             },
             {
                 classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
-                functionDefinition: "rules",
+                methodDefinition: "rules",
             },
         ];
     }
