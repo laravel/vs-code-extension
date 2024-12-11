@@ -1,18 +1,24 @@
+import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
+import { getAppBindings } from "@src/repositories/appBinding";
+import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
+import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
-import { notFound } from "../diagnostic";
-import { getAppBindings } from "../repositories/appBinding";
-import { findHoverMatchesInDoc } from "../support/doc";
-import { relativePath } from "../support/project";
+import { CompletionProvider, HoverProvider, LinkProvider } from "..";
 
 const toFind = [
-    { class: facade("App"), method: "make" },
-    { class: null, method: "app" },
+    {
+        class: facade("App"),
+        method: ["make", "bound", "isShared"],
+        argumentIndex: 0,
+    },
+    { method: "app", argumentIndex: 0 },
 ];
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -32,7 +38,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -54,7 +60,7 @@ const hoverProvider: HoverProvider = (
     });
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -78,4 +84,30 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const completionProvider: CompletionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return Object.entries(getAppBindings().items).map(([key, value]) => {
+            let completeItem = new vscode.CompletionItem(
+                key,
+                vscode.CompletionItemKind.Constant,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            return completeItem;
+        });
+    },
+};

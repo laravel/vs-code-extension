@@ -6,10 +6,9 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { initClient } from "./blade/client";
 import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
-import AppCompletion from "./completion/App";
-import AssetCompletion from "./completion/Asset";
 import GateCompletion from "./completion/Auth";
 import BladeCompletion from "./completion/Blade";
+import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
 import EnvCompletion from "./completion/Env";
 import InertiaCompletion from "./completion/Inertia";
@@ -21,7 +20,6 @@ import ValidationCompletion from "./completion/Validation";
 import ViewCompletion from "./completion/View";
 import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
-import { completionProvider as configCompletion } from "./features/config";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
@@ -71,18 +69,15 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push();
 
     const delegatedRegistry = new Registry(
+        ...completionProviders,
         new EloquentCompletion(),
-        // new ConfigCompletion(),
-        configCompletion,
         new RouteCompletion(),
         new ViewCompletion(),
         new TranslationCompletion(),
         new MixCompletion(),
         new EnvCompletion(),
         new GateCompletion(),
-        new AssetCompletion(),
         new InertiaCompletion(),
-        new AppCompletion(),
     );
 
     const validationRegistry = new Registry(new ValidationCompletion());

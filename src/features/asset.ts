@@ -1,12 +1,14 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getAssets } from "@src/repositories/asset";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { FeatureTag, LinkProvider } from "..";
 
-const toFind = { class: null, method: "asset" };
+const toFind: FeatureTag = { class: null, method: "asset", argumentIndex: 0 };
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -28,7 +30,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -54,4 +56,30 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, linkProvider };
+export const completionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return getAssets().items.map((file) => {
+            let completeItem = new vscode.CompletionItem(
+                file.path,
+                vscode.CompletionItemKind.Constant,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            return completeItem;
+        });
+    },
+};
