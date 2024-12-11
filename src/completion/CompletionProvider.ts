@@ -1,8 +1,8 @@
 "use strict";
 
 import { completionProvider as appBinding } from "@src/features/appBinding";
-// import { completionProvider as auth } from "@src/features/auth";
 import { completionProvider as asset } from "@src/features/asset";
+import { completionProvider as auth } from "@src/features/auth";
 import { completionProvider as config } from "@src/features/config";
 // import { completionProvider as env } from "@src/features/env";
 // import { completionProvider as inertia } from "@src/features/inertia";
@@ -17,7 +17,7 @@ import { CompletionProvider } from "..";
 
 const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "appBinding.completion": appBinding,
-    // "auth.completion": auth,
+    "auth.completion": auth,
     "config.completion": config,
     "asset.completion": asset,
     // "env.completion": env,

@@ -1,12 +1,19 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getPolicies } from "@src/repositories/auth";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { facade, relativeMarkdownLink } from "@src/support/util";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import {
+    CompletionProvider,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-const toFind = [
+const toFind: FeatureTag = [
     {
         class: facade("Gate"),
         method: [
@@ -19,17 +26,20 @@ const toFind = [
             "authorize",
             "inspect",
         ],
+        argumentIndex: 0,
     },
     {
-        class: null,
-        method: "can",
+        class: [facade("Route"), facade("Auth")],
+        method: ["can", "cannot"],
+        argumentIndex: 0,
     },
-    // "@can",
-    // "@cannot",
-    // "@canany",
+    {
+        method: ["@can", "@cannot", "@canany"],
+        argumentIndex: 0,
+    },
 ];
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -53,7 +63,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -87,7 +97,7 @@ const hoverProvider: HoverProvider = (
     });
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -109,4 +119,42 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const completionProvider: CompletionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        if (result.paramCount() > 0) {
+            return [];
+        }
+
+        return Object.entries(getPolicies().items).map(([key, value]) => {
+            let completeItem = new vscode.CompletionItem(
+                value[0].key,
+                vscode.CompletionItemKind.Value,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            const policyClasses = value
+                .map((item) => item.policy_class)
+                .filter(String);
+
+            if (policyClasses.length > 0) {
+                completeItem.detail = policyClasses.join("\n\n");
+            }
+
+            return completeItem;
+        });
+    },
+};

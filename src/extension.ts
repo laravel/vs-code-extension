@@ -6,7 +6,6 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { initClient } from "./blade/client";
 import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
-import GateCompletion from "./completion/Auth";
 import BladeCompletion from "./completion/Blade";
 import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
@@ -76,7 +75,6 @@ export function activate(context: vscode.ExtensionContext) {
         new TranslationCompletion(),
         new MixCompletion(),
         new EnvCompletion(),
-        new GateCompletion(),
         new InertiaCompletion(),
     );
 
