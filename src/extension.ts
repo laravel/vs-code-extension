@@ -9,7 +9,6 @@ import { openFileCommand } from "./commands";
 import BladeCompletion from "./completion/Blade";
 import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
-import MixCompletion from "./completion/Mix";
 import Registry from "./completion/Registry";
 import RouteCompletion from "./completion/Route";
 import TranslationCompletion from "./completion/Translation";
@@ -71,7 +70,6 @@ export function activate(context: vscode.ExtensionContext) {
         new RouteCompletion(),
         new ViewCompletion(),
         new TranslationCompletion(),
-        new MixCompletion(),
     );
 
     const validationRegistry = new Registry(new ValidationCompletion());

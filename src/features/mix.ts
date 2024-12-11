@@ -1,17 +1,26 @@
 import { notFound } from "@src/diagnostic";
+import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getMixManifest } from "@src/repositories/mix";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
+import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import {
+    CompletionProvider,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-const toFind = {
-    class: null,
-    method: "mix",
-};
+const toFind: FeatureTag = [
+    {
+        method: ["mix"],
+        argumentIndex: 0,
+    },
+];
 
-const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
+export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
@@ -30,7 +39,7 @@ const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     );
 };
 
-const hoverProvider: HoverProvider = (
+export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
@@ -50,7 +59,7 @@ const hoverProvider: HoverProvider = (
     });
 };
 
-const diagnosticProvider = (
+export const diagnosticProvider = (
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> => {
     return detectInDoc<vscode.Diagnostic, "string">(
@@ -76,4 +85,30 @@ const diagnosticProvider = (
     );
 };
 
-export { diagnosticProvider, hoverProvider, linkProvider };
+export const completionProvider: CompletionProvider = {
+    tags() {
+        return toFind;
+    },
+
+    provideCompletionItems(
+        result: AutocompleteResult,
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext,
+    ): vscode.CompletionItem[] {
+        return getMixManifest().items.map((mix) => {
+            let completeItem = new vscode.CompletionItem(
+                mix.key,
+                vscode.CompletionItemKind.Value,
+            );
+
+            completeItem.range = document.getWordRangeAtPosition(
+                position,
+                wordMatchRegex,
+            );
+
+            return completeItem;
+        });
+    },
+};

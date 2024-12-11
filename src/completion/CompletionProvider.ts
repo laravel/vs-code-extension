@@ -7,7 +7,7 @@ import { completionProvider as config } from "@src/features/config";
 import { completionProvider as env } from "@src/features/env";
 import { completionProvider as inertia } from "@src/features/inertia";
 // import { completionProvider as middleware } from "@src/features/middleware";
-// import { completionProvider as mix } from "@src/features/mix";
+import { completionProvider as mix } from "@src/features/mix";
 // import { completionProvider as route } from "@src/features/route";
 // import { completionProvider as translation } from "@src/features/translation";
 // import { completionProvider as view } from "@src/features/view";
@@ -23,7 +23,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "env.completion": env,
     "inertia.completion": inertia,
     // "middleware.completion": middleware,
-    // "mix.completion": mix,
+    "mix.completion": mix,
     // "route.completion": route,
     // "translation.completion": translation,
     // "view.completion": view,
