@@ -9,7 +9,7 @@ import {
     DetectResult,
     DetectResultParam,
     DetectResultStringParam,
-    DocFindParams,
+    FeatureTag,
     ValidDetectParamTypes,
 } from "..";
 import { toArray } from "./util";
@@ -259,7 +259,7 @@ export const parse = (
 
 export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     doc: vscode.TextDocument,
-    toFind: DocFindParams | DocFindParams[],
+    toFind: FeatureTag,
     repo: ReturnType<typeof repository>,
     cb: (arg: {
         param: Extract<DetectResultParam, { type: U }>;
@@ -274,8 +274,12 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
                 .filter((result) => {
                     return toArray(toFind).some((toFind) => {
                         return (
-                            toArray(toFind.class).includes(result.class) &&
-                            toArray(toFind.method).includes(result.method)
+                            toArray(toFind.class ?? null).includes(
+                                result.class,
+                            ) &&
+                            toArray(toFind.method ?? null).includes(
+                                result.method,
+                            )
                         );
                     });
                 })
