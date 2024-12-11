@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, Eloquent as EloquentType, Tags } from "..";
+import { CompletionProvider, Eloquent as EloquentType } from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
@@ -52,10 +52,10 @@ export default class Eloquent implements CompletionProvider {
 
     private anyParamMethods = ["firstOrNew", "firstOrCreate"];
 
-    tags(): Tags {
+    tags() {
         return Object.entries(getModels().items).map(([key]) => ({
             class: key,
-            functions: this.getAllFunctions(),
+            method: this.getAllFunctions(),
         }));
     }
 
