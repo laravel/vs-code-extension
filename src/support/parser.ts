@@ -1,9 +1,10 @@
-import { FileDownloader, getApi } from "@microsoft/vscode-file-downloader-api";
+import { FileDownloader } from "@src/downloaders/FileDownloader";
+import OutputLogger from "@src/downloaders/logging/OutputLogger";
+import HttpRequestHandler from "@src/downloaders/networking/HttpRequestHandler";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { repository } from "@src/repositories";
 import * as cp from "child_process";
 import * as os from "os";
-import engine from "php-parser";
 import * as vscode from "vscode";
 import {
     DetectResult,
@@ -13,15 +14,6 @@ import {
     ValidDetectParamTypes,
 } from "..";
 import { toArray } from "./util";
-
-// TODO: Problem?
-// @ts-ignore
-const parser = new engine({
-    parser: {
-        extractDoc: true,
-        php8: true,
-    },
-});
 
 const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
 const detected = new Map<string, Promise<DetectResult[]>>();
@@ -49,7 +41,9 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     const filename = `php-parser-${binaryVersion}`;
     const uri = `https://github.com/laravel/vs-code-php-parser-cli/raw/refs/heads/main/bin/${filename}`;
 
-    const fileDownloader: FileDownloader = await getApi();
+    const logger = new OutputLogger(`File Downloader`, context);
+    const requestHandler = new HttpRequestHandler(logger);
+    const fileDownloader = new FileDownloader(requestHandler, logger);
 
     const downloadedFiles: vscode.Uri[] =
         await fileDownloader.listDownloadedItems(context);
@@ -96,23 +90,6 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             "Failed to download binary for Laravel extension",
         );
     }
-};
-
-export const getTokens = (code: string): Token[] => {
-    return parser.tokenGetAll(code);
-};
-
-export const getNormalizedTokens = (code: string): TokenFormatted[] => {
-    return parser
-        .tokenGetAll(code)
-        .map((token: Token) => {
-            if (typeof token === "string") {
-                return ["T_CUSTOM_STRING", token, -1];
-            }
-
-            return token;
-        })
-        .filter((token: Token) => token[0] !== "T_WHITESPACE");
 };
 
 export const parseFaultTolerant = async (
