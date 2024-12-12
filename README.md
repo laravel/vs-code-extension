@@ -1,17 +1,19 @@
 # Official Laravel VS Code Extension
 
-## Intro
+> **Note:** This extension is currently in Open Beta Testing. Please refer to the [support instructions](./SUPPORT.md) on how to file a bug report or feature request.
 
-This is the beta version of the official Laravel VS Code Extension. Below you'll find a list of features as well as a roadmap with features we will be integrating soon.
+Below you'll find a list of features as well as a roadmap with features we will be integrating soon.
 
-### Of Note
+**Please Note:**
 
 -   This extension will occasionally boot your app in the background to collect information about your app for use in autocompletion, linking, hovering, and diagnostics
 -   When you first install the extension it will download a small binary to your machine, we use this binary for PHP parsing
 
+## Features
+
 A non-exhaustive list of features covered in the extension:
 
-## App Bindings
+### App Bindings
 
 ```php
 app('auth')
@@ -27,7 +29,7 @@ App::isShared('auth.driver')
 -   Warns when binding not found
 -   Hoverable
 
-## Assets
+### Assets
 
 ```php
 asset('my-amazing-jpeg.png')
@@ -38,7 +40,7 @@ asset('my-amazing-jpeg.png')
 -   Warns when asset not found
 
 <!--
-## Auth
+### Auth
 
 ```php
 Gate::has('viewNova');
@@ -51,11 +53,11 @@ Gate::allows('viewNova');
 -   Warns when gate not found
 -->
 
-## Blade
+### Blade
 
 -   Syntax highlighting
 
-## Config
+### Config
 
 ```php
 config('broadcasting.connections.reverb.app_id');
@@ -73,14 +75,14 @@ config()->string('broadcasting.connections.reverb.app_id');
 -   Warns when config not found
 -   Hoverable
 
-## Eloquent
+### Eloquent
 
 -   Method auto-completion
 -   Field auto-completion (e.g. `where` methods, `create`/`make`/object creation)
 -   Relationship auto-completion (e.g. `with` method + `with` with array keys)
 -   Sub-query auto-completion ( `with` with array keys + value as closure)
 
-## Env
+### Env
 
 ```php
 env('REVERB_APP_ID');
@@ -94,7 +96,7 @@ Env::get('REVERB_APP_ID');
     -   Copy value from `.env.example`
 -   Hoverable
 
-## Inertia
+### Inertia
 
 ```php
 inertia('Pages/Dashboard');
@@ -108,7 +110,7 @@ Route::inertia('/dashboard', 'Pages/Dashboard');
     -   Create view
 -   Hoverable
 
-## Route
+### Route
 
 ```php
 route('dashboard');
@@ -127,7 +129,7 @@ redirect()->route('dashboard');
 -   Warns when route not found
 -   Hoverable
 
-## Middleware
+### Middleware
 
 ```php
 Route::middleware('auth');
@@ -141,7 +143,7 @@ Route::withoutMiddleware('auth');
 -   Warns when middleware not found
 -   Hoverable
 
-## Translation
+### Translation
 
 ```php
 trans('auth.failed');
@@ -157,7 +159,7 @@ Lang::get('auth.failed');
 -   Hoverable
 -   Parameter auto-completion
 
-## Validation
+### Validation
 
 ```php
 Validator::validate($input, ['name' => 'required']);
@@ -168,7 +170,7 @@ request()->sometimes(['name' => 'required']);
 
 -   Auto-completion for strings/arrays (not "|" just yet)
 
-## View
+### View
 
 ```php
 view('dashboard');
@@ -187,3 +189,7 @@ Route::view('/', 'home');
 -   Livewire support
 -   Volt support
 -   Pint support
+
+### LSP Availability
+
+Our focus right now is to create the best VS Code experience for Laravel developers. While we're not ruling out the possibility of porting much of this functionality to an LSP in the future, it's not on the immediate roadmap.
