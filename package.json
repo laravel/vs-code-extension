@@ -357,42 +357,7 @@
                     "description": null
                 }
             }
-        },
-        "commands": [
-            {
-                "command": "laravel.run-test",
-                "title": "Laravel: Run Test at Cursor"
-            },
-            {
-                "command": "laravel.run-test-file",
-                "title": "Laravel: Run Tests in File"
-            },
-            {
-                "command": "laravel.run-test-suite",
-                "title": "Laravel: Run Test Suite"
-            },
-            {
-                "command": "laravel.run-test-previous",
-                "title": "Laravel: Run Previous Test"
-            }
-        ],
-        "keybindings": [
-            {
-                "key": "cmd+k cmd+r",
-                "command": "laravel.run",
-                "when": "editorLangId == php"
-            },
-            {
-                "key": "cmd+k cmd+f",
-                "command": "laravel.run-file",
-                "when": "editorLangId == php"
-            },
-            {
-                "key": "cmd+k cmd+p",
-                "command": "laravel.run-previous",
-                "when": "editorLangId == php"
-            }
-        ]
+        }
     },
     "scripts": {
         "pretest": "npm run compile && npm run lint",
