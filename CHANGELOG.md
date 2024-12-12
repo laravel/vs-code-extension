@@ -2,6 +2,11 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.5]
+
+-   Remove external dependency on file downloader extension
+-   Removed keybindings and commands for test runner
+
 ## [0.1.4]
 
 -   Aligned items you can autocomplete with linkable, hoverable, and diagnostic-able items
