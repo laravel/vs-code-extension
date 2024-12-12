@@ -11,7 +11,6 @@ import { completionProviders } from "./completion/CompletionProvider";
 import EloquentCompletion from "./completion/Eloquent";
 import Registry from "./completion/Registry";
 import ValidationCompletion from "./completion/Validation";
-import VoltCompletion from "./completion/Volt";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
@@ -107,11 +106,6 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
             new BladeCompletion(),
             "@",
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            new VoltCompletion(),
-            ...TRIGGER_CHARACTERS.concat(["$"]),
         ),
         ...linkProviders.map((provider) =>
             vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
