@@ -2,6 +2,12 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.7]
+
+-   Facade aliases are now considered
+-   Blade linking, hovering, and diagnostics are improved
+-   Fixed an error where variables were not consistently resolved
+
 ## [0.1.6]
 
 -   Fixed bug where we weren't restricting diagnostics to only PHP files

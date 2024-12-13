@@ -42,7 +42,7 @@ const toFind: FeatureTag = [
     },
     {
         method: [
-            "@component",
+            // "@component",
             "@each",
             "@extends",
             "@include",
