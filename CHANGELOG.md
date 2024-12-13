@@ -2,6 +2,11 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.6]
+
+-   Fixed bug where we weren't restricting diagnostics to only PHP files
+-   Added timeout to parsing processes
+
 ## [0.1.5]
 
 -   Remove external dependency on file downloader extension
