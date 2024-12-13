@@ -137,6 +137,7 @@ export const parseFaultTolerant = async (
             command,
             {
                 cwd: __dirname,
+                timeout: 5000,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
@@ -199,6 +200,7 @@ export const detect = async (code: string): Promise<DetectResult[]> => {
             command,
             {
                 cwd: __dirname,
+                timeout: 5000,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
