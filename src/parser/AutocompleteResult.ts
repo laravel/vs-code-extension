@@ -45,12 +45,16 @@ export default class AutocompleteResult {
         return this.result.className ?? null;
     }
 
-    public isClass(className: string) {
+    public isClass(className: string | string[]) {
+        if (Array.isArray(className)) {
+            return className.includes(this.class());
+        }
+
         return this.class() === className;
     }
 
     public isFacade(className: string) {
-        return this.class() === facade(className);
+        return this.isClass(facade(className));
     }
 
     public func() {

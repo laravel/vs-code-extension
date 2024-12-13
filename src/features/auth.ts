@@ -30,7 +30,7 @@ const toFind: FeatureTag = [
         argumentIndex: 0,
     },
     {
-        class: [facade("Route"), facade("Auth")],
+        class: [...facade("Route"), ...facade("Auth")],
         method: ["can", "cannot"],
         argumentIndex: 0,
     },

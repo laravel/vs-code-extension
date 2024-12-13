@@ -8,11 +8,16 @@ import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { CompletionProvider, HoverProvider, LinkProvider } from "..";
+import {
+    CompletionProvider,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
-const toFind = [
+const toFind: FeatureTag = [
     {
-        class: [facade("App"), "app"],
+        class: [...facade("App"), "app"],
         method: ["make", "bound", "isShared"],
         argumentIndex: 0,
     },

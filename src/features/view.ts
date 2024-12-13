@@ -2,6 +2,7 @@ import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import {
     CodeActionProviderFunction,
+    FeatureTag,
     HoverProvider,
     LinkProvider,
 } from "@src/index";
@@ -17,7 +18,7 @@ import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
 import * as vscode from "vscode";
 
-const toFind = [
+const toFind: FeatureTag = [
     {
         class: facade("View"),
         method: [
@@ -62,7 +63,7 @@ const isCorrectIndexForMethod = (
     param: AutocompleteParsingResult.StringValue,
 ) => {
     // @ts-ignore
-    if (item.className === facade("Route")) {
+    if (facade("Route").includes(item.className)) {
         return index === 1;
     }
 
@@ -234,7 +235,7 @@ export const completionProvider = {
             return [];
         }
 
-        if (result.class() === facade("Route")) {
+        if (result.isFacade("Route")) {
             if (result.func() === "view" && result.isParamIndex(1)) {
                 return views.map(({ key }) => {
                     let completionItem = new vscode.CompletionItem(

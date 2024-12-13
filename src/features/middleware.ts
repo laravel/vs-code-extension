@@ -9,9 +9,9 @@ import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
-const toFind = {
+const toFind: FeatureTag = {
     class: facade("Route"),
     method: ["middleware", "withoutMiddleware"],
 };

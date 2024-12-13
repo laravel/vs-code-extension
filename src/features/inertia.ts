@@ -36,7 +36,7 @@ const toFind: FeatureTag = [
 ];
 
 const isCorrectMethodIndex = (item: any, index: number) => {
-    if (item.class === facade("Route") && item.method === "inertia") {
+    if (facade("Route").includes(item.class) && item.method === "inertia") {
         return index === 1;
     }
 
@@ -192,7 +192,7 @@ export const completionProvider: CompletionProvider = {
 
         const views = getInertiaViews().items;
 
-        if (result.class() === facade("Route")) {
+        if (result.isFacade("Route")) {
             if (result.isParamIndex(1)) {
                 return Object.entries(views).map(([key]) => {
                     let completionItem = new vscode.CompletionItem(

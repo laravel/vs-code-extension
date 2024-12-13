@@ -14,7 +14,7 @@ import { FeatureTag, HoverProvider, LinkProvider } from "..";
 const toFind: FeatureTag = [
     { method: ["route", "signedRoute", "to_route"] },
     {
-        class: [facade("Redirect"), facade("URL"), "redirect", "url"],
+        class: [...facade("Redirect"), ...facade("URL"), "redirect", "url"],
         method: ["route", "signedRoute", "temporarySignedRoute"],
     },
 ];
@@ -24,7 +24,7 @@ const isCorrectIndexForMethod = (
     index: number,
 ) => {
     // @ts-ignore
-    if (item.className === facade("Redirect")) {
+    if (facade("Redirect").includes(item.className)) {
         return index === 0;
     }
 

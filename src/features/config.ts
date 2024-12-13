@@ -19,7 +19,7 @@ import {
 const toFind: FeatureTag = [
     { method: "config" },
     {
-        class: [facade("Config"), "config"],
+        class: [...facade("Config"), "config"],
         method: [
             "get",
             "getMany",
@@ -39,8 +39,20 @@ const isCorrectIndexForMethod = (
     item: AutocompleteParsingResult.ContextValue,
     index: number,
 ) => {
-    // @ts-ignore
-    if (["prepend", "push"].includes(item.methodName ?? "")) {
+    if (
+        [
+            "get",
+            "getMany",
+            "string",
+            "integer",
+            "boolean",
+            "float",
+            "array",
+            "prepend",
+            "push",
+            // @ts-ignore
+        ].includes(item.methodName ?? "")
+    ) {
         return index === 0;
     }
 

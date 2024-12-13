@@ -164,7 +164,7 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: AutocompleteResult,
     ): vscode.CompletionItem[] | undefined {
-        if (result.isClass(facade("Validator"))) {
+        if (result.isFacade("Validator")) {
             return this.getRules(document, position);
         }
     }
