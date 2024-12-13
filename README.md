@@ -189,6 +189,7 @@ Route::view('/', 'home');
 -   Livewire support
 -   Volt support
 -   Pint support
+-   Better autocompletion, linking, hovering, and diagnostics in Blade files
 
 ### LSP Availability
 
