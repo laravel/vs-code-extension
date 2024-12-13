@@ -45,6 +45,10 @@ export const updateDiagnostics = (
         return;
     }
 
+    if (!["php", "blade", "laravel-blade"].includes(document.languageId)) {
+        return;
+    }
+
     Promise.all(
         providers
             .filter((provider) => getConfig(provider.configKey, true))
