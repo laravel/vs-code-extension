@@ -7,13 +7,9 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
-import {
-    DetectResultParam,
-    DetectResultStringParam,
-    HoverProvider,
-    LinkProvider,
-} from "..";
+import { HoverProvider, LinkProvider } from "..";
 
 const toFind = {
     class: facade("Route"),
@@ -25,14 +21,14 @@ const getName = (match: string) => {
 };
 
 const processParam = <T>(
-    param: DetectResultParam,
-    cb: (value: DetectResultStringParam) => T | null,
+    param: AutocompleteParsingResult.ContextValue,
+    cb: (value: AutocompleteParsingResult.StringValue) => T | null,
 ) => {
     if (param.type === "string") {
         return cb(param);
     }
 
-    return param.value
+    return (param as AutocompleteParsingResult.ArrayValue).children
         .map(({ value }) => {
             return value.type === "string" ? cb(value) : null;
         })

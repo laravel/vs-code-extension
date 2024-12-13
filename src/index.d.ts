@@ -39,49 +39,9 @@ interface View {
     uri: vscode.Uri;
 }
 
-interface DetectResult {
-    method: string;
-    class: string | null;
-    params: DetectResultParam[];
-}
-
 type FeatureTag = FeatureTagParam | FeatureTagParam[];
 
-interface DetectResultArrayValue {
-    key: {
-        type: string;
-        value: string | null;
-    };
-    value:
-        | {
-              type: "unknown";
-              value: null;
-          }
-        | DetectResultStringParam;
-}
-
-interface DetectResultStringParam {
-    type: "string";
-    value: string;
-    name: string | null;
-    start: {
-        line: number;
-        column: number;
-    };
-    end: {
-        line: number;
-        column: number;
-    };
-}
-
 type ValidDetectParamTypes = "string" | "array";
-
-interface DetectResultArrayParam {
-    type: "array";
-    value: DetectResultArrayValue[];
-}
-
-type DetectResultParam = DetectResultArrayParam | DetectResultStringParam;
 
 type HoverProvider = (
     doc: vscode.TextDocument,

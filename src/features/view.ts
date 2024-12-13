@@ -2,8 +2,6 @@ import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import {
     CodeActionProviderFunction,
-    DetectResult,
-    DetectResultStringParam,
     HoverProvider,
     LinkProvider,
 } from "@src/index";
@@ -15,6 +13,7 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
 import * as vscode from "vscode";
 
@@ -58,18 +57,21 @@ const toFind = [
 ];
 
 const isCorrectIndexForMethod = (
-    item: DetectResult,
+    item: AutocompleteParsingResult.ContextValue,
     index: number,
-    param: DetectResultStringParam,
+    param: AutocompleteParsingResult.StringValue,
 ) => {
-    if (item.class === facade("Route")) {
+    // @ts-ignore
+    if (item.className === facade("Route")) {
         return index === 1;
     }
 
-    if (item.class === "Illuminate\\Mail\\Mailables\\Content") {
-        if (param.name) {
-            return ["view", "markdown"].includes(param.name);
-        }
+    // @ts-ignore
+    if (item.className === "Illuminate\\Mail\\Mailables\\Content") {
+        // TODO: Re-instate this
+        // if (param.name) {
+        //     return ["view", "markdown"].includes(param.name);
+        // }
 
         return [0, 3].includes(index);
     }

@@ -7,10 +7,10 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
     CompletionProvider,
-    DetectResult,
     FeatureTag,
     HoverProvider,
     LinkProvider,
@@ -35,8 +35,12 @@ const toFind: FeatureTag = [
     },
 ];
 
-const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
-    if (["prepend", "push"].includes(item.method)) {
+const isCorrectIndexForMethod = (
+    item: AutocompleteParsingResult.ContextValue,
+    index: number,
+) => {
+    // @ts-ignore
+    if (["prepend", "push"].includes(item.methodName ?? "")) {
         return index === 0;
     }
 

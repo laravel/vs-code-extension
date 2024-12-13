@@ -1,4 +1,5 @@
 import { repository } from "@src/repositories";
+import { AutocompleteParsingResult } from "@src/types";
 import {
     Diagnostic,
     DocumentLink,
@@ -9,12 +10,7 @@ import {
     TextDocument,
     Uri,
 } from "vscode";
-import {
-    DetectResult,
-    DetectResultStringParam,
-    FeatureTag,
-    ValidDetectParamTypes,
-} from "..";
+import { FeatureTag, ValidDetectParamTypes } from "..";
 import { detectInDoc, isInHoverRange } from "./parser";
 
 export const findWarningsInDoc = (
@@ -64,9 +60,9 @@ export const findHoverMatchesInDoc = (
     cb: (
         match: string,
         arg: {
-            param: DetectResultStringParam;
+            param: AutocompleteParsingResult.StringValue;
             index: number;
-            item: DetectResult;
+            item: AutocompleteParsingResult.ContextValue;
         },
     ) => ProviderResult<Hover>,
     validParamTypes?: ValidDetectParamTypes[],
@@ -98,11 +94,11 @@ export const findHoverMatchesInDoc = (
             }
 
             if (param.type === "array") {
-                const value = param.value.find(
+                const value = param.children.find(
                     ({ value }) =>
                         value.type === "string" &&
                         isInHoverRange(linkRange, value),
-                ) as DetectResultStringParam | undefined;
+                ) as AutocompleteParsingResult.StringValue | undefined;
 
                 if (!value) {
                     return null;

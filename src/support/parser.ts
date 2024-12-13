@@ -3,21 +3,19 @@ import OutputLogger from "@src/downloaders/logging/OutputLogger";
 import HttpRequestHandler from "@src/downloaders/networking/HttpRequestHandler";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { repository } from "@src/repositories";
+import { AutocompleteParsingResult } from "@src/types";
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
-import {
-    DetectResult,
-    DetectResultParam,
-    DetectResultStringParam,
-    FeatureTag,
-    ValidDetectParamTypes,
-} from "..";
+import { FeatureTag, ValidDetectParamTypes } from "..";
 import { showErrorPopup } from "./popup";
 import { toArray } from "./util";
 
 const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
-const detected = new Map<string, Promise<DetectResult[]>>();
+const detected = new Map<
+    string,
+    Promise<AutocompleteParsingResult.ContextValue[]>
+>();
 
 type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
@@ -151,12 +149,16 @@ export const parseFaultTolerant = async (
     });
 };
 
-export const detect = async (code: string): Promise<DetectResult[]> => {
+export const detect = async (
+    code: string,
+): Promise<AutocompleteParsingResult.ContextValue[]> => {
     // We're about to modify the code for the command, but the key should be the original code
     const originalCode = code;
 
     if (detected.has(originalCode)) {
-        return detected.get(originalCode) as Promise<DetectResult[]>;
+        return detected.get(originalCode) as Promise<
+            AutocompleteParsingResult.ContextValue[]
+        >;
     }
 
     let replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
@@ -195,23 +197,25 @@ export const detect = async (code: string): Promise<DetectResult[]> => {
 
     // console.log("detect command", command);
 
-    const promise = new Promise<DetectResult[]>(function (resolve, error) {
-        cp.exec(
-            command,
-            {
-                cwd: __dirname,
-                timeout: 5000,
-            },
-            (err, stdout, stderr) => {
-                if (err === null) {
-                    // console.log("detect result", JSON.parse(stdout));
-                    return resolve(JSON.parse(stdout));
-                }
+    const promise = new Promise<AutocompleteParsingResult.ContextValue[]>(
+        function (resolve, error) {
+            cp.exec(
+                command,
+                {
+                    cwd: __dirname,
+                    timeout: 5000,
+                },
+                (err, stdout, stderr) => {
+                    if (err === null) {
+                        // console.log("detect result", JSON.parse(stdout));
+                        return resolve(JSON.parse(stdout));
+                    }
 
-                showErrorPopup(stderr.length > 0 ? stderr : stdout);
-            },
-        );
-    });
+                    showErrorPopup(stderr.length > 0 ? stderr : stdout);
+                },
+            );
+        },
+    );
 
     detected.set(originalCode, promise);
 
@@ -238,44 +242,66 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     toFind: FeatureTag,
     repo: ReturnType<typeof repository>,
     cb: (arg: {
-        param: Extract<DetectResultParam, { type: U }>;
+        param: Extract<AutocompleteParsingResult.ContextValue, { type: U }>;
         index: number;
-        item: DetectResult;
+        item: AutocompleteParsingResult.ContextValue;
     }) => T[] | T | null,
     validParamTypes: ValidDetectParamTypes[] = ["string"],
 ): Promise<T[]> => {
     return detect(doc.getText().trim()).then((results) => {
         return Promise.all(
             results
+                .filter(
+                    (result) =>
+                        result.type === "object" ||
+                        result.type === "methodCall",
+                )
                 .filter((result) => {
                     return toArray(toFind).some((toFind) => {
                         return (
                             toArray(toFind.class ?? null).includes(
-                                result.class,
+                                result.className ?? null,
                             ) &&
                             toArray(toFind.method ?? null).includes(
-                                result.method,
+                                // @ts-ignore
+                                result.methodName ?? null,
                             )
                         );
                     });
                 })
                 .map((item) => {
                     return repo().whenLoaded(() =>
-                        item.params
-                            .map((param, index) => {
-                                if (validParamTypes.includes(param.type)) {
+                        item.arguments.children
+                            .flatMap((arg, index) => {
+                                // @ts-ignore
+                                return arg.children.map((child) => {
+                                    if (
+                                        !validParamTypes.includes(
+                                            child.type ?? "",
+                                        )
+                                    ) {
+                                        return null;
+                                    }
+
                                     // Come on, TypeScript
-                                    const finalParam = param as Extract<
-                                        DetectResultParam,
+                                    const finalParam = child as Extract<
+                                        AutocompleteParsingResult.ContextValue,
                                         { type: U }
                                     >;
 
-                                    return toArray<T | T[] | null>(
-                                        cb({ param: finalParam, index, item }),
-                                    );
-                                }
-
-                                return null;
+                                    try {
+                                        return toArray<T | T[] | null>(
+                                            cb({
+                                                param: finalParam,
+                                                index,
+                                                item,
+                                            }),
+                                        );
+                                    } catch (e) {
+                                        console.log(e);
+                                        return null;
+                                    }
+                                });
                             })
                             .flat(2)
                             .filter((item) => item !== null),
@@ -287,8 +313,12 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
 
 export const isInHoverRange = (
     range: vscode.Range,
-    param: DetectResultStringParam,
+    param: AutocompleteParsingResult.StringValue,
 ): boolean => {
+    if (!param.start || !param.end) {
+        return false;
+    }
+
     return (
         param.start.line === range.start.line &&
         param.start.column === range.start.character &&
@@ -296,7 +326,16 @@ export const isInHoverRange = (
     );
 };
 
-export const detectedRange = (param: DetectResultStringParam): vscode.Range => {
+export const detectedRange = (
+    param: AutocompleteParsingResult.StringValue,
+): vscode.Range => {
+    if (!param.start || !param.end) {
+        return new vscode.Range(
+            new vscode.Position(0, 0),
+            new vscode.Position(0, 0),
+        );
+    }
+
     return new vscode.Range(
         new vscode.Position(param.start.line, param.start.column + 1),
         new vscode.Position(param.end.line, param.end.column + 1),

@@ -134,5 +134,13 @@ export namespace AutocompleteParsingResult {
         type: "string";
         parent: ContextValue | null;
         value: string;
+        start?: {
+            line: number;
+            column: number;
+        };
+        end?: {
+            line: number;
+            column: number;
+        };
     }
 }

@@ -6,8 +6,9 @@ import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
-import { DetectResult, LinkProvider } from "..";
+import { LinkProvider } from "..";
 
 const toFind = {
     class: facade("Route"),
@@ -26,7 +27,10 @@ const toFind = {
     ],
 };
 
-const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
+const isCorrectIndexForMethod = (
+    item: AutocompleteParsingResult.ContextValue,
+    index: number,
+) => {
     const indices: Record<string, number> = {
         fallback: 0,
         match: 2,
@@ -34,7 +38,8 @@ const isCorrectIndexForMethod = (item: DetectResult, index: number) => {
         addRoute: 2,
     };
 
-    return index === (indices[item.method] ?? 1);
+    // @ts-ignore
+    return index === (indices[item.methodName ?? ""] ?? 1);
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
