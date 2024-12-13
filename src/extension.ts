@@ -22,10 +22,12 @@ let client: LanguageClient;
 
 function shouldActivate(): boolean {
     if (!hasWorkspace()) {
+        info("Not activating Laravel Extension because no workspace found");
         return false;
     }
 
     if (!projectPathExists("artisan")) {
+        info("Not activating Laravel Extension because no artisan file found");
         return false;
     }
 

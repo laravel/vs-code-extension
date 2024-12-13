@@ -6,7 +6,8 @@ type ConfigKey =
     | "phpCommand"
     | "tests.docker.enabled"
     | "tests.ssh.enabled"
-    | "tests.suiteSuffix";
+    | "tests.suiteSuffix"
+    | "showErrorPopups";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);

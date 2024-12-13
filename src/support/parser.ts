@@ -13,6 +13,7 @@ import {
     FeatureTag,
     ValidDetectParamTypes,
 } from "..";
+import { showErrorPopup } from "./popup";
 import { toArray } from "./util";
 
 const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
@@ -143,9 +144,7 @@ export const parseFaultTolerant = async (
                     return resolve(new AutocompleteResult(JSON.parse(stdout)));
                 }
 
-                const errorOutput = stderr.length > 0 ? stderr : stdout;
-
-                error(errorOutput);
+                showErrorPopup(stderr.length > 0 ? stderr : stdout);
             },
         );
     });
@@ -207,9 +206,7 @@ export const detect = async (code: string): Promise<DetectResult[]> => {
                     return resolve(JSON.parse(stdout));
                 }
 
-                const errorOutput = stderr.length > 0 ? stderr : stdout;
-
-                error(errorOutput);
+                showErrorPopup(stderr.length > 0 ? stderr : stdout);
             },
         );
     });

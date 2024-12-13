@@ -2,7 +2,7 @@ import * as cp from "child_process";
 import * as os from "os";
 import { TemplateName, getTemplate } from "../templates";
 import { config } from "./config";
-import { error, info } from "./logger";
+import { error } from "./logger";
 import { showErrorPopup } from "./popup";
 import { getWorkspaceFolders, projectPath, projectPathExists } from "./project";
 
@@ -159,10 +159,6 @@ export const runPhp = (
     const command = commandTemplate.replace("{code}", code);
 
     const out = new Promise<string>(function (resolve, error) {
-        if (description !== null) {
-            info("Command started: " + description);
-        }
-
         cp.exec(
             command,
             {
@@ -170,10 +166,6 @@ export const runPhp = (
             },
             (err, stdout, stderr) => {
                 if (err === null) {
-                    if (description !== null) {
-                        info("Resolved: " + description);
-                    }
-
                     return resolve(stdout);
                 }
 

@@ -68,6 +68,11 @@
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as a placeholder for the code to run. e.g. `php -r \"{code}\"`"
                 },
+                "Laravel.showErrorPopups": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show popups for errors."
+                },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
                     "default": true,
