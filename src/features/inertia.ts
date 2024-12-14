@@ -15,6 +15,7 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
 import * as vscode from "vscode";
 
@@ -35,8 +36,16 @@ const toFind: FeatureTag = [
     },
 ];
 
-const isCorrectMethodIndex = (item: any, index: number) => {
-    if (facade("Route").includes(item.class) && item.method === "inertia") {
+const isCorrectMethodIndex = (
+    item: AutocompleteParsingResult.ContextValue,
+    index: number,
+) => {
+    if (
+        // @ts-ignore
+        facade("Route").includes(item.className ?? null) &&
+        // @ts-ignore
+        item.methodName === "inertia"
+    ) {
         return index === 1;
     }
 
