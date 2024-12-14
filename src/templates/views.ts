@@ -3,6 +3,10 @@ function vsCodeFindBladeFiles($path)
 {
   $paths = [];
 
+  if (!is_dir($path)) {
+    return $paths;
+  }
+
   foreach (
     \\Symfony\\Component\\Finder\\Finder::create()
       ->files()
