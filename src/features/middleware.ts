@@ -30,7 +30,7 @@ const processParam = <T>(
 
     return (param as AutocompleteParsingResult.ArrayValue).children
         .map(({ value }) => {
-            return value.type === "string" ? cb(value) : null;
+            return value?.type === "string" ? cb(value) : null;
         })
         .filter((i: T | null) => i !== null);
 };

@@ -96,7 +96,7 @@ export const findHoverMatchesInDoc = (
             if (param.type === "array") {
                 const value = param.children.find(
                     ({ value }) =>
-                        value.type === "string" &&
+                        value?.type === "string" &&
                         isInHoverRange(linkRange, value),
                 ) as AutocompleteParsingResult.StringValue | undefined;
 
