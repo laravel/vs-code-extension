@@ -3,7 +3,7 @@
     "publisher": "Laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "engines": {
         "vscode": "^1.89.0"
     },

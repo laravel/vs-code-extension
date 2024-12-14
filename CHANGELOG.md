@@ -2,6 +2,23 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.8]
+
+-   Bugfix for (really) large `detect` responses
+-   Autocomplete for `view` related items orders by non-vendor views first
+-   Fixed bug for searching for views in non-directories
+-   Better support for earlier versions of Laravel (fixes for config and translation loading)
+-   If extension cannot load, give specific reason
+-   Support for linking in path helpers:
+    -   `base_path`
+    -   `resource_path`
+    -   `config_path`
+    -   `app_path`
+    -   `database_path`
+    -   `lang_path`
+    -   `public_path`
+    -   `storage_path`
+
 ## [0.1.7]
 
 -   Facade aliases are now considered
