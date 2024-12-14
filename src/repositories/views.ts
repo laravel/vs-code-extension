@@ -2,10 +2,11 @@ import { runInLaravel, template } from "@src/support/php";
 import * as vscode from "vscode";
 import { repository } from ".";
 
-interface ViewItem {
+export interface ViewItem {
     key: string;
     path: string;
     uri: vscode.Uri;
+    isVendor: boolean;
 }
 
 const load = () => {
@@ -16,11 +17,12 @@ const load = () => {
             isVendor: boolean;
         }[]
     >(template("views")).then((results) => {
-        return results.map(({ key, path }) => {
+        return results.map(({ key, path, isVendor }) => {
             return {
                 key,
                 path,
                 uri: vscode.Uri.file(path),
+                isVendor,
             };
         });
     });

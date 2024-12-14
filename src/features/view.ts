@@ -7,7 +7,7 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getViews } from "@src/repositories/views";
+import { getViews, ViewItem } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -188,6 +188,26 @@ export const codeActionProvider: CodeActionProviderFunction = async (
     return [action];
 };
 
+const getCompletionItem = (
+    view: ViewItem,
+    document: vscode.TextDocument,
+    position: vscode.Position,
+) => {
+    let completionItem = new vscode.CompletionItem(
+        view.key,
+        vscode.CompletionItemKind.Constant,
+    );
+
+    completionItem.sortText = (view.isVendor ? "1" : "0") + view.key;
+
+    completionItem.range = document.getWordRangeAtPosition(
+        position,
+        wordMatchRegex,
+    );
+
+    return completionItem;
+};
+
 export const completionProvider = {
     tags() {
         return toFind;
@@ -217,19 +237,9 @@ export const completionProvider = {
                 result.isParamIndex(0) ||
                 result.isParamIndex(3)
             ) {
-                return views.map(({ key }) => {
-                    let completionItem = new vscode.CompletionItem(
-                        key,
-                        vscode.CompletionItemKind.Constant,
-                    );
-
-                    completionItem.range = document.getWordRangeAtPosition(
-                        position,
-                        wordMatchRegex,
-                    );
-
-                    return completionItem;
-                });
+                return views.map((view) =>
+                    getCompletionItem(view, document, position),
+                );
             }
 
             return [];
@@ -237,19 +247,9 @@ export const completionProvider = {
 
         if (result.isFacade("Route")) {
             if (result.func() === "view" && result.isParamIndex(1)) {
-                return views.map(({ key }) => {
-                    let completionItem = new vscode.CompletionItem(
-                        key,
-                        vscode.CompletionItemKind.Constant,
-                    );
-
-                    completionItem.range = document.getWordRangeAtPosition(
-                        position,
-                        wordMatchRegex,
-                    );
-
-                    return completionItem;
-                });
+                return views.map((view) =>
+                    getCompletionItem(view, document, position),
+                );
             }
 
             return [];
@@ -260,35 +260,15 @@ export const completionProvider = {
                 return [];
             }
 
-            return views.map(({ key }) => {
-                let completionItem = new vscode.CompletionItem(
-                    key,
-                    vscode.CompletionItemKind.Constant,
-                );
-
-                completionItem.range = document.getWordRangeAtPosition(
-                    position,
-                    wordMatchRegex,
-                );
-
-                return completionItem;
-            });
+            return views.map((view) =>
+                getCompletionItem(view, document, position),
+            );
         }
 
         if (result.isParamIndex(0)) {
-            return views.map(({ key }) => {
-                let completionItem = new vscode.CompletionItem(
-                    key,
-                    vscode.CompletionItemKind.Constant,
-                );
-
-                completionItem.range = document.getWordRangeAtPosition(
-                    position,
-                    wordMatchRegex,
-                );
-
-                return completionItem;
-            });
+            return views.map((view) =>
+                getCompletionItem(view, document, position),
+            );
         }
 
         // TODO: Layer this back in (props)
