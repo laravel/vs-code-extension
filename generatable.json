@@ -34,5 +34,11 @@
     },
     {
         "type": "view"
+    },
+    {
+        "type": "paths",
+        "features": [
+            "link"
+        ]
     }
 ]

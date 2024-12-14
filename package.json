@@ -289,6 +289,12 @@
                     "generated": true,
                     "description": null
                 },
+                "Laravel.paths.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for paths."
+                },
                 "Laravel.route.diagnostics": {
                     "type": "boolean",
                     "default": true,
