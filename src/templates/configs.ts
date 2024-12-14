@@ -3,10 +3,9 @@ $local = collect(glob(config_path("/*.php")))
   ->merge(glob(config_path("**/*.php")))
   ->map(function ($path) {
     return [
-      \\Illuminate\\Support\\Str::of($path)
+      (string) \\Illuminate\\Support\\Str::of($path)
         ->replace([config_path("/"), ".php"], "")
-        ->replace("/", ".")
-        ->toString(),
+        ->replace("/", "."),
       $path
     ];
   });
@@ -15,11 +14,10 @@ $vendor = collect(glob(base_path("vendor/**/**/config/*.php")))->map(function (
   $path
 ) {
   return [
-    \\Illuminate\\Support\\Str::of($path)
+    (string) \\Illuminate\\Support\\Str::of($path)
       ->afterLast("/config/")
       ->replace(".php", "")
-      ->replace("/", ".")
-      ->toString(),
+      ->replace("/", "."),
     $path
   ];
 });
