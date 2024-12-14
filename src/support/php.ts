@@ -79,9 +79,8 @@ export const template = (
     return templateString;
 };
 
-const isLaravelProject =
-    projectPathExists("vendor/autoload.php") &&
-    projectPathExists("bootstrap/app.php");
+const hasVendor = projectPathExists("vendor/autoload.php");
+const hasBootstrap = projectPathExists("bootstrap/app.php");
 
 export const runInLaravel = <T>(
     code: string,
@@ -90,8 +89,12 @@ export const runInLaravel = <T>(
 ): Promise<T> => {
     code = code.replace(/(?:\r\n|\r|\n)/g, " ");
 
-    if (!isLaravelProject) {
-        throw new Error("Not a Laravel project");
+    if (!hasVendor) {
+        throw new Error("Vendor autoload not found, run composer install");
+    }
+
+    if (!hasBootstrap) {
+        throw new Error("Bootstrap file not found, not a Laravel project");
     }
 
     const command = template("bootstrapLaravel", {
