@@ -2,6 +2,11 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.9]
+
+-   Fixed parsing for `new` anonymous classes (i.e. migrations)
+-   Fixed parsing for regular function declarations
+
 ## [0.1.8]
 
 -   Bugfix for (really) large `detect` responses
