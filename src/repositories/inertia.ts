@@ -8,13 +8,19 @@ interface ViewItem {
     [key: string]: View;
 }
 
+const config = vscode.workspace.getConfiguration();
+const viewsPath = config.get<string>(
+    "inertia.viewsPath",
+    "/resources/js/Pages"
+);
+
 const load = () => {
     let views: ViewItem = {};
 
-    ["/resources/js/Pages"].forEach((path) => {
-        collectViews(projectPath(path), path).forEach((view) => {
-            views[view.name] = view;
-        });
+    [viewsPath].forEach((path) => {
+      collectViews(projectPath(path), path).forEach((view) => {
+        views[view.name] = view;
+      });
     });
 
     return views;
@@ -56,7 +62,7 @@ const collectViews = (path: string, basePath: string): View[] => {
 
 export const getInertiaViews = repository<ViewItem>(
     () => new Promise((resolve) => resolve(load())),
-    "{,**/}{resources/js/Pages}/{*,**/*}",
+    `{,**/}{${viewsPath.replace(/^\//, '')}}/{*,**/*}`,
     {},
     ["create", "delete"],
 );

@@ -241,6 +241,11 @@
                     "generated": true,
                     "description": "Enable linking for inertia."
                 },
+                "Laravel.inertia.viewsPath": {
+                    "type": "string",
+                    "default": "/resources/js/Pages",
+                    "description": "Path to the Inertia views."
+                },
                 "Laravel.inertia.completion": {
                     "type": "boolean",
                     "default": true,
