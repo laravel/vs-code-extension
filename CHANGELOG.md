@@ -2,6 +2,13 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.10]
+
+-   Updated icon
+-   Fixed translation file path display
+-   Fixed detection of helper methods in parser (e.g. `config()`, `redirect()`, etc)
+-   Made downloaded binary ~30% smaller
+
 ## [0.1.9]
 
 -   Fixed parsing for `new` anonymous classes (i.e. migrations)

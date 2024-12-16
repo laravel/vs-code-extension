@@ -36,7 +36,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.5";
+    const binaryVersion = "0.1.6";
     const filename = `php-parser-${binaryVersion}`;
     const uri = `https://github.com/laravel/vs-code-php-parser-cli/raw/refs/heads/main/bin/${filename}`;
 

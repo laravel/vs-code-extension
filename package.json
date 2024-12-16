@@ -3,10 +3,16 @@
     "publisher": "Laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "engines": {
         "vscode": "^1.89.0"
     },
+    "keywords": [
+        "laravel",
+        "php",
+        "blade",
+        "eloquent"
+    ],
     "icon": "icon.png",
     "homepage": "https://github.com/laravel/vs-code-extension",
     "repository": {
