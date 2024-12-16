@@ -19,7 +19,7 @@ function vsCodeTranslationValue($key, $value, $file, $lines): array
 
     return [
         'value' => $value,
-        'path' => $file,
+        'path' => realpath($file),
         'line' => $lineNumber,
         'params' => preg_match_all('/\\:([A-Za-z0-9_]+)/', $value, $matches) ? $matches[1] : [],
     ];
