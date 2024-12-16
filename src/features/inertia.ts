@@ -154,8 +154,13 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         break;
     }
 
+    const viewsPath = config(
+      "inertia.viewsPath",
+      "/resources/js/Pages"
+    ).replace(/^\//, "");
+
     const fileUri = vscode.Uri.file(
-        projectPath(`resources/js/Pages/${missingFilename}.${extension}`),
+        projectPath(`${viewsPath}/${missingFilename}.${extension}`),
     );
 
     const edit = new vscode.WorkspaceEdit();

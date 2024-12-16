@@ -2,17 +2,14 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { repository } from ".";
 import { View } from "..";
+import { config } from "@src/support/config";
 import { projectPath, relativePath } from "./../support/project";
 
 interface ViewItem {
     [key: string]: View;
 }
 
-const config = vscode.workspace.getConfiguration();
-const viewsPath = config.get<string>(
-    "inertia.viewsPath",
-    "/resources/js/Pages"
-);
+const viewsPath = config("inertia.viewsPath", "/resources/js/Pages");
 
 const load = () => {
     let views: ViewItem = {};
