@@ -109,7 +109,7 @@ export const runInLaravel = <T>(
                 toTemplateVar("start_output") +
                     "(.*)" +
                     toTemplateVar("end_output"),
-                "g",
+                "gs",
             );
 
             const out = regex.exec(result);
