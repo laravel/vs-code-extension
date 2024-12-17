@@ -90,7 +90,7 @@ function vsCodeTranslationValue($key, $value, $file, $lines): ?array
   ];
 }
 
-function vscodeCollectTranslations(string $path, string $namespace = null)
+function vscodeCollectTranslations(string $path, ?string $namespace = null)
 {
   return collect(glob(realpath($path) . "/**/*.{php,json}", GLOB_BRACE))->map(
     fn($file) => vsCodeGetTranslationsFromFile($file, $path, $namespace)
