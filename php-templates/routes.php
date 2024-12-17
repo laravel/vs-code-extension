@@ -1,33 +1,33 @@
-// This file was generated from php-templates/routes.php, do not edit directly
-export default `
-function vsCodeGetRouterReflection(\\Illuminate\\Routing\\Route $route)
+<?php
+
+function vsCodeGetRouterReflection(\Illuminate\Routing\Route $route)
 {
     if ($route->getActionName() === 'Closure') {
-        return new \\ReflectionFunction($route->getAction()['uses']);
+        return new \ReflectionFunction($route->getAction()['uses']);
     }
 
     if (!str_contains($route->getActionName(), '@')) {
-        return new \\ReflectionClass($route->getActionName());
+        return new \ReflectionClass($route->getActionName());
     }
 
     try {
-        return new \\ReflectionMethod($route->getControllerClass(), $route->getActionMethod());
-    } catch (\\Throwable $e) {
-        $namespace = app(\\Illuminate\\Routing\\UrlGenerator::class)->getRootControllerNamespace()
-            ?? (app()->getNamespace() . 'Http\\Controllers');
+        return new \ReflectionMethod($route->getControllerClass(), $route->getActionMethod());
+    } catch (\Throwable $e) {
+        $namespace = app(\Illuminate\Routing\UrlGenerator::class)->getRootControllerNamespace()
+            ?? (app()->getNamespace() . 'Http\Controllers');
 
-        return new \\ReflectionMethod(
-            $namespace . '\\\\' . ltrim($route->getControllerClass(), '\\\\'),
+        return new \ReflectionMethod(
+            $namespace . '\\' . ltrim($route->getControllerClass(), '\\'),
             $route->getActionMethod(),
         );
     }
 }
 
 echo collect(app('router')->getRoutes()->getRoutes())
-    ->map(function (\\Illuminate\\Routing\\Route $route) {
+    ->map(function (\Illuminate\Routing\Route $route) {
         try {
             $reflection = vsCodeGetRouterReflection($route);
-        } catch (\\Throwable $e) {
+        } catch (\Throwable $e) {
             $reflection = null;
         }
 
@@ -44,4 +44,3 @@ echo collect(app('router')->getRoutes()->getRoutes())
         ];
     })
     ->toJson();
-`;

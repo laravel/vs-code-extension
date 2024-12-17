@@ -1,18 +1,18 @@
-// This file was generated from php-templates/auth.php, do not edit directly
-export default `
-echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
+<?php
+
+echo collect(\Illuminate\Support\Facades\Gate::abilities())
     ->map(function ($policy, $key) {
-        $reflection = new \\ReflectionFunction($policy);
+        $reflection = new \ReflectionFunction($policy);
 
         $policyClass = null;
 
-        if (get_class($reflection->getClosureThis()) === \\Illuminate\\Auth\\Access\\Gate::class) {
+        if (get_class($reflection->getClosureThis()) === \Illuminate\Auth\Access\Gate::class) {
             $vars = $reflection->getClosureUsedVariables();
 
             if (isset($vars['callback'])) {
                 [$policyClass, $method] = explode('@', $vars['callback']);
 
-                $reflection = new \\ReflectionMethod($policyClass, $method);
+                $reflection = new \ReflectionMethod($policyClass, $method);
             }
         }
         return [
@@ -23,7 +23,7 @@ echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
         ];
     })
     ->merge(
-        collect(\\Illuminate\\Support\\Facades\\Gate::policies())->flatMap(function ($policy, $model) {
+        collect(\Illuminate\Support\Facades\Gate::policies())->flatMap(function ($policy, $model) {
             $methods = (new ReflectionClass($policy))->getMethods();
 
             return collect($methods)->map(function (ReflectionMethod $method) use ($policy) {
@@ -41,4 +41,3 @@ echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
     ->values()
     ->groupBy('key')
     ->toJson();
-`;

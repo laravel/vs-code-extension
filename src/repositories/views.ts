@@ -1,4 +1,5 @@
 import { runInLaravel, template } from "@src/support/php";
+import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { repository } from ".";
 
@@ -21,7 +22,7 @@ const load = () => {
             return {
                 key,
                 path,
-                uri: vscode.Uri.file(path),
+                uri: vscode.Uri.file(projectPath(path)),
                 isVendor,
             };
         });

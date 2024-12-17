@@ -1,8 +1,8 @@
-// This file was generated from php-templates/blade-directives.php, do not edit directly
-export default `
-echo collect(app(\\Illuminate\\View\\Compilers\\BladeCompiler::class)->getCustomDirectives())
+<?php
+
+echo collect(app(\Illuminate\View\Compilers\BladeCompiler::class)->getCustomDirectives())
     ->map(function ($customDirective, $name) {
-        if ($customDirective instanceof \\Closure) {
+        if ($customDirective instanceof \Closure) {
             return [
                 'name' => $name,
                 'hasParams' => (new ReflectionFunction($customDirective))->getNumberOfParameters() >= 1,
@@ -21,4 +21,3 @@ echo collect(app(\\Illuminate\\View\\Compilers\\BladeCompiler::class)->getCustom
     ->filter()
     ->values()
     ->toJson();
-`;

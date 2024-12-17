@@ -1,5 +1,5 @@
-// This file was generated from php-templates/views.php, do not edit directly
-export default `
+<?php
+
 function vsCodeFindBladeFiles($path)
 {
   $paths = [];
@@ -9,7 +9,7 @@ function vsCodeFindBladeFiles($path)
   }
 
   foreach (
-    \\Symfony\\Component\\Finder\\Finder::create()
+    \Symfony\Component\Finder\Finder::create()
       ->files()
       ->name("*.blade.php")
       ->in($path)
@@ -18,7 +18,7 @@ function vsCodeFindBladeFiles($path)
     $paths[] = [
       "path" => str_replace(base_path('/'), '', $file->getRealPath()),
       "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
-      "key" => \\Illuminate\\Support\\Str::of($file->getRealPath())
+      "key" => \Illuminate\Support\Str::of($file->getRealPath())
         ->replace(realpath($path), "")
         ->replace(".blade.php", "")
         ->ltrim("/")
@@ -61,4 +61,3 @@ echo $local
   ->sortBy("key", SORT_NATURAL)
   ->merge($vendor->sortBy("key", SORT_NATURAL))
   ->toJson();
-`;

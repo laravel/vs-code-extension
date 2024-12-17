@@ -1,7 +1,7 @@
-// This file was generated from php-templates/middleware.php, do not edit directly
-export default `
-echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
-  ->merge(app("Illuminate\\Contracts\\Http\\Kernel")->getRouteMiddleware())
+<?php
+
+echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
+  ->merge(app("Illuminate\Contracts\Http\Kernel")->getRouteMiddleware())
   ->map(function ($middleware, $key) {
     $result = [
       "class" => null,
@@ -63,4 +63,3 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
     ]);
   })
   ->toJson();
-`;

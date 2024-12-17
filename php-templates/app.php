@@ -1,5 +1,5 @@
-// This file was generated from php-templates/app.php, do not edit directly
-export default `
+<?php
+
 echo collect(app()->getBindings())
     ->filter(fn ($binding) => ($binding['concrete'] ?? null) !== null)
     ->flatMap(function ($binding, $key) {
@@ -15,4 +15,3 @@ echo collect(app()->getBindings())
             ],
         ];
     })->toJson();
-`;

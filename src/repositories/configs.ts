@@ -1,3 +1,4 @@
+import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { repository } from ".";
 import { Config, ConfigItem } from "..";
@@ -12,7 +13,7 @@ export const getConfigs = repository<ConfigItem[]>(
                         name: item.name,
                         value: item.value,
                         uri: item.file
-                            ? vscode.Uri.file(item.file).with({
+                            ? vscode.Uri.file(projectPath(item.file)).with({
                                   fragment: `L${item.line}`,
                               })
                             : undefined,

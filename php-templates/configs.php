@@ -1,9 +1,9 @@
-// This file was generated from php-templates/configs.php, do not edit directly
-export default `
+<?php
+
 $local = collect(glob(config_path("/*.php")))
   ->merge(glob(config_path("**/*.php")))
   ->map(fn ($path) => [
-      (string) \\Illuminate\\Support\\Str::of($path)
+      (string) \Illuminate\Support\Str::of($path)
         ->replace([config_path("/"), ".php"], "")
         ->replace("/", "."),
       $path
@@ -12,7 +12,7 @@ $local = collect(glob(config_path("/*.php")))
 $vendor = collect(glob(base_path("vendor/**/**/config/*.php")))->map(fn (
   $path
 ) => [
-    (string) \\Illuminate\\Support\\Str::of($path)
+    (string) \Illuminate\Support\Str::of($path)
       ->afterLast("/config/")
       ->replace(".php", "")
       ->replace("/", "."),
@@ -56,7 +56,7 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
         $cachedContents[$path] ??= file_get_contents($path);
         $cachedParsed[$path] ??= token_get_all($cachedContents[$path]);
 
-        $keysToFind = \\Illuminate\\Support\\Str::of($key)
+        $keysToFind = \Illuminate\Support\Str::of($key)
           ->replaceFirst($found, "")
           ->ltrim(".")
           ->explode(".");
@@ -92,7 +92,7 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
             continue;
           }
 
-          $str = trim($token[1], '"\\'');
+          $str = trim($token[1], '"\'');
 
           if (
             $str === $nextKey &&
@@ -124,9 +124,8 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
     ];
 }
 
-echo collect(\\Illuminate\\Support\\Arr::dot(config()->all()))
+echo collect(\Illuminate\Support\Arr::dot(config()->all()))
   ->map(fn ($value, $key) => vsCodeGetConfigValue($value, $key, $configPaths))
   ->filter()
   ->values()
   ->toJson();
-`;
