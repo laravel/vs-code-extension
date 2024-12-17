@@ -16,8 +16,6 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
   $lines = [];
   $inComment = false;
 
-  $values = collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)));
-
   foreach ($fileLines as $index => $line) {
     $trimmed = trim($line);
 
@@ -44,7 +42,7 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
   return [
     "k" => $key,
     "la" => $lang,
-    "vs" => collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)))
+    "vs" => collect(\Illuminate\Support\Arr::dot((\Illuminate\Support\Arr::wrap(__($key, [], $lang)))))
       ->map(
         fn($value, $key) => vsCodeTranslationValue(
           $key,

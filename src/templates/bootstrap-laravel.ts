@@ -1,5 +1,7 @@
 // This file was generated from php-templates/bootstrap-laravel.php, do not edit directly
 export default `
+error_reporting(E_ERROR | E_PARSE);
+
 define('LARAVEL_START', microtime(true));
 
 require_once '__VSCODE_LARAVEL_VENDOR_AUTOLOAD_PATH__';
