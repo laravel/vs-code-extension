@@ -227,19 +227,19 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable diagnostics for inertia."
+                    "description": "Enable diagnostics for Inertia."
                 },
                 "Laravel.inertia.hover": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable hover information for inertia."
+                    "description": "Enable hover information for Inertia."
                 },
                 "Laravel.inertia.link": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable linking for inertia."
+                    "description": "Enable linking for Inertia."
                 },
                 "Laravel.inertia.completion": {
                     "type": "boolean",
