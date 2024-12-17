@@ -387,7 +387,7 @@
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
         "vscode:prepublish": "php generate-templates.php && ./checkBinaryVersion && npm run package",
         "package": "npm run check-types && node esbuild.js --production",
-        "installLocal": "vsce package && code --install-extension /Users/joetannenbaum/Dev/vs-code/laravel/laravel-$npm_package_version.vsix"
+        "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.6",
