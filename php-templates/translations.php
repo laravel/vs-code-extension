@@ -1,5 +1,5 @@
-// This file was generated from php-templates/translations.php, do not edit directly
-export default `
+<?php
+
 function vsCodeGetTranslationsFromFile($file, $path, $namespace)
 {
   $key = pathinfo($file, PATHINFO_FILENAME);
@@ -12,11 +12,11 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
     ->filter()
     ->first();
 
-  $fileLines = \\Illuminate\\Support\\Facades\\File::lines($file);
+  $fileLines = \Illuminate\Support\Facades\File::lines($file);
   $lines = [];
   $inComment = false;
 
-  $values = collect(\\Illuminate\\Support\\Arr::dot(__($key, [], $lang)));
+  $values = collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)));
 
   foreach ($fileLines as $index => $line) {
     $trimmed = trim($line);
@@ -44,7 +44,7 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
   return [
     "k" => $key,
     "la" => $lang,
-    "vs" => collect(\\Illuminate\\Support\\Arr::dot(__($key, [], $lang)))
+    "vs" => collect(\Illuminate\Support\Arr::dot(__($key, [], $lang)))
       ->map(
         fn($value, $key) => vsCodeTranslationValue(
           $key,
@@ -86,7 +86,7 @@ function vsCodeTranslationValue($key, $value, $file, $lines): ?array
     "v" => $value,
     "p" => $file,
     "li" => $lineNumber,
-    "pa" => preg_match_all("/\\:([A-Za-z0-9_]+)/", $value, $matches)
+    "pa" => preg_match_all("/\:([A-Za-z0-9_]+)/", $value, $matches)
       ? $matches[1]
       : []
   ];
@@ -108,7 +108,7 @@ $property = $reflection->hasProperty("paths")
   : $reflection->getProperty("path");
 $property->setAccessible(true);
 
-$paths = \\Illuminate\\Support\\Arr::wrap($property->getValue($loader));
+$paths = \Illuminate\Support\Arr::wrap($property->getValue($loader));
 
 $default = collect($paths)->flatMap(
   fn($path) => vscodeCollectTranslations($path)
@@ -130,11 +130,10 @@ foreach ($default->merge($namespaced) as $value) {
 
     $final[$dotKey][$value["la"]] = $v;
 
-    if ($value["la"] === \\Illuminate\\Support\\Facades\\App::currentLocale()) {
+    if ($value["la"] === \Illuminate\Support\Facades\App::currentLocale()) {
       $final[$dotKey]["default"] = $v;
     }
   }
 }
 
 echo json_encode($final);
-`;

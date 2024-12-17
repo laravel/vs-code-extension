@@ -1,6 +1,9 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getTranslations } from "@src/repositories/translations";
+import {
+    getTranslations,
+    TranslationItem,
+} from "@src/repositories/translations";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -22,6 +25,10 @@ const toFind: FeatureTag = [
     },
 ];
 
+const getDefault = (translation: TranslationItem) => {
+    return translation.default ?? translation[Object.keys(translation)[0]];
+};
+
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
@@ -34,10 +41,12 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
+            const def = getDefault(translation);
+
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(translation.default.path).with({
-                    fragment: `L${translation.default.line}`,
+                vscode.Uri.file(def.path).with({
+                    fragment: `L${def.line}`,
                 }),
             );
         },
@@ -113,6 +122,10 @@ export const completionProvider = {
             return this.getParameterCompletionItems(result, document, position);
         }
 
+        const totalTranslationItems = Object.entries(
+            getTranslations().items,
+        ).length;
+
         return Object.entries(getTranslations().items).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -125,7 +138,11 @@ export const completionProvider = {
                     wordMatchRegex,
                 );
 
-                completionItem.detail = translations.default.value;
+                if (totalTranslationItems < 200) {
+                    // This will bomb if we have too many translations,
+                    // 200 is an arbitrary but probably safe number
+                    completionItem.detail = getDefault(translations).value;
+                }
 
                 return completionItem;
             },
@@ -149,8 +166,8 @@ export const completionProvider = {
         return Object.entries(getTranslations().items)
             .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
-                return value.default.params
-                    .filter((param) => {
+                return getDefault(value)
+                    .params.filter((param) => {
                         return true;
                         // TODO: Fix this....
                         // return !result.param.keys.includes(param);
