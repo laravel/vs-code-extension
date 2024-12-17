@@ -36,9 +36,11 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.6";
-    const filename = `php-parser-${binaryVersion}`;
-    const uri = `https://github.com/laravel/vs-code-php-parser-cli/raw/refs/heads/main/bin/${filename}`;
+    const binaryVersion = "0.1.17";
+    const osPlatform = os.platform();
+    const osArch = os.arch();
+    const filename = `php-parser-v${binaryVersion}-${osArch}-${osPlatform}`;
+    const uri = `https://github.com/laravel/vs-code-php-parser-cli/releases/download/v${binaryVersion}/${filename}`;
 
     const logger = new OutputLogger(`File Downloader`, context);
     const requestHandler = new HttpRequestHandler(logger);
@@ -84,9 +86,8 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
 
         return file.fsPath;
     } catch (e) {
-        console.log(e);
         vscode.window.showErrorMessage(
-            "Failed to download binary for Laravel extension",
+            `Failed to download binary for Laravel extension: ${filename}`,
         );
     }
 };
