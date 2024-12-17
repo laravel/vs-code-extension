@@ -2,6 +2,16 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.12]
+
+-   Now fetching OS/arch specific binaries for Mac and Linux (Windows coming soon)
+-   Fixed translation loading when there were _a lot_ of translations
+-   Fixed an issue regarding full name resolution for scoped property access
+
+## [0.1.11]
+
+-   No significant changes
+
 ## [0.1.10]
 
 -   Updated icon
