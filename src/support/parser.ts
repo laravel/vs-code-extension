@@ -36,7 +36,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.28";
+    const binaryVersion = "0.1.29";
     const osPlatform = os.platform();
     const osArch = os.arch();
     const extension = osPlatform === "win32" ? ".exe" : "";
@@ -80,7 +80,9 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             context,
         );
 
-        cp.execSync(`chmod +x ${file.fsPath.replace(" ", "\\ ")}`);
+        if (osPlatform !== 'win32') {
+            cp.execSync(`chmod +x ${file.fsPath.replace(" ", "\\ ")}`);
+        }
 
         vscode.window.showInformationMessage(
             "Binary downloaded for Laravel extension",
