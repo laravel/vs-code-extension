@@ -20,23 +20,26 @@ let defaultPhpCommand: string | null = null;
 
 const discoverFiles = new Map<string, string>();
 
-const initDiscoverFiles = () => {
-    fs.readdirSync(internalVendorPath()).forEach((file) => {
-        if (file.startsWith("discover-")) {
-            fs.unlinkSync(internalVendorPath(file));
-        }
-    });
+export const initDiscoverFiles = () => {
+    // fs.readdirSync(internalVendorPath()).forEach((file) => {
+    //     if (file.startsWith("discover-")) {
+    //         fs.unlinkSync(internalVendorPath(file));
+    //     }
+    // });
 
     const watcher = vscode.workspace.createFileSystemWatcher(
         new vscode.RelativePattern(internalVendorPath(), "discover-*"),
     );
 
     watcher.onDidDelete((file) => {
-        discoverFiles.delete(file.fsPath);
+        for (const [key, value] of discoverFiles) {
+            if (value === file.fsPath) {
+                discoverFiles.delete(key);
+                break;
+            }
+        }
     });
 };
-
-initDiscoverFiles();
 
 const getPhpCommand = (): string => {
     const options = [
@@ -63,7 +66,6 @@ const getPhpCommand = (): string => {
             let result = "";
 
             while (check) {
-                console.log(check);
                 result = cp
                     .execSync(check)
                     .toString()

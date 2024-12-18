@@ -1,7 +1,6 @@
 import fs from "fs";
 import { Eloquent } from "..";
 import {
-    ensureInternalVendorDirectoryExists,
     internalVendorPath,
 } from "./project";
 import { indent } from "./util";
@@ -18,8 +17,6 @@ export const writeEloquentDocBlocks = (
     models: Eloquent.Models,
     builderMethods: Eloquent.BuilderMethod[],
 ) => {
-    ensureInternalVendorDirectoryExists();
-
     if (!models) {
         return;
     }

@@ -182,6 +182,8 @@ export const detect = async (
         code = code.replace(replacement[0], replacement[1]);
     });
 
+    const promise = new Promise<AutocompleteParsingResult.ContextValue[]>(
+        async function (resolve, error) {
     if (!parserBinaryPath) {
         const waitForPath = async () => {
             if (!parserBinaryPath) {
@@ -200,8 +202,6 @@ export const detect = async (
 
     // console.log("detect command", command);
 
-    const promise = new Promise<AutocompleteParsingResult.ContextValue[]>(
-        function (resolve, error) {
             cp.exec(
                 command,
                 {
@@ -210,7 +210,6 @@ export const detect = async (
                 },
                 (err, stdout, stderr) => {
                     if (err === null) {
-                        // console.log("detect result", JSON.parse(stdout));
                         return resolve(JSON.parse(stdout));
                     }
 

@@ -16,7 +16,8 @@ import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
-import { hasWorkspace, projectPathExists } from "./support/project";
+import {  hasWorkspace, projectPathExists } from "./support/project";
+import { initDiscoverFiles } from "./support/php";
 
 let client: LanguageClient;
 
@@ -54,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "laravel-blade" },
     ];
 
+    initDiscoverFiles();
     setParserBinaryPath(context);
 
     const TRIGGER_CHARACTERS = ["'", '"'];
