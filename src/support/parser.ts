@@ -153,10 +153,10 @@ export const parseFaultTolerant = async (
 };
 
 export const detect = async (
-    code: string,
+    doc: vscode.TextDocument,
 ): Promise<AutocompleteParsingResult.ContextValue[]> => {
     // We're about to modify the code for the command, but the key should be the original code
-    const originalCode = code;
+    const originalCode = doc.getText().trim();
 
     if (detected.has(originalCode)) {
         return detected.get(originalCode) as Promise<
@@ -164,43 +164,25 @@ export const detect = async (
         >;
     }
 
-    let replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
-
-    if (
-        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
-            os.platform().includes(unixPlatforms),
-        )
-    ) {
-        replacements.push([/\$/g, "\\$"]);
-        replacements.push([/\\'/g, "\\\\'"]);
-        replacements.push([/\\"/g, '\\\\"']);
-    }
-
-    replacements.push([/\"/g, '\\"']);
-
-    replacements.forEach((replacement) => {
-        code = code.replace(replacement[0], replacement[1]);
-    });
-
     const promise = new Promise<AutocompleteParsingResult.ContextValue[]>(
         async function (resolve, error) {
-    if (!parserBinaryPath) {
-        const waitForPath = async () => {
             if (!parserBinaryPath) {
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 500);
-                });
+                const waitForPath = async () => {
+                    if (!parserBinaryPath) {
+                        await new Promise((resolve) => {
+                            setTimeout(resolve, 500);
+                        });
 
-                return waitForPath();
+                        return waitForPath();
+                    }
+                };
+
+                await waitForPath();
             }
-        };
 
-        await waitForPath();
-    }
+            const command = `${parserBinaryPath} detect "${doc.uri.fsPath}"`;
 
-    const command = `${parserBinaryPath} detect "${code}"`;
-
-    // console.log("detect command", command);
+            // console.log("detect command", command);
 
             cp.exec(
                 command,
@@ -250,7 +232,7 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     }) => T[] | T | null,
     validParamTypes: ValidDetectParamTypes[] = ["string"],
 ): Promise<T[]> => {
-    return detect(doc.getText().trim()).then((results) => {
+    return detect(doc).then((results) => {
         return Promise.all(
             results
                 .filter(
