@@ -69,6 +69,10 @@ const getBuilderReturnType = (
     method: Eloquent.BuilderMethod,
     className: string,
 ): string => {
+    if (method.return === null) {
+        return "mixed";
+    }
+
     const returnType = method.return
         .replace(
             "$this",

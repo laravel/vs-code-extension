@@ -24,16 +24,12 @@ $builderMethods = collect($reflection->getMethods(\ReflectionMethod::IS_PUBLIC))
                    : [$param->getType()]
                };
 
-               return [
-                 "name" => $param->getName(),
-                 "types" => collect($types)
+               $types = collect($types)
                    ->filter()
                    ->values()
-                   ->map(function ($t) use ($types, $param) {
-                     return $t->getName();
-                   })
-                   ->all()
-               ];
+                   ->map(fn ($t) => $t->getName());
+
+               return trim($types->join("|") . " $" . $param->getName());
              })
              ->all();
 
