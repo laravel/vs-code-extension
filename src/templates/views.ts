@@ -16,13 +16,13 @@ function vsCodeFindBladeFiles($path)
     as $file
   ) {
     $paths[] = [
-      "path" => str_replace(base_path('/'), '', $file->getRealPath()),
+      "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $file->getRealPath()),
       "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
       "key" => \\Illuminate\\Support\\Str::of($file->getRealPath())
         ->replace(realpath($path), "")
         ->replace(".blade.php", "")
-        ->ltrim("/")
-        ->replace("/", ".")
+        ->ltrim(DIRECTORY_SEPARATOR)
+        ->replace(DIRECTORY_SEPARATOR, ".")
     ];
   }
 
