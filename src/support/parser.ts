@@ -5,7 +5,9 @@ import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { repository } from "@src/repositories";
 import { AutocompleteParsingResult } from "@src/types";
 import * as cp from "child_process";
+import * as fs from "fs";
 import * as os from "os";
+import path from "path";
 import * as vscode from "vscode";
 import { FeatureTag, ValidDetectParamTypes } from "..";
 import { showErrorPopup } from "./popup";
@@ -96,9 +98,23 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     }
 };
 
+if (os.platform() === "win32") {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vscode-laravel"));
+    console.log("tempDir", tempDir);
+}
+
 const cleanArg = (arg: string): string => {
     if (os.platform() === "win32") {
-        return Buffer.from(arg).toString("base64");
+        // write the file to the temp directory
+        // Gnerate a random file name
+        const randomString = Math.random().toString(36).substring(7);
+        const tempFile = path.join(tempDir, randomString);
+
+        fs.writeFileSync(tempFile, arg);
+
+        console.log("tempFile", tempFile);
+
+        return tempFile;
     }
 
     const replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
