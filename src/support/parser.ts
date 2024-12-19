@@ -97,6 +97,10 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
 };
 
 const cleanArg = (arg: string): string => {
+    if (os.platform() === "win32") {
+        return Buffer.from(arg).toString("base64");
+    }
+
     const replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
 
     if (
@@ -158,7 +162,8 @@ const runCommand = (command: string): Promise<string> => {
             await waitForPath();
         }
 
-        const toRun = `${parserBinaryPath} ${command}`;
+        const extraArgs = os.platform() === "win32" ? "--encoded" : "";
+        const toRun = `${parserBinaryPath} ${command} ${extraArgs}`;
 
         // console.log("running command", toRun);
 
