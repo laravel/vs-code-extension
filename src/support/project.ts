@@ -4,8 +4,8 @@ import * as vscode from "vscode";
 
 let internalVendorExists: boolean | null = null;
 
-export const internalVendorPath = (path = ""): string => {
-    const baseDir = 'vendor/_laravel_ide';
+export const internalVendorPath = (subPath = ""): string => {
+    const baseDir = path.join("vendor", "_laravel_ide");
 
     if (internalVendorExists !== true) {
         const baseVendorDir = projectPath(baseDir);
@@ -15,20 +15,17 @@ export const internalVendorPath = (path = ""): string => {
         if (!internalVendorExists) {
             fs.mkdirSync(baseVendorDir, { recursive: true });
         }
-
     }
 
-    return projectPath(`${baseDir}/${path}`);
+    return projectPath(`${baseDir}/${subPath}`);
 };
 
-const normalizePath = (srcPath: string): string => {
-    return srcPath.replace(/[\/\\]/g, path.sep);
+const trimFirstSlash = (srcPath: string): string => {
+    return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
 export const projectPath = (srcPath = "", forCode = false): string => {
-    if (srcPath[0] === path.sep) {
-        srcPath = srcPath.substring(1);
-    }
+    srcPath = trimFirstSlash(srcPath);
 
     let basePath = "";
     // let basePath = config<string>("basePath", "");
@@ -45,8 +42,8 @@ export const projectPath = (srcPath = "", forCode = false): string => {
     }
 
     for (let workspaceFolder of getWorkspaceFolders()) {
-        if (fs.existsSync(normalizePath(`${workspaceFolder.uri.fsPath}/artisan`))) {
-            return normalizePath(`${workspaceFolder.uri.fsPath}/${srcPath}`);
+        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, "artisan"))) {
+            return path.join(workspaceFolder.uri.fsPath, srcPath);
         }
     }
 
@@ -56,13 +53,9 @@ export const projectPath = (srcPath = "", forCode = false): string => {
 export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (srcPath.startsWith(workspaceFolder.uri.fsPath)) {
-            let tempPath = srcPath.replace(workspaceFolder.uri.fsPath, "");
-
-            if (tempPath[0] === path.sep) {
-                tempPath = tempPath.substring(1);
-            }
-
-            return tempPath;
+            return trimFirstSlash(
+                srcPath.replace(workspaceFolder.uri.fsPath, ""),
+            );
         }
     }
 
@@ -74,7 +67,7 @@ const resolvePath = (basePath: string, relativePath: string): string => {
         basePath = path.resolve(getWorkspaceFolders()[0].uri.fsPath, basePath);
     }
 
-    return normalizePath(`${basePath.replace(/[\/\\]$/, "")}/${relativePath}`);
+    return path.join(basePath, relativePath);
 };
 
 export const hasWorkspace = (): boolean => {
