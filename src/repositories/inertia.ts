@@ -78,7 +78,10 @@ export const getInertiaViews = repository<ViewItem>(
             page_paths?: string[];
             page_extensions?: string[];
         }>(template("inertia")).then((result) => {
-            return load(result.page_paths ?? [], result.page_extensions ?? []);
+            return load(
+                result?.page_paths ?? [],
+                result?.page_extensions ?? [],
+            );
         }),
     "{,**/}{resources/js/Pages}/{*,**/*}",
     {},
