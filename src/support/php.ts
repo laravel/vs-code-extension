@@ -87,7 +87,7 @@ const getPhpCommand = (): string => {
         }
     }
 
-    return `php -r "{code}"`;
+    return `php "{code}"`;
 };
 
 const getDefaultPhpCommand = (): string => {
