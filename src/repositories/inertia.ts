@@ -1,3 +1,4 @@
+import { runInLaravel, template } from "@src/support/php";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { repository } from ".";
@@ -8,19 +9,29 @@ interface ViewItem {
     [key: string]: View;
 }
 
-const load = () => {
+const load = (pagePaths: string[], validExtensions: string[]) => {
     let views: ViewItem = {};
 
-    ["/resources/js/Pages"].forEach((path) => {
-        collectViews(projectPath(path), path).forEach((view) => {
-            views[view.name] = view;
+    pagePaths = pagePaths.length > 0 ? pagePaths : ["/resources/js/Pages"];
+
+    pagePaths
+        .map((path) => "/" + relativePath(path))
+        .forEach((path) => {
+            collectViews(projectPath(path), path, validExtensions).forEach(
+                (view) => {
+                    views[view.name] = view;
+                },
+            );
         });
-    });
 
     return views;
 };
 
-const collectViews = (path: string, basePath: string): View[] => {
+const collectViews = (
+    path: string,
+    basePath: string,
+    validExtensions: string[],
+): View[] => {
     if (path.substring(-1) === "/" || path.substring(-1) === "\\") {
         path = path.substring(0, path.length - 1);
     }
@@ -33,14 +44,21 @@ const collectViews = (path: string, basePath: string): View[] => {
         .readdirSync(path)
         .map((file: string) => {
             if (fs.lstatSync(`${path}/${file}`).isDirectory()) {
-                return collectViews(`${path}/${file}`, basePath);
+                return collectViews(
+                    `${path}/${file}`,
+                    basePath,
+                    validExtensions,
+                );
             }
 
-            if (!file.match(/\.vue|\.tsx|\.jsx|\.svelte$/)) {
+            const parts = file.split(".");
+            const extension = parts.pop();
+
+            if (!validExtensions.includes(extension ?? "")) {
                 return [];
             }
 
-            const name = file.replace(/\.(vue|tsx|jsx|svelte)$/, "");
+            const name = parts.join(".");
 
             return {
                 name: relativePath(`${path}/${name}`).replace(
@@ -55,7 +73,13 @@ const collectViews = (path: string, basePath: string): View[] => {
 };
 
 export const getInertiaViews = repository<ViewItem>(
-    () => new Promise((resolve) => resolve(load())),
+    () =>
+        runInLaravel<{
+            page_paths?: string[];
+            page_extensions?: string[];
+        }>(template("inertia")).then((result) => {
+            return load(result.page_paths ?? [], result.page_extensions ?? []);
+        }),
     "{,**/}{resources/js/Pages}/{*,**/*}",
     {},
     ["create", "delete"],
