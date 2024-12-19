@@ -2,6 +2,10 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.14]
+
+-   Fixed fallback for running PHP code (mentioned in 0.1.13 as a breaking change). The note in the last changelog was incorrect: the new PHP Command setting should just read `php`, meaning the file will just be added to the end of the command.
+
 ## [0.1.13]
 
 -   Initial Windows support
