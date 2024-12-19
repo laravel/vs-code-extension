@@ -8,7 +8,7 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
     $key = "{$namespace}::{$key}";
   }
 
-  $lang = collect(explode("/", str_replace($path, "", $file)))
+  $lang = collect(explode(DIRECTORY_SEPARATOR, str_replace($path, "", $file)))
     ->filter()
     ->first();
 
@@ -47,7 +47,7 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
         fn($value, $key) => vsCodeTranslationValue(
           $key,
           $value,
-          str_replace(base_path("/"), "", $file),
+          str_replace(base_path(DIRECTORY_SEPARATOR), "", $file),
           $lines
         )
       )
@@ -92,9 +92,15 @@ function vsCodeTranslationValue($key, $value, $file, $lines): ?array
 
 function vscodeCollectTranslations(string $path, ?string $namespace = null)
 {
-  return collect(\\Illuminate\\Support\\Facades\\File::allFiles(realpath($path)))->map(
-    fn($file) => vsCodeGetTranslationsFromFile($file, $path, $namespace)
-  );
+    $realPath = realpath($path);
+
+    if (!is_dir($realPath)) {
+        return collect();
+    }
+
+    return collect(\\Illuminate\\Support\\Facades\\File::allFiles($realPath))->map(
+        fn($file) => vsCodeGetTranslationsFromFile($file, $path, $namespace)
+    );
 }
 
 $loader = app("translator")->getLoader();
