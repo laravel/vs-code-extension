@@ -72,7 +72,7 @@
             "properties": {
                 "Laravel.phpCommand": {
                     "type": "string",
-                    "description": "Template for running PHP code. Use {code} as a placeholder for the code to run. e.g. `php -r \"{code}\"`"
+                    "description": "Template for running PHP code. Use {code} as a placeholder for the code file to run. e.g. `php \"{code}\"`"
                 },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",
