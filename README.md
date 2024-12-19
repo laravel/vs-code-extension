@@ -8,6 +8,7 @@ Below you'll find a list of features as well as a roadmap with features we will 
 
 -   This extension will occasionally boot your app in the background to collect information about your app for use in autocompletion, linking, hovering, and diagnostics
 -   When you first install the extension it will download a small binary to your machine, we use this binary for PHP parsing
+-   This extension is intended to provide Laravel-specific intelligence, not general PHP intelligence. If you are currently using an extension for general PHP intelligence, it is recommended to continue using that in conjunction with this extension.
 
 ## Features
 
