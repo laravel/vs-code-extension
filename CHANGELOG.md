@@ -11,6 +11,7 @@ All notable changes to the Laravel extension will be documented in this file.
 -   Fix for handling newline characters in JSON response ([#31](https://github.com/laravel/vs-code-extension/pull/31))
 -   Remove `.github` from bundle ([#29](https://github.com/laravel/vs-code-extension/pull/29))
 -   Inspired by [#20](https://github.com/laravel/vs-code-extension/pull/20), Inertia paths are now read from the existing PHP config in the project
+-   **Breaking**: The setting for PHP Command is now changed to run a file, not inline code. Previously this would have looked like this: `php -r "{code}"` but should now look like this `php "{code}"`
 
 ## [0.1.12]
 
