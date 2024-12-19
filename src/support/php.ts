@@ -53,8 +53,8 @@ const getPhpCommand = (): string => {
             command: "{binaryPath}",
         },
         {
-            check: "which sail",
-            command: "{binaryPath} php",
+            check: `${projectPath("vendor/bin/sail")} ps`,
+            command: `${projectPath("vendor/bin/sail")} php`,
         },
     ];
 

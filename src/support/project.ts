@@ -25,6 +25,7 @@ const trimFirstSlash = (srcPath: string): string => {
 };
 
 export const projectPath = (srcPath = "", forCode = false): string => {
+    srcPath = srcPath.replace(/\//g, path.sep);
     srcPath = trimFirstSlash(srcPath);
 
     let basePath = "";

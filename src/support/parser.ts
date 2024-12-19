@@ -172,7 +172,7 @@ const runCommand = (command: string): Promise<string> => {
         const extraArgs = os.platform() === "win32" ? "--from-file" : "";
         const toRun = `${parserBinaryPath} ${command} ${extraArgs}`;
 
-        console.log("running command", toRun);
+        // console.log("running command", toRun);
 
         cp.exec(
             toRun,
@@ -209,7 +209,6 @@ export const parseForAutocomplete = (
         })
         .finally(() => {
             if (os.platform() === "win32") {
-                console.log("unlinking", arg);
                 fs.unlink(arg, () => null);
             }
         }) as Promise<AutocompleteResult>;
