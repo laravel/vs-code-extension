@@ -80,7 +80,7 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             context,
         );
 
-        if (osPlatform !== 'win32') {
+        if (osPlatform !== "win32") {
             cp.execSync(`chmod +x ${file.fsPath.replace(" ", "\\ ")}`);
         }
 
@@ -96,127 +96,85 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     }
 };
 
-export const parseFaultTolerant = async (
-    code: string,
-): Promise<AutocompleteResult> => {
-    let replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
+export const detect = async (
+    doc: vscode.TextDocument,
+): Promise<AutocompleteParsingResult.ContextValue[]> => {
+    const code = doc.getText();
 
-    if (
-        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
-            os.platform().includes(unixPlatforms),
-        )
-    ) {
-        replacements.push([/\$/g, "\\$"]);
-        replacements.push([/\\'/g, "\\\\'"]);
-        replacements.push([/\\"/g, '\\\\"']);
+    if (detected.has(code)) {
+        return detected.get(code) as Promise<
+            AutocompleteParsingResult.ContextValue[]
+        >;
     }
 
-    replacements.push([/\"/g, '\\"']);
+    const promise = runCommand(
+        `detect  ${Buffer.from(code).toString("base64")}`,
+    )
+        .then((result: string) => {
+            return JSON.parse(result);
+        })
+        .catch((err) => {
+            showErrorPopup(err);
+        }) as Promise<AutocompleteParsingResult.ContextValue[]>;
 
-    replacements.forEach((replacement) => {
-        code = code.replace(replacement[0], replacement[1]);
-    });
+    detected.set(code, promise);
 
-    if (!parserBinaryPath) {
-        const waitForPath = async () => {
-            if (!parserBinaryPath) {
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 500);
-                });
+    return promise;
+};
 
-                return waitForPath();
-            }
-        };
+const runCommand = (command: string): Promise<string> => {
+    return new Promise(async function (resolve, error) {
+        if (!parserBinaryPath) {
+            const waitForPath = async () => {
+                if (!parserBinaryPath) {
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 500);
+                    });
 
-        await waitForPath();
-    }
+                    return waitForPath();
+                }
+            };
 
-    const command = `${parserBinaryPath} autocomplete "${code}"`;
+            await waitForPath();
+        }
 
-    // console.log("autocomplete command", command);
+        const toRun = `${parserBinaryPath} ${command}`;
 
-    return new Promise<AutocompleteResult>(function (resolve, error) {
+        // console.log("running command", toRun);
+
         cp.exec(
-            command,
+            toRun,
             {
                 cwd: __dirname,
                 timeout: 5000,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
-                    // console.log("parsing result", JSON.parse(stdout));
-                    return resolve(new AutocompleteResult(JSON.parse(stdout)));
+                    return resolve(stdout);
                 }
 
-                showErrorPopup(stderr.length > 0 ? stderr : stdout);
+                return error(stderr.length > 0 ? stderr : stdout);
             },
         );
     });
 };
 
-export const detect = async (
-    doc: vscode.TextDocument,
-): Promise<AutocompleteParsingResult.ContextValue[]> => {
-    // We're about to modify the code for the command, but the key should be the original code
-    const originalCode = doc.getText().trim();
-
-    if (detected.has(originalCode)) {
-        return detected.get(originalCode) as Promise<
-            AutocompleteParsingResult.ContextValue[]
-        >;
-    }
-
-    const promise = new Promise<AutocompleteParsingResult.ContextValue[]>(
-        async function (resolve, error) {
-            if (!parserBinaryPath) {
-                const waitForPath = async () => {
-                    if (!parserBinaryPath) {
-                        await new Promise((resolve) => {
-                            setTimeout(resolve, 500);
-                        });
-
-                        return waitForPath();
-                    }
-                };
-
-                await waitForPath();
-            }
-
-            const command = `${parserBinaryPath} detect "${doc.uri.fsPath}"`;
-
-            // console.log("detect command", command);
-
-            cp.exec(
-                command,
-                {
-                    cwd: __dirname,
-                    timeout: 5000,
-                },
-                (err, stdout, stderr) => {
-                    if (err === null) {
-                        return resolve(JSON.parse(stdout));
-                    }
-
-                    showErrorPopup(stderr.length > 0 ? stderr : stdout);
-                },
-            );
-        },
-    );
-
-    detected.set(originalCode, promise);
-
-    return promise;
-};
-
-export const parse = (
+export const parseForAutocomplete = (
     code: string,
-    depth = 0,
 ): Promise<AutocompleteResult | null> => {
     if (currentlyParsing.has(code)) {
         return currentlyParsing.get(code) as Promise<AutocompleteResult>;
     }
 
-    const promise = parseFaultTolerant(code);
+    const promise = runCommand(
+        `autocomplete ${Buffer.from(code).toString("base64")}`,
+    )
+        .then((result: string) => {
+            return new AutocompleteResult(JSON.parse(result));
+        })
+        .catch((err) => {
+            showErrorPopup(err);
+        }) as Promise<AutocompleteResult>;
 
     currentlyParsing.set(code, promise);
 
@@ -224,7 +182,7 @@ export const parse = (
 };
 
 export const detectInDoc = <T, U extends ValidDetectParamTypes>(
-    doc: vscode.TextDocument,
+    document: vscode.TextDocument,
     toFind: FeatureTag,
     repo: ReturnType<typeof repository>,
     cb: (arg: {
@@ -234,7 +192,7 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     }) => T[] | T | null,
     validParamTypes: ValidDetectParamTypes[] = ["string"],
 ): Promise<T[]> => {
-    return detect(doc).then((results) => {
+    return detect(document).then((results) => {
         return Promise.all(
             results
                 .filter(
