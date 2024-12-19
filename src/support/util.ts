@@ -1,3 +1,7 @@
+import * as crypto from "crypto";
+import fs from "fs";
+import os from "os";
+import path from "path";
 import * as vscode from "vscode";
 import { relativePath } from "./project";
 
@@ -31,4 +35,26 @@ export const facade = (className: string): string[] => {
 
 export const support = (className: string): string => {
     return `Illuminate\\Support\\${className}`;
+};
+
+export const md5 = (string: string) => {
+    const hash = crypto.createHash("md5");
+    hash.update(string);
+    return hash.digest("hex");
+};
+
+let tempDir: string;
+
+export const tempPath = (...paths: string[]): string => {
+    if (!tempDir) {
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vscode-laravel"));
+    }
+
+    return path.join(tempDir, ...paths);
+};
+
+export const cleanUpTemp = () => {
+    if (tempDir) {
+        fs.rmdirSync(tempDir, { recursive: true });
+    }
 };

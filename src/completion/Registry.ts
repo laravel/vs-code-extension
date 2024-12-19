@@ -1,7 +1,7 @@
 "use strict";
 
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { parse } from "@src/support/parser";
+import { parseForAutocomplete } from "@src/support/parser";
 import { toArray } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, FeatureTagParam } from "..";
@@ -25,7 +25,7 @@ export default class Registry implements vscode.CompletionItemProvider {
             new vscode.Range(0, 0, position.line, position.character),
         );
 
-        return parse(docUntilPosition).then((parseResult) => {
+        return parseForAutocomplete(docUntilPosition).then((parseResult) => {
             if (parseResult === null) {
                 return [];
             }

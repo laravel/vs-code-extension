@@ -1,10 +1,17 @@
 import * as cp from "child_process";
-import * as os from "os";
+import * as fs from "fs";
+import * as vscode from "vscode";
 import { TemplateName, getTemplate } from "../templates";
 import { config } from "./config";
 import { error } from "./logger";
 import { showErrorPopup } from "./popup";
-import { getWorkspaceFolders, projectPath, projectPathExists } from "./project";
+import {
+    getWorkspaceFolders,
+    internalVendorPath,
+    projectPath,
+    projectPathExists,
+} from "./project";
+import { md5 } from "./util";
 
 const toTemplateVar = (str: string) => {
     return `__VSCODE_LARAVEL_${str.toUpperCase()}__`;
@@ -12,19 +19,42 @@ const toTemplateVar = (str: string) => {
 
 let defaultPhpCommand: string | null = null;
 
+const discoverFiles = new Map<string, string>();
+
+export const initDiscoverFiles = () => {
+    // fs.readdirSync(internalVendorPath()).forEach((file) => {
+    //     if (file.startsWith("discover-")) {
+    //         fs.unlinkSync(internalVendorPath(file));
+    //     }
+    // });
+
+    const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(internalVendorPath(), "discover-*"),
+    );
+
+    watcher.onDidDelete((file) => {
+        for (const [key, value] of discoverFiles) {
+            if (value === file.fsPath) {
+                discoverFiles.delete(key);
+                break;
+            }
+        }
+    });
+};
+
 const getPhpCommand = (): string => {
     const options = [
         {
-            check: ["which herd", "{binaryPath} which-php"],
-            command: '{binaryPath} -r "{code}"',
+            check: "herd which-php",
+            command: "{binaryPath}",
         },
         {
-            check: "which php",
-            command: '{binaryPath} -r "{code}"',
+            check: "php -r 'echo PHP_BINARY;'",
+            command: "{binaryPath}",
         },
         {
-            check: "which sail",
-            command: '{binaryPath} php -r "{code}"',
+            check: `${projectPath("vendor/bin/sail")} ps`,
+            command: `${projectPath("vendor/bin/sail")} php`,
         },
     ];
 
@@ -87,8 +117,6 @@ export const runInLaravel = <T>(
     description: string | null = null,
     asJson: boolean = true,
 ): Promise<T> => {
-    code = code.replace(/(?:\r\n|\r|\n)/g, " ");
-
     if (!hasVendor) {
         throw new Error("Vendor autoload not found, run composer install");
     }
@@ -128,38 +156,35 @@ export const runInLaravel = <T>(
         });
 };
 
-// TODO: Make sure all of these replacements are necessary
-// (also is there no escape quotes/backslashes function in JS?)
-const replacements: [string | RegExp, string][] = [
-    [/\<\?php/g, ""],
-    [/;;/g, ";"],
-];
+const getHashedFile = (code: string) => {
+    if (discoverFiles.has(code)) {
+        return discoverFiles.get(code);
+    }
 
-if (
-    ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
-        os.platform().includes(unixPlatforms),
-    )
-) {
-    replacements.push([/\$/g, "\\$"]);
-    replacements.push([/\\'/g, "\\\\'"]);
-    replacements.push([/\\"/g, '\\\\"']);
-}
+    const hashedFile = internalVendorPath(`discover-${md5(code)}.php`);
 
-replacements.push([/\"/g, '\\"']);
+    fs.writeFileSync(hashedFile, code);
+
+    discoverFiles.set(code, hashedFile);
+
+    return hashedFile;
+};
 
 export const runPhp = (
     code: string,
     description: string | null = null,
 ): Promise<string> => {
-    replacements.forEach((replacement) => {
-        code = code.replace(replacement[0], replacement[1]);
-    });
+    if (!code.startsWith("<?php")) {
+        code = "<?php\n\n" + code;
+    }
+
+    const hashedFile = getHashedFile(code);
 
     const commandTemplate =
         config<string>("phpCommand", getDefaultPhpCommand()) ||
         getDefaultPhpCommand();
 
-    const command = commandTemplate.replace("{code}", code);
+    const command = `${commandTemplate} ${hashedFile}`;
 
     const out = new Promise<string>(function (resolve, error) {
         cp.exec(

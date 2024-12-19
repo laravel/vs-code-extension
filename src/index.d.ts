@@ -72,7 +72,7 @@ declare namespace Eloquent {
     interface BuilderMethod {
         name: string;
         parameters: string[];
-        return: string;
+        return: string | null;
     }
 
     interface Models {

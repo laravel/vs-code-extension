@@ -2,60 +2,65 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-export const internalVendorPath = (path = ""): string => {
-    return projectPath(`vendor/_laravel_ide/${path}`);
+let internalVendorExists: boolean | null = null;
+
+export const internalVendorPath = (subPath = ""): string => {
+    const baseDir = path.join("vendor", "_laravel_ide");
+
+    if (internalVendorExists !== true) {
+        const baseVendorDir = projectPath(baseDir);
+
+        internalVendorExists = fs.existsSync(baseVendorDir);
+
+        if (!internalVendorExists) {
+            fs.mkdirSync(baseVendorDir, { recursive: true });
+        }
+    }
+
+    return projectPath(`${baseDir}/${subPath}`);
 };
 
-export const ensureInternalVendorDirectoryExists = () => {
-    let vendorPath = internalVendorPath();
-
-    if (!fs.existsSync(vendorPath)) {
-        fs.mkdirSync(vendorPath, { recursive: true });
-    }
+const trimFirstSlash = (srcPath: string): string => {
+    return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
-export const projectPath = (path = "", forCode = false): string => {
-    if (path[0] === "/") {
-        path = path.substring(1);
-    }
+export const projectPath = (srcPath = "", forCode = false): string => {
+    srcPath = srcPath.replace(/\//g, path.sep);
+    srcPath = trimFirstSlash(srcPath);
 
     let basePath = "";
     // let basePath = config<string>("basePath", "");
 
     if (forCode === false && basePath.length > 0) {
-        return resolvePath(basePath, path);
+        return resolvePath(basePath, srcPath);
     }
 
     let basePathForCode = "";
     // let basePathForCode = config<string>("basePathForCode", "");
 
     if (forCode && basePathForCode.length > 0) {
-        return resolvePath(basePathForCode, path);
+        return resolvePath(basePathForCode, srcPath);
     }
 
     for (let workspaceFolder of getWorkspaceFolders()) {
-        if (fs.existsSync(`${workspaceFolder.uri.fsPath}/artisan`)) {
-            return `${workspaceFolder.uri.fsPath}/${path}`;
+        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, "artisan"))) {
+            return path.join(workspaceFolder.uri.fsPath, srcPath);
         }
     }
 
     return "";
 };
 
-export const relativePath = (path: string): string => {
+export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {
-        if (path.startsWith(workspaceFolder.uri.fsPath)) {
-            let tempPath = path.replace(workspaceFolder.uri.fsPath, "");
-
-            if (tempPath[0] === "/") {
-                tempPath = tempPath.substring(1);
-            }
-
-            return tempPath;
+        if (srcPath.startsWith(workspaceFolder.uri.fsPath)) {
+            return trimFirstSlash(
+                srcPath.replace(workspaceFolder.uri.fsPath, ""),
+            );
         }
     }
 
-    return path;
+    return srcPath;
 };
 
 const resolvePath = (basePath: string, relativePath: string): string => {
@@ -63,7 +68,7 @@ const resolvePath = (basePath: string, relativePath: string): string => {
         basePath = path.resolve(getWorkspaceFolders()[0].uri.fsPath, basePath);
     }
 
-    return `${basePath.replace(/[\/\\]$/, "")}/${relativePath}`;
+    return path.join(basePath, relativePath);
 };
 
 export const hasWorkspace = (): boolean => {
