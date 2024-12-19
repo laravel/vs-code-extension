@@ -87,7 +87,7 @@ const getPhpCommand = (): string => {
         }
     }
 
-    return `php "{code}"`;
+    return "php";
 };
 
 const getDefaultPhpCommand = (): string => {
