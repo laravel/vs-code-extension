@@ -96,6 +96,28 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     }
 };
 
+const cleanArg = (arg: string): string => {
+    const replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
+
+    if (
+        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+            os.platform().includes(unixPlatforms),
+        )
+    ) {
+        replacements.push([/\$/g, "\\$"]);
+        replacements.push([/\\'/g, "\\\\'"]);
+        replacements.push([/\\"/g, '\\\\"']);
+    }
+
+    replacements.push([/\"/g, '\\"']);
+
+    replacements.forEach((replacement) => {
+        arg = arg.replace(replacement[0], replacement[1]);
+    });
+
+    return arg;
+};
+
 export const detect = async (
     doc: vscode.TextDocument,
 ): Promise<AutocompleteParsingResult.ContextValue[]> => {
@@ -107,9 +129,7 @@ export const detect = async (
         >;
     }
 
-    const promise = runCommand(
-        `detect  ${Buffer.from(code).toString("base64")}`,
-    )
+    const promise = runCommand(`detect "${cleanArg(code)}"`)
         .then((result: string) => {
             return JSON.parse(result);
         })
@@ -166,9 +186,7 @@ export const parseForAutocomplete = (
         return currentlyParsing.get(code) as Promise<AutocompleteResult>;
     }
 
-    const promise = runCommand(
-        `autocomplete ${Buffer.from(code).toString("base64")}`,
-    )
+    const promise = runCommand(`autocomplete "${cleanArg(code)}"`)
         .then((result: string) => {
             return new AutocompleteResult(JSON.parse(result));
         })
