@@ -2,6 +2,16 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.13]
+
+-   Initial Windows support
+-   Fixed nullable param for translations template for PHP 8.4
+-   Fixed undefined GLOB_BRACE for translations template
+-   Fix for Eloquent model info when `phpDocumentor` wasn't installed
+-   Fix for handling newline characters in JSON response ([#31](https://github.com/laravel/vs-code-extension/pull/31))
+-   Remove `.github` from bundle ([#29](https://github.com/laravel/vs-code-extension/pull/29))
+-   Inspired by [#20](https://github.com/laravel/vs-code-extension/pull/20), Inertia paths are now read from the existing PHP config in the project
+
 ## [0.1.12]
 
 -   Now fetching OS/arch specific binaries for Mac and Linux (Windows coming soon)
