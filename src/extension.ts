@@ -2,6 +2,7 @@
 
 import * as vscode from "vscode";
 
+import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { initClient } from "./blade/client";
 import { CodeActionProvider } from "./codeAction/codeActionProvider";
@@ -16,8 +17,9 @@ import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
-import {  hasWorkspace, projectPathExists } from "./support/project";
 import { initDiscoverFiles } from "./support/php";
+import { hasWorkspace, projectPathExists } from "./support/project";
+import { cleanUpTemp } from "./support/util";
 
 let client: LanguageClient;
 
@@ -133,6 +135,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
     info("Stopped");
+
+    if (os.platform() === "win32") {
+        cleanUpTemp();
+    }
 
     if (client) {
         client.stop();

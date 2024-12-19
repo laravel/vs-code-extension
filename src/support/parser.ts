@@ -7,11 +7,10 @@ import { AutocompleteParsingResult } from "@src/types";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as os from "os";
-import path from "path";
 import * as vscode from "vscode";
 import { FeatureTag, ValidDetectParamTypes } from "..";
 import { showErrorPopup } from "./popup";
-import { md5, toArray } from "./util";
+import { md5, tempPath, toArray } from "./util";
 
 const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
 const detected = new Map<
@@ -98,21 +97,11 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     }
 };
 
-let tempDir: string;
-
-if (os.platform() === "win32") {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vscode-laravel"));
-    console.log("tempDir", tempDir);
-}
-
 const cleanArg = (arg: string): string => {
     if (os.platform() === "win32") {
-        const tempFile = path.join(tempDir, md5(arg));
-
-        console.log("tempFile", tempFile);
+        const tempFile = tempPath(md5(arg));
 
         if (!fs.existsSync(tempFile)) {
-            console.log("writing tempFile", tempFile);
             fs.writeFileSync(tempFile, arg);
         }
 
@@ -209,12 +198,20 @@ export const parseForAutocomplete = (
         return currentlyParsing.get(code) as Promise<AutocompleteResult>;
     }
 
-    const promise = runCommand(`autocomplete "${cleanArg(code)}"`)
+    const arg = cleanArg(code);
+
+    const promise = runCommand(`autocomplete "${arg}"`)
         .then((result: string) => {
             return new AutocompleteResult(JSON.parse(result));
         })
         .catch((err) => {
             showErrorPopup(err);
+        })
+        .finally(() => {
+            if (os.platform() === "win32") {
+                console.log("unlinking", arg);
+                fs.unlink(arg, () => null);
+            }
         }) as Promise<AutocompleteResult>;
 
     currentlyParsing.set(code, promise);
