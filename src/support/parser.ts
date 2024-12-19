@@ -11,7 +11,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { FeatureTag, ValidDetectParamTypes } from "..";
 import { showErrorPopup } from "./popup";
-import { toArray } from "./util";
+import { md5, toArray } from "./util";
 
 const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
 const detected = new Map<
@@ -98,21 +98,23 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     }
 };
 
+let tempDir: string;
+
 if (os.platform() === "win32") {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vscode-laravel"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vscode-laravel"));
     console.log("tempDir", tempDir);
 }
 
 const cleanArg = (arg: string): string => {
     if (os.platform() === "win32") {
-        // write the file to the temp directory
-        // Gnerate a random file name
-        const randomString = Math.random().toString(36).substring(7);
-        const tempFile = path.join(tempDir, randomString);
-
-        fs.writeFileSync(tempFile, arg);
+        const tempFile = path.join(tempDir, md5(arg));
 
         console.log("tempFile", tempFile);
+
+        if (!fs.existsSync(tempFile)) {
+            console.log("writing tempFile", tempFile);
+            fs.writeFileSync(tempFile, arg);
+        }
 
         return tempFile;
     }
@@ -178,10 +180,10 @@ const runCommand = (command: string): Promise<string> => {
             await waitForPath();
         }
 
-        const extraArgs = os.platform() === "win32" ? "--encoded" : "";
+        const extraArgs = os.platform() === "win32" ? "--from-file" : "";
         const toRun = `${parserBinaryPath} ${command} ${extraArgs}`;
 
-        // console.log("running command", toRun);
+        console.log("running command", toRun);
 
         cp.exec(
             toRun,

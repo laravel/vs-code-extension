@@ -11,6 +11,7 @@ import {
     projectPath,
     projectPathExists,
 } from "./project";
+import { md5 } from "./util";
 
 const toTemplateVar = (str: string) => {
     return `__VSCODE_LARAVEL_${str.toUpperCase()}__`;
@@ -111,14 +112,6 @@ export const template = (
 const hasVendor = projectPathExists("vendor/autoload.php");
 const hasBootstrap = projectPathExists("bootstrap/app.php");
 
-const crypto = require("crypto");
-
-const hashString = (string: string) => {
-    const hash = crypto.createHash("md5");
-    hash.update(string);
-    return hash.digest("hex");
-};
-
 export const runInLaravel = <T>(
     code: string,
     description: string | null = null,
@@ -168,7 +161,7 @@ const getHashedFile = (code: string) => {
         return discoverFiles.get(code);
     }
 
-    const hashedFile = internalVendorPath(`discover-${hashString(code)}.php`);
+    const hashedFile = internalVendorPath(`discover-${md5(code)}.php`);
 
     fs.writeFileSync(hashedFile, code);
 

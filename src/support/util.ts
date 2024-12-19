@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import * as vscode from "vscode";
 import { relativePath } from "./project";
 
@@ -31,4 +32,10 @@ export const facade = (className: string): string[] => {
 
 export const support = (className: string): string => {
     return `Illuminate\\Support\\${className}`;
+};
+
+export const md5 = (string: string) => {
+    const hash = crypto.createHash("md5");
+    hash.update(string);
+    return hash.digest("hex");
 };
