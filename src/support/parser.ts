@@ -31,7 +31,6 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
     downloadBinary(context).then((path) => {
         if (path) {
             parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
-            parserBinaryPath = path.replace(" ", "\\ ");
         }
     });
 };
@@ -170,7 +169,7 @@ const runCommand = (command: string): Promise<string> => {
         }
 
         const extraArgs = os.platform() === "win32" ? "--from-file" : "";
-        const toRun = `${parserBinaryPath} ${command} ${extraArgs}`;
+        const toRun = `"${parserBinaryPath}" ${command} ${extraArgs}`;
 
         // console.log("running command", toRun);
 
