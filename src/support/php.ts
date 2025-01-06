@@ -10,6 +10,7 @@ import {
     internalVendorPath,
     projectPath,
     projectPathExists,
+    setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
 
@@ -30,6 +31,8 @@ export const initDiscoverFiles = () => {
 
     const watcher = vscode.workspace.createFileSystemWatcher(
         new vscode.RelativePattern(internalVendorPath(), "discover-*"),
+        true,
+        true,
     );
 
     watcher.onDidDelete((file) => {
@@ -39,6 +42,21 @@ export const initDiscoverFiles = () => {
                 break;
             }
         }
+    });
+
+    const onVendorDelete = () => {
+        setInternalVendorExists(false);
+        discoverFiles.clear();
+    };
+
+    [internalVendorPath(), projectPath("vendor")].forEach((path) => {
+        const watcher = vscode.workspace.createFileSystemWatcher(
+            path,
+            true,
+            true,
+        );
+
+        watcher.onDidDelete(onVendorDelete);
     });
 };
 
