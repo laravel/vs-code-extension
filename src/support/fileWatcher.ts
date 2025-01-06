@@ -19,7 +19,7 @@ export const loadAndWatch = (
 
     load();
 
-    createFileWatcher(patterns, debounce(load, 500), events);
+    createFileWatcher(patterns, debounce(load, 750), events);
 };
 
 export const createFileWatcher = (
