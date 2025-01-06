@@ -4,7 +4,7 @@ $local = collect(glob(config_path("/*.php")))
   ->merge(glob(config_path("**/*.php")))
   ->map(fn ($path) => [
       (string) \\Illuminate\\Support\\Str::of($path)
-        ->replace([config_path(DIRECTORY_SEPARATOR), ".php"], "")
+        ->replace([config_path('/'), ".php"], "")
         ->replace(DIRECTORY_SEPARATOR, "."),
       $path
     ]);
