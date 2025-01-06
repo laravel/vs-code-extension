@@ -154,8 +154,10 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         break;
     }
 
+    const path = config("inertia.path", "resources/js/Pages");
+
     const fileUri = vscode.Uri.file(
-        projectPath(`resources/js/Pages/${missingFilename}.${extension}`),
+        projectPath(`${path}/${missingFilename}.${extension}`),
     );
 
     const edit = new vscode.WorkspaceEdit();

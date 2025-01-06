@@ -247,6 +247,12 @@
                     "generated": true,
                     "description": null
                 },
+                "Laravel.inertia.path": {
+                    "type": "string",
+                    "default": "resources/js/Pages",
+                    "generated": true,
+                    "description": "Path to Inertia pages."
+                },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
                     "default": true,

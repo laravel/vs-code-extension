@@ -4,6 +4,7 @@ import { GeneratedConfigKey } from "./generated-config";
 type ConfigKey =
     | GeneratedConfigKey
     | "phpCommand"
+    | "inertia.path"
     | "tests.docker.enabled"
     | "tests.ssh.enabled"
     | "tests.suiteSuffix"

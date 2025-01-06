@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { repository } from ".";
 import { View } from "..";
 import { projectPath, relativePath } from "./../support/project";
+import { config } from "./../support/config";
 
 interface ViewItem {
     [key: string]: View;
@@ -12,7 +13,7 @@ interface ViewItem {
 const load = (pagePaths: string[], validExtensions: string[]) => {
     let views: ViewItem = {};
 
-    pagePaths = pagePaths.length > 0 ? pagePaths : ["/resources/js/Pages"];
+    pagePaths = pagePaths.length > 0 ? pagePaths : [config("inertia.path", "resources/js/Pages")];
 
     pagePaths
         .map((path) => "/" + relativePath(path))
@@ -83,7 +84,7 @@ export const getInertiaViews = repository<ViewItem>(
                 result?.page_extensions ?? [],
             );
         }),
-    "{,**/}{resources/js/Pages}/{*,**/*}",
+    `{,**/}{${config("inertia.path", "resources/js/Pages")}}/{*,**/*}`,
     {},
     ["create", "delete"],
 );
