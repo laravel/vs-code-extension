@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { TemplateName, getTemplate } from "../templates";
 import { config } from "./config";
-import { error } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
     getWorkspaceFolders,
@@ -143,6 +142,17 @@ export const template = (
     return templateString;
 };
 
+const getFormattedError = (
+    error: string,
+    description: string | null,
+): string => {
+    if (!description) {
+        return error;
+    }
+
+    return `${description}\n\n${error}`;
+};
+
 export const runInLaravel = <T>(
     code: string,
     description: string | null = null,
@@ -186,13 +196,10 @@ export const runInLaravel = <T>(
                 return asJson ? JSON.parse(out[1]) : out[1];
             }
 
-            // TODO: Fix this
-            error("Parse Error:\n " + (description ?? "") + "\n\n" + result);
-
-            throw new Error("No output found");
+            throw new Error(getFormattedError(result, description));
         })
         .catch((error) => {
-            showErrorPopup(command);
+            showErrorPopup(getFormattedError(error.toString(), description));
         });
 };
 
