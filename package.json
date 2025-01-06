@@ -74,6 +74,32 @@
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as a placeholder for the code file to run. e.g. `php \"{code}\"`"
                 },
+                "Laravel.localPhp": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "herd",
+                        "valet",
+                        "sail",
+                        "local"
+                    ],
+                    "enumItemLabels": [
+                        "Auto Detect",
+                        "Herd",
+                        "Valet",
+                        "Sail",
+                        "Local"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Auto detect the local PHP environment.",
+                        "Detect PHP version Herd is using for the project.",
+                        "Valet",
+                        "Sail",
+                        "PHP is installed on the local machine."
+                    ],
+                    "default": "auto",
+                    "description": "Local PHP environment, leave on 'auto' and configure the 'PHP Command' setting to configure a custom local PHP setup."
+                },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",
                     "default": true,
