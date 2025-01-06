@@ -4,8 +4,8 @@ $local = collect(glob(config_path("/*.php")))
   ->merge(glob(config_path("**/*.php")))
   ->map(fn ($path) => [
       (string) \\Illuminate\\Support\\Str::of($path)
-        ->replace([config_path("/"), ".php"], "")
-        ->replace("/", "."),
+        ->replace([config_path(DIRECTORY_SEPARATOR), ".php"], "")
+        ->replace(DIRECTORY_SEPARATOR, "."),
       $path
     ]);
 
@@ -13,9 +13,9 @@ $vendor = collect(glob(base_path("vendor/**/**/config/*.php")))->map(fn (
   $path
 ) => [
     (string) \\Illuminate\\Support\\Str::of($path)
-      ->afterLast("/config/")
+      ->afterLast(DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR)
       ->replace(".php", "")
-      ->replace("/", "."),
+      ->replace(DIRECTORY_SEPARATOR, "."),
     $path
   ]);
 
@@ -119,7 +119,7 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
     return [
       "name" => $key,
       "value" => $value,
-      "file" => $file === null ? null : str_replace(base_path('/'), '', $file),
+      "file" => $file === null ? null : str_replace(base_path(DIRECTORY_SEPARATOR), '', $file),
       "line" => $line
     ];
 }
