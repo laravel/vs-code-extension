@@ -1,10 +1,8 @@
-import { projectPath } from "@src/support/project";
-import * as vscode from "vscode";
 import { repository } from ".";
-import { Config, ConfigItem } from "..";
+import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
 
-export const getConfigs = repository<ConfigItem[]>(
+export const getConfigs = repository<Config[]>(
     () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(
             (result) =>
@@ -12,11 +10,8 @@ export const getConfigs = repository<ConfigItem[]>(
                     return {
                         name: item.name,
                         value: item.value,
-                        uri: item.file
-                            ? vscode.Uri.file(projectPath(item.file)).with({
-                                  fragment: `L${item.line}`,
-                              })
-                            : undefined,
+                        file: item.file,
+                        line: item.line,
                     };
                 }),
         );

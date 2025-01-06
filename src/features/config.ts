@@ -5,7 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -69,15 +69,20 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const uri = getConfigs().items.find(
+            const configItem = getConfigs().items.find(
                 (config) => config.name === param.value,
-            )?.uri;
+            );
 
-            if (!uri) {
+            if (!configItem || !configItem.file) {
                 return null;
             }
 
-            return new vscode.DocumentLink(detectedRange(param), uri);
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(projectPath(configItem.file)).with({
+                    fragment: `L${configItem.line}`,
+                }),
+            );
         },
     );
 };
@@ -115,11 +120,13 @@ export const hoverProvider: HoverProvider = (
                 text.push("`" + display + "`");
             }
 
-            if (configItem.uri) {
+            if (configItem.file) {
                 text.push(
-                    `[${relativePath(configItem.uri.path)}](${
-                        configItem.uri.fsPath
-                    })`,
+                    `[${configItem.file}](${vscode.Uri.file(
+                        projectPath(configItem.file),
+                    ).with({
+                        fragment: `L${configItem.line}`,
+                    })})`,
                 );
             }
 

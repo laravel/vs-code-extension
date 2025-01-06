@@ -12,7 +12,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath, relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
@@ -90,15 +90,18 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const uri = getViews().items.find(
+            const path = getViews().items.find(
                 (view) => view.key === param.value,
-            )?.uri;
+            )?.path;
 
-            if (!uri) {
+            if (!path) {
                 return null;
             }
 
-            return new vscode.DocumentLink(detectedRange(param), uri);
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(projectPath(path)),
+            );
         },
     );
 };
@@ -116,7 +119,9 @@ export const hoverProvider: HoverProvider = (
 
         return new vscode.Hover(
             new vscode.MarkdownString(
-                `[${relativePath(item.uri.path)}](${item.uri.fsPath})`,
+                `[${item.path}](${
+                    vscode.Uri.file(projectPath(item.path)).fsPath
+                })`,
             ),
         );
     });
@@ -324,7 +329,7 @@ export const completionProvider = {
             return [];
         }
 
-        let parentContent = fs.readFileSync(item.uri.path, "utf8");
+        let parentContent = fs.readFileSync(projectPath(item.path), "utf8");
         let yieldRegex =
             func === "@push"
                 ? /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g
