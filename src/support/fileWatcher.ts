@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getWorkspaceFolders, hasWorkspace } from "./project";
+import { debounce } from "./util";
 
 type FileEvent = "change" | "create" | "delete";
 
@@ -18,7 +19,7 @@ export const loadAndWatch = (
 
     load();
 
-    createFileWatcher(patterns, load, events);
+    createFileWatcher(patterns, debounce(load, 750), events);
 };
 
 export const createFileWatcher = (
@@ -35,6 +36,9 @@ export const createFileWatcher = (
     return patterns.map((pattern) => {
         const watcher = vscode.workspace.createFileSystemWatcher(
             new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
+            !events.includes("create"),
+            !events.includes("change"),
+            !events.includes("delete"),
         );
 
         if (events.includes("change")) {

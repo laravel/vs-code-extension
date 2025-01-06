@@ -10,6 +10,7 @@ import {
     internalVendorPath,
     projectPath,
     projectPathExists,
+    setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
 
@@ -21,7 +22,10 @@ let defaultPhpCommand: string | null = null;
 
 const discoverFiles = new Map<string, string>();
 
-export const initDiscoverFiles = () => {
+let hasVendor = projectPathExists("vendor/autoload.php");
+const hasBootstrap = projectPathExists("bootstrap/app.php");
+
+export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
     //     if (file.startsWith("discover-")) {
     //         fs.unlinkSync(internalVendorPath(file));
@@ -30,6 +34,8 @@ export const initDiscoverFiles = () => {
 
     const watcher = vscode.workspace.createFileSystemWatcher(
         new vscode.RelativePattern(internalVendorPath(), "discover-*"),
+        true,
+        true,
     );
 
     watcher.onDidDelete((file) => {
@@ -39,6 +45,34 @@ export const initDiscoverFiles = () => {
                 break;
             }
         }
+    });
+
+    [internalVendorPath(), projectPath("vendor")].forEach((path) => {
+        const watcher = vscode.workspace.createFileSystemWatcher(
+            path,
+            true,
+            true,
+        );
+
+        watcher.onDidDelete(() => {
+            setInternalVendorExists(false);
+            discoverFiles.clear();
+            hasVendor = false;
+        });
+    });
+
+    const autoloadWatcher = vscode.workspace.createFileSystemWatcher(
+        projectPath("vendor/autoload.php"),
+        false,
+        true,
+    );
+
+    autoloadWatcher.onDidCreate(() => {
+        hasVendor = true;
+    });
+
+    autoloadWatcher.onDidDelete(() => {
+        hasVendor = false;
     });
 };
 
@@ -109,16 +143,22 @@ export const template = (
     return templateString;
 };
 
-const hasVendor = projectPathExists("vendor/autoload.php");
-const hasBootstrap = projectPathExists("bootstrap/app.php");
-
 export const runInLaravel = <T>(
     code: string,
     description: string | null = null,
     asJson: boolean = true,
+    tryCount = 0,
 ): Promise<T> => {
     if (!hasVendor) {
-        throw new Error("Vendor autoload not found, run composer install");
+        if (tryCount >= 30) {
+            throw new Error("Vendor autoload not found, run composer install");
+        }
+
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(runInLaravel(code, description, asJson, tryCount + 1));
+            }, 1000);
+        });
     }
 
     if (!hasBootstrap) {

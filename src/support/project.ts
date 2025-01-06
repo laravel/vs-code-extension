@@ -4,6 +4,10 @@ import * as vscode from "vscode";
 
 let internalVendorExists: boolean | null = null;
 
+export const setInternalVendorExists = (value: boolean) => {
+    internalVendorExists = value;
+};
+
 export const internalVendorPath = (subPath = ""): string => {
     const baseDir = path.join("vendor", "_laravel_ide");
 
