@@ -2,6 +2,12 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.15]
+
+-   Fixed issue with executing binary on Windows path with spaces
+-   Repo file watchers are now debounced to prevent CPU from spiking
+-   Extension should now output cleaner errors from mini scripts so that future issues will be easier to debug
+
 ## [0.1.14]
 
 -   Fixed fallback for running PHP code (mentioned in 0.1.13 as a breaking change). The note in the last changelog was incorrect: the new PHP Command setting should just read `php`, meaning the file will just be added to the end of the command.
