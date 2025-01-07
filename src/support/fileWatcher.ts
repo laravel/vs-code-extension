@@ -4,7 +4,10 @@ import { debounce } from "./util";
 
 type FileEvent = "change" | "create" | "delete";
 
-export type WatcherPattern = string | string[];
+export type WatcherPattern =
+    | string
+    | string[]
+    | (() => Promise<string | string[] | null>);
 
 export const defaultFileEvents: FileEvent[] = ["change", "create", "delete"];
 
@@ -18,6 +21,16 @@ export const loadAndWatch = (
     }
 
     load();
+
+    if (patterns instanceof Function) {
+        patterns().then((result) => {
+            if (result !== null) {
+                createFileWatcher(result, debounce(load, 750), events);
+            }
+        });
+
+        return;
+    }
 
     createFileWatcher(patterns, debounce(load, 750), events);
 };

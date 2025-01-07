@@ -9,13 +9,19 @@ interface ViewItem {
     [key: string]: View;
 }
 
+export let inertiaPagePaths: string[] | null = null;
+export let inertiaPageExtensions: string[] | null = null;
+
 const load = (pagePaths: string[], validExtensions: string[]) => {
+    inertiaPagePaths = pagePaths;
+    inertiaPageExtensions = validExtensions;
+
     let views: ViewItem = {};
 
-    pagePaths = pagePaths.length > 0 ? pagePaths : ["/resources/js/Pages"];
+    pagePaths = pagePaths.length > 0 ? pagePaths : ["resources/js/Pages"];
 
     pagePaths
-        .map((path) => "/" + relativePath(path))
+        .map((path) => sysPath.sep + relativePath(path))
         .forEach((path) => {
             collectViews(projectPath(path), path, validExtensions).forEach(
                 (view) => {
@@ -82,7 +88,22 @@ export const getInertiaViews = repository<ViewItem>(
                 result?.page_extensions ?? [],
             );
         }),
-    "{,**/}{resources/js/Pages}/{*,**/*}",
+    () =>
+        new Promise((resolve) => {
+            const checkForPagePaths = () => {
+                if (inertiaPagePaths === null) {
+                    return setTimeout(checkForPagePaths, 100);
+                }
+
+                if (inertiaPagePaths.length === 0) {
+                    resolve(null);
+                } else {
+                    resolve(`{${inertiaPagePaths.join(",")}}/{*,**/*}`);
+                }
+            };
+
+            checkForPagePaths();
+        }),
     {},
     ["create", "delete"],
 );

@@ -8,15 +8,20 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getInertiaViews } from "@src/repositories/inertia";
+import {
+    getInertiaViews,
+    inertiaPageExtensions,
+    inertiaPagePaths,
+} from "@src/repositories/inertia";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
+import * as sysPath from "path";
 import * as vscode from "vscode";
 
 const toFind: FeatureTag = [
@@ -151,19 +156,10 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         return [];
     }
 
-    const items = getInertiaViews().items;
-    let extension = "vue";
-
-    for (const item in items) {
-        extension = items[item].path.split(".").pop() ?? "vue";
-        break;
-    }
-
-    const fileUri = vscode.Uri.file(
-        projectPath(`resources/js/Pages/${missingFilename}.${extension}`),
-    );
-
-    const edit = new vscode.WorkspaceEdit();
+    const extension =
+        Object.values(getInertiaViews().items)[0].path.split(".").pop() ??
+        inertiaPageExtensions[0] ??
+        "vue";
 
     const mapping: Record<string, string> = {
         vue: ["<script setup>", "</script>", "<template>", "</template>"].join(
@@ -171,21 +167,28 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         ),
     };
 
-    edit.createFile(fileUri, {
-        overwrite: false,
-        contents: Buffer.from(mapping[extension] ?? ""),
+    return inertiaPagePaths.map((path) => {
+        const filepath = sysPath.join(path, `${missingFilename}.${extension}`);
+        const uri = vscode.Uri.file(projectPath(filepath));
+
+        const edit = new vscode.WorkspaceEdit();
+
+        edit.createFile(uri, {
+            overwrite: false,
+            contents: Buffer.from(mapping[extension] ?? ""),
+        });
+
+        const action = new vscode.CodeAction(
+            `Create ${relativePath(filepath)}`,
+            vscode.CodeActionKind.QuickFix,
+        );
+        action.edit = edit;
+        action.diagnostics = [diagnostic];
+        action.isPreferred = true;
+        action.command = openFile(uri, 1, 0);
+
+        return action;
     });
-
-    const action = new vscode.CodeAction(
-        "Create missing Inertia view",
-        vscode.CodeActionKind.QuickFix,
-    );
-    action.edit = edit;
-    action.diagnostics = [diagnostic];
-    action.isPreferred = true;
-    action.command = openFile(fileUri, 1, 0);
-
-    return [action];
 };
 
 export const completionProvider: CompletionProvider = {
