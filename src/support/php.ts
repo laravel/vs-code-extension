@@ -196,7 +196,7 @@ export const runInLaravel = <T>(
                 return asJson ? JSON.parse(out[1]) : out[1];
             }
 
-            throw new Error(getFormattedError(result, description));
+            throw new Error(result);
         })
         .catch((error) => {
             showErrorPopup(getFormattedError(error.toString(), description));
