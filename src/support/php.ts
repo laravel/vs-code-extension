@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import { TemplateName, getTemplate } from "../templates";
 import { config } from "./config";
+import { error } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
     getWorkspaceFolders,
@@ -196,10 +197,17 @@ export const runInLaravel = <T>(
                 return asJson ? JSON.parse(out[1]) : out[1];
             }
 
-            throw new Error(getFormattedError(result, description));
+            throw new Error(result);
         })
-        .catch((error) => {
-            showErrorPopup(getFormattedError(error.toString(), description));
+        .catch((e) => {
+            if (e.toString().includes("ParseError")) {
+                // If we it's a parse error let's not show the popup,
+                // probably just a momentary syntax error
+                error(e);
+                return;
+            }
+
+            showErrorPopup(getFormattedError(e.toString(), description));
         });
 };
 
