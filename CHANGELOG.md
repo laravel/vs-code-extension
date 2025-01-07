@@ -2,6 +2,23 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.16]
+
+### Added
+
+-   PHP Environment setting. Specify your local environment via a list of common local setups.
+-   Broadened the scope of `config` values to include top level files and top-level array keys
+
+### Fixed
+
+-   Auto-detection of Sail and running PHP scripts via Sail
+-   Bug where second parameter of `config()` was autocompleting, linking, hovering, and validating
+-   Removed hardcoded `env` values from `launch.json` to allow users to contribute more easily
+-   File watcher paths as configured by `config/inertia.php`
+-   Missing Inertia views quick fix now respects the paths as configured by `config/inertia.php`
+-   Hovering and linking for Windows users with incorrect filepaths
+-   Removed error popups when the codebase had a parser error (during active editing)
+
 ## [0.1.15]
 
 -   Fixed issue with executing binary on Windows path with spaces
