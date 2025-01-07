@@ -9,13 +9,19 @@ interface ViewItem {
     [key: string]: View;
 }
 
+export let inertiaPagePaths: string[] = [];
+export let inertiaPageExtensions: string[] = [];
+
 const load = (pagePaths: string[], validExtensions: string[]) => {
+    inertiaPagePaths = pagePaths;
+    inertiaPageExtensions = validExtensions;
+
     let views: ViewItem = {};
 
-    pagePaths = pagePaths.length > 0 ? pagePaths : ["/resources/js/Pages"];
+    pagePaths = pagePaths.length > 0 ? pagePaths : ["resources/js/Pages"];
 
     pagePaths
-        .map((path) => "/" + relativePath(path))
+        .map((path) => sysPath.sep + relativePath(path))
         .forEach((path) => {
             collectViews(projectPath(path), path, validExtensions).forEach(
                 (view) => {
