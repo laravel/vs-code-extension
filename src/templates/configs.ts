@@ -33,13 +33,14 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
     $found = null;
 
     while (count($parts) > 0) {
-      array_pop($parts);
       $toFind = implode(".", $parts);
 
       if ($configPaths->has($toFind)) {
         $found = $toFind;
         break;
       }
+
+      array_pop($parts);
     }
 
     if ($found === null) {
@@ -124,7 +125,21 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
     ];
 }
 
+function vsCodeUnpackDottedKey($value, $key) {
+  $arr = [$key => $value];
+  $parts = explode('.', $key);
+  array_pop($parts);
+
+  while (count($parts)) {
+    $arr[implode('.', $parts)] = 'array(...)';
+    array_pop($parts);
+  }
+
+  return $arr;
+}
+
 echo collect(\\Illuminate\\Support\\Arr::dot(config()->all()))
+  ->mapWithKeys(fn($value, $key) => vsCodeUnpackDottedKey($value, $key))
   ->map(fn ($value, $key) => vsCodeGetConfigValue($value, $key, $configPaths))
   ->filter()
   ->values()
