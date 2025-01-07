@@ -1,6 +1,6 @@
 <?php
 
-$config = config('inertia.testing');
+$config = config('inertia.testing', []);
 
 $pagePaths = collect($config['page_paths'] ?? [])->map(function($path) {
     return vsCodeToRelativePath($path);
