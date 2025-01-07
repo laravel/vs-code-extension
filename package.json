@@ -70,9 +70,35 @@
         "configuration": {
             "title": "Laravel",
             "properties": {
+                "Laravel.phpEnvironment": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "herd",
+                        "valet",
+                        "sail",
+                        "local"
+                    ],
+                    "enumItemLabels": [
+                        "Auto Detect",
+                        "Herd",
+                        "Valet",
+                        "Sail",
+                        "Local"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Auto detect the local PHP environment.",
+                        "Auto detect PHP version Herd is using for the project.",
+                        "Auto detect PHP version Valet is using for the project.",
+                        "Sail",
+                        "Use PHP installed on the local machine."
+                    ],
+                    "default": "auto",
+                    "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."
+                },
                 "Laravel.phpCommand": {
                     "type": "string",
-                    "description": "Template for running PHP code. Use {code} as a placeholder for the code file to run. e.g. `php \"{code}\"`"
+                    "description": "Template for running PHP code. Use {code} as a placeholder for the php file to run. e.g. `php \"{code}\"`"
                 },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",

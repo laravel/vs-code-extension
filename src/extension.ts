@@ -15,9 +15,10 @@ import ValidationCompletion from "./completion/Validation";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
+import { configAffected } from "./support/config";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
-import { initVendorWatchers } from "./support/php";
+import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 
@@ -131,6 +132,12 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),
     );
+
+    vscode.workspace.onDidChangeConfiguration((event) => {
+        if (configAffected(event, "phpCommand", "phpEnvironment")) {
+            clearDefaultPhpCommand();
+        }
+    });
 }
 
 export function deactivate() {

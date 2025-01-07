@@ -1,15 +1,16 @@
+import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { TemplateName, getTemplate } from "../templates";
-import { config } from "./config";
-import { error } from "./logger";
+import { config, PhpEnvironment } from "./config";
+import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
     getWorkspaceFolders,
     internalVendorPath,
     projectPath,
     projectPathExists,
+    relativePath,
     setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
@@ -24,6 +25,9 @@ const discoverFiles = new Map<string, string>();
 
 let hasVendor = projectPathExists("vendor/autoload.php");
 const hasBootstrap = projectPathExists("bootstrap/app.php");
+
+let phpEnvKey: PhpEnvironment | null = null;
+const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -77,22 +81,38 @@ export const initVendorWatchers = () => {
 };
 
 const getPhpCommand = (): string => {
-    const options = [
-        {
-            check: "herd which-php",
-            command: "{binaryPath}",
-        },
-        {
-            check: "php -r 'echo PHP_BINARY;'",
-            command: "{binaryPath}",
-        },
-        {
-            check: `${projectPath("vendor/bin/sail")} ps`,
-            command: `${projectPath("vendor/bin/sail")} php`,
-        },
-    ];
+    const phpEnv = config<PhpEnvironment>("phpEnvironment", "auto");
 
-    for (const option of options) {
+    const options = new Map<
+        PhpEnvironment,
+        { check: string | string[]; command: string }
+    >();
+
+    options.set("herd", {
+        check: "herd which-php",
+        command: `"{binaryPath}"`,
+    });
+
+    options.set("valet", {
+        check: "valet which-php",
+        command: `"{binaryPath}"`,
+    });
+
+    options.set("local", {
+        check: "php -r 'echo PHP_BINARY;'",
+        command: `"{binaryPath}"`,
+    });
+
+    options.set("sail", {
+        check: "./vendor/bin/sail ps",
+        command: "./vendor/bin/sail php",
+    });
+
+    for (const [key, option] of options.entries()) {
+        if (phpEnv !== "auto" && phpEnv !== key) {
+            continue;
+        }
+
         try {
             const checks = Array.isArray(option.check)
                 ? option.check
@@ -101,27 +121,40 @@ const getPhpCommand = (): string => {
             let result = "";
 
             while (check) {
+                info(`Checking ${key} PHP installation: ${check}`);
+
                 result = cp
-                    .execSync(check)
+                    .execSync(check, {
+                        cwd: projectPath(""),
+                    })
                     .toString()
                     .trim()
-                    .replace("{binaryPath}", result.replace(/ /g, "\\ "));
+                    .replace("{binaryPath}", result);
 
                 check = checks.shift();
             }
 
             if (result !== "") {
-                return option.command.replace(
-                    "{binaryPath}",
-                    result.replace(/ /g, "\\ "),
-                );
+                info(`Using ${key} PHP installation: ${result}`);
+
+                phpEnvKey = key;
+
+                return option.command.replace("{binaryPath}", result);
             }
         } catch (e) {
             // ignore
         }
     }
 
+    info("Falling back to system PHP installation");
+
+    phpEnvKey = "local";
+
     return "php";
+};
+
+export const clearDefaultPhpCommand = () => {
+    defaultPhpCommand = null;
 };
 
 const getDefaultPhpCommand = (): string => {
@@ -211,9 +244,17 @@ export const runInLaravel = <T>(
         });
 };
 
+const fixFilePath = (path: string) => {
+    if (phpEnvsThatUseRelativePaths.includes(phpEnvKey!)) {
+        return relativePath(path);
+    }
+
+    return path;
+};
+
 const getHashedFile = (code: string) => {
     if (discoverFiles.has(code)) {
-        return discoverFiles.get(code);
+        return fixFilePath(discoverFiles.get(code)!);
     }
 
     const hashedFile = internalVendorPath(`discover-${md5(code)}.php`);
@@ -222,7 +263,7 @@ const getHashedFile = (code: string) => {
 
     discoverFiles.set(code, hashedFile);
 
-    return hashedFile;
+    return fixFilePath(hashedFile);
 };
 
 export const runPhp = (
@@ -233,13 +274,13 @@ export const runPhp = (
         code = "<?php\n\n" + code;
     }
 
-    const hashedFile = getHashedFile(code);
-
     const commandTemplate =
         config<string>("phpCommand", getDefaultPhpCommand()) ||
         getDefaultPhpCommand();
 
-    const command = `${commandTemplate} ${hashedFile}`;
+    const hashedFile = getHashedFile(code);
+
+    const command = `${commandTemplate} "${hashedFile}"`;
 
     const out = new Promise<string>(function (resolve, error) {
         cp.exec(
