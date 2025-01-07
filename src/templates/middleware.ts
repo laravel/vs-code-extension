@@ -5,8 +5,8 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
   ->map(function ($middleware, $key) {
     $result = [
       "class" => null,
-      "uri" => null,
-      "startLine" => null,
+      "path" => null,
+      "line" => null,
       "parameters" => null,
       "groups" => [],
     ];
@@ -16,8 +16,8 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
         if (!class_exists($m)) {
           return [
             "class" => $m,
-            "uri" => null,
-            "startLine" => null
+            "path" => null,
+            "line" => null
           ];
         }
 
@@ -26,8 +26,8 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
 
         return [
           "class" => $m,
-          "uri" => $reflected->getFileName(),
-          "startLine" =>
+          "path" => vsCodeToRelativePath($reflected->getFileName()),
+          "line" =>
               $reflectedMethod->getFileName() === $reflected->getFileName()
               ? $reflectedMethod->getStartLine()
               : null
@@ -42,8 +42,8 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
 
     $result = array_merge($result, [
       "class" => $middleware,
-      "uri" => $reflected->getFileName(),
-      "startLine" => $reflectedMethod->getStartLine(),
+      "path" => vsCodeToRelativePath($reflected->getFileName()),
+      "line" => $reflectedMethod->getStartLine(),
     ]);
 
     $parameters = collect($reflectedMethod->getParameters())

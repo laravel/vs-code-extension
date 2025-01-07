@@ -1,12 +1,9 @@
 import { runInLaravel, template } from "@src/support/php";
-import { projectPath } from "@src/support/project";
-import * as vscode from "vscode";
 import { repository } from ".";
 
 export interface ViewItem {
     key: string;
     path: string;
-    uri: vscode.Uri;
     isVendor: boolean;
 }
 
@@ -22,7 +19,6 @@ const load = () => {
             return {
                 key,
                 path,
-                uri: vscode.Uri.file(projectPath(path)),
                 isVendor,
             };
         });

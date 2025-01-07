@@ -21,6 +21,11 @@ class VsCodeLaravel extends \\Illuminate\\Support\\ServiceProvider
     }
 }
 
+function vsCodeToRelativePath($path)
+{
+    return ltrim(str_replace(base_path(), '', $path), DIRECTORY_SEPARATOR);
+}
+
 $app->register(new VsCodeLaravel($app));
 $kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);
 $kernel->bootstrap();

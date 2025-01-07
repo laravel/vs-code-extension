@@ -5,7 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -46,11 +46,16 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             return processParam(param, (value) => {
                 const route = routes[getName(value.value)];
 
-                if (!route || !route.uri) {
+                if (!route || !route.path) {
                     return null;
                 }
 
-                return new vscode.DocumentLink(detectedRange(value), route.uri);
+                return new vscode.DocumentLink(
+                    detectedRange(value),
+                    vscode.Uri.file(projectPath(route.path)).with({
+                        fragment: `L${route.line}`,
+                    }),
+                );
             });
         },
         ["string", "array"],
@@ -69,9 +74,13 @@ export const hoverProvider: HoverProvider = (
         (match) => {
             const item = getMiddleware().items[getName(match)];
 
-            if (item?.uri) {
+            if (item?.path) {
                 const text = [
-                    `[${relativePath(item.uri.path)}](${item.uri.path})`,
+                    `[${item.path}](${vscode.Uri.file(
+                        projectPath(item.path),
+                    ).with({
+                        fragment: `L${item.line}`,
+                    })})`,
                 ];
 
                 return new vscode.Hover(
@@ -84,8 +93,10 @@ export const hoverProvider: HoverProvider = (
             }
 
             const text = item.groups.map((i) =>
-                i.uri
-                    ? `[${relativePath(i.uri.path)}](${i.uri.toString()})`
+                i.path
+                    ? `[${i.path}](${vscode.Uri.file(projectPath(i.path)).with({
+                          fragment: `L${i.line}`,
+                      })})`
                     : i.class,
             );
 

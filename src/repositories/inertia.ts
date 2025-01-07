@@ -1,9 +1,9 @@
 import { runInLaravel, template } from "@src/support/php";
+import { projectPath, relativePath } from "@src/support/project";
 import * as fs from "fs";
-import * as vscode from "vscode";
+import * as sysPath from "path";
 import { repository } from ".";
 import { View } from "..";
-import { projectPath, relativePath } from "./../support/project";
 
 interface ViewItem {
     [key: string]: View;
@@ -32,7 +32,7 @@ const collectViews = (
     basePath: string,
     validExtensions: string[],
 ): View[] => {
-    if (path.substring(-1) === "/" || path.substring(-1) === "\\") {
+    if (path.substring(-1) === sysPath.sep) {
         path = path.substring(0, path.length - 1);
     }
 
@@ -43,9 +43,9 @@ const collectViews = (
     return fs
         .readdirSync(path)
         .map((file: string) => {
-            if (fs.lstatSync(`${path}/${file}`).isDirectory()) {
+            if (fs.lstatSync(sysPath.join(path, file)).isDirectory()) {
                 return collectViews(
-                    `${path}/${file}`,
+                    sysPath.join(path, file),
                     basePath,
                     validExtensions,
                 );
@@ -61,12 +61,11 @@ const collectViews = (
             const name = parts.join(".");
 
             return {
-                name: relativePath(`${path}/${name}`).replace(
-                    basePath.substring(1) + "/",
+                name: relativePath(sysPath.join(path, name)).replace(
+                    basePath.substring(1) + sysPath.sep,
                     "",
                 ),
-                relativePath: relativePath(`${path}/${file}`),
-                uri: vscode.Uri.file(`${path}/${file}`),
+                path: relativePath(sysPath.join(path, file)),
             };
         })
         .flat();

@@ -15,12 +15,6 @@ interface Config {
     line: string | null;
 }
 
-interface ConfigItem {
-    name: string;
-    value: string;
-    uri?: vscode.Uri;
-}
-
 interface CompletionProvider {
     tags(): FeatureTag;
     customCheck?(result: AutocompleteResult, document: string): any;
@@ -35,8 +29,7 @@ interface CompletionProvider {
 
 interface View {
     name: string;
-    relativePath: string;
-    uri: vscode.Uri;
+    path: string;
 }
 
 type FeatureTag = FeatureTagParam | FeatureTagParam[];
