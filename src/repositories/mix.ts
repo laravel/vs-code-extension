@@ -1,6 +1,7 @@
+import { projectPathExists, readFileInProject } from "@src/support/project";
+import * as sysPath from "path";
 import { Uri } from "vscode";
 import { repository } from ".";
-import { projectPathExists, readFileInProject } from "../support/project";
 
 interface MixManifestItem {
     key: string;
@@ -20,9 +21,9 @@ const load = () => {
     } = JSON.parse(readFileInProject(path));
 
     return Object.entries(results).map(([key, value]) => ({
-        key: key.replace(/^\//g, ""),
-        value: value.replace(/^\//g, ""),
-        uri: Uri.file(`public/${value}`),
+        key: key.replace(sysPath.sep, ""),
+        value: value.replace(sysPath.sep, ""),
+        uri: Uri.file(sysPath.join("public", value)),
     }));
 };
 

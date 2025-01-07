@@ -29,8 +29,7 @@ interface CompletionProvider {
 
 interface View {
     name: string;
-    relativePath: string;
-    uri: vscode.Uri;
+    path: string;
 }
 
 type FeatureTag = FeatureTagParam | FeatureTagParam[];

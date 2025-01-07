@@ -5,7 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import * as vscode from "vscode";
 import {
@@ -24,21 +24,27 @@ const toFind: FeatureTag = [
     { method: "app", argumentIndex: 0 },
 ];
 
+const toUrl = (path: string, line: number) => {
+    return vscode.Uri.file(projectPath(path)).with({
+        fragment: `L${line}`,
+    });
+};
+
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
         toFind,
         getAppBindings,
         ({ param }) => {
-            const appBinding = getAppBindings().items[param.value];
+            const binding = getAppBindings().items[param.value];
 
-            if (!appBinding) {
+            if (!binding) {
                 return null;
             }
 
             return new vscode.DocumentLink(
                 detectedRange(param),
-                appBinding.uri,
+                toUrl(binding.path, binding.line),
             );
         },
     );
@@ -59,7 +65,7 @@ export const hoverProvider: HoverProvider = (
             new vscode.MarkdownString(
                 [
                     "`" + binding.class + "`",
-                    `[${relativePath(binding.uri.path)}](${binding.uri})`,
+                    `[${binding.path}](${toUrl(binding.path, binding.line)})`,
                 ].join("\n\n"),
             ),
         );

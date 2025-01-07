@@ -9,9 +9,9 @@ echo collect(app()->getBindings())
 
         return [
             $key => [
-                'uri' => $closureClass->getFileName(),
+                'path' => vsCodeToRelativePath($closureClass->getFileName()),
                 'class' => $closureClass->getName(),
-                'startLine' => $boundTo->getStartLine(),
+                'line' => $boundTo->getStartLine(),
             ],
         ];
     })->toJson();

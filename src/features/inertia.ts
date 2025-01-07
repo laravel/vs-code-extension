@@ -13,7 +13,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath, relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
@@ -68,7 +68,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            return new vscode.DocumentLink(detectedRange(param), view.uri);
+            return new vscode.DocumentLink(
+                detectedRange(param),
+                vscode.Uri.file(projectPath(view.path)),
+            );
         },
     );
 };
@@ -95,7 +98,9 @@ export const hoverProvider: HoverProvider = (
 
             return new vscode.Hover(
                 new vscode.MarkdownString(
-                    `[${relativePath(found.uri.path)}](${found.uri.fsPath})`,
+                    `[${found.path}](${
+                        vscode.Uri.file(projectPath(found.path)).fsPath
+                    })`,
                 ),
             );
         },
@@ -150,7 +155,7 @@ export const codeActionProvider: CodeActionProviderFunction = async (
     let extension = "vue";
 
     for (const item in items) {
-        extension = items[item].uri.path.split(".").pop() ?? "vue";
+        extension = items[item].path.split(".").pop() ?? "vue";
         break;
     }
 
