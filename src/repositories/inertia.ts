@@ -9,8 +9,8 @@ interface ViewItem {
     [key: string]: View;
 }
 
-export let inertiaPagePaths: string[] = [];
-export let inertiaPageExtensions: string[] = [];
+export let inertiaPagePaths: string[] | null = null;
+export let inertiaPageExtensions: string[] | null = null;
 
 const load = (pagePaths: string[], validExtensions: string[]) => {
     inertiaPagePaths = pagePaths;
@@ -88,7 +88,22 @@ export const getInertiaViews = repository<ViewItem>(
                 result?.page_extensions ?? [],
             );
         }),
-    "{,**/}{resources/js/Pages}/{*,**/*}",
+    () =>
+        new Promise((resolve) => {
+            const checkForPagePaths = () => {
+                if (inertiaPagePaths === null) {
+                    return setTimeout(checkForPagePaths, 100);
+                }
+
+                if (inertiaPagePaths.length === 0) {
+                    resolve(null);
+                } else {
+                    resolve(`{${inertiaPagePaths.join(",")}}/{*,**/*}`);
+                }
+            };
+
+            checkForPagePaths();
+        }),
     {},
     ["create", "delete"],
 );
