@@ -19,3 +19,5 @@ esbuild.js
 generatable.json
 php-templates
 checkBinaryVersion
+.env
+.env.example
