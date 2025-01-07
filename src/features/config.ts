@@ -17,7 +17,7 @@ import {
 } from "..";
 
 const toFind: FeatureTag = [
-    { method: "config" },
+    { method: "config", argumentIndex: 0 },
     {
         class: [...facade("Config"), "config"],
         method: [
@@ -50,6 +50,7 @@ const isCorrectIndexForMethod = (
             "array",
             "prepend",
             "push",
+            "config",
             // @ts-ignore
         ].includes(item.methodName ?? "")
     ) {
