@@ -158,7 +158,7 @@ export const codeActionProvider: CodeActionProviderFunction = async (
 
     const extension =
         Object.values(getInertiaViews().items)[0].path.split(".").pop() ??
-        inertiaPageExtensions[0] ??
+        inertiaPageExtensions?.[0] ??
         "vue";
 
     const mapping: Record<string, string> = {
@@ -167,7 +167,7 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         ),
     };
 
-    return inertiaPagePaths.map((path) => {
+    return (inertiaPagePaths ?? []).map((path) => {
         const filepath = sysPath.join(path, `${missingFilename}.${extension}`);
         const uri = vscode.Uri.file(projectPath(filepath));
 
