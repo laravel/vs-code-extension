@@ -1,7 +1,8 @@
+import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { getTemplate, TemplateName } from "../templates";
+import { config, PhpEnvironment } from "./config";
 import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
