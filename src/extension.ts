@@ -134,7 +134,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     vscode.workspace.onDidChangeConfiguration((event) => {
-        if (configAffected(event, "phpCommand", "localPhp")) {
+        if (configAffected(event, "phpCommand", "phpEnvironment")) {
             clearDefaultPhpCommand();
         }
     });

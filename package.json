@@ -70,11 +70,7 @@
         "configuration": {
             "title": "Laravel",
             "properties": {
-                "Laravel.phpCommand": {
-                    "type": "string",
-                    "description": "Template for running PHP code. Use {code} as a placeholder for the code file to run. e.g. `php \"{code}\"`"
-                },
-                "Laravel.localPhp": {
+                "Laravel.phpEnvironment": {
                     "type": "string",
                     "enum": [
                         "auto",
@@ -92,13 +88,17 @@
                     ],
                     "markdownEnumDescriptions": [
                         "Auto detect the local PHP environment.",
-                        "Detect PHP version Herd is using for the project.",
-                        "Valet",
+                        "Auto detect PHP version Herd is using for the project.",
+                        "Auto detect PHP version Valet is using for the project.",
                         "Sail",
-                        "PHP is installed on the local machine."
+                        "Use PHP installed on the local machine."
                     ],
                     "default": "auto",
-                    "description": "Local PHP environment, leave on 'auto' and configure the 'PHP Command' setting to configure a custom local PHP setup."
+                    "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."
+                },
+                "Laravel.phpCommand": {
+                    "type": "string",
+                    "description": "Template for running PHP code. Use {code} as a placeholder for the php file to run. e.g. `php \"{code}\"`"
                 },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",

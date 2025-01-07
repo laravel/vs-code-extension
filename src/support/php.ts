@@ -2,7 +2,6 @@ import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { getTemplate, TemplateName } from "../templates";
-import { config, LocalPhpInstallation } from "./config";
 import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
@@ -26,10 +25,8 @@ const discoverFiles = new Map<string, string>();
 let hasVendor = projectPathExists("vendor/autoload.php");
 const hasBootstrap = projectPathExists("bootstrap/app.php");
 
-let localPhpKey: LocalPhpInstallation | null = null;
-const localPhpInstallationsThatUseRelativePaths: LocalPhpInstallation[] = [
-    "sail",
-];
+let phpEnvKey: PhpEnvironment | null = null;
+const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -83,10 +80,10 @@ export const initVendorWatchers = () => {
 };
 
 const getPhpCommand = (): string => {
-    const localPhp = config<LocalPhpInstallation>("localPhp", "auto");
+    const phpEnv = config<PhpEnvironment>("phpEnvironment", "auto");
 
     const options = new Map<
-        LocalPhpInstallation,
+        PhpEnvironment,
         { check: string | string[]; command: string }
     >();
 
@@ -111,7 +108,7 @@ const getPhpCommand = (): string => {
     });
 
     for (const [key, option] of options.entries()) {
-        if (localPhp !== "auto" && localPhp !== key) {
+        if (phpEnv !== "auto" && phpEnv !== key) {
             continue;
         }
 
@@ -139,7 +136,7 @@ const getPhpCommand = (): string => {
             if (result !== "") {
                 info(`Using ${key} PHP installation: ${result}`);
 
-                localPhpKey = key;
+                phpEnvKey = key;
 
                 return option.command.replace("{binaryPath}", result);
             }
@@ -150,7 +147,7 @@ const getPhpCommand = (): string => {
 
     info("Falling back to system PHP installation");
 
-    localPhpKey = "local";
+    phpEnvKey = "local";
 
     return "php";
 };
@@ -247,7 +244,7 @@ export const runInLaravel = <T>(
 };
 
 const fixFilePath = (path: string) => {
-    if (localPhpInstallationsThatUseRelativePaths.includes(localPhpKey!)) {
+    if (phpEnvsThatUseRelativePaths.includes(phpEnvKey!)) {
         return relativePath(path);
     }
 

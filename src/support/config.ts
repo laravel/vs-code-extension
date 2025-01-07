@@ -3,7 +3,7 @@ import { GeneratedConfigKey } from "./generated-config";
 
 type ConfigKey =
     | GeneratedConfigKey
-    | "localPhp"
+    | "phpEnvironment"
     | "phpCommand"
     | "tests.docker.enabled"
     | "tests.ssh.enabled"
@@ -20,4 +20,4 @@ export const configAffected = (
     ...keys: ConfigKey[]
 ): boolean => keys.some((key) => event.affectsConfiguration(configKey(key)));
 
-export type LocalPhpInstallation = "auto" | "herd" | "valet" | "sail" | "local";
+export type PhpEnvironment = "auto" | "herd" | "valet" | "sail" | "local";
