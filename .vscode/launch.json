@@ -2,9 +2,7 @@
 // Use IntelliSense to learn about possible attributes.
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-// Local Phar: /Users/joetannenbaum/Dev/vs-code/parser-zero/builds/php-parser`;
-// Local Bin: /Users/joetannenbaum/Dev/vs-code/parser-zero/bin/php-parser`;
-// Local Live: /Users/joetannenbaum/Dev/vs-code/parser-zero/php-parser`;
+
 {
     "version": "0.2.0",
     "configurations": [
@@ -20,9 +18,7 @@
                 "${workspaceFolder}/**/*.ts"
             ],
             "preLaunchTask": "${defaultBuildTask}",
-            "env": {
-                "PHP_PARSER_BINARY_PATH": "/Users/joetannenbaum/Dev/vs-code/parser-zero/php-parser"
-            }
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
