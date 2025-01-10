@@ -81,7 +81,7 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             undefined,
             undefined,
             {
-                timeoutInMs: 30_000,
+                timeoutInMs: 60_000,
             },
         );
 
