@@ -81,7 +81,7 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
         );
 
         if (osPlatform !== "win32") {
-            cp.execSync(`chmod +x ${file.fsPath.replace(" ", "\\ ")}`);
+            cp.execSync(`chmod +x "${file.fsPath}"`);
         }
 
         vscode.window.showInformationMessage(
