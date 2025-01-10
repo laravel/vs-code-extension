@@ -107,12 +107,20 @@ $loader = app("translator")->getLoader();
 $namespaces = $loader->namespaces();
 
 $reflection = new ReflectionClass($loader);
-$property = $reflection->hasProperty("paths")
-  ? $reflection->getProperty("paths")
-  : $reflection->getProperty("path");
-$property->setAccessible(true);
+$property = null;
 
-$paths = \Illuminate\Support\Arr::wrap($property->getValue($loader));
+if ($reflection->hasProperty("paths")) {
+    $property = $reflection->getProperty("paths");
+} else if ($reflection->hasProperty("path")) {
+    $property = $reflection->getProperty("path");
+}
+
+if ($property !== null) {
+    $property->setAccessible(true);
+    $paths = \Illuminate\Support\Arr::wrap($property->getValue($loader));
+} else {
+    $paths = [];
+}
 
 $default = collect($paths)->flatMap(
   fn($path) => vscodeCollectTranslations($path)
