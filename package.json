@@ -98,7 +98,7 @@
                 },
                 "Laravel.phpCommand": {
                     "type": "string",
-                    "description": "Template for running PHP code. Use {code} as a placeholder for the php file to run. e.g. `php \"{code}\"`"
+                    "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
                 },
                 "Laravel.basePath": {
                     "type": "string",

@@ -273,12 +273,13 @@ export const runPhp = (
     }
 
     const commandTemplate =
-        config<string>("phpCommand", getDefaultPhpCommand()) ||
-        getDefaultPhpCommand();
+        config<string>("phpCommand", "") || getDefaultPhpCommand();
 
     const hashedFile = getHashedFile(code);
 
-    const command = `${commandTemplate} "${hashedFile}"`;
+    const command = commandTemplate.includes("{code}")
+        ? commandTemplate.replace("{code}", hashedFile)
+        : `${commandTemplate} "${hashedFile}"`;
 
     const out = new Promise<string>(function (resolve, error) {
         cp.exec(
