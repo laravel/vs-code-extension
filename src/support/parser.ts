@@ -78,6 +78,11 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
             vscode.Uri.parse(uri),
             filename,
             context,
+            undefined,
+            undefined,
+            {
+                timeoutInMs: 30_000,
+            },
         );
 
         if (osPlatform !== "win32") {
