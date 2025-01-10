@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { config } from "./config";
 
 let internalVendorExists: boolean | null = null;
 
@@ -28,27 +29,16 @@ const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
-export const projectPath = (srcPath = "", forCode = false): string => {
-    srcPath = srcPath.replace(/\//g, path.sep);
-    srcPath = trimFirstSlash(srcPath);
-
-    let basePath = "";
-    // let basePath = config<string>("basePath", "");
-
-    if (forCode === false && basePath.length > 0) {
-        return resolvePath(basePath, srcPath);
-    }
-
-    let basePathForCode = "";
-    // let basePathForCode = config<string>("basePathForCode", "");
-
-    if (forCode && basePathForCode.length > 0) {
-        return resolvePath(basePathForCode, srcPath);
-    }
+export const projectPath = (srcPath = ""): string => {
+    const basePath = config<string>("basePath", "");
 
     for (let workspaceFolder of getWorkspaceFolders()) {
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, "artisan"))) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
+        if (
+            fs.existsSync(
+                path.join(workspaceFolder.uri.fsPath, basePath, "artisan"),
+            )
+        ) {
+            return path.join(workspaceFolder.uri.fsPath, basePath, srcPath);
         }
     }
 

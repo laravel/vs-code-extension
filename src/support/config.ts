@@ -3,6 +3,7 @@ import { GeneratedConfigKey } from "./generated-config";
 
 type ConfigKey =
     | GeneratedConfigKey
+    | "basePath"
     | "phpEnvironment"
     | "phpCommand"
     | "tests.docker.enabled"
