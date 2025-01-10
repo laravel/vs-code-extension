@@ -8,3 +8,10 @@ if [ "$confirmation" != "y" ]; then
   echo "Please update the binary version in src/support/parser.ts"
   exit 1
 fi
+
+read -p "Did you update the changelog? (y/n)? " confirmation
+
+if [ "$confirmation" != "y" ]; then
+  echo "Maybe update the changelog before publishing."
+  exit 1
+fi
