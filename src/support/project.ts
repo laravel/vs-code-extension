@@ -29,16 +29,20 @@ const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
+export const basePath = (srcPath = ""): string => {
+    return path.join(config<string>("basePath", ""), srcPath);
+};
+
 export const projectPath = (srcPath = ""): string => {
-    const basePath = config<string>("basePath", "");
+    srcPath = basePath(srcPath);
 
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (
             fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath, "artisan"),
+                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
             )
         ) {
-            return path.join(workspaceFolder.uri.fsPath, basePath, srcPath);
+            return path.join(workspaceFolder.uri.fsPath, srcPath);
         }
     }
 
@@ -49,7 +53,10 @@ export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (srcPath.startsWith(workspaceFolder.uri.fsPath)) {
             return trimFirstSlash(
-                srcPath.replace(workspaceFolder.uri.fsPath, ""),
+                srcPath.replace(
+                    path.join(workspaceFolder.uri.fsPath, basePath()),
+                    "",
+                ),
             );
         }
     }
