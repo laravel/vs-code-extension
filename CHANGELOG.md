@@ -2,6 +2,19 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [0.1.17]
+
+### Added
+
+-   Allow configuration of project base path ([#184](https://github.com/laravel/vs-code-extension/pull/184))
+
+### Fixed
+
+-   Fix confusing "PHP Command" setting ([#187](https://github.com/laravel/vs-code-extension/pull/187))
+-   Fix for missing translation "path" property ([#186](https://github.com/laravel/vs-code-extension/pull/186))
+-   Fix binary permissions cross platform ([#183](https://github.com/laravel/vs-code-extension/pull/183))
+-   Increase binary download timeout to 60s ([#182](https://github.com/laravel/vs-code-extension/pull/182))
+
 ## [0.1.16]
 
 ### Added
