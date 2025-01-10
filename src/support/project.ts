@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { config } from "./config";
 
 let internalVendorExists: boolean | null = null;
 
@@ -28,26 +29,19 @@ const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
-export const projectPath = (srcPath = "", forCode = false): string => {
-    srcPath = srcPath.replace(/\//g, path.sep);
-    srcPath = trimFirstSlash(srcPath);
+export const basePath = (srcPath = ""): string => {
+    return path.join(config<string>("basePath", ""), srcPath);
+};
 
-    let basePath = "";
-    // let basePath = config<string>("basePath", "");
-
-    if (forCode === false && basePath.length > 0) {
-        return resolvePath(basePath, srcPath);
-    }
-
-    let basePathForCode = "";
-    // let basePathForCode = config<string>("basePathForCode", "");
-
-    if (forCode && basePathForCode.length > 0) {
-        return resolvePath(basePathForCode, srcPath);
-    }
+export const projectPath = (srcPath = ""): string => {
+    srcPath = basePath(srcPath);
 
     for (let workspaceFolder of getWorkspaceFolders()) {
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, "artisan"))) {
+        if (
+            fs.existsSync(
+                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+            )
+        ) {
             return path.join(workspaceFolder.uri.fsPath, srcPath);
         }
     }
@@ -59,7 +53,10 @@ export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (srcPath.startsWith(workspaceFolder.uri.fsPath)) {
             return trimFirstSlash(
-                srcPath.replace(workspaceFolder.uri.fsPath, ""),
+                srcPath.replace(
+                    path.join(workspaceFolder.uri.fsPath, basePath()),
+                    "",
+                ),
             );
         }
     }

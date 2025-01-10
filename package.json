@@ -100,6 +100,11 @@
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as a placeholder for the php file to run. e.g. `php \"{code}\"`"
                 },
+                "Laravel.basePath": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "_Relative_ base path for the Laravel project. This is used to resolve paths in the project. e.g. src, code/backend\n\n_Requires extension reload after changing._"
+                },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",
                     "default": true,

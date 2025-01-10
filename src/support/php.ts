@@ -211,8 +211,6 @@ export const runInLaravel = <T>(
 
     const command = template("bootstrapLaravel", {
         output: code,
-        vendor_autoload_path: projectPath("vendor/autoload.php", true),
-        bootstrap_path: projectPath("bootstrap/app.php", true),
     });
 
     return runPhp(command, description)
