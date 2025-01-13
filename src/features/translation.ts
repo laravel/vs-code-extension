@@ -36,7 +36,11 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         doc,
         toFind,
         getTranslations,
-        ({ param }) => {
+        ({ param, index }) => {
+            if (index !== 0) {
+                return null;
+            }
+
             const translation =
                 getTranslations().items.translations[param.value];
 
@@ -92,7 +96,11 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getTranslations,
-        ({ param }) => {
+        ({ param, index }) => {
+            if (index !== 0) {
+                return null;
+            }
+
             const item = getTranslations().items.translations[param.value];
 
             if (item) {
