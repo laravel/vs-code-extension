@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getWorkspaceFolders, hasWorkspace } from "./project";
-import { debounce } from "./util";
+import { leadingDebounce } from "./util";
 
 type FileEvent = "change" | "create" | "delete";
 
@@ -22,17 +22,23 @@ export const loadAndWatch = (
 
     load();
 
+    const debounceTime = 1000;
+
     if (patterns instanceof Function) {
         patterns().then((result) => {
             if (result !== null) {
-                createFileWatcher(result, debounce(load, 750), events);
+                createFileWatcher(
+                    result,
+                    leadingDebounce(load, debounceTime),
+                    events,
+                );
             }
         });
 
         return;
     }
 
-    createFileWatcher(patterns, debounce(load, 750), events);
+    createFileWatcher(patterns, leadingDebounce(load, debounceTime), events);
 };
 
 export const createFileWatcher = (

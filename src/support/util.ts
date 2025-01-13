@@ -73,3 +73,26 @@ export const debounce = <T extends (...args: any[]) => any>(
         }, wait);
     } as T;
 };
+
+export const leadingDebounce = <T extends (...args: any[]) => any>(
+    func: T,
+    wait: number,
+): T => {
+    let timeout: NodeJS.Timeout;
+    let lastInvocation = 0;
+
+    return function (this: any, ...args: any[]) {
+        clearTimeout(timeout);
+
+        if (lastInvocation < Date.now() - wait) {
+            // It's been a while since the last invocation, just call the function, no need to wait
+            func.apply(this, args);
+        } else {
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, wait);
+        }
+
+        lastInvocation = Date.now();
+    } as T;
+};
