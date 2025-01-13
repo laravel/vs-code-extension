@@ -23,6 +23,10 @@ class VsCodeLaravel extends \Illuminate\Support\ServiceProvider
 
 function vsCodeToRelativePath($path)
 {
+    if (!str_contains($path, base_path())) {
+        return (string) $path;
+    }
+
     return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
 }
 

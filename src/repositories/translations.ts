@@ -12,16 +12,22 @@ export interface TranslationItem {
 }
 
 interface TranslationGroupResult {
-    [key: string]: TranslationItem;
+    default: string;
+    translations: {
+        [key: string]: TranslationItem;
+    };
 }
 
 interface TranslationGroupPhpResult {
-    [key: string]: {
+    default: string;
+    translations: {
         [key: string]: {
-            v: string;
-            p: string;
-            li: number;
-            pa: string[];
+            [key: string]: {
+                v: string;
+                p: string;
+                li: number;
+                pa: string[];
+            };
         };
     };
 }
@@ -31,26 +37,34 @@ const load = () => {
         template("translations"),
         "Translation namespaces",
     ).then((res) => {
-        const result: TranslationGroupResult = {};
+        const result: TranslationGroupResult["translations"] = {};
 
-        Object.entries(res).forEach(([namespace, translations]) => {
-            result[namespace] = {};
-            Object.entries(translations).forEach(([key, value]) => {
-                result[namespace][key] = {
-                    value: value.v,
-                    path: projectPath(value.p),
-                    line: value.li,
-                    params: value.pa,
-                };
-            });
-        });
+        Object.entries(res.translations).forEach(
+            ([namespace, translations]) => {
+                result[namespace] = {};
+                Object.entries(translations).forEach(([key, value]) => {
+                    result[namespace][key] = {
+                        value: value.v,
+                        path: projectPath(value.p),
+                        line: value.li,
+                        params: value.pa,
+                    };
+                });
+            },
+        );
 
-        return result;
+        return {
+            default: res.default,
+            translations: result,
+        };
     });
 };
 
 export const getTranslations = repository<TranslationGroupResult>(
     load,
     "{,**/}{lang,localization,localizations,trans,translation,translations}/{*,**/*}",
-    {},
+    {
+        default: "",
+        translations: {},
+    },
 );
