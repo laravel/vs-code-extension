@@ -26,7 +26,9 @@ const toFind: FeatureTag = [
 ];
 
 const getDefault = (translation: TranslationItem) => {
-    return translation.default ?? translation[Object.keys(translation)[0]];
+    const langDefault = getTranslations().items.default;
+
+    return translation[langDefault] ?? translation[Object.keys(translation)[0]];
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -35,7 +37,8 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         toFind,
         getTranslations,
         ({ param }) => {
-            const translation = getTranslations().items[param.value];
+            const translation =
+                getTranslations().items.translations[param.value];
 
             if (!translation) {
                 return null;
@@ -58,7 +61,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslations().items[match];
+        const item = getTranslations().items.translations[match];
 
         if (!item) {
             return null;
@@ -90,7 +93,7 @@ export const diagnosticProvider = (
         toFind,
         getTranslations,
         ({ param }) => {
-            const item = getTranslations().items[param.value];
+            const item = getTranslations().items.translations[param.value];
 
             if (item) {
                 return null;
@@ -123,10 +126,10 @@ export const completionProvider = {
         }
 
         const totalTranslationItems = Object.entries(
-            getTranslations().items,
+            getTranslations().items.translations,
         ).length;
 
-        return Object.entries(getTranslations().items).map(
+        return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
                     key,
@@ -163,7 +166,7 @@ export const completionProvider = {
         }
 
         // Parameters autocomplete
-        return Object.entries(getTranslations().items)
+        return Object.entries(getTranslations().items.translations)
             .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
                 return getDefault(value)
