@@ -116,6 +116,7 @@ function vsCodeTranslationValue($key, $value, $file, $lines): ?array
 
     return [
         "v" => $value,
+        "f" => $currentKey === null,
         "p" => $file,
         "li" => $lineNumber,
         "pa" => preg_match_all("/\\:([A-Za-z0-9_]+)/", $value, $matches)
@@ -177,6 +178,7 @@ foreach ($default->merge($namespaced) as $value) {
                     $final[$dotKey] = [];
                 }
 
+                $foundFullKey = \\Illuminate\\Support\\Arr::pull($v, "f");
                 $final[$dotKey][$val["la"]] = $v;
             }
         }
@@ -184,7 +186,14 @@ foreach ($default->merge($namespaced) as $value) {
         foreach ($value["vs"] as $key => $v) {
             $dotKey = "{$value["k"]}.{$key}";
             $final[$dotKey] ??= [];
-            $final[$dotKey][$value["la"]] ??= $v;
+
+            $foundFullKey = \\Illuminate\\Support\\Arr::pull($v, "f");
+
+            if ($foundFullKey) {
+              $final[$dotKey][$value["la"]] = $v;
+            } else {
+              $final[$dotKey][$value["la"]] ??= $v;
+            }
         }
     }
 }
