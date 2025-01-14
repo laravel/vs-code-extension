@@ -10,6 +10,7 @@ All notable changes to the Laravel extension will be documented in this file.
 -   App Bindings: Make sure reflected class is not null ([#198](https://github.com/laravel/vs-code-extension/pull/198))
 -   ScopedPropertyAccessExpressionParser improvements ([#8](https://github.com/laravel/vs-code-php-parser-cli/pull/8))
 -   Check `isAutoCompleting` before firing it ([#7](https://github.com/laravel/vs-code-php-parser-cli/pull/7))
+-   Make sure `ClosureThis` is not null before we use it in `auth` mini script ([#200](https://github.com/laravel/vs-code-extension/pull/200))
 
 ## [0.1.17]
 
