@@ -7,6 +7,10 @@ echo collect(app()->getBindings())
 
         $closureClass = $boundTo->getClosureScopeClass();
 
+        if ($closureClass === null) {
+            return [];
+        }
+
         return [
             $key => [
                 'path' => vsCodeToRelativePath($closureClass->getFileName()),
