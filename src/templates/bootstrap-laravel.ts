@@ -15,9 +15,13 @@ class VsCodeLaravel extends \\Illuminate\\Support\\ServiceProvider
 
     public function boot()
     {
-        if (method_exists($this->app['log'], 'setHandlers')) {
-            $this->app['log']->setHandlers([new \\Monolog\\Handler\\ProcessHandler()]);
-        }
+        config([
+            'logging.channels.null' => [
+                'driver' => 'monolog',
+                'handler' => \\Monolog\\Handler\\NullHandler::class,
+            ],
+            'logging.default' => 'null',
+        ]);
     }
 }
 
