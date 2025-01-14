@@ -3,18 +3,21 @@ export default `
 echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
     ->map(function ($policy, $key) {
         $reflection = new \\ReflectionFunction($policy);
-
         $policyClass = null;
+        $closureThis = $reflection->getClosureThis();
 
-        if (get_class($reflection->getClosureThis()) === \\Illuminate\\Auth\\Access\\Gate::class) {
-            $vars = $reflection->getClosureUsedVariables();
+        if ($closureThis !== null) {
+            if (get_class($closureThis) === \\Illuminate\\Auth\\Access\\Gate::class) {
+                $vars = $reflection->getClosureUsedVariables();
 
-            if (isset($vars['callback'])) {
-                [$policyClass, $method] = explode('@', $vars['callback']);
+                if (isset($vars['callback'])) {
+                    [$policyClass, $method] = explode('@', $vars['callback']);
 
-                $reflection = new \\ReflectionMethod($policyClass, $method);
+                    $reflection = new \\ReflectionMethod($policyClass, $method);
+                }
             }
         }
+
         return [
             'key' => $key,
             'uri' => $reflection->getFileName(),
