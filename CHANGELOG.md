@@ -2,6 +2,15 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+-   Null logger for mini PHP scripts ([#199](https://github.com/laravel/vs-code-extension/pull/199))
+-   App Bindings: Make sure reflected class is not null ([#198](https://github.com/laravel/vs-code-extension/pull/198))
+-   ScopedPropertyAccessExpressionParser improvements ([#8](https://github.com/laravel/vs-code-php-parser-cli/pull/8))
+-   Check `isAutoCompleting` before firing it ([#7](https://github.com/laravel/vs-code-php-parser-cli/pull/7))
+
 ## [0.1.17]
 
 ### Added
