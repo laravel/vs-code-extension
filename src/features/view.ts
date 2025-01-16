@@ -139,6 +139,11 @@ export const diagnosticProvider = (
                 return null;
             }
 
+            // @ts-ignore
+            if (["@section", "@push"].includes(item.methodName)) {
+                return null;
+            }
+
             const view = getViews().items.find(
                 (view) => view.key === param.value,
             );

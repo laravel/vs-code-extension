@@ -125,6 +125,7 @@ const cleanArg = (arg: string): string => {
     }
 
     replacements.push([/\"/g, '\\"']);
+    replacements.push([/\`/g, "\\`"]);
 
     replacements.forEach((replacement) => {
         arg = arg.replace(replacement[0], replacement[1]);
