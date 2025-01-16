@@ -4,6 +4,10 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
+-   Nothing yet
+
+## [0.1.18]
+
 ### Fixed
 
 -   Null logger for mini PHP scripts ([#199](https://github.com/laravel/vs-code-extension/pull/199))
