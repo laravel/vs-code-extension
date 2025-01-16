@@ -12,6 +12,7 @@ All notable changes to the Laravel extension will be documented in this file.
 -   Check `isAutoCompleting` before firing it ([#7](https://github.com/laravel/vs-code-php-parser-cli/pull/7))
 -   Make sure `ClosureThis` is not null before we use it in `auth` mini script ([#200](https://github.com/laravel/vs-code-extension/pull/200))
 -   Handle string concatenation parsing ([#9](https://github.com/laravel/vs-code-php-parser-cli/pull/9))
+-   Improved Blade autocomplete, linking, hovering, and diagnostics for echo statements ([#10](https://github.com/laravel/vs-code-php-parser-cli/pull/10), [#205](https://github.com/laravel/vs-code-extension/pull/205))
 
 ## [0.1.17]
 
