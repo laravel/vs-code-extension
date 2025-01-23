@@ -10,6 +10,10 @@ Below you'll find a list of features as well as a roadmap with features we will 
 -   When you first install the extension it will download a small binary to your machine, we use this binary for PHP parsing
 -   This extension is intended to provide Laravel-specific intelligence, not general PHP intelligence. If you are currently using an extension for general PHP intelligence, it is recommended to continue using that in conjunction with this extension.
 
+## Supported Versions
+
+The extension supports all Laravel versions currently listed under the [Support Policy](https://laravel.com/docs/releases#support-policy) and requires PHP >= 8.0 to run.
+
 ## Features
 
 A non-exhaustive list of features covered in the extension:
