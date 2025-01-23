@@ -230,7 +230,17 @@ export const runInLaravel = <T>(
             const out = regex.exec(result);
 
             if (out && out[1]) {
-                return asJson ? JSON.parse(out[1]) : out[1];
+                if (!asJson) {
+                    return out[1];
+                }
+
+                const data = JSON.parse(out[1]);
+
+                if (data[toTemplateVar("error")]) {
+                    throw new Error(data[toTemplateVar("error")]);
+                }
+
+                return data;
             }
 
             throw new Error(result);
@@ -239,6 +249,12 @@ export const runInLaravel = <T>(
             if (e.toString().includes("ParseError")) {
                 // If we it's a parse error let's not show the popup,
                 // probably just a momentary syntax error
+                error(e);
+                return;
+            }
+
+            if (e.toString().includes("autoload_real")) {
+                // Probably a momentary error as they composer install or update
                 error(e);
                 return;
             }

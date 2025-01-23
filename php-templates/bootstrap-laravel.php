@@ -4,8 +4,21 @@ error_reporting(E_ERROR | E_PARSE);
 
 define('LARAVEL_START', microtime(true));
 
-require_once __DIR__ . '/../autoload.php';
-$app = require_once __DIR__ . '/../../bootstrap/app.php';
+define('__VSCODE_LARAVEL_START_OUTPUT__', '__VSCODE_LARAVEL_START_OUTPUT__');
+define('__VSCODE_LARAVEL_END_OUTPUT__', '__VSCODE_LARAVEL_END_OUTPUT__');
+define('__VSCODE_LARAVEL_ERROR__', '__VSCODE_LARAVEL_ERROR__');
+
+try {
+    require_once __DIR__ . '/../autoload.php';
+    $app = require_once __DIR__ . '/../../bootstrap/app.php';
+} catch (Throwable $e) {
+    echo __VSCODE_LARAVEL_START_OUTPUT__;
+    echo json_encode([
+        __VSCODE_LARAVEL_ERROR__ => $e->getMessage(),
+    ]);
+    echo __VSCODE_LARAVEL_END_OUTPUT__;
+    exit(1);
+}
 
 class VsCodeLaravel extends \Illuminate\Support\ServiceProvider
 {
@@ -38,8 +51,8 @@ $app->register(new VsCodeLaravel($app));
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-echo '__VSCODE_LARAVEL_START_OUTPUT__';
+echo __VSCODE_LARAVEL_START_OUTPUT__;
 __VSCODE_LARAVEL_OUTPUT__;
-echo '__VSCODE_LARAVEL_END_OUTPUT__';
+echo __VSCODE_LARAVEL_END_OUTPUT__;
 
 exit(0);
