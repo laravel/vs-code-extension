@@ -4,7 +4,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
--   Nothing yet
+-   Added optional test func to PHP auto detection ([#219](https://github.com/laravel/vs-code-extension/pull/219))
 
 ## [0.1.18]
 
