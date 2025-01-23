@@ -85,12 +85,17 @@ const getPhpCommand = (): string => {
 
     const options = new Map<
         PhpEnvironment,
-        { check: string | string[]; command: string }
+        {
+            check: string | string[];
+            command: string;
+            test?: (output: string) => boolean;
+        }
     >();
 
     options.set("herd", {
         check: "herd which-php",
         command: `"{binaryPath}"`,
+        test: (output) => !output.includes("No usable PHP version found"),
     });
 
     options.set("valet", {
@@ -134,7 +139,7 @@ const getPhpCommand = (): string => {
                 check = checks.shift();
             }
 
-            if (result !== "") {
+            if (result !== "" && (!option.test || option.test(result))) {
                 info(`Using ${key} PHP installation: ${result}`);
 
                 phpEnvKey = key;
