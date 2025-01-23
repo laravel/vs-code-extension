@@ -5,6 +5,7 @@ All notable changes to the Laravel extension will be documented in this file.
 ## [Unreleased]
 
 -   Added optional test func to PHP auto detection ([#219](https://github.com/laravel/vs-code-extension/pull/219))
+-   Use 2MB buffer instead of 1MB ([#211](https://github.com/laravel/vs-code-extension/pull/211))
 
 ## [0.1.18]
 
