@@ -272,6 +272,7 @@ const getHashedFile = (code: string) => {
 export const runPhp = (
     code: string,
     description: string | null = null,
+    maxBuffer: number = 1024 * 1024 * 2, // 2MB default buffer size
 ): Promise<string> => {
     if (!code.startsWith("<?php")) {
         code = "<?php\n\n" + code;
@@ -291,9 +292,22 @@ export const runPhp = (
             command,
             {
                 cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+                maxBuffer,
             },
             (err, stdout, stderr) => {
-                if (err === null) {
+                // Check if the error is specifically a buffer error
+                if (
+                    err &&
+                    (err as any).code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER"
+                ) {
+                    // If we have stdout despite the buffer error, we can still use it
+                    if (stdout && stdout.length > 0) {
+                        return resolve(stdout);
+                    }
+                }
+
+                // Handle normal execution results
+                if (!err || (stdout && !stderr)) {
                     return resolve(stdout);
                 }
 
