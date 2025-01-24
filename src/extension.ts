@@ -16,6 +16,7 @@ import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
+import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
@@ -146,6 +147,8 @@ export function deactivate() {
     if (os.platform() === "win32") {
         cleanUpTemp();
     }
+
+    disposeWatchers();
 
     if (client) {
         client.stop();

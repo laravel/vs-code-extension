@@ -4,6 +4,8 @@ import { leadingDebounce } from "./util";
 
 type FileEvent = "change" | "create" | "delete";
 
+let watchers: vscode.FileSystemWatcher[] = [];
+
 export type WatcherPattern =
     | string
     | string[]
@@ -72,6 +74,17 @@ export const createFileWatcher = (
             watcher.onDidDelete(callback);
         }
 
+        registerWatcher(watcher);
+
         return watcher;
     });
+};
+
+export const registerWatcher = (watcher: vscode.FileSystemWatcher) => {
+    watchers.push(watcher);
+};
+
+export const disposeWatchers = () => {
+    watchers.forEach((watcher) => watcher.dispose());
+    watchers = [];
 };
