@@ -17,9 +17,47 @@ function vsCodeGetJsonTranslationsFromFile($lang, $key, $value, $file, $lines)
             ->filter()
     ];
 }
+function validateFile($file){
+    if (pathinfo($file, PATHINFO_EXTENSION) === 'json'){ 
+        try{
+           $decoded = json_decode(file_get_contents($file)); 
+            if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON');
+            }
+        }catch(Exception $e){
+            echo 'Translation Files: Invalid JSON translation file at: '.$file;
+            exit(0);
+        }
+     
+    }
+    if (pathinfo($file, PATHINFO_EXTENSION) === 'php'){
+        try{
+            $content = file_get_contents($file);
+            $parseResult =shell_exec('php -l '.$file);
+           
+            if(str_contains($parseResult,'No syntax errors detected') === false){
+                throw new Exception('Parse Error');
+            }
+            if(str_contains($content,'<?php') === false){
+                throw new Exception('<?php not included');
+            }
+            
+            $content = str_replace('<?php','',$content);
+            $content =  str_replace('?>','',$content);
 
+            eval($content);
+
+        }catch(Exception $e){
+    
+            echo 'Translation Files: Invalid PHP translation file at: '.$file;
+            
+            exit(0);
+        }
+    }
+}
 function vsCodeGetTranslationsFromFile($file, $path, $namespace)
 {
+    validateFile($file);
     $fileLines = \Illuminate\Support\Facades\File::lines($file);
     $lines = [];
     $inComment = false;
@@ -201,4 +239,5 @@ foreach ($default->merge($namespaced) as $value) {
 echo json_encode([
     'default' => \Illuminate\Support\Facades\App::currentLocale(),
     'translations' => $final,
+    'error'=> null
 ]);

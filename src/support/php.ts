@@ -230,7 +230,14 @@ export const runInLaravel = <T>(
 
             throw new Error(result);
         })
-        .catch((e) => {
+        .catch((e) => { 
+            if(e.toString().includes('Translation Files: Invalid')){
+                error(e.toString().replace(toTemplateVar("start_output"),''));
+                return {
+                    default:"",
+                    translations:{}
+                };
+            }
             if (e.toString().includes("ParseError")) {
                 // If we it's a parse error let's not show the popup,
                 // probably just a momentary syntax error
