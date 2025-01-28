@@ -238,7 +238,6 @@ foreach ($default->merge($namespaced) as $value) {
 
 echo json_encode([
     'default' => \\Illuminate\\Support\\Facades\\App::currentLocale(),
-    'translations' => $final,
-    'error'=> null
+    'translations' => $final
 ]);
 `;
