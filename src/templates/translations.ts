@@ -24,7 +24,7 @@ function validateFile($file){
             if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception('Invalid JSON');
             }
-        }catch(Exception $e){
+        }catch(Throwable $e){
             echo 'Translation Files: Invalid JSON translation file at: '.$file;
             exit(0);
         }
@@ -33,11 +33,6 @@ function validateFile($file){
     if (pathinfo($file, PATHINFO_EXTENSION) === 'php'){
         try{
             $content = file_get_contents($file);
-            $parseResult =shell_exec('php -l '.$file);
-           
-            if(str_contains($parseResult,'No syntax errors detected') === false){
-                throw new Exception('Parse Error');
-            }
             if(str_contains($content,'<?php') === false){
                 throw new Exception('<?php not included');
             }
@@ -45,12 +40,12 @@ function validateFile($file){
             $content = str_replace('<?php','',$content);
             $content =  str_replace('?>','',$content);
 
-            eval($content);
-
-        }catch(Exception $e){
-    
+            $result = eval($content);
+            if(is_array($result) === false){
+                throw new Exception('return type is not an array');
+            }
+        }catch(Throwable $e){
             echo 'Translation Files: Invalid PHP translation file at: '.$file;
-            
             exit(0);
         }
     }
