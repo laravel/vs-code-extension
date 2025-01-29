@@ -6,7 +6,7 @@ foreach ($templates as $template) {
     $content = file_get_contents($template);
 
     $content = str_replace('\\', '\\\\', $content);
-    $content = str_replace('<?php', '', $content);
+    $content = substr_replace($content, '', strpos($content,'<?php'), strlen('<?php'));
     $content = implode("\n", [
         "// This file was generated from {$template}, do not edit directly",
         'export default `',
