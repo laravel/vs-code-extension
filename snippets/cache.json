@@ -1,0 +1,105 @@
+{
+    "Cache-add.sublime-snippet": {
+        "prefix": "Cache::add",
+        "body": [
+            "Cache::add('${1:key}', ${2:\\$value}, ${3:\\$ttl});$4"
+        ],
+        "description": "Store an item in the Cache if it doesn't exist."
+    },
+    "Cache-decrement.sublime-snippet": {
+        "prefix": "Cache::decrement",
+        "body": [
+            "Cache::decrement('${1:key}', ${2:\\$amount});$3"
+        ],
+        "description": "Decrement a Cached value"
+    },
+    "Cache-flush.sublime-snippet": {
+        "prefix": "Cache::flush",
+        "body": [
+            "Cache::flush();"
+        ],
+        "description": "Remove all items from the cache."
+    },
+    "Cache-forever.sublime-snippet": {
+        "prefix": "Cache::forever",
+        "body": [
+            "Cache::forever('${1:key}', ${2:\\$value});$3"
+        ],
+        "description": "Store an item in the Cache Permanently"
+    },
+    "Cache-forget.sublime-snippet": {
+        "prefix": "Cache::forget",
+        "body": [
+            "Cache::forget('${1:key}');$2"
+        ],
+        "description": "Remove an Item from the Cache"
+    },
+    "Cache-get.sublime-snippet": {
+        "prefix": "Cache::get",
+        "body": [
+            "Cache::get('${1:key}', '${2:default}');$3"
+        ],
+        "description": "Retrieve an Item from the Cache"
+    },
+    "Cache-has.sublime-snippet": {
+        "prefix": "Cache::has",
+        "body": [
+            "Cache::has('${1:key}')$2"
+        ],
+        "description": "Check for existence in Cache"
+    },
+    "Cache-increment.sublime-snippet": {
+        "prefix": "Cache::increment",
+        "body": [
+            "Cache::increment('${1:key}', ${2:\\$amount});$3"
+        ],
+        "description": "Increment a Cached value"
+    },
+    "Cache-pull.sublime-snippet": {
+        "prefix": "Cache::pull",
+        "body": [
+            "Cache::pull('${1:key}');$2"
+        ],
+        "description": "Pulling An Item From The Cache"
+    },
+    "Cache-put.sublime-snippet": {
+        "prefix": "Cache::put",
+        "body": [
+            "Cache::put('${1:key}', ${2:\\$value}, ${3:\\$ttl});$4"
+        ],
+        "description": "Store an item in the Cache (key, value, ttl)"
+    },
+    "Cache-remember.sublime-snippet": {
+        "prefix": "Cache::remember",
+        "body": [
+            "Cache::remember('${1:key}', ${2:\\$ttl}, function () {",
+            "    $3",
+            "});"
+        ],
+        "description": "Retrieve item or Store a default value if it doesn't exist"
+    },
+    "Cache-rememberForever.sublime-snippet": {
+        "prefix": "Cache::rememberForever",
+        "body": [
+            "Cache::rememberForever('${1:key}', function () {",
+            "    $2",
+            "});"
+        ],
+        "description": "Retrieve item or Store a default value permanently"
+    },
+    "Cache-lock-get": {
+        "prefix": "Cache::lock-get",
+        "body": "Cache::lock('${1:lock-name}', ${2:60})->get()",
+        "description": "obtaining arbitrary locks"
+    },
+    "Cache-lock-release": {
+        "prefix": "Cache::lock-release",
+        "body": "Cache::lock('${1:lock-name}')->release()",
+        "description": "release locks"
+    },
+    "Cache-lock-block": {
+        "prefix": "Cache::lock-block",
+        "body": "Cache::lock('${1:lock-name}', ${2:60})->block(${3:10})",
+        "description": "block until the lock becomes available"
+    }
+}

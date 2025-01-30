@@ -1,0 +1,371 @@
+{
+  "Laravel Model: Database Connection": {
+    "prefix": "Model::con",
+    "body": [
+      "/**",
+      " * The connection name for the model.",
+      " *",
+      " * @var string|null",
+      " */",
+      "protected \\$connection = '$0';"
+    ],
+    "description": "Database Connection: The connection name for the model."
+  },
+  "Laravel Model: Table": {
+    "prefix": "Model::t",
+    "body": [
+      "/**",
+      " * The table associated with the model.",
+      " *",
+      " * @var string",
+      " */",
+      "protected \\$table = '$0';"
+    ],
+    "description": "Protected Table: The table associated with the model."
+  },
+  "Laravel Model: Primary Key": {
+    "prefix": "Model::pk",
+    "body": [
+      "/**",
+      " * The primary key for the model.",
+      " *",
+      " * @var string",
+      " */",
+      "protected \\$primaryKey = '${1:id}';"
+    ],
+    "description": "Primary Key: The primary key for the model."
+  },
+  "Laravel Model: KeyType": {
+    "prefix": "Model::kt",
+    "body": [
+      "/**",
+      " * The \"type\" of the primary key ID.",
+      " *",
+      " * @var string",
+      " */",
+      "protected \\$keyType = '${1:int}';"
+    ],
+    "description": "KeyType: The \"type\" of the primary key ID."
+  },
+  "Laravel Model: Incrementing": {
+    "prefix": "Model::i",
+    "body": [
+      "/**",
+      " * Indicates if the IDs are auto-incrementing.",
+      " *",
+      " * @var bool",
+      " */",
+      "public \\$incrementing = ${1:true};"
+    ],
+    "description": "Incrementing: Indicates if the IDs are auto-incrementing."
+  },
+  "Laravel Model: Timestamps": {
+    "prefix": "Model::ts",
+    "body": [
+      "/**",
+      " * Indicates if the model should be timestamped.",
+      " *",
+      " * @var bool",
+      " */",
+      "public \\$timestamps = ${1:true};"
+    ],
+    "description": "Timestamps: Indicates if the model should be timestamped."
+  },
+  "Laravel Model: Date Format": {
+    "prefix": "Model::df",
+    "body": [
+      "/**",
+      " * The storage format of the model's date columns.",
+      " *",
+      " * @var string",
+      " */",
+      "protected \\$dateFormat = '$0';"
+    ],
+    "description": "Date Format: The storage format of the model's date columns."
+  },
+  "Laravel Model: Attribute Casting": {
+    "prefix": "Model::c",
+    "body": [
+      "/**",
+      " * The attributes that should be cast.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$casts = [",
+      "\t'$1' => '${0:type}',",
+      "];"
+    ],
+    "description": "Attribute Casting: The attributes that should be cast."
+  },
+  "Laravel Model: Mass Assignment (Fillable) ": {
+    "prefix": "Model::f",
+    "body": [
+      "/**",
+      " * The attributes that are mass assignable.",
+      " *",
+      " * @var array<string>",
+      " */",
+      "protected \\$fillable = ['$0'];"
+    ],
+    "description": "Mass Assignment (Fillable): The attributes that are mass assignable."
+  },
+  "Laravel Model: Guard Attributes": {
+    "prefix": "Model::g",
+    "body": [
+      "/**",
+      " * The attributes that aren't mass assignable.",
+      " *",
+      " * @var array<string>",
+      " */",
+      "protected \\$guarded = ['${1:*}'];"
+    ],
+    "description": "Guard Attributes: The attributes that aren't mass assignable."
+  },
+  "Laravel Model: Dates": {
+    "prefix": "Model::d",
+    "body": [
+      "/**",
+      " * The attributes that should be mutated to dates.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$dates = ['created_at', 'updated_at', '${0:deleted_at}'];"
+    ],
+    "description": "Dates: The attributes that should be mutated to dates."
+  },
+  "Laravel Model: Boot": {
+    "prefix": "Model::b",
+    "body": [
+      "/**",
+      " * The \"booting\" method of the model.",
+      " *",
+      " * @return void",
+      " */",
+      "protected static function boot()",
+      "{",
+      "\tparent::boot();",
+      "\t",
+      "\t$0",
+      "}"
+    ],
+    "description": "Boot: The \"booting\" method of the model."
+  },
+  "Laravel Model: Local Scope": {
+    "prefix": "Model::s",
+    "body": [
+      "/**",
+      " * Scope a query to only include $1",
+      " *",
+      " * @param  \\Illuminate\\Database\\Eloquent\\Builder \\$query",
+      " * @return \\Illuminate\\Database\\Eloquent\\Builder",
+      " */",
+      "public function scope$2(\\$query)",
+      "{",
+      "\treturn \\$query->where('$3'$0);",
+      "}"
+    ],
+    "description": "Local Scope: Query a local scope within your model."
+  },
+  "Laravel Model: Hidden": {
+    "prefix": "Model::h",
+    "body": [
+      "/**",
+      " * The attributes that should be hidden for arrays.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$hidden = ['$0'];"
+    ],
+    "description": "Hidden: The attributes that should be hidden for arrays."
+  },
+  "Laravel Model: Visible": {
+    "prefix": "Model::v",
+    "body": [
+      "/**",
+      " * The attributes that should be visible in arrays.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$visible = ['$0'];"
+    ],
+    "description": "Visible: The attributes that should be visible in arrays."
+  },
+  "Laravel Model: Appends": {
+    "prefix": "Model::ap",
+    "body": [
+      "/**",
+      " * The accessors to append to the model's array form.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$appends = ['$0'];"
+    ],
+    "description": "Appends: The accessors to append to the model's array form."
+  },
+  "Laravel Model: Touches": {
+    "prefix": "Model::tc",
+    "body": [
+      "/**",
+      " * The relationships that should be touched on save.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$touches = [$0];"
+    ],
+    "description": "Touches: The relationships that should be touched on save."
+  },
+  "Laravel Model: PerPage": {
+    "prefix": "Model::pp",
+    "body": [
+      "/**",
+      " * The number of models to return for pagination.",
+      " *",
+      " * @var int",
+      " */",
+      "protected \\$perPage = $0;"
+    ],
+    "description": "PerPage: The number of models to return for pagination."
+  },
+  "Laravel Model: Created At": {
+    "prefix": "Model::cat",
+    "body": [
+      "/**",
+      " * The name of the \"created at\" column.",
+      " *",
+      " * @var string|null",
+      " */",
+      "const CREATED_AT = '${1:created_at}';$0"
+    ],
+    "description": "Created At: The name of the \"created at\" column."
+  },
+  "Laravel Model: Updated At": {
+    "prefix": "Model::uat",
+    "body": [
+      "/**",
+      " * The name of the \"updated at\" column.",
+      " *",
+      " * @var string|null",
+      " */",
+      "const UPDATED_AT = '${1:updated_at}';$0"
+    ],
+    "description": "Updated At: The name of the \"updated at\" column."
+  },
+  "Laravel Model: Deleted At": {
+    "prefix": "Model::dat",
+    "body": [
+      "/**",
+      " * The name of the \"deleted at\" column.",
+      " *",
+      " * @var string",
+      " */",
+      "const DELETED_AT = '${1:deleted_at}';$0"
+    ],
+    "description": "Deleted At: The name of the \"deleted at\" column."
+  },
+  "Laravel Model: Dispatches Events": {
+    "prefix": "Model::de",
+    "body": [
+      "/**",
+      " * The event map for the model.",
+      " *",
+      " * @var array",
+      " */",
+      "protected \\$dispatchesEvents = [",
+      "\t'$1' => $2,",
+      "];"
+    ],
+    "description": "Dispatches Events: The event map for the model."
+  },
+  "Laravel Model: Accessor": {
+    "prefix": "Model::ac",
+    "body": [
+      "/**",
+      " * Get the $1",
+      " *",
+      " * @param  string  \\$value",
+      " * @return ${4:string}",
+      " */",
+      "public function get$2Attribute(\\$value)",
+      "{",
+      "\treturn ${3:\\$value};",
+      "}"
+    ],
+    "description": "Accessors: Define an accessor for the model."
+  },
+  "Laravel Model: Mutator": {
+    "prefix": "Model::mu",
+    "body": [
+      "/**",
+      " * Set the $1",
+      " *",
+      " * @param  string  \\$value",
+      " * @return ${5:void}",
+      " */",
+      "public function set$2Attribute(\\$value)",
+      "{",
+      "\treturn \\$this->attributes['$3'] = ${4:\\$value};",
+      "}"
+    ],
+    "description": "Mutators: Define a mutator for the model."
+  },
+  "Laravel Model: Attribute": {
+    "prefix": "Model::att",
+    "body": [
+      "/**",
+      " * Interact with the $1 attribute.",
+      " *",
+      " * @return \\Illuminate\\Database\\Eloquent\\Casts\\Attribute",
+      " */",
+      "public function $1(): Attribute",
+      "{",
+      "\treturn Attribute::make(",
+      "\t\tget: fn ($2 \\$value) => $3,",
+      "\t\tset: fn ($2 \\$value) => $4,",
+      "\t);",
+      "}"
+    ],
+    "description": "Attribute: Define a attribute method for the model."
+  },
+  "Laravel Model: Get attribute": {
+    "prefix": "Model::gatt",
+    "body": [
+      "/**",
+      " * Interact with the $1 attribute.",
+      " *",
+      " * @return \\Illuminate\\Database\\Eloquent\\Casts\\Attribute",
+      " */",
+      "public function $1(): Attribute",
+      "{",
+      "\treturn Attribute::get(fn ($2 \\$value) => $3);",
+      "}"
+    ],
+    "description": "Attribute: Define a get attribute method for the model."
+  },
+  "Laravel Model: Set attribute": {
+    "prefix": "Model::satt",
+    "body": [
+      "/**",
+      " * Interact with the $1 attribute.",
+      " *",
+      " * @return \\Illuminate\\Database\\Eloquent\\Casts\\Attribute",
+      " */",
+      "public function $1(): Attribute",
+      "{",
+      "\treturn Attribute::set(fn ($2 \\$value) => $3);",
+      "}"
+    ],
+    "description": "Attribute: Define a set attribute method for the model."
+  },
+  "Laravel Model: Prevents lazy loading": {
+    "prefix": "Model::pll",
+    "body": [
+      "/**",
+      " * Indicates whether lazy loading will be prevented on this model..",
+      " *",
+      " * @var bool",
+      " */",
+      "protected \\$preventsLazyLoading = $0;"
+    ],
+    "description": "Prevents lazy loading: Indicates whether lazy loading will be prevented on this model.."
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "Crypt-decrypt.sublime-snippet": {
+        "prefix": "Crypt::decrypt",
+        "body": [
+            "try {",
+            "    ${1:\\$decrypted} = Crypt::decrypt(${2:\\$encryptedValue});",
+            "} catch (Illuminate\\Contracts\\Encryption\\DecryptException $e) {",
+            "    $3",
+            "}$4"
+        ],
+        "description": "Decrypt a value"
+    },
+    "Crypt-encrypt.sublime-snippet": {
+        "prefix": "Crypt::encrypt",
+        "body": [
+            "Crypt::encrypt(${1:\\$value});$2"
+        ],
+        "description": "Encrypt a value"
+    }
+}

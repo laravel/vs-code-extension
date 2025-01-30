@@ -1,0 +1,63 @@
+{
+    "View-composer.sublime-snippet": {
+        "prefix": "View::composer",
+        "body": [
+            "view()->composer('${1:name}', function (${2:\\$view}) {",
+            "    $3",
+            "});"
+        ],
+        "description": "Define a View Composer"
+    },
+    "View-composerClass.sublime-snippet": {
+        "prefix": "View::composerClass",
+        "body": [
+            "view()->composer('${1:name}', '${2:App\\Http\\ViewComposers\\SomeComposer}');$3"
+        ],
+        "description": "Define a Class-based View Composer"
+    },
+    "View-exists.sublime-snippet": {
+        "prefix": "View::exists",
+        "body": [
+            "if (view()->exists('${1:view.name}'))",
+            "{",
+            "    $2",
+            "}"
+        ],
+        "description": "Determine if a view exists"
+    },
+    "View-make.sublime-snippet": {
+        "prefix": "View::make",
+        "body": [
+            "view('${1:view.name}', ${2:\\$data});$3"
+        ],
+        "description": "Create a View with Data"
+    },
+    "View-makeCompact.sublime-snippet": {
+        "prefix": "View::makeCompact",
+        "body": [
+            "view('${1:view.name}', compact('${2:data}'));$3"
+        ],
+        "description": "Create a View, Pass Data with compact()"
+    },
+    "View-makeWith.sublime-snippet": {
+        "prefix": "View::makeWith",
+        "body": [
+            "view(${1:'view.name'})->with('${2:key}', ${3:\\$value});$4"
+        ],
+        "description": "Create a View, Pass Data using with()"
+    },
+    "View-render.sublime-snippet": {
+        "prefix": "View::render",
+        "body": [
+            "view(${1:'name'}, ${2:\\$data})->render();$3"
+        ],
+        "description": "Render a view with some data"
+    },
+    "View-share.sublime-snippet": {
+        "prefix": "View::share",
+        "body": [
+            "view()->share('${1:key}', ${2:\\$value});$3"
+        ],
+        "description": "Share Data across all Views"
+    }
+}

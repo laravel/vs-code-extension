@@ -1,0 +1,46 @@
+{
+    "eloquent-getter": {
+        "prefix": "Eloquent-getter",
+        "body": [
+            "public function get${1:Name}Attribute(\\$value) {",
+            "    return ${2:strtoupper(\\$value)};",
+            "}"
+        ],
+        "description": "Eloquent getter (Laravel 5.1+)"
+    },
+    "eloquent-setter": {
+        "prefix": "Eloquent-setter",
+        "body": [
+            "public function set${1:Name}Attribute(\\$value) {",
+            "    \\$this->attributes['${2:column}'] = ${3:\\$value};",
+            "}"
+        ],
+        "description": "Eloquent setter (Laravel 5.1+)"
+    },
+    "eloquent-attribute": {
+        "prefix": "Eloquent-attribute",
+        "body": [
+            "public function ${1:name}(): Attribute",
+            "{",
+            "    return new Attribute(",
+            "        get: fn (\\$value) => ${2:strtoupper(\\$value)},",
+            "        set: fn (\\$value) => ${3:\\$value},",
+            "    );",
+            "}"
+        ],
+        "description": "Eloquent accessors / mutators (Laravel 9.x)"
+    },
+    "eloquent-attribute-make": {
+        "prefix": "Eloquent-attribute-make",
+        "body": [
+            "public function ${1:name}(): Attribute",
+            "{",
+            "    return Attribute::make(",
+            "        get: fn (\\$value) => ${2:\\$value},",
+            "        set: fn (\\$value) => ${3:\\$value},",
+            "    );",
+            "}"
+        ],
+        "description": "Eloquent accessors / mutators (Laravel 9.x)"
+    }
+}

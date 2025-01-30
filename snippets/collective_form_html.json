@@ -1,0 +1,191 @@
+{
+	"Form-checkbox": {
+        "prefix": "Form::checkbox",
+        "body": [
+            "{!! Form::checkbox(${1:$$name}, ${2:$$value}, ${3:$$checked}, [${4:$$options}]) !!}"
+        ],
+        "description": "Create a checkbox input field."
+    },
+    "Form-close": {
+        "prefix": "Form::close",
+        "body": [
+            "{!! Form::close(${1}) !!}"
+        ],
+        "description": "Closes a form tag"
+    },
+    "Form-date": {
+        "prefix": "Form::date",
+        "body": [
+            "{!! Form::date(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a date input field"
+    },
+    "Form-datetime": {
+        "prefix": "Form::datetime",
+        "body": [
+            "{!! Form::datetime(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a datetime input field"
+    },
+    "Form-datetimeLocal": {
+        "prefix": "Form::datetimeLocal",
+        "body": [
+            "{!! Form::datetimeLocal(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a datetime-local input field"
+    },
+    "Form-email": {
+        "prefix": "Form::email",
+        "body": [
+            "{!! Form::email(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create an e-mail input field"
+    },
+    "Form-file": {
+        "prefix": "Form::file",
+        "body": [
+            "{!! Form::file(${1:$$name}, [${2:$$options}]) !!}"
+        ],
+        "description": "Create a file input field"
+    },
+    "Form-hidden": {
+        "prefix": "Form::hidden",
+        "body": [
+            "{!! Form::hidden(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a hidden input field"
+    },
+    "Form-label": {
+        "prefix": "Form::label",
+        "body": [
+            "{!! Form::label(${1:$$for}, ${2:$$text}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a form label element."
+    },
+    "Form-model": {
+        "prefix": "Form::model",
+        "body": [
+            "{!! Form::model(${1:$$user}, [${2:$$options}]) !!}"
+        ],
+        "description": "Create a new model based form builder."
+    },
+    "Form-number": {
+        "prefix": "Form::number",
+        "body": [
+            "{!! Form::number(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a number input field"
+    },
+    "Form-open": {
+        "prefix": "Form::open",
+        "body": [
+            "{!! Form::open(${1}) !!}"
+        ],
+        "description": "Open up a new HTML form"
+    },
+    "Form-password": {
+        "prefix": "Form::password",
+        "body": [
+            "{!! Form::password(${1:$$name}, [${2:$$options}]) !!}"
+        ],
+        "description": "Create a password input field"
+    },
+    "Form-radio": {
+        "prefix": "Form::radio",
+        "body": [
+            "{!! Form::radio(${1:$$name}, ${2:$$value}, ${3:$$checked}, [${4:$$options}]) !!}"
+        ],
+        "description": "Create a radio button input field"
+    },
+    "Form-select": {
+        "prefix": "Form::select",
+        "body": [
+            "{!! Form::select(${1:$$name}, ${2:$$list}, ${3:$$selected}, [${4:$$options}]) !!}"
+        ],
+        "description": "Create a select box field"
+    },
+    "Form-selectMonth": {
+        "prefix": "Form::selectMonth",
+        "body": [
+            "{!! Form::selectMonth(${1:$$name}, ${2:$$selected}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a select month field"
+    },
+    "Form-selectRange": {
+        "prefix": "Form::selectRange",
+        "body": [
+            "{!! Form::selectRange(${1:$$name}, ${2:$$min}, ${3:$$max}), ${4:$$selected}, [${5:$$options} !!}"
+        ],
+        "description": "Create a select range field"
+    },
+    "Form-submit": {
+        "prefix": "Form::submit",
+        "body": [
+            "{!! Form::submit(${1:$$text}, [${2:$$options}]) !!}"
+        ],
+        "description": "Create a submit button element"
+    },
+    "Form-text": {
+        "prefix": "Form::text",
+        "body": [
+            "{!! Form::text(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a text input field"
+    },
+    "Form-textarea": {
+        "prefix": "Form::textarea",
+        "body": [
+            "{!! Form::textarea(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a textarea input field"
+    },
+    "Form-time": {
+        "prefix": "Form::time",
+        "body": [
+            "{!! Form::time(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a time input field"
+    },
+    "Form-token": {
+        "prefix": "Form::token",
+        "body": [
+            "{!! Form::token(${1}) !!}"
+        ],
+        "description": "Generate a hidden field with the current CSRF token"
+    },
+    "Form-url": {
+        "prefix": "Form::url",
+        "body": [
+            "{!! Form::url(${1:$$name}, ${2:$$value}, [${3:$$options}]) !!}"
+        ],
+        "description": "Create a url input field"
+    },
+	"link_to": {
+		"prefix": "link_to",
+		"body": [
+            "{!! link_to(${1:$url}, ${2:$title = null}, ${3:$attributes = []}, ${4:$secure = null}, ${5:$escape = true}) !!}"
+        ],
+		"description": "Generate an HTML link"
+	},
+	"link_to_asset": {
+		"prefix": "link_to_asset",
+		"body": [
+            "{!! link_to_asset(${1:$url}, ${2:$title = null}, ${3:$attributes = []}, ${4:$secure = null}) !!}"
+        ],
+		"description": "Generate an HTML link to an asset"
+	},
+	"link_to_route": {
+		"prefix": "link_to_route",
+		"body": [
+            "{!! link_to_route(${1:$name}, ${2:$title = null}, ${3:$parameters = []}, ${4:$attributes = []}) !!}"
+        ],
+		"description": "Generate an HTML link to a named route"
+	},
+	"link_to_action": {
+		"prefix": "link_to_action",
+		"body": [
+            "{!! link_to_action(${1:$action}, ${2:$title = null}, ${3:$parameters = []}, ${4:$attributes = []}) !!}"
+        ],
+		"description": "Generate an HTML link to a controller action"
+	}
+}

@@ -1,0 +1,30 @@
+{
+    "Response-download.sublime-snippet": {
+        "prefix": "Response::download",
+        "body": [
+            "return response()->download(${1:\\$pathToFile}, ${2:\\$name}, ${3:\\$headers});"
+        ],
+        "description": "Create a File Download Response"
+    },
+    "Response-json.sublime-snippet": {
+        "prefix": "Response::json",
+        "body": [
+            "return response()->json(${1:\\$data}, ${2:200}, ${3:\\$headers});"
+        ],
+        "description": "Create a JSON Response"
+    },
+    "Response-JSONP.sublime-snippet": {
+        "prefix": "Response::jsonp",
+        "body": [
+            "return response()->jsonp(${1:\\$callback}, ${2:\\$data}, ${3:200}, ${4:\\$headers});"
+        ],
+        "description": "Create a JSONP Response"
+    },
+    "Response-make.sublime-snippet": {
+        "prefix": "Response::make",
+        "body": [
+            "return Response::make(${1:\\$contents}, ${2:200}, ${3:\\$headers});"
+        ],
+        "description": "Create a Custom Response"
+    }
+}

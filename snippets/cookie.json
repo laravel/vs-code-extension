@@ -1,0 +1,23 @@
+{
+    "Cookie-forever.sublime-snippet": {
+        "prefix": "Cookie::forever",
+        "body": [
+            "\\$response->withCookie(cookie()->forever('${1:key}', ${2:\\$value}));$3"
+        ],
+        "description": "Make a Permanent Cookie"
+    },
+    "Cookie-get.sublime-snippet": {
+        "prefix": "Cookie::get",
+        "body": [
+            "\\$request->cookie('${1:key}');$2"
+        ],
+        "description": "Retrieve a Cookie value"
+    },
+    "Cookie-set.sublime-snippet": {
+        "prefix": "Cookie::set",
+        "body": [
+            "\\$response->withCookie(cookie('${1:key}', ${2:\\$value}));$3"
+        ],
+        "description": "Attach a Cookie to a Response."
+    }
+}

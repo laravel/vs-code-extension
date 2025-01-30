@@ -1,0 +1,227 @@
+{
+    "Str-of": {
+      "prefix": "Str::of",
+      "body": "Str::of(${1:\\$string})",
+      "description": "Get a new stringable object from the given string. (v7.x)"
+    },
+    "Str-after": {
+      "prefix": "Str::after",
+      "body": "Str::after(${1:\\$subject}, '${2:search}')",
+      "description": "The Str::after method returns everything after the given value in a string. The entire string will be returned if the value does not exist within the string."
+    },
+    "Str-afterLast": {
+      "prefix": "Str::afterLast",
+      "body": "Str::afterLast(${1:\\$subject}, '${2:search}')",
+      "description": "The Str::afterLast method returns everything after the last occurrence of the given value in a string. The entire string will be returned if the value does not exist within the string. (v6.x)"
+    },
+    "Str-ascii": {
+      "prefix": "Str::ascii",
+      "body": "Str::ascii('${1:û}')",
+      "description": "The Str::ascii method will attempt to transliterate the string into an ASCII value."
+    },
+    "Str-before": {
+      "prefix": "Str::before",
+      "body": "Str::before(${1:\\$subject}, '${2:search}')",
+      "description": "Get the portion of a string before the first occurrence of a given value."
+    },
+    "Str-beforeLast": {
+      "prefix": "Str::beforeLast",
+      "body": "Str::beforeLast(${1:\\$subject}, '${2:search}')",
+      "description": "Get the portion of a string before the last occurrence of a given value. (v6.x)"
+    },
+    "Str-between": {
+      "prefix": "Str::between",
+      "body": "Str::between(${1:\\$subject}, '${2:from}', '${3:to}')",
+      "description": "Get the portion of a string between two given values. (v7.x)"
+    },
+    "Str-betweenFirst": {
+      "prefix": "Str::betweenFirst",
+      "body": "Str::betweenFirst(${1:\\$subject}, '${2:from}', '${3:to}')",
+      "description": "Get the smallest possible portion of a string between two values. (v9.2)"
+    },
+    "Str-camel": {
+      "prefix": "Str::camel",
+      "body": "Str::camel(${1:\\$value})",
+      "description": "Convert a value to camel case."
+    },
+    "Str-contains": {
+      "prefix": "Str::contains",
+      "body": "Str::contains(${1:\\$haystack}, '${2:needles}')",
+      "description": "Return boolean. Determine if a given string contains a given substring."
+    },
+    "Str-containsAll": {
+      "prefix": "Str::containsAll",
+      "body": "Str::containsAll(${1:\\$haystack}, '${2:needles}')",
+      "description": "Determine if a given string contains all array values. (v5.8)"
+    },
+    "Str-endsWith": {
+      "prefix": "Str::endsWith",
+      "body": "Str::endsWith(${1:\\$haystack}, '${2:needles}')",
+      "description": "Return boolean. Determine if a given string ends with a given substring."
+    },
+    "Str-finish": {
+      "prefix": "Str::finish",
+      "body": "Str::finish(${1:\\$value}, '${2:cap}')",
+      "description": "Cap a string with a single instance of a given value."
+    },
+    "Str-is": {
+      "prefix": "Str::is",
+      "body": "Str::is(${1:\\$pattern}, '${2:value}')",
+      "description": "Return boolean. Determine if a given string matches a given pattern."
+    },
+    "Str-isAscii": {
+      "prefix": "Str::isAscii",
+      "body": "Str::isAscii(${1:\\$value})",
+      "description": "Determine if a given string is 7 bit ASCII. (v7.x)"
+    },
+    "Str-isUuid": {
+      "prefix": "Str::isUuid",
+      "body": "Str::isUuid(${1:\\$value})",
+      "description": "Return boolean. Determine if a given string is a valid UUID. (v6.x)"
+    },
+    "Str-kebab": {
+      "prefix": "Str::kebab",
+      "body": "Str::kebab(${1:\\$value})",
+      "description": "Convert a string to kebab case."
+    },
+    "Str-lcfirst": {
+      "prefix": "Str::lcfirst",
+      "body": "Str::lcfirst(${1:\\$value})",
+      "description": "Return string with first character lowercase. (v9.4)"
+    },
+    "Str-length": {
+      "prefix": "Str::length",
+      "body": "Str::length(${1:\\$value})",
+      "description": "Return the length of the given string."
+    },
+    "Str-limit": {
+      "prefix":"Str::limit",
+      "body": "Str::limit(${1:\\$string}, ${2:\\$limit}, '${3:...}')",
+      "description": "Truncates the given string at the specified length"
+    },
+    "Str-lower": {
+      "prefix": "Str::lower",
+      "body": "Str::lower(${1:\\$value})",
+      "description": "Convert the given string to lower-case."
+    },
+    "Str-words": {
+      "prefix": "Str::words",
+      "body": "Str::words(${1:\\$value}, ${2:\\$words}, '${3:...}')",
+      "description": "Limit the number of words in a string."
+    },
+    "Str-parseCallback": {
+      "prefix": "Str::parseCallback",
+      "body": "Str::parseCallback('${1:callback}', ${2:\\$default})",
+      "description": "Return array. Parse a Class@method style callback into class and method. $default is null or given string."
+    },
+    "Str-plural": {
+      "prefix":"Str::plural",
+      "body": "Str::plural(${1:\\$value}, ${2:\\$count})",
+      "description": "Get the plural form of an English word."
+    },
+    "Str-pluralStudly": {
+      "prefix":"Str::pluralStudly",
+      "body": "Str::pluralStudly(${1:\\$value}, ${2:\\$count})",
+      "description": "Pluralize the last word of an English, studly caps case string. (v5.8)"
+    },
+    "Str-random": {
+      "prefix": "Str::random",
+      "body": "Str::random(${1:\\$length})",
+      "description": "Generate a more truly random alpha-numeric string."
+    },
+    "Str-replaceArray": {
+      "prefix": "Str::replaceArray",
+      "body": "Str::replaceArray('${1:search}', '${2:replace}', ${3:\\$subject})",
+      "description": "Replace a given value in the string sequentially with an array."
+    },
+    "Str-replaceFirst": {
+      "prefix": "Str::replaceFirst",
+      "body": "Str::replaceFirst('${1:search}', '${2:replace}', ${3:\\$subject})",
+      "description": "Replace the first occurrence of a given value in the string."
+    },
+    "Str-replaceLast": {
+      "prefix": "Str::replaceLast",
+      "body": "Str::replaceLast('${1:search}', '${2:replace}', ${3:\\$subject})",
+      "description": "Replace the last occurrence of a given value in the string."
+    },
+    "Str-start": {
+      "prefix": "Str::start",
+      "body": "Str::start(${1:\\$value}, '${2:prefix}')",
+      "description": "Begin a string with a single instance of a given value."
+    },
+    "Str-upper": {
+      "prefix": "Str::upper",
+      "body": "Str::upper(${1:\\$value})",
+      "description": "Convert the given string to upper-case."
+    },
+    "Str-title": {
+      "prefix": "Str::title",
+      "body": "Str::title(${1:\\$value})",
+      "description": "Convert the given string to title case."
+    },
+    "Str-singular": {
+      "prefix": "Str::singular",
+      "body": "Str::singular(${1:\\$value})",
+      "description": "Get the singular form of an English word."
+    },
+    "Str-slug": {
+      "prefix": "Str::slug",
+      "body": "Str::slug(${1:\\$title})",
+      "description": "Generate a URL friendly slug from a given string."
+    },
+    "Str-snake": {
+      "prefix": "Str::snake",
+      "body": "Str::snake(${1:\\$value})",
+      "description": "Convert a string to snake case."
+    },
+    "Str-startsWith": {
+      "prefix": "Str::startsWith",
+      "body": "Str::startsWith(${1:\\$haystack}, '${2:needles}')",
+      "description": "Return boolean. Determine if a given string starts with a given substring."
+    },
+    "Str-studly": {
+      "prefix": "Str::studly",
+      "body": "Str::studly(${1:\\$value})",
+      "description": "Convert a value to studly caps case."
+    },
+    "Str-substr": {
+      "prefix": "Str::substr",
+      "body": "Str::substr(${1:\\$string}, ${2:\\$start}, ${3:\\$length})",
+      "description": "Returns the portion of string specified by the start and length parameters."
+    },
+    "Str-substrCount": {
+      "prefix": "Str::substrCount",
+      "body": "Str::substrCount(${1:\\$haystack}, ${2:\\$needle}, ${3:\\$offset}, ${4:\\$length})",
+      "description": "Returns the number of substring occurrences. (v7.x)"
+    },
+    "Str-ucfirst": {
+      "prefix": "Str::ucfirst",
+      "body": "Str::ucfirst(${1:\\$string})",
+      "description": "Make a string's first character uppercase."
+    },
+    "Str-uuid": {
+        "prefix": "Str::uuid",
+        "body": "Str::uuid()",
+        "description": "Generate a UUID (version 4)."
+    },
+    "Str-orderedUuid": {
+        "prefix": "Str::orderedUuid",
+        "body": "Str::orderedUuid()",
+        "description": "Generate a time-ordered UUID (version 4)."
+    },
+    "Str-createUuidsUsing": {
+      "prefix": "Str::createUuidsUsing",
+      "body": "Str::createUuidsUsing(${1:callable})",
+      "description": "void. Set the callable that will be used to generate UUIDs. (v6.x)"
+    },
+    "Str-createUuidsNormally": {
+      "prefix": "Str::createUuidsNormally",
+      "body": "Str::createUuidsNormally()",
+      "description": "void. Indicate that UUIDs should be created normally and not using a custom factory. (v6.x)"
+    },
+    "Str-wrap": {
+      "prefix": "Str::wrap",
+      "body": "Str::wrap(${1:\\$value}, ${2:\\$prefix}, ${3:\\$suffix})",
+      "description": "Wrap the given string in a HTML tag. (v9.5)"
+    }
+}

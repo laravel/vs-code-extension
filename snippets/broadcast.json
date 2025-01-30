@@ -1,0 +1,7 @@
+{
+    "Broadcast-channel": {
+        "prefix": "Broadcast::channel",
+        "body": "Broadcast::channel('${1}', ${2}::class);${3}",
+        "description": "Broadcast Channel Classes"
+    }
+}

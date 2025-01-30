@@ -1,0 +1,203 @@
+{
+    "Route-any.sublime-snippet": {
+        "prefix": "Route::any",
+        "body": [
+            "Route::any('${2:users/{id\\}}', function (${3:\\$id}) {",
+            "    $4",
+            "});"
+        ],
+        "description": "Basic Route with Closure."
+    },
+    "Route-closure.sublime-snippet": {
+        "prefix": "Route::closure",
+        "body": [
+            "Route::${1:get}('${2:users/{id\\}}', function (${3:\\$id}) {",
+            "    $4",
+            "});"
+        ],
+        "description": "Basic Route with Closure."
+    },
+    "Route-controller.sublime-snippet": {
+        "prefix": "Route::controller",
+        "body": [
+            "Route::controller('${1:users}', '${2:UserController}');"
+        ],
+        "description": "Route a controller to a URI with wildcard routing. (Deprecated)"
+    },
+    "Route-controllerAction.sublime-snippet": {
+        "prefix": "Route-controllerAction",
+        "body": [
+            "Route::${1:get}('${2:users/{id\\}}', [${3:$User}Controller::class, '${4:index}'])->name('${5:user.index}');"
+        ],
+        "description": "Basic route to a controller action."
+    },
+    "Route-current": {
+        "prefix": "Route::current",
+        "body": "Route::current()",
+        "description": "Accessing current route; Return type: Illuminate\\Routing\\Route"
+    },
+    "Route-currentRouteName": {
+        "prefix": "Route::currentRouteName",
+        "body": "Route::currentRouteName()",
+        "description": "Accessing current route; Return type: string"
+    },
+    "Route-currentRouteAction.sublime-snippet": {
+        "prefix": "Route::currentRouteAction",
+        "body": [
+            "Route::currentRouteAction();"
+        ],
+        "description": "Get the current route name."
+    },
+    "Route-delete.sublime-snippet": {
+        "prefix": "Route::delete",
+        "body": [
+            "Route::delete('${1:users/{id\\}}', function (${2:\\$id}) {",
+            "    $3",
+            "});"
+        ],
+        "description": "Basic Delete Route."
+    },
+    "Route-dispatch": {
+        "prefix": "Route::dispatch",
+        "body": "Route::dispatch(${1:\\$request});",
+        "description": "Dispatch the request to the application."
+    },
+    "Route-dispatchToRoute": {
+        "prefix": "Route::dispatchToRoute",
+        "body": "Route::dispatchToRoute(${1:\\$request});",
+        "description": "Dispatch the request to a route and return the response."
+    },
+    "Route-get.sublime-snippet": {
+        "prefix": "Route::get",
+        "body": [
+            "Route::get('${1:users/{id\\}}', function (${2:\\$id}) {",
+            "    $3",
+            "});"
+        ],
+        "description": "Basic Get Route."
+    },
+    "Router-post.sublime-snippet": {
+        "prefix": "Route::post",
+        "body": [
+            "Route::post('${1:users/{id\\}}', function (${2:\\$id}) {",
+            "    $3",
+            "});"
+        ],
+        "description": "Basic Post Route."
+    },
+    "Route-get-with-name": {
+        "prefix": "Route-get-name",
+        "body": "Route::get('${1:user}', '${2:User}Controller@${3:index}')->name('${4:user}');",
+        "description": "Get route with naming"
+    },
+    "Route-post-with-name": {
+        "prefix": "Route-post-name",
+        "body": "Route::post('${1:user}', '${2:User}Controller@${3:index}')->name('${4:user}');",
+        "description": "Post route with naming"
+    },
+    "Route-group.sublime-snippet": {
+        "prefix": "Route::group",
+        "body": [
+            "Route::prefix('${1:admin}')->group(function () {",
+            "    $2",
+            "});"
+        ],
+        "description": "Create a Group of Routes"
+    },
+    "Route-group-middleware": {
+        "prefix": "Route::group-middleware",
+        "body": [
+            "Route::middleware(['${1:auth}'${2:, '${3:second}'}])->group(function () {",
+            "    $4",
+            "});"
+        ],
+        "description": "Create a Group of Routers with middleware defined in RouteServiceProvider"
+    },
+    "Route-match.sublime-snippet": {
+        "prefix": "Route::match",
+        "body": [
+            "Route::match([${1:'get', 'post'}], '${2:/user/profile}', function () {",
+            "    $3",
+            "});"
+        ],
+        "description": "Register a new route with the given verbs."
+    },
+    "Route-put.sublime-snippet": {
+        "prefix": "Route::put",
+        "body": [
+            "Route::put('${1:users/{id\\}}', function (${2:\\$id}) {",
+            "    $3",
+            "});"
+        ],
+        "description": "Basic Put Route."
+    },
+    "Route-resource.sublime-snippet": {
+        "prefix": "Route::resource",
+        "body": [
+            "Route::resource('${1:user}', ${2:User}Controller::class);"
+        ],
+        "description": "Route to a RESTful Controller"
+    },
+    "Route-when.sublime-snippet": {
+        "prefix": "Route::when",
+        "body": [
+            "\\$router->when('${1:admin/*}', '${2:admin}', ${3:['post']})$4"
+        ],
+        "description": "Pattern based filters on routes"
+    },
+    "Router-model.sublime-snippet": {
+        "prefix": "Route::model",
+        "body": [
+            "\\$router->model('${1:user}', '${2:App\\Models\\User}')$3"
+        ],
+        "description": "Register a model binder for a wildcard."
+    },
+    "Router-pattern.sublime-snippet": {
+        "prefix": "Route::pattern",
+        "body": [
+            "\\$router->pattern('${1:id}', '${2:[0-9]+}')$3"
+        ],
+        "description": "Set a global where pattern on all routes."
+    },
+    "Route-redirect": {
+        "prefix": "Route::redirect",
+        "body": "Route::redirect('${1:URI}', '${2:URI}', ${3:301});",
+        "description": "a convenient shortcut for performing a simple redirect"
+    },
+    "Route-view": {
+        "prefix": "Route::view",
+        "body": "Route::view('${1:URI}', '${2:viewName}');",
+        "description": "route only needs to return a view; you may provide an array of data to pass to the view as an optional third argument"
+    },
+
+    // Laravel 9.x
+
+    "Route-controller-group": {
+        "prefix": "Rotue-controller-group",
+        "body": [
+            "Route::controller(${1:Order}Controller::class)->group(function () {",
+            "    Route::get('/${2:orders}/{id}', 'show');",
+            "    Route::post('/${2:orders}', 'store');",
+            "});"
+        ],
+        "description": "Controller route groups (Laravel 9.x)"
+    },
+    "Route-get-scopeBindings": {
+        "prefix": "Route-get-scopeBindings",
+        "body": [
+            "Route::get('${1:/users/{user\\}/posts/{post\\}}', function (${2:User \\$user, Post \\$post}) {",
+            "    return ${3:\\$post};",
+            "})->scopeBindings();"
+        ],
+        "description": "Scope binding (Laravel 9.x)"
+    },
+    "Route-group-scopeBindings": {
+        "prefix": "Route-group-scopeBindings",
+        "body": [
+            "Route::scopeBindings()->group(function () {",
+            "   $1",
+            "});"
+        ],
+        "description": "Group scope binding (Laravel 9.x)"
+    }
+}

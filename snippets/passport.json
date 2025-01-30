@@ -1,0 +1,30 @@
+{
+    "Passport-routes": {
+        "prefix": "Passport::routes",
+        "body": [
+            "Passport::routes();"
+        ],
+        "description": "Passport - routes"
+    },
+    "Passport-tokensExpireIn": {
+        "prefix": "Passport::tokensExpireIn",
+        "body": [
+            "Passport::tokensExpireIn(Carbon::now()->addDays(${1:15}));$2"
+        ],
+        "description": "Passport - tokensExpireIn"
+    },
+    "Passport-refreshTokensExpireIn": {
+        "prefix": "Passport::refreshTokensExpireIn",
+        "body": [
+            "Passport::refreshTokensExpireIn(Carbon::now()->addDays(${1:30}));$2"
+        ],
+        "description": "Passport - refreshTokensExpireIn"
+    },
+    "Passport-pruneRevokedTokens": {
+        "prefix": "Passport::pruneRevokedTokens",
+        "body": [
+            "Passport::pruneRevokedTokens();"
+        ],
+        "description": "Passport - pruneRevokedTokens"
+    }
+}

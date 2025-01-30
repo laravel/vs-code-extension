@@ -1,0 +1,79 @@
+{
+    "Log-alert.sublime-snippet": {
+        "prefix": "Log::alert",
+        "body": [
+            "Log::alert(\"${1:message}\");"
+        ],
+        "description": "Log an alert message to the logs."
+    },
+    "Log-critical.sublime-snippet": {
+        "prefix": "Log::critical",
+        "body": [
+            "Log::critical(\"${1:message}\");"
+        ],
+        "description": "Log a critical message to the logs."
+    },
+    "Log-debug.sublime-snippet": {
+        "prefix": "Log::debug",
+        "body": [
+            "Log::debug(\"${1:message}\");"
+        ],
+        "description": "Log a debug message to the logs."
+    },
+    "Log-emergency.sublime-snippet": {
+        "prefix": "Log::emergency",
+        "body": [
+            "Log::emergency(\"${1:message}\");"
+        ],
+        "description": "Log an emergency message to the logs."
+    },
+    "Log-error.sublime-snippet": {
+        "prefix": "Log::error",
+        "body": [
+            "Log::error(\"${1:message}\");"
+        ],
+        "description": "Log an error message to the logs."
+    },
+    "Log-info.sublime-snippet": {
+        "prefix": "Log::info",
+        "body": [
+            "Log::info(\"${1:message}\");"
+        ],
+        "description": "Log an informational message to the logs."
+    },
+    "Log-log.sublime-snippet": {
+        "prefix": "Log::log",
+        "body": [
+            "Log::log(\"${1:level}\", \"${2:message}\");"
+        ],
+        "description": "Log a message to the logs."
+    },
+    "Log-notice.sublime-snippet": {
+        "prefix": "Log::notice",
+        "body": [
+            "Log::notice(\"${1:message}\");"
+        ],
+        "description": "Log a notice to the logs."
+    },
+    "Log-useDailyFiles.sublime-snippet": {
+        "prefix": "Log::useDailyFiles",
+        "body": [
+            "Log::useDailyFiles('${1:path}', ${2:days}, '${3:level}');"
+        ],
+        "description": "Register a daily file log handler."
+    },
+    "Log-useFiles.sublime-snippet": {
+        "prefix": "Log::useFiles",
+        "body": [
+            "Log::useFiles('${1:path}', '${2:level}');"
+        ],
+        "description": "Register a file log handler."
+    },
+    "Log-warning.sublime-snippet": {
+        "prefix": "Log::warning",
+        "body": [
+            "Log::warning(\"${1:message}\");"
+        ],
+        "description": "Log a warning message to the logs."
+    }
+}

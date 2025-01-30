@@ -1,0 +1,79 @@
+{
+    "Session-all.sublime-snippet": {
+        "prefix": "Session::all",
+        "body": [
+            "\\$request->session()->all();"
+        ],
+        "description": "Retrieve All Data from the Session"
+    },
+    "Session-flash.sublime-snippet": {
+        "prefix": "Session::flash",
+        "body": [
+            "\\$request->session()->flash('${1:key}', ${2:\\$value});$3"
+        ],
+        "description": "Flash an Item in the Session"
+    },
+    "Session-flush.sublime-snippet": {
+        "prefix": "Session::flush",
+        "body": [
+            "\\$request->session()->flush();"
+        ],
+        "description": "Remove All Items from the Session"
+    },
+    "Session-forget.sublime-snippet": {
+        "prefix": "Session::forget",
+        "body": [
+            "\\$request->session()->forget('${1:key}');$2"
+        ],
+        "description": "Remove an Item from the Session"
+    },
+    "Session-get.sublime-snippet": {
+        "prefix": "Session::get",
+        "body": [
+            "\\$request->session()->get('${1:key}', '${2:default}');$3"
+        ],
+        "description": "Retrieve an Item from the Session or Default Value"
+    },
+    "Session-has.sublime-snippet": {
+        "prefix": "Session::has",
+        "body": [
+            "\\$request->session()->has('${1:key}');$2"
+        ],
+        "description": "Determin if an Item Exists in the Session"
+    },
+    "Session-keep.sublime-snippet": {
+        "prefix": "Session::keep",
+        "body": [
+            "\\$request->session()->keep(${1:['key', 'otherkey']});$2"
+        ],
+        "description": "Reflash Only a Subset of Flash Data"
+    },
+    "Session-push.sublime-snippet": {
+        "prefix": "Session::push",
+        "body": [
+            "\\$request->session()->push('${1:key.subArray}', '${2:value}');$3"
+        ],
+        "description": "Push a Value onto an Array Session Value"
+    },
+    "Session-put.sublime-snippet": {
+        "prefix": "Session::put",
+        "body": [
+            "\\$request->session()->put('${1:key}', ${2:\\$value});$3"
+        ],
+        "description": "Store an Item in the Session"
+    },
+    "Session-reflash.sublime-snippet": {
+        "prefix": "Session::reflash",
+        "body": [
+            "\\$request->session()->reflash();"
+        ],
+        "description": "Reflash the Current Flash Data"
+    },
+    "Session-regenerate.sublime-snippet": {
+        "prefix": "Session::regenerate",
+        "body": [
+            "\\$request->session()->regenerate();"
+        ],
+        "description": "Regenerate the Session ID"
+    }
+}
