@@ -1,0 +1,39 @@
+{
+    "Config-all.sublime-snippet": {
+        "prefix": "Config::all",
+        "body": [
+            "Config::all();"
+        ],
+        "description": "Get all of the configuration items for the application."
+    },
+    "Config-get.sublime-snippet": {
+        "prefix": "Config::get",
+        "body": [
+            "Config::get('${1:key}', '${2:default}');$3"
+        ],
+        "description": "Get the specified configuration value."
+    },
+    "Config-has.sublime-snippet": {
+        "prefix": "Config::has",
+        "body": [
+            "Config::has('${1:key}')$2"
+        ],
+        "description": "Determine if the given configuration value exists."
+    },
+    "Config-set.sublime-snippet": {
+        "prefix": "Config::set",
+        "body": [
+            "Config::set('${1:key}', ${2:\\$value});$3"
+        ],
+        "description": "Set a given configuration value."
+    },
+    "Config-setMany.sublime-snippet": {
+        "prefix": "Config::setMany",
+        "body": [
+            "Config::set([",
+            "    '${1:key}' => ${2:\\$value},$3",
+            "]);$4"
+        ],
+        "description": "Set a given configuration value."
+    }
+}

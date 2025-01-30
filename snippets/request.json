@@ -1,0 +1,423 @@
+{
+    "Request-method.sublime-snippet": {
+        "prefix": "Request::method",
+        "body": [
+            "\\$request->method()"
+        ],
+        "description": "Get the request method (GET, POST, ...)."
+    },
+    "Request-root.sublime-snippet": {
+        "prefix": "Request::root",
+        "body": [
+            "\\$request->root()"
+        ],
+        "description": "Get the root URL for the application."
+    },
+    "Request-url.sublime-snippet": {
+        "prefix": "Request::url",
+        "body": [
+            "\\$request->url()"
+        ],
+        "description": "Get the URL (no query string) for the request."
+    },
+    "Request-fullUrl.sublime-snippet": {
+        "prefix": "Request::fullUrl",
+        "body": [
+            "\\$request->fullUrl()"
+        ],
+        "description": "Get the full URL for the request."
+    },
+    "Request-fullUrlWithQuery": {
+        "prefix": "Request::fullUrlWithQuery",
+        "body": [
+            "\\$request->fullUrlWithQuery(${1:\\$query})$2"
+        ],
+        "description": "Get the full URL for the request with the added query string parameters."
+    },
+    "Request-path.sublime-snippet": {
+        "prefix": "Request::path",
+        "body": [
+            "\\$request->path()"
+        ],
+        "description": "Get the current path info for the request."
+    },
+    "Request-decodedPath.sublime-snippet": {
+        "prefix": "Request::decodedPath",
+        "body": [
+            "\\$request->decodedPath()"
+        ],
+        "description": "Get the current encoded path info for the request."
+    },
+    "Request-segment.sublime-snippet": {
+        "prefix": "Request::segment",
+        "body": [
+            "\\$request->segment(${1:\\$index}, '${2:default}')$3"
+        ],
+        "description": "Get a segment from the URI (1 based index)."
+    },
+    "Request-segments.sublime-snippet": {
+        "prefix": "Request::segments",
+        "body": [
+            "\\$request->segments()"
+        ],
+        "description": "Get all of the segments for the request path."
+    },
+    "Request-is": {
+        "prefix": "Request::is",
+        "body": [
+            "\\$request->is()"
+        ],
+        "description": "Determine if the current request URI matches a pattern."
+    },
+    "Request-fullUrlIs": {
+        "prefix": "Request::fullUrlIs",
+        "body": [
+            "\\$request->fullUrlIs()"
+        ],
+        "description": "Determine if the current request URL and query string matches a pattern."
+    },
+    "Request-ajax.sublime-snippet": {
+        "prefix": "Request::ajax",
+        "body": [
+            "\\$request->ajax()"
+        ],
+        "description": "Determine if the request is the result of an AJAX call."
+    },
+    "Request-pjax.sublime-snippet": {
+        "prefix": "Request::pjax",
+        "body": [
+            "\\$request->pjax()"
+        ],
+        "description": "Determine if the request is the result of an PJAX call."
+    },
+    "Request-secure.sublime-snippet": {
+        "prefix": "Request::secure",
+        "body": [
+            "\\$request->secure()"
+        ],
+        "description": "Determine if the request is over HTTPS."
+    },
+    "Request-ip.sublime-snippet": {
+        "prefix": "Request::ip",
+        "body": [
+            "\\$request->ip()"
+        ],
+        "description": "Returns the client IP address."
+    },
+    "Request-ips.sublime-snippet": {
+        "prefix": "Request::ips",
+        "body": [
+            "\\$request->ips()"
+        ],
+        "description": "Returns the client IP addresses."
+    },
+    "Request-exists.sublime-snippet": {
+        "prefix": "Request::exists",
+        "body": [
+            "\\$request->exists('${1:key}')$2"
+        ],
+        "description": "Determine if the request contains a given input item key."
+    },
+    "Request-has.sublime-snippet": {
+        "prefix": "Request::has",
+        "body": [
+            "\\$request->has('${1:key}')$2"
+        ],
+        "description": "Determine if the request contains a non-empty value for an input item."
+    },
+    "Request-all.sublime-snippet": {
+        "prefix": "Request::all",
+        "body": [
+            "\\$request->all()"
+        ],
+        "description": "Get all of the input and files for the request."
+    },
+    "Request-input.sublime-snippet": {
+        "prefix": "Request::input",
+        "body": [
+            "\\$request->input('${1:key}'${2:, 'default'})$3"
+        ],
+        "description": "Retrieve an input item from the request."
+    },
+    "Request-only.sublime-snippet": {
+        "prefix": "Request::only",
+        "body": [
+            "\\$request->only(${1:\\$keys})$2"
+        ],
+        "description": "Get a subset of the items from the input data."
+    },
+    "Request-except.sublime-snippet": {
+        "prefix": "Request::except",
+        "body": [
+            "\\$request->except(${1:\\$keys})$2"
+        ],
+        "description": "Get all of the input except for a specified array of items."
+    },
+    "Request-intersect": {
+        "prefix": "Request::intersect",
+        "body": [
+            "\\$request->intersect(${1:\\$keys})$2"
+        ],
+        "description": "Intersect an array of items with the input data."
+    },
+    "Request-query.sublime-snippet": {
+        "prefix": "Request::query",
+        "body": [
+            "\\$request->query('${1:key}', '${2:default'})$3"
+        ],
+        "description": "Retrieve a query string item from the request."
+    },
+    "Request-hasCookie": {
+        "prefix": "Request::hasCookie",
+        "body": [
+            "\\$request->hasCookie('${1:key}')$2"
+        ],
+        "description": "Determine if a cookie is set on the request."
+    },
+    "Request-cookie": {
+        "prefix": "Request::cookie",
+        "body": [
+            "\\$request->cookie('${1:key}', '${2:default'})$3"
+        ],
+        "description": "Retrieve a cookie from the request."
+    },
+    "Request-allFiles.sublime-snippet": {
+        "prefix": "Request::allFiles",
+        "body": [
+            "\\$request->allFiles()"
+        ],
+        "description": "Get an array of all of the files on the request."
+    },
+    "Request-file.sublime-snippet": {
+        "prefix": "Request::file",
+        "body": [
+            "\\$request->file('${1:key}'${2:, 'default'})$2"
+        ],
+        "description": "Retrieve a file from the request."
+    },
+    "Request-hasFile.sublime-snippet": {
+        "prefix": "Request::hasFile",
+        "body": [
+            "\\$request->hasFile('${1:key}')$2"
+        ],
+        "description": "Determine if the uploaded data contains a file."
+    },
+    "Request-hasHeader": {
+        "prefix": "Request::hasHeader",
+        "body": [
+            "\\$request->hasHeader('${1:key}')$2"
+        ],
+        "description": "Determine if a header is set on the request."
+    },
+    "Request-header.sublime-snippet": {
+        "prefix": "Request::header",
+        "body": [
+            "\\$request->header('${1:key}', ${2:\\$default})$3"
+        ],
+        "description": "Retrieve a header from the request."
+    },
+    "Request-server": {
+        "prefix": "Request::server",
+        "body": [
+            "\\$request->server('${1:key}', ${2:\\$default})$3"
+        ],
+        "description": "Retrieve a server variable from the request."
+    },
+    "Request-old.sublime-snippet": {
+        "prefix": "Request::old",
+        "body": [
+            "\\$request->old('${1:key}'${2:, 'default'})$3"
+        ],
+        "description": "Retrieve an old input item."
+    },
+    "Input-flash.sublime-snippet": {
+        "prefix": "Request::flash",
+        "body": [
+            "\\$request->flash();"
+        ],
+        "description": "Flash Input to the Session"
+    },
+    "Input-flashOnly.sublime-snippet": {
+        "prefix": "Request::flashOnly",
+        "body": [
+            "\\$request->flashOnly(${1:\\$keys});$2"
+        ],
+        "description": "Flash only some Input to the Session"
+    },
+    "Input-flashExcept.sublime-snippet": {
+        "prefix": "Request::flashExcept",
+        "body": [
+            "\\$request->flashExcept(${1:\\$keys});$2"
+        ],
+        "description": "Flash only some Input to the Session"
+    },
+    "Request-flush": {
+        "prefix": "Request::flush",
+        "body": [
+            "\\$request->flush();"
+        ],
+        "description": "Flush all of the old input from the session."
+    },
+    "Request-merge": {
+        "prefix": "Request::merge",
+        "body": [
+            "\\$request->merge(${1:\\$input})$2"
+        ],
+        "description": "Merge new input into the current request's input array."
+    },
+    "Request-replace": {
+        "prefix": "Request::replace",
+        "body": [
+            "\\$request->replace(${1:\\$input})$2"
+        ],
+        "description": "Replace the input for the current request."
+    },
+    "Request-json.sublime-snippet": {
+        "prefix": "Request::json",
+        "body": [
+            "\\$request->json()"
+        ],
+        "description": "Determine if the request is sending JSON."
+    },
+    "Request-isJson": {
+        "prefix": "Request::isJson",
+        "body": [
+            "\\$request->isJson()"
+        ],
+        "description": "Determine if the request is sending JSON."
+    },
+    "Request-wantsJson": {
+        "prefix": "Request::wantsJson",
+        "body": [
+            "\\$request->wantsJson()"
+        ],
+        "description": "Determine if the current request is asking for JSON in return."
+    },
+    "Request-accepts": {
+        "prefix": "Request::accepts",
+        "body": [
+            "\\$request->accepts(${1:\\$contentTypes})$2"
+        ],
+        "description": "Determines whether the current requests accepts a given content type."
+    },
+    "Request-prefers": {
+        "prefix": "Request::prefers",
+        "body": [
+            "\\$request->prefers(${1:\\$contentTypes})$2"
+        ],
+        "description": "Return the most suitable content type from the given array based on content negotiation."
+    },
+    "Request-acceptsJson": {
+        "prefix": "Request::acceptsJson",
+        "body": [
+            "\\$request->acceptsJson()"
+        ],
+        "description": "Determines whether a request accepts JSON."
+    },
+    "Request-acceptsHtml": {
+        "prefix": "Request::acceptsHtml",
+        "body": [
+            "\\$request->acceptsHtml()"
+        ],
+        "description": "Determines whether a request accepts HTML."
+    },
+    "Request-format": {
+        "prefix": "Request::format",
+        "body": [
+            "\\$request->format('${1:html}')$2"
+        ],
+        "description": "Get the data format expected in the response."
+    },
+    "Request-bearerToken": {
+        "prefix": "Request::bearerToken",
+        "body": [
+            "\\$request->bearerToken()"
+        ],
+        "description": "Get the bearer token from the request headers."
+    },
+    "Request-session.sublime-snippet": {
+        "prefix": "Request::session",
+        "body": [
+            "\\$request->session()"
+        ],
+        "description": "Get the session associated with the request."
+    },
+    "Request-user.sublime-snippet": {
+        "prefix": "Request::user",
+        "body": [
+            "\\$request->user()"
+        ],
+        "description": "Get the user making the request."
+    },
+    "Request-route": {
+        "prefix": "Request::route",
+        "body": [
+            "\\$request->route(${1:\\$param})"
+        ],
+        "description": "Get the route handling the request."
+    },
+    "Request-fingerprint.sublime-snippet": {
+        "prefix": "Request::fingerprint",
+        "body": [
+            "\\$request->fingerprint()"
+        ],
+        "description": "Get a unique fingerprint for the request / route / IP address."
+    },
+    "Request-getUserResolver": {
+        "prefix": "Request::getUserResolver",
+        "body": [
+            "\\$request->getUserResolver()"
+        ],
+        "description": "Get the user resolver callback."
+    },
+    "Request-setUserResolver": {
+        "prefix": "Request::setUserResolver",
+        "body": [
+            "\\$request->setUserResolver(${1:\\$callback})$2"
+        ],
+        "description": "Set the user resolver callback."
+    },
+
+    "Request-getRouteResolver": {
+        "prefix": "Request::getRouteResolver",
+        "body": [
+            "\\$request->getRouteResolver()"
+        ],
+        "description": "Get the route resolver callback."
+    },
+    "Request-setRouteResolver": {
+        "prefix": "Request::setRouteResolver",
+        "body": [
+            "\\$request->setRouteResolver(${1:\\$callback})$2"
+        ],
+        "description": "Set the route resolver callback."
+    },
+    "Request-toArray": {
+        "prefix": "Request::toArray",
+        "body": [
+            "\\$request->toArray()"
+        ],
+        "description": "Get all of the input and files for the request."
+    },
+    "Request-offsetExists": {
+        "prefix": "Request::offsetExists",
+        "body": [
+            "\\$request->offsetExists('${1:offset}')$2"
+        ],
+        "description": "Determine if the given offset exists."
+    },
+    "Request-offsetSet": {
+        "prefix": "Request::offsetSet",
+        "body": [
+            "\\$request->offsetSet('${1:offset}', ${2:\\$value});$3"
+        ],
+        "description": "Set the value at the given offset."
+    },
+    "Request-offsetUnset": {
+        "prefix": "Request::offsetUnset",
+        "body": [
+            "\\$request->offsetUnset('${1:offset}');$2"
+        ],
+        "description": "Remove the value at the given offset."
+    }
+}

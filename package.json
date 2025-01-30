@@ -11,7 +11,8 @@
         "laravel",
         "php",
         "blade",
-        "eloquent"
+        "eloquent",
+        "snippet"
     ],
     "icon": "icon.png",
     "homepage": "https://github.com/laravel/vs-code-extension",
@@ -23,7 +24,8 @@
         "url": "https://github.com/laravel/vs-code-extension/issues"
     },
     "categories": [
-        "Other"
+        "Other",
+        "Snippets"
     ],
     "activationEvents": [
         "onLanguage:php"
@@ -405,7 +407,121 @@
                     "description": null
                 }
             }
-        }
+        },
+        "snippets": [
+            {
+                "language": "php",
+                "path": "./snippets/arr.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/auth.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/cache.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/config.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/console.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/cookie.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/crypt.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/db.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/eloquent.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/event.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/hash.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/helper.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/log.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/mail.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/model.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/redirect.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/relation.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/request.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/response.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/route.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/schema.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/session.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/storage.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/view.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/passport.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/str.json"
+            },
+            {
+                "language": "php",
+                "path": "./snippets/broadcast.json"
+            },
+            {
+                "language": "blade",
+                "path": "./snippets/collective_form_html.json"
+            }
+        ]
     },
     "scripts": {
         "pretest": "npm run compile && npm run lint",

@@ -1,0 +1,66 @@
+{
+    "Redirect-action.sublime-snippet": {
+        "prefix": "Redirect::action",
+        "body": [
+            "return redirect()->action('${App\\Http\\Controllers\\HomeController@index}', ${2:['parameterKey' => 'value']});$3"
+        ],
+        "description": "Redirect to a controller action, with parameters"
+    },
+    "Redirect-back.sublime-snippet": {
+        "prefix": "Redirect::back",
+        "body": [
+            "return redirect()->back()${1:->withErrors(\\$validator)}${2:->withInput()};$3"
+        ],
+        "description": "Redirect to URL, Route or Controller"
+    },
+    "Redirect-namedRoute.sublime-snippet": {
+        "prefix": "Redirect::namedRoute",
+        "body": [
+            "return redirect()->route('${named_route}', ${2:['parameterKey' => 'value']});$3"
+        ],
+        "description": "Redirect to a named route, with parameters"
+    },
+    "Redirect-to.sublime-snippet": {
+        "prefix": "Redirect::to",
+        "body": [
+            "return redirect('${1:some/url}');$2"
+        ],
+        "description": "Redirect to URL, Route or Controller"
+    },
+    "Redirect-withErrors.sublime-snippet": {
+        "prefix": "Redirect::withErrors",
+        "body": [
+            "->withErrors(${1:\\$validator})$2"
+        ],
+        "description": "Redirect to URL, Route or Controller with Errors"
+    },
+    "Redirect-withFlashData.sublime-snippet": {
+        "prefix": "Redirect::withFlashData",
+        "body": [
+            "->with('${1:flashKey}', '${2:flashValue}')$3"
+        ],
+        "description": "Redirect to URL, Route or Controller with Flash Data"
+    },
+    "Redirect-withInput.sublime-snippet": {
+        "prefix": "Redirect::withInput",
+        "body": [
+            "->withInput(${1:[1, 2])})$2"
+        ],
+        "description": "Redirect to URL, Route or Controller with Input"
+    },
+    "Redirect-withInputAndErrors.sublime-snippet": {
+        "prefix": "Redirect::withInputAndErrors",
+        "body": [
+            "->withInput(${1:\\$request->except('key')})",
+            "->withErrors(${2:\\$validator})$3"
+        ],
+        "description": "Redirect with Inputs and Errors"
+    },
+    "Redirect-withNamedInput.sublime-snippet": {
+        "prefix": "Redirect::withNamedInput",
+        "body": [
+            "->withInput(${1:['key' => 'value'])})$2"
+        ],
+        "description": "Redirect to URL, Route or Controller with Input"
+    }
+}

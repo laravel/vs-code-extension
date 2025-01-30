@@ -1,0 +1,423 @@
+{
+    "Helper-array-add.sublime-snippet": {
+        "prefix": "Helper::array_add",
+        "body": [
+            "array_add(${1:\\$array}, ${2:'key'}, ${3:'value'})"
+        ],
+        "description": "Add an element to an array using \"dot\" notation if it doesn't exist."
+    },
+    "Helper-array-collapse.sublime-snippet": {
+        "prefix": "Helper::array_collapse",
+        "body": [
+            "array_collapse(${1:\\$array})"
+        ],
+        "description": "Collapse an array of arrays into a single array."
+    },
+    "Helper-array-data_get.sublime-snippet": {
+        "prefix": "Helper::array-data_get",
+        "body": [
+            "data_get(${1:\\$array}, ${2:'names.michael'}, ${3:'default'})"
+        ],
+        "description": "Get an item from an array using \"dot\" notation."
+    },
+    "Helper-array-divide.sublime-snippet": {
+        "prefix": "Helper::array_divide",
+        "body": [
+            "list(${1:\\$keys}, ${2:\\$values}) = array_divide(${3:\\$array});"
+        ],
+        "description": "Divide an array into two arrays. One with keys and the other with values."
+    },
+    "Helper-array-dot.sublime-snippet": {
+        "prefix": "Helper::array_dot",
+        "body": [
+            "array_dot(${1:\\$array})"
+        ],
+        "description": "Flatten a multi-dimensional associative array with dots."
+    },
+    "Helper-array-end.sublime-snippet": {
+        "prefix": "Helper::array_last",
+        "body": [
+            "last(${1:\\$array})"
+        ],
+        "description": "Get the last element of an array. Useful for method chaining."
+    },
+    "Helper-array-except.sublime-snippet": {
+        "prefix": "Helper::array_except",
+        "body": [
+            "array_except(${1:\\$array}, ${2:['key', 'otherKey']})"
+        ],
+        "description": "Get all of the given array except for a specified array of items."
+    },
+    "Helper-array-first.sublime-snippet": {
+        "prefix": "Helper::array_first",
+        "body": [
+            "array_first(${1:\\$array}, function (${2:\\$key}, ${3:\\$value}) {",
+            "    return ${4:\\$value >= 150;}",
+            "});"
+        ],
+        "description": "Return the first element in an array passing a given truth test."
+    },
+    "Helper-array-flatten.sublime-snippet": {
+        "prefix": "Helper::array_flatten",
+        "body": [
+            "array_flatten(${1:\\$array})"
+        ],
+        "description": "Will flatten a multi-dimensional array into a single level."
+    },
+    "Helper-array-forget.sublime-snippet": {
+        "prefix": "Helper::array_forget",
+        "body": [
+            "array_forget(${1:\\$array}, ${2:'names.joe'})"
+        ],
+        "description": "Remove one or many array items from a given array using \"dot\" notation."
+    },
+    "Helper-array-get.sublime-snippet": {
+        "prefix": "Helper::array_get",
+        "body": [
+            "array_get(${1:\\$array}, ${2:'names.michael'}, ${3:'default'})"
+        ],
+        "description": "Get an item from an array using \"dot\" notation."
+    },
+    "Helper-array-has.sublime-snippet": {
+        "prefix": "Helper::array_has",
+        "body": [
+            "array_has(${1:\\$array}, ${2:key})$3"
+        ],
+        "description": "Check if an item exists in an array using \"dot\" notation."
+    },
+    "Helper-array-head.sublime-snippet": {
+        "prefix": "Helper::array-head",
+        "body": [
+            "head(${1:\\$array})"
+        ],
+        "description": "Get the first element of an array. Useful for method chaining."
+    },
+    "Helper-array-last.sublime-snippet": {
+        "prefix": "Helper::array_last",
+        "body": [
+            "array_last(${1:\\$array}, function (${2:\\$key}, ${3:\\$value}) {",
+            "    return ${4:\\$value >= 150;}",
+            "});"
+        ],
+        "description": "Return the last element in an array passing a given truth test."
+    },
+    "Helper-array-only.sublime-snippet": {
+        "prefix": "Helper::array_only",
+        "body": [
+            "array_only(${1:\\$array}, ${2:['key', 'otherKey']})"
+        ],
+        "description": "Get a subset of the items from the given array."
+    },
+    "Helper-array-pluck.sublime-snippet": {
+        "prefix": "Helper::array_pluck",
+        "body": [
+            "array_pluck(${1:\\$array}, ${2:'value'})"
+        ],
+        "description": "Pluck an array of values from an array."
+    },
+    "Helper-array-prepend.sublime-snippet": {
+        "prefix": "Helper::array_prepend",
+        "body": [
+            "array_prepend(${1:\\$array}, ${2:'value'})"
+        ],
+        "description": "Push an item onto the beginning of an array."
+    },
+    "Helper-array-pull.sublime-snippet": {
+        "prefix": "Helper::array_pull",
+        "body": [
+            "array_pull(${1:\\$array}, ${2:'value'})"
+        ],
+        "description": "Get a value from the array, and remove it."
+    },
+    "Helper-array-set.sublime-snippet": {
+        "prefix": "Helper::array_set",
+        "body": [
+            "array_set(${1:\\$array}, ${2:'products.desk.price'}, ${3:200})"
+        ],
+        "description": "Set an array item to a given value using \"dot\" notation."
+    },
+    "Helper-array-sort-recursive.sublime-snippet": {
+        "prefix": "Helper::array_sort_recursive",
+        "body": [
+            "array_sort_recursive(${1:\\$array});"
+        ],
+        "description": "Recursively sort an array by keys and values."
+    },
+    "Helper-array-sort.sublime-snippet": {
+        "prefix": "Helper::array_sort",
+        "body": [
+            "array_values(array_sort(${1:\\$array}, function (${2:\\$key}, ${3:\\$value}) {",
+            "    return ${3:\\$value}['${4:name}'];",
+            "}));"
+        ],
+        "description": "Sort the array using the given callback."
+    },
+    "Helper-array-where.sublime-snippet": {
+        "prefix": "Helper::array_where",
+        "body": [
+            "array_where(${2:\\$array}, function (${3:\\$key}, ${4:\\$value}) {",
+            "    return ${4:is_string(\\$value);}",
+            "});"
+        ],
+        "description": "Filter the array using the given callback."
+    },
+    "Helper-misc-class_uses-recursive.sublime-snippet": {
+        "prefix": "Helper::misc-class_uses_recursive",
+        "body": [
+            "class_uses_recursive(${1:'Foo\\Bar\\Baz'})"
+        ],
+        "description": "Returns all traits used by a class, its subclasses and trait of their traits."
+    },
+    "Helper-misc-collect.sublime-snippet": {
+        "prefix": "Helper::misc-collect",
+        "body": [
+            "collect(${1:'Foo\\Bar\\Baz'})"
+        ],
+        "description": "Create a collection from the given value."
+    },
+    "Helper-misc-csrf_field.sublime-snippet": {
+        "prefix": "Helper::misc-csrf_field",
+        "body": [
+            "csrf_field()"
+        ],
+        "description": "Get the value of the current CSRF token."
+    },
+    "Helper-misc-csrf_token.sublime-snippet": {
+        "prefix": "Helper::misc-csrf_token",
+        "body": [
+            "csrf_token()"
+        ],
+        "description": "Get the value of the current CSRF token."
+    },
+    "Helper-misc-dd.sublime-snippet": {
+        "prefix": "Helper::misc-dd",
+        "body": [
+            "dd(${1:\\$value});"
+        ],
+        "description": "Dump the passed variables and end the script."
+    },
+    "Helper-misc-object_get.sublime-snippet": {
+        "prefix": "Helper::misc-object_get",
+        "body": [
+            "object_get(${1:\\$object, ${2:'names.michael'}, ${3:'default'})"
+        ],
+        "description": "Get an item from an object using \"dot\" notation."
+    },
+    "Helper-misc-trait_uses-recursive.sublime-snippet": {
+        "prefix": "Helper::misc-trait_uses_recursive",
+        "body": [
+            "trait_uses_recursive(${1:'Foo\\Bar\\Baz'})"
+        ],
+        "description": "Returns all traits used by a trait and its traits."
+    },
+    "Helper-path-app.sublime-snippet": {
+        "prefix": "Helper::path-app",
+        "body": [
+            "app_path()"
+        ],
+        "description": "Get the fully qualified path to the app directory."
+    },
+    "Helper-path-base.sublime-snippet": {
+        "prefix": "Helper::path-base",
+        "body": [
+            "base_path(${1:'file'})"
+        ],
+        "description": "Get the fully qualified path to the root of the application install."
+    },
+    "Helper-path-config.sublime-snippet": {
+        "prefix": "Helper::path-config",
+        "body": [
+            "config_path()"
+        ],
+        "description": "Get the fully qualified path to the app directory."
+    },
+    "Helper-path-elixir.sublime-snippet": {
+        "prefix": "Helper::path-elixir",
+        "body": [
+            "elixir('${1:file}')"
+        ],
+        "description": "Get the path to the versionned Elixir file."
+    },
+    "Helper-path-public.sublime-snippet": {
+        "prefix": "Helper::path-public",
+        "body": [
+            "public_path()"
+        ],
+        "description": "Get the fully qualified path to the public directory."
+    },
+    "Helper-path-storage.sublime-snippet": {
+        "prefix": "Helper::path-storage",
+        "body": [
+            "storage_path(${1:'file'})"
+        ],
+        "description": "Get the fully qualified path to the app/storage directory."
+    },
+    "Helper-strings-camel_case.sublime-snippet": {
+        "prefix": "Helper::strings-camel_case",
+        "body": [
+            "camel_case(${1:'foo_bar'})"
+        ],
+        "description": "Convert a value to camel case."
+    },
+    "Helper-strings-class_basename.sublime-snippet": {
+        "prefix": "Helper::strings-class_basename",
+        "body": [
+            "class_basename(${1:'Foo\\Bar\\Baz'})$2"
+        ],
+        "description": "Get the class \"basename\" of the given object / class."
+    },
+    "Helper-strings-e.sublime-snippet": {
+        "prefix": "Helper::strings-e",
+        "body": [
+            "e(${1:'<html>foo</html>'})"
+        ],
+        "description": "Escape HTML entities in a string."
+    },
+    "Helper-strings-ends_with.sublime-snippet": {
+        "prefix": "Helper::strings-ends_with",
+        "body": [
+            "ends_with(${1:'haystack'}, ${2:'needles'})"
+        ],
+        "description": "Determine if a given string ends with a given substring."
+    },
+    "Helper-strings-snake_case.sublime-snippet": {
+        "prefix": "Helper::strings-snake_case",
+        "body": [
+            "snake_case(${1:'fooBar'})"
+        ],
+        "description": "Convert the given string to snake_case."
+    },
+    "Helper-strings-starts_with.sublime-snippet": {
+        "prefix": "Helper::strings-starts_with",
+        "body": [
+            "starts_with(${1:'haystack'}, ${2:'needle'})"
+        ],
+        "description": "Determine if the given haystack begins with the given needle."
+    },
+    "Helper-strings-str_contains.sublime-snippet": {
+        "prefix": "Helper::strings-str_contains",
+        "body": [
+            "str_contains(${1:'This is my name'}, ${2:'my'})"
+        ],
+        "description": "Determine if the given haystack contains the given needle."
+    },
+    "Helper-strings-str_finish.sublime-snippet": {
+        "prefix": "Helper::strings-str_finish",
+        "body": [
+            "str_finish(${1:'this/string'}, ${2:'/'})"
+        ],
+        "description": "Determine if a given string matches a given pattern. Asterisks may be used to indicate wildcards."
+    },
+    "Helper-strings-str_is.sublime-snippet": {
+        "prefix": "Helper::strings-str_is",
+        "body": [
+            "str_is(${1:'foo*'}, ${2:'foobar'})"
+        ],
+        "description": "Add a single instance of the given needle to the haystack. Remove any extra instances."
+    },
+    "Helper-strings-str_limit.sublime-snippet": {
+        "prefix": "Helper::strings-str_limit",
+        "body": [
+            "str_limit(${1:\\$value}, ${2:100})"
+        ],
+        "description": "Limit the number of characters in a string."
+    },
+    "Helper-strings-str_random.sublime-snippet": {
+        "prefix": "Helper::strings-str_random",
+        "body": [
+            "str_random(${1:40})"
+        ],
+        "description": "Generate a random string of the given length."
+    },
+    "Helper-strings-str_singular.sublime-snippet": {
+        "prefix": "Helper::strings-str_singular",
+        "body": [
+            "str_singular(${1:'string'})"
+        ],
+        "description": "Convert a string to its singular form (English only)."
+    },
+    "Helper-strings-str_slug.sublime-snippet": {
+        "prefix": "Helper::strings-str_slug",
+        "body": [
+            "str_slug(${1:'fooBar'})"
+        ],
+        "description": "Generate a URL friendly \"slug\" from a given string."
+    },
+    "Helper-strings-studly_case.sublime-snippet": {
+        "prefix": "Helper::strings-studly_case",
+        "body": [
+            "studly_case(${1:'foo_bar'})"
+        ],
+        "description": "Convert the given string to StudlyCase."
+    },
+    "Helper-strings-title_case.sublime-snippet": {
+        "prefix": "Helper::strings-title_case",
+        "body": [
+            "title_case(${1:'fooBar'})"
+        ],
+        "description": "Convert a value to title case."
+    },
+    "Helper-strings-trans.sublime-snippet": {
+        "prefix": "Helper::strings-trans",
+        "body": [
+            "trans(${1:'validation.required'})"
+        ],
+        "description": "Translate a given language line. Alias of Lang::get."
+    },
+    "Helper-strings-trans_choice.sublime-snippet": {
+        "prefix": "Helper::strings-trans_choice",
+        "body": [
+            "trans_choice(${1:'foo.bar'}, ${2:\\$count})"
+        ],
+        "description": "Translate a given language line with inflection. Alias of Lang::choice."
+    },
+    "Helper-strings_plural.sublime-snippet": {
+        "prefix": "Helper::strings-str_plural",
+        "body": [
+            "str_plural(${1:'string'})"
+        ],
+        "description": "Convert a string to its plural form (English only)."
+    },
+    "Helper-url-action.sublime-snippet": {
+        "prefix": "Helper::url-action",
+        "body": [
+            "action(${1:'HomeController@getIndex'}, ${2:\\$params})"
+        ],
+        "description": "Generate a URL for a given controller action."
+    },
+    "Helper-url-asset.sublime-snippet": {
+        "prefix": "Helper::url-asset",
+        "body": [
+            "asset(${1:'img/photo.jpg'})"
+        ],
+        "description": "Generate a URL for an asset."
+    },
+    "Helper-url-route.sublime-snippet": {
+        "prefix": "Helper::url-route",
+        "body": [
+            "route(${1:'routeName'}, ${2:\\$params})"
+        ],
+        "description": "Generate a URL for a given named route."
+    },
+    "Helper-url-secure_asset.sublime-snippet": {
+        "prefix": "Helper::url-secure_asset",
+        "body": [
+            "secure_asset(${1:'foo/bar'}, ${2:\\$title}, ${3:\\$attributes})"
+        ],
+        "description": "Generate a HTML link to the given asset using HTTPS."
+    },
+    "Helper-url-secure_url.sublime-snippet": {
+        "prefix": "Helper::secure_url",
+        "body": [
+            "secure_url(${1:'foo/bar'}, ${2:\\$parameters})"
+        ],
+        "description": "Generate a fully qualified URL to a given path using HTTPS."
+    },
+    "Helper-url.sublime-snippet": {
+        "prefix": "Helper::url-url",
+        "body": [
+            "url(${1:'foo/bar'}, ${2:\\$parameters}, ${3:\\$secure})"
+        ],
+        "description": "Generate a fully qualified URL to the given path."
+    }
+}
