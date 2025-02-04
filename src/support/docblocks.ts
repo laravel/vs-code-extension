@@ -177,15 +177,17 @@ const getAttributeBlocks = (
     attr: Eloquent.Attribute,
     className: string,
 ): string[] => {
-    const blocks = [];
+    const blocks: string[] = [];
 
     const propType = ["accessor", "attribute"].includes(attr.cast || "")
         ? "@property-read"
         : "@property";
 
-    const type = getAttributeType(attr);
+    if (!attr.documented) {
+        const type = getAttributeType(attr);
 
-    blocks.push(`${propType} ${type} $${attr.name}`);
+        blocks.push(`${propType} ${type} $${attr.name}`);
+    }
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
@@ -220,7 +222,7 @@ const mapType = (type: string): string => {
             /char\(\d+\)/,
         ],
         float: [/double\(\d+\,\d+\)/],
-        int: ["bigint", "bigint unsigned", "integer"],
+        int: ["bigint", "bigint unsigned", "integer", "int unsigned"],
         mixed: ["attribute", "accessor", "encrypted"],
         array: ["encrypted:json", "encrypted:array", "json"],
         "\\Illuminate\\Support\\Carbon": ["datetime", "timestamp"],
