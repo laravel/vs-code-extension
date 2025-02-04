@@ -3,6 +3,7 @@ import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import { config, PhpEnvironment } from "./config";
+import { registerWatcher } from "./fileWatcher";
 import { error, info } from "./logger";
 import { showErrorPopup } from "./popup";
 import {
@@ -78,6 +79,9 @@ export const initVendorWatchers = () => {
     autoloadWatcher.onDidDelete(() => {
         hasVendor = false;
     });
+
+    registerWatcher(watcher);
+    registerWatcher(autoloadWatcher);
 };
 
 const getPhpCommand = (): string => {
