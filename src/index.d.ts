@@ -96,6 +96,7 @@ declare namespace Eloquent {
         appended: null;
         cast: string | null;
         title_case: string;
+        documented: boolean;
     }
 
     interface Relation {
