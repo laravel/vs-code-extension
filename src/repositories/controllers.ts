@@ -4,7 +4,7 @@ import { projectPath } from "../support/project";
 
 const load = (): string[] => {
     return collectControllers(projectPath("app/Http/Controllers")).map(
-        (contoller) => contoller.replace(/@__invoke/, ""),
+        (controller) => controller.replace(/@__invoke/, ""),
     );
 };
 
