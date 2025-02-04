@@ -1,8 +1,6 @@
 import fs from "fs";
 import { Eloquent } from "..";
-import {
-    internalVendorPath,
-} from "./project";
+import { internalVendorPath } from "./project";
 import { indent } from "./util";
 
 interface ClassBlock {
@@ -204,32 +202,49 @@ const getAttributeType = (attr: Eloquent.Attribute): string => {
     return attr.nullable ? `${type}|null` : type;
 };
 
-const getActualType = (type: string): string => {
-    const mapping: {
-        [key: string]: string;
-    } = {
-        datetime: "\\Illuminate\\Support\\Carbon",
-        "boolean(1)": "bool",
-        "boolean(0)": "bool",
-        boolean: "bool",
-        text: "string",
-        bigint: "int",
-        "bigint unsigned": "int",
-        integer: "int",
-        attribute: "mixed",
-        accessor: "mixed",
-        "encrypted:json": "array",
-        "encrypted:array": "array",
-        "encrypted:collection": "\\Illuminate\\Support\\Collection",
-        "encrypted:object": "object",
-        encrypted: "mixed",
+const mapType = (type: string): string => {
+    const mapping: Record<string, (string | RegExp)[]> = {
+        bool: [
+            "boolean(1)",
+            "boolean(0)",
+            "tinyint",
+            "tinyint unsigned",
+            "boolean",
+            /tinyint\(\d+\)/,
+        ],
+        string: [
+            "longtext",
+            "mediumtext",
+            "text",
+            /varchar\(\d+\)/,
+            /char\(\d+\)/,
+        ],
+        float: [/double\(\d+\,\d+\)/],
+        int: ["bigint", "bigint unsigned", "integer"],
+        mixed: ["attribute", "accessor", "encrypted"],
+        array: ["encrypted:json", "encrypted:array", "json"],
+        "\\Illuminate\\Support\\Carbon": ["datetime", "timestamp"],
+        "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
+        object: ["encrypted:object"],
     };
 
-    let finalType = mapping[type] || type;
+    for (const [newType, matches] of Object.entries(mapping)) {
+        for (const match of matches) {
+            if (type === match) {
+                return newType;
+            }
 
-    if (finalType.match(/varchar\(\d+\)/)) {
-        finalType = "string";
+            if (match instanceof RegExp && type.match(match)) {
+                return newType;
+            }
+        }
     }
+
+    return type;
+};
+
+const getActualType = (type: string): string => {
+    const finalType = mapType(type);
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;
