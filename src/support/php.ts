@@ -28,7 +28,7 @@ let hasVendor = projectPathExists("vendor/autoload.php");
 const hasBootstrap = projectPathExists("bootstrap/app.php");
 
 let phpEnvKey: PhpEnvironment | null = null;
-const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail"];
+const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -115,6 +115,11 @@ const getPhpCommand = (): string => {
     options.set("sail", {
         check: "./vendor/bin/sail ps",
         command: "./vendor/bin/sail php",
+    });
+
+    options.set("lando", {
+        check: "lando info",
+        command: "lando ssh -c 'php {code}'",
     });
 
     for (const [key, option] of options.entries()) {
