@@ -107,11 +107,6 @@ const getPhpCommand = (): string => {
         command: `"{binaryPath}"`,
     });
 
-    options.set("local", {
-        check: "php -r 'echo PHP_BINARY;'",
-        command: `"{binaryPath}"`,
-    });
-
     options.set("sail", {
         check: "./vendor/bin/sail ps",
         command: "./vendor/bin/sail php",
@@ -120,6 +115,11 @@ const getPhpCommand = (): string => {
     options.set("lando", {
         check: "lando info",
         command: "lando ssh -c 'php {code}'",
+    });
+
+    options.set("local", {
+        check: "php -r 'echo PHP_BINARY;'",
+        command: `"{binaryPath}"`,
     });
 
     for (const [key, option] of options.entries()) {
