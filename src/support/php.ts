@@ -113,8 +113,8 @@ const getPhpCommand = (): string => {
     });
 
     options.set("lando", {
-        check: "lando info",
-        command: "lando ssh -c 'php {code}'",
+        check: "lando exec appserver -- php -r 'echo PHP_BINARY;'",
+        command: "lando exec appserver -- php",
     });
 
     options.set("local", {
