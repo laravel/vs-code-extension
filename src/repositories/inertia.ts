@@ -12,7 +12,7 @@ interface ViewItem {
 export let inertiaPagePaths: string[] | null = null;
 export let inertiaPageExtensions: string[] | null = null;
 
-const load = (pagePaths: string[], validExtensions: string[]) => {
+const load = (pagePaths: string[], validExtensions: string[], registeredHints: Record<string, string>) => {
     inertiaPagePaths = pagePaths;
     inertiaPageExtensions = validExtensions;
 
@@ -23,7 +23,7 @@ const load = (pagePaths: string[], validExtensions: string[]) => {
     pagePaths
         .map((path) => sysPath.sep + relativePath(path))
         .forEach((path) => {
-            collectViews(projectPath(path), path, validExtensions).forEach(
+            collectViews(projectPath(path), path, validExtensions, registeredHints).forEach(
                 (view) => {
                     views[view.name] = view;
                 },
@@ -37,6 +37,7 @@ const collectViews = (
     path: string,
     basePath: string,
     validExtensions: string[],
+    registeredHints: Record<string, string>
 ): View[] => {
     if (path.substring(-1) === sysPath.sep) {
         path = path.substring(0, path.length - 1);
@@ -54,11 +55,15 @@ const collectViews = (
                     sysPath.join(path, file),
                     basePath,
                     validExtensions,
+                    registeredHints
                 );
             }
 
+
+
             const parts = file.split(".");
             const extension = parts.pop();
+            const hint = typeof registeredHints[path] === 'undefined' ? false : registeredHints[path];
 
             if (!validExtensions.includes(extension ?? "")) {
                 return [];
@@ -67,10 +72,10 @@ const collectViews = (
             const name = parts.join(".");
 
             return {
-                name: relativePath(sysPath.join(path, name)).replace(
+                name: typeof hint === 'boolean' ? relativePath(sysPath.join(path, name)).replace(
                     basePath.substring(1) + sysPath.sep,
                     "",
-                ),
+                ) : sysPath.join(path, name).replace(`${path}${sysPath.sep}`, `${hint}::`),
                 path: relativePath(sysPath.join(path, file)),
             };
         })
@@ -82,10 +87,14 @@ export const getInertiaViews = repository<ViewItem>(
         runInLaravel<{
             page_paths?: string[];
             page_extensions?: string[];
+            page_hints?: Record<string, string>
         }>(template("inertia")).then((result) => {
+            console.log(result);
+
             return load(
                 result?.page_paths ?? [],
                 result?.page_extensions ?? [],
+                result?.page_hints ?? {}
             );
         }),
     () =>
