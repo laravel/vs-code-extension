@@ -113,8 +113,8 @@ const getPhpCommand = (): string => {
     });
 
     options.set("lando", {
-        check: "lando exec appserver -- php -r 'echo PHP_BINARY;'",
-        command: "lando exec appserver -- php",
+        check: "lando php -r 'echo PHP_BINARY;'",
+        command: "lando php",
     });
 
     options.set("local", {
