@@ -273,6 +273,10 @@ const getHashedFile = (code: string) => {
     return fixFilePath(hashedFile);
 };
 
+export const getCommandTemplate = (): string => {
+    return config<string>("phpCommand", "") || getDefaultPhpCommand();
+};
+
 export const runPhp = (
     code: string,
     description: string | null = null,
@@ -282,8 +286,7 @@ export const runPhp = (
         code = "<?php\n\n" + code;
     }
 
-    const commandTemplate =
-        config<string>("phpCommand", "") || getDefaultPhpCommand();
+    const commandTemplate = getCommandTemplate();
 
     const hashedFile = getHashedFile(code);
 
