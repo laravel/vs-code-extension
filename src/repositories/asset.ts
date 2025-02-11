@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import { repository } from ".";
 import { projectPath, relativePath } from "../support/project";
@@ -37,10 +38,11 @@ const getFilesInDirectory = (dir: string, depth: number = 0): Item[] => {
             ) {
                 return [
                     {
-                        path: relativePath(fullFilePath).replace(
-                            /\/?public\/?/g,
-                            "",
-                        ),
+                        path: relativePath(
+                            fullFilePath.replace(/[\/\\]/g, path.sep),
+                        )
+                            .replace("public" + path.sep, "")
+                            .replaceAll(path.sep, "/"),
                         uri: vscode.Uri.file(fullFilePath),
                     },
                 ];
