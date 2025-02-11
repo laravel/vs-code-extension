@@ -63,13 +63,29 @@ const collectViews = (
 
             const parts = file.split(".");
             const extension = parts.pop();
-            const hint = typeof registeredHints[path] === 'undefined' ? false : registeredHints[path];
+            const hint = Object.entries(registeredHints).reduce((previous, [currentHintPath, currentHintKey]) => {
+                const regexp = new RegExp(`^${currentHintPath}`);
+                if (regexp.test(path)) {
+                    return currentHintKey;
+                }
+                return previous;
+            }, '');
 
             if (!validExtensions.includes(extension ?? "")) {
                 return [];
             }
 
+
             const name = parts.join(".");
+            
+            if (hint.length > 0) {
+                return {
+                    name: hint + '::' + relativePath(sysPath.join(path, name))
+                        .replace(basePath.substring(1) + sysPath.sep, "")
+                        .replaceAll(sysPath.sep, "/"),
+                    path: relativePath(sysPath.join(path, file)),
+                };
+            }
 
             return {
                 name: relativePath(sysPath.join(path, name))
@@ -88,8 +104,6 @@ export const getInertiaViews = repository<ViewItem>(
             page_extensions?: string[];
             page_hints?: Record<string, string>
         }>(template("inertia")).then((result) => {
-            console.log(result);
-
             return load(
                 result?.page_paths ?? [],
                 result?.page_extensions ?? [],
