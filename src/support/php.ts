@@ -17,7 +17,9 @@ import {
 import { md5 } from "./util";
 
 const toTemplateVar = (str: string) => {
-    return `__VSCODE_LARAVEL_${str.toUpperCase()}__`;
+    const suffix = str === "output" ? ";" : "";
+
+    return `__VSCODE_LARAVEL_${str.toUpperCase()}__${suffix}`;
 };
 
 let defaultPhpCommand: string | null = null;
