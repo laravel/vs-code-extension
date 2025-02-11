@@ -50,7 +50,7 @@ function vsCodeGetTranslationsFromFile($file, $path, $namespace)
     if (pathinfo($file, PATHINFO_EXTENSION) === 'json') {
         $lang = pathinfo($file, PATHINFO_FILENAME);
 
-        return collect(\\Illuminate\\Support\\Facades\\File::json($file))->map(
+        return collect(json_decode(file_get_contents($file)))->map(
             fn($value, $key) => vsCodeGetJsonTranslationsFromFile(
                 $lang,
                 $key,
