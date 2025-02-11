@@ -35,7 +35,7 @@ interface TranslationGroupPhpResult {
 const load = () => {
     return runInLaravel<TranslationGroupPhpResult>(
         template("translations"),
-        "Translation namespaces",
+        "Translations",
     ).then((res) => {
         const result: TranslationGroupResult["translations"] = {};
 
