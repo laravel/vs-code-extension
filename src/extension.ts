@@ -16,6 +16,7 @@ import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
+import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
@@ -133,6 +134,8 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),
     );
+
+    collectDebugInfo();
 
     vscode.workspace.onDidChangeConfiguration((event) => {
         if (configAffected(event, "phpCommand", "phpEnvironment")) {
