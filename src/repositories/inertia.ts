@@ -72,10 +72,9 @@ const collectViews = (
             const name = parts.join(".");
 
             return {
-                name: typeof hint === 'boolean' ? relativePath(sysPath.join(path, name)).replace(
-                    basePath.substring(1) + sysPath.sep,
-                    "",
-                ) : sysPath.join(path, name).replace(`${path}${sysPath.sep}`, `${hint}::`),
+                name: relativePath(sysPath.join(path, name))
+                    .replace(basePath.substring(1) + sysPath.sep, "")
+                    .replaceAll(sysPath.sep, "/"),
                 path: relativePath(sysPath.join(path, file)),
             };
         })
