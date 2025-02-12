@@ -201,7 +201,11 @@ const getAttributeBlocks = (
 const getAttributeType = (attr: Eloquent.Attribute): string => {
     const type = getActualType(attr.cast || attr.type);
 
-    return attr.nullable ? `${type}|null` : type;
+    if (attr.nullable && type !== "mixed") {
+        return `${type}|null`
+    }
+    
+    return type;
 };
 
 const mapType = (type: string): string => {
