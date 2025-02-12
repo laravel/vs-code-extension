@@ -6,12 +6,14 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { facade, relativeMarkdownLink } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
     CompletionProvider,
     FeatureTag,
     HoverProvider,
     LinkProvider,
+    ValidDetectParamTypes,
 } from "..";
 
 const toFind: FeatureTag = [
@@ -40,83 +42,149 @@ const toFind: FeatureTag = [
     },
 ];
 
+const analyzeParam = (
+    param:
+        | AutocompleteParsingResult.StringValue
+        | AutocompleteParsingResult.ArrayValue
+        | string,
+    item: AutocompleteParsingResult.ContextValue,
+    index: number,
+):
+    | { missingReason: "not_found" | "wrong_model" | "ignored" }
+    | {
+          policies: AuthItem[];
+          values: AutocompleteParsingResult.StringValue[] | { value: string }[];
+          missingReason: null;
+      } => {
+    if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+        return {
+            missingReason: "ignored",
+        };
+    }
+
+    let values = [];
+
+    if (typeof param === "string") {
+        values.push({
+            value: param,
+        });
+    } else if (param.type === "array") {
+        values.push(
+            ...param.children
+                .map((child) => {
+                    if (child.value.type === "string") {
+                        return child.value;
+                    }
+
+                    return null;
+                })
+                .filter((v) => v !== null),
+        );
+    } else {
+        values.push(param);
+    }
+
+    values = values.filter((value) => value.value !== "");
+
+    if (values.length === 0) {
+        return {
+            missingReason: "not_found",
+        };
+    }
+
+    const policies = values
+        .map((value) => getPolicies().items[value.value])
+        .flat();
+
+    if (["has"].includes(item.methodName)) {
+        return {
+            policies,
+            values,
+            missingReason: null,
+        };
+    }
+
+    if (item.arguments.children.length < 2) {
+        // We don't have a second argument, just ignore it for now
+        return {
+            missingReason: "ignored",
+        };
+    }
+
+    // @ts-ignore
+    const nextArg = item.arguments.children[1].children[0];
+    let classArg: string | null = null;
+
+    if (nextArg.type === "array") {
+        classArg = nextArg.children[0]?.value?.className;
+    } else {
+        classArg = nextArg?.className;
+    }
+
+    if (!classArg) {
+        // If it's not a class we can even identify, just ignore it
+        return {
+            missingReason: "ignored",
+        };
+    }
+
+    const found = policies.find((items) => items.model === classArg);
+
+    if (!found) {
+        return {
+            missingReason: "wrong_model",
+        };
+    }
+
+    return {
+        policies: [found],
+        values,
+        missingReason: null,
+    };
+};
+
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
-    return detectInDoc<vscode.DocumentLink, "string">(
+    return detectInDoc<vscode.DocumentLink, ValidDetectParamTypes>(
         doc,
         toFind,
         getPolicies,
         ({ param, item, index }) => {
-            const policy = getPolicies().items[param.value];
+            const result = analyzeParam(param, item, index);
 
-            if (!policy || policy.length === 0) {
+            if (result.missingReason) {
                 return null;
             }
 
-            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+            if (result.policies.length > 1) {
+                // We can't link to multiple policies, just ignore it
                 return null;
             }
 
-            if (["has"].includes(item.methodName)) {
-                return formattedLink(policy, param);
-            }
-
-            if (item.arguments.children.length < 2) {
-                // We don't have a second argument, just ignore it for now
-                return null;
-            }
-
-            // @ts-ignore
-            const nextArg = item.arguments.children[1].children[0];
-            const classArg = nextArg?.className;
-
-            if (!classArg) {
-                // If it's not a class we can even identify, just ignore it
-                return null;
-            }
-
-            const found = policy.find((item) => item.model === classArg);
-
-            if (!found) {
-                return null;
-            }
-
-            return formattedLink([found], param);
+            return result.policies
+                .map((item) => {
+                    return result.values
+                        .map(
+                            (
+                                param:
+                                    | AutocompleteParsingResult.StringValue
+                                    | { value: string },
+                            ) => {
+                                return new vscode.DocumentLink(
+                                    detectedRange(
+                                        param as AutocompleteParsingResult.StringValue,
+                                    ),
+                                    vscode.Uri.file(item.uri).with({
+                                        fragment: `L${item.line}`,
+                                    }),
+                                );
+                            },
+                        )
+                        .flat();
+                })
+                .flat();
         },
+        ["array", "string"],
     );
-};
-
-const formattedLink = (items: AuthItem[], param: any) => {
-    return items.map((item) => {
-        return new vscode.DocumentLink(
-            detectedRange(param),
-            vscode.Uri.file(item.uri).with({
-                fragment: `L${item.line}`,
-            }),
-        );
-    });
-};
-
-const formattedHover = (items: AuthItem[]) => {
-    const text = items.map((item) => {
-        if (item.policy) {
-            return [
-                "`" + item.policy + "`",
-                relativeMarkdownLink(
-                    vscode.Uri.file(item.uri).with({
-                        fragment: `L${item.line}`,
-                    }),
-                ),
-            ].join("\n\n");
-        }
-
-        return relativeMarkdownLink(
-            vscode.Uri.file(item.uri).with({
-                fragment: `L${item.line}`,
-            }),
-        );
-    });
-
-    return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
 };
 
 export const hoverProvider: HoverProvider = (
@@ -129,42 +197,36 @@ export const hoverProvider: HoverProvider = (
         toFind,
         getPolicies,
         (match, { index, item }) => {
-            const items = getPolicies().items[match];
+            const result = analyzeParam(match, item, index);
 
-            if (!items || items.length === 0) {
+            if (result.missingReason) {
                 return null;
             }
 
-            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
-                return null;
-            }
+            const text = result.policies.map((item) => {
+                if (item.policy) {
+                    return [
+                        "`" + item.policy + "`",
+                        relativeMarkdownLink(
+                            vscode.Uri.file(item.uri).with({
+                                fragment: `L${item.line}`,
+                            }),
+                        ),
+                    ].join("\n\n");
+                }
 
-            if (["has"].includes(item.methodName)) {
-                return formattedHover(items);
-            }
+                return relativeMarkdownLink(
+                    vscode.Uri.file(item.uri).with({
+                        fragment: `L${item.line}`,
+                    }),
+                );
+            });
 
-            if (item.arguments.children.length < 2) {
-                // We don't have a second argument, just ignore it for now
-                return null;
-            }
-
-            // @ts-ignore
-            const nextArg = item.arguments.children[1].children[0];
-            const classArg = nextArg?.className;
-
-            if (!classArg) {
-                // If it's not a class we can even identify, just ignore it
-                return null;
-            }
-
-            const found = items.find((item) => item.model === classArg);
-
-            if (!found) {
-                return null;
-            }
-
-            return formattedHover([found]);
+            return new vscode.Hover(
+                new vscode.MarkdownString(text.join("\n\n")),
+            );
         },
+        ["array", "string"],
     );
 };
 
@@ -176,13 +238,13 @@ export const diagnosticProvider = (
         toFind,
         getPolicies,
         ({ param, item, index }) => {
-            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+            const result = analyzeParam(param, item, index);
+
+            if (result.missingReason === null || param.value === "") {
                 return null;
             }
 
-            const policy = getPolicies().items[param.value];
-
-            if (!policy) {
+            if (result.missingReason === "not_found") {
                 return notFound(
                     "Policy",
                     param.value,
@@ -191,30 +253,10 @@ export const diagnosticProvider = (
                 );
             }
 
-            if (["has"].includes(item.methodName)) {
-                return null;
-            }
-
-            if (item.arguments.children.length < 2) {
-                // We don't have a second argument, just ignore it for now
-                return null;
-            }
-
-            // @ts-ignore
-            const nextArg = item.arguments.children[1].children[0];
-            const classArg = nextArg?.className;
-
-            if (!classArg) {
-                // If it's not a class we can even identify, just ignore it
-                return null;
-            }
-
-            const found = policy.find((item) => item.model === classArg);
-
-            if (!found) {
+            if (result.missingReason === "wrong_model") {
                 return notFound(
                     "Policy/Model match",
-                    classArg,
+                    param.value,
                     detectedRange(param),
                     "auth",
                 );
@@ -222,6 +264,7 @@ export const diagnosticProvider = (
 
             return null;
         },
+        ["array", "string"],
     );
 };
 
@@ -241,7 +284,7 @@ export const completionProvider: CompletionProvider = {
             return [];
         }
 
-        if (result.paramCount() > 0) {
+        if (result.paramIndex() > 0) {
             return [];
         }
 
