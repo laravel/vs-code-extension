@@ -1,6 +1,6 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getPolicies } from "@src/repositories/auth";
+import { AuthItem, getPolicies } from "@src/repositories/auth";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -45,57 +45,127 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         doc,
         toFind,
         getPolicies,
-        ({ param }) => {
+        ({ param, item, index }) => {
             const policy = getPolicies().items[param.value];
 
             if (!policy || policy.length === 0) {
                 return null;
             }
 
-            return policy.map((item) => {
-                return new vscode.DocumentLink(
-                    detectedRange(param),
-                    vscode.Uri.file(item.uri).with({
-                        fragment: `L${item.lineNumber}`,
-                    }),
-                );
-            });
+            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+                return null;
+            }
+
+            if (["has"].includes(item.methodName)) {
+                return formattedLink(policy, param);
+            }
+
+            if (item.arguments.children.length < 2) {
+                // We don't have a second argument, just ignore it for now
+                return null;
+            }
+
+            // @ts-ignore
+            const nextArg = item.arguments.children[1].children[0];
+            const classArg = nextArg?.className;
+
+            if (!classArg) {
+                // If it's not a class we can even identify, just ignore it
+                return null;
+            }
+
+            const found = policy.find((item) => item.model === classArg);
+
+            if (!found) {
+                return null;
+            }
+
+            return formattedLink([found], param);
         },
     );
+};
+
+const formattedLink = (items: AuthItem[], param: any) => {
+    return items.map((item) => {
+        return new vscode.DocumentLink(
+            detectedRange(param),
+            vscode.Uri.file(item.uri).with({
+                fragment: `L${item.line}`,
+            }),
+        );
+    });
+};
+
+const formattedHover = (items: AuthItem[]) => {
+    const text = items.map((item) => {
+        if (item.policy) {
+            return [
+                "`" + item.policy + "`",
+                relativeMarkdownLink(
+                    vscode.Uri.file(item.uri).with({
+                        fragment: `L${item.line}`,
+                    }),
+                ),
+            ].join("\n\n");
+        }
+
+        return relativeMarkdownLink(
+            vscode.Uri.file(item.uri).with({
+                fragment: `L${item.line}`,
+            }),
+        );
+    });
+
+    return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
 };
 
 export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, toFind, getPolicies, (match) => {
-        const items = getPolicies().items[match];
+    return findHoverMatchesInDoc(
+        doc,
+        pos,
+        toFind,
+        getPolicies,
+        (match, { index, item }) => {
+            const items = getPolicies().items[match];
 
-        if (!items || items.length === 0) {
-            return null;
-        }
-
-        const text = items.map((item) => {
-            if (item.policy_class) {
-                return [
-                    "`" + item.policy_class + "`",
-                    relativeMarkdownLink(
-                        vscode.Uri.file(item.uri).with({
-                            fragment: `L${item.lineNumber}`,
-                        }),
-                    ),
-                ].join("\n\n");
+            if (!items || items.length === 0) {
+                return null;
             }
 
-            return relativeMarkdownLink(
-                vscode.Uri.file(item.uri).with({
-                    fragment: `L${item.lineNumber}`,
-                }),
-            );
-        });
+            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+                return null;
+            }
 
-        return new vscode.Hover(new vscode.MarkdownString(text.join("\n\n")));
-    });
+            if (["has"].includes(item.methodName)) {
+                return formattedHover(items);
+            }
+
+            if (item.arguments.children.length < 2) {
+                // We don't have a second argument, just ignore it for now
+                return null;
+            }
+
+            // @ts-ignore
+            const nextArg = item.arguments.children[1].children[0];
+            const classArg = nextArg?.className;
+
+            if (!classArg) {
+                // If it's not a class we can even identify, just ignore it
+                return null;
+            }
+
+            const found = items.find((item) => item.model === classArg);
+
+            if (!found) {
+                return null;
+            }
+
+            return formattedHover([found]);
+        },
+    );
 };
 
 export const diagnosticProvider = (
@@ -105,17 +175,52 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getPolicies,
-        ({ param }) => {
-            if (getPolicies().items[param.value]) {
+        ({ param, item, index }) => {
+            if (item.type !== "methodCall" || !item.methodName || index !== 0) {
                 return null;
             }
 
-            return notFound(
-                "Policy",
-                param.value,
-                detectedRange(param),
-                "auth",
-            );
+            const policy = getPolicies().items[param.value];
+
+            if (!policy) {
+                return notFound(
+                    "Policy",
+                    param.value,
+                    detectedRange(param),
+                    "auth",
+                );
+            }
+
+            if (["has"].includes(item.methodName)) {
+                return null;
+            }
+
+            if (item.arguments.children.length < 2) {
+                // We don't have a second argument, just ignore it for now
+                return null;
+            }
+
+            // @ts-ignore
+            const nextArg = item.arguments.children[1].children[0];
+            const classArg = nextArg?.className;
+
+            if (!classArg) {
+                // If it's not a class we can even identify, just ignore it
+                return null;
+            }
+
+            const found = policy.find((item) => item.model === classArg);
+
+            if (!found) {
+                return notFound(
+                    "Policy/Model match",
+                    classArg,
+                    detectedRange(param),
+                    "auth",
+                );
+            }
+
+            return null;
         },
     );
 };
@@ -142,7 +247,7 @@ export const completionProvider: CompletionProvider = {
 
         return Object.entries(getPolicies().items).map(([key, value]) => {
             let completeItem = new vscode.CompletionItem(
-                value[0].key,
+                key,
                 vscode.CompletionItemKind.Value,
             );
 
@@ -152,7 +257,7 @@ export const completionProvider: CompletionProvider = {
             );
 
             const policyClasses = value
-                .map((item) => item.policy_class)
+                .map((item) => item.policy)
                 .filter(String);
 
             if (policyClasses.length > 0) {

@@ -1,16 +1,16 @@
 import { repository } from ".";
 import { runInLaravel, template } from "./../support/php";
 
-interface AuthItems {
+type AuthItems = {
     [key: string]: AuthItem[];
-}
+};
 
-interface AuthItem {
-    key: string;
-    policy_class: string | null;
+export type AuthItem = {
+    policy: string | null;
     uri: string;
-    lineNumber: number;
-}
+    line: number;
+    model: string | null;
+};
 
 const load = () => {
     return runInLaravel<AuthItems>(template("auth"), "Auth Data");
