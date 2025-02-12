@@ -1,5 +1,31 @@
 // This file was generated from php-templates/auth.php, do not edit directly
 export default `
+collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
+
+$modelPolicies = collect(get_declared_classes())
+    ->filter(fn($class) => is_subclass_of($class, \\Illuminate\\Database\\Eloquent\\Model::class))
+    ->filter(fn($class) => !in_array($class, [
+        \\Illuminate\\Database\\Eloquent\\Relations\\Pivot::class,
+        \\Illuminate\\Foundation\\Auth\\User::class,
+    ]))
+    ->flatMap(fn($class) => [
+        $class => Gate::getPolicyFor($class),
+    ])
+    ->filter(fn($policy) => $policy !== null);
+
+function vsCodeGetPolicyInfo($policy, $model)
+{
+    $methods = (new ReflectionClass($policy))->getMethods();
+
+    return collect($methods)->map(fn(ReflectionMethod $method) => [
+        'key' => $method->getName(),
+        'uri' => $method->getFileName(),
+        'policy' => is_string($policy) ? $policy : get_class($policy),
+        'model' => $model,
+        'line' => $method->getStartLine(),
+    ])->filter(fn($ability) => !in_array($ability['key'], ['allow', 'deny']));
+}
+
 echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
     ->map(function ($policy, $key) {
         $reflection = new \\ReflectionFunction($policy);
@@ -21,27 +47,18 @@ echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
         return [
             'key' => $key,
             'uri' => $reflection->getFileName(),
-            'policy_class' => $policyClass,
-            'lineNumber' => $reflection->getStartLine(),
+            'policy' => $policyClass,
+            'line' => $reflection->getStartLine(),
         ];
     })
     ->merge(
-        collect(\\Illuminate\\Support\\Facades\\Gate::policies())->flatMap(function ($policy, $model) {
-            $methods = (new ReflectionClass($policy))->getMethods();
-
-            return collect($methods)->map(function (ReflectionMethod $method) use ($policy) {
-                return [
-                    'key' => $method->getName(),
-                    'uri' => $method->getFileName(),
-                    'policy_class' => $policy,
-                    'lineNumber' => $method->getStartLine(),
-                ];
-            })->filter(function ($ability) {
-                return !in_array($ability['key'], ['allow', 'deny']);
-            });
-        }),
+        collect(\\Illuminate\\Support\\Facades\\Gate::policies())->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
+    )
+    ->merge(
+        $modelPolicies->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
     )
     ->values()
     ->groupBy('key')
+    ->map(fn($item) => $item->map(fn($i) => \\Illuminate\\Support\\Arr::except($i, 'key')))
     ->toJson();
 `;
