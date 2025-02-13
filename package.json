@@ -114,19 +114,19 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable diagnostics for appBinding."
+                    "description": "Enable diagnostics for app bindings."
                 },
                 "Laravel.appBinding.hover": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable hover information for appBinding."
+                    "description": "Enable hover information for app bindings."
                 },
                 "Laravel.appBinding.link": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable linking for appBinding."
+                    "description": "Enable linking for app bindings."
                 },
                 "Laravel.appBinding.completion": {
                     "type": "boolean",
@@ -182,6 +182,12 @@
                     "generated": true,
                     "description": null
                 },
+                "Laravel.bladeComponent.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for Blade components."
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -210,19 +216,19 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable diagnostics for controllerAction."
+                    "description": "Enable diagnostics for controller actions."
                 },
                 "Laravel.controllerAction.hover": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable hover information for controllerAction."
+                    "description": "Enable hover information for controller actions."
                 },
                 "Laravel.controllerAction.link": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable linking for controllerAction."
+                    "description": "Enable linking for controller actions."
                 },
                 "Laravel.controllerAction.completion": {
                     "type": "boolean",

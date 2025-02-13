@@ -1,6 +1,7 @@
 [
     {
-        "type": "appBinding"
+        "type": "appBinding",
+        "label": "app bindings"
     },
     {
         "type": "asset"
@@ -12,13 +13,15 @@
         "type": "config"
     },
     {
-        "type": "controllerAction"
+        "type": "controllerAction",
+        "label": "controller actions"
     },
     {
         "type": "env"
     },
     {
-        "type": "inertia"
+        "type": "inertia",
+        "label": "Inertia"
     },
     {
         "type": "middleware"
@@ -37,6 +40,13 @@
     },
     {
         "type": "paths",
+        "features": [
+            "link"
+        ]
+    },
+    {
+        "type": "bladeComponent",
+        "label": "Blade components",
         "features": [
             "link"
         ]
