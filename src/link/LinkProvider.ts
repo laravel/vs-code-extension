@@ -3,6 +3,7 @@
 import { linkProvider as appBinding } from "@src/features/appBinding";
 import { linkProvider as asset } from "@src/features/asset";
 import { linkProvider as auth } from "@src/features/auth";
+import { linkProvider as bladeComponent } from "@src/features/bladeComponent";
 import { linkProvider as config } from "@src/features/config";
 import { linkProvider as controllerAction } from "@src/features/controllerAction";
 import { linkProvider as env } from "@src/features/env";
@@ -37,6 +38,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     "translation.link": translation,
     "view.link": view,
     "paths.link": paths,
+    "bladeComponent.link": bladeComponent,
 };
 
 export const linkProviders: DocumentLinkProvider[] = Object.entries(

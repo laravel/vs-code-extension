@@ -11,6 +11,7 @@ usort($items, function($a, $b) {
 
 foreach ($items as $item) {
     $type = $item['type'];
+    $label = $item['label'] ?? $type;
     $features = $item['features'] ?? ['diagnostics', 'hover', 'link', 'completion'];
 
     foreach ($features as $feature) {
@@ -19,9 +20,9 @@ foreach ($items as $item) {
             'default' => true,
             'generated' => true,
             'description' => match($feature) {
-                'diagnostics' => "Enable diagnostics for {$type}.",
-                'hover' => "Enable hover information for {$type}.",
-                'link' => "Enable linking for {$type}.",
+                'diagnostics' => "Enable diagnostics for {$label}.",
+                'hover' => "Enable hover information for {$label}.",
+                'link' => "Enable linking for {$label}.",
                 default => null,
             },
         ];
@@ -36,10 +37,16 @@ $customConfig = array_filter($currentConfig, function($value, $key) {
 
 $packageJson['contributes']['configuration']['properties'] = array_merge($customConfig, $config);
 
-file_put_contents(__DIR__ . '/package.json', json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+file_put_contents(
+    __DIR__ . '/package.json',
+    json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
+);
 
 $keys = array_map(function($key) {
     return str_replace('Laravel.', '', $key);
 }, array_keys($config));
 
-file_put_contents(__DIR__ . '/src/support/generated-config.ts', "export type GeneratedConfigKey = '" . implode("' | '", $keys) . "';");
+file_put_contents(
+    __DIR__ . '/src/support/generated-config.ts',
+    "export type GeneratedConfigKey = '" . implode("' | '", $keys) . "';" . PHP_EOL
+);
