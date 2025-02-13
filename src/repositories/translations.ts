@@ -22,14 +22,12 @@ interface TranslationGroupPhpResult {
     default: string;
     translations: {
         [key: string]: {
-            [key: string]: {
-                v: string;
-                p: string;
-                li: number;
-                pa: string[];
-            };
+            [key: string]: [number, number, number, number | null];
         };
     };
+    params: string[][];
+    paths: string[];
+    values: string[];
 }
 
 const load = () => {
@@ -42,12 +40,15 @@ const load = () => {
         Object.entries(res.translations).forEach(
             ([namespace, translations]) => {
                 result[namespace] = {};
+
                 Object.entries(translations).forEach(([key, value]) => {
+                    const [v, p, li, pa] = value;
+
                     result[namespace][key] = {
-                        value: value.v,
-                        path: projectPath(value.p),
-                        line: value.li,
-                        params: value.pa,
+                        value: res.values[v],
+                        path: projectPath(res.paths[p]),
+                        line: li,
+                        params: pa === null ? [] : res.params[pa],
                     };
                 });
             },
