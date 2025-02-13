@@ -208,49 +208,100 @@ const getAttributeType = (attr: Eloquent.Attribute): string => {
     return type;
 };
 
-const mapType = (type: string): string => {
-    const mapping: Record<string, (string | RegExp)[]> = {
-        bool: [
-            "boolean(1)",
-            "boolean(0)",
-            "tinyint",
-            "tinyint unsigned",
-            "boolean",
-            /tinyint\(\d+\)/,
-        ],
-        string: [
-            "longtext",
-            "mediumtext",
-            "text",
-            /varchar\(\d+\)/,
-            /char\(\d+\)/,
-        ],
-        float: [/double\(\d+\,\d+\)/],
-        int: ["bigint", "bigint unsigned", "integer", "int unsigned"],
-        mixed: ["attribute", "accessor", "encrypted"],
-        array: ["encrypted:json", "encrypted:array", "json"],
-        "\\Illuminate\\Support\\Carbon": ["datetime", "timestamp"],
-        "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
-        object: ["encrypted:object"],
-    };
+const castMapping: Record<string, (string | RegExp)[]> = {
+    array: [
+        "json",
+        "encrypted:json",
+        "encrypted:array",
+    ],
+    int: [
+        "timestamp",
+    ],
+    mixed: [
+        "attribute",
+        "accessor",
+        "encrypted",
+    ],
+    object: [
+        "encrypted:object",
+    ],
+    string: [
+        "hashed",
+    ],
+    "\\Illuminate\\Support\\Carbon": [
+        "date",
+        "datetime",
+    ],
+    "\\Illuminate\\Support\\Collection": [
+        "encrypted:collection",
+    ],
+};
+
+const typeMapping: Record<string, (string | RegExp)[]> = {
+    bool: [
+        /^boolean(\((0|1)\))?$/,
+        /^tinyint( unsigned)?(\(\d+\))?$/,
+    ],
+    float: [
+        "real",
+        "money",
+        "double precision",
+        /^(double|decimal|numeric)(\(\d+\,\d+\))?$/,
+    ],
+    int: [
+        /^(big)?serial$/,
+        /^(small|big)?int(eger)?( unsigned)?$/,
+    ],
+    resource: [
+        "bytea",
+    ],
+    string: [
+        "box",
+        "cidr",
+        "date",
+        "inet",
+        "line",
+        "lseg",
+        "path",
+        "time",
+        "uuid",
+        "point",
+        "circle",
+        "polygon",
+        "interval",
+        /^json(b)?$/,
+        /^macaddr(8)?$/,
+        /^(long|medium)?text$/,
+        /^(var)?char(acter)?( varying)??(\(\d+\))?$/,
+        /^time(stamp)?\(\d+\)( (with|without) time zone)?$/,
+    ],
+};
+
+const findInMapping = (
+    mapping: Record<string, (string | RegExp)[]>,
+    value: string | null
+): string | null => {
+    if (value === null) {
+        return null;
+    }
 
     for (const [newType, matches] of Object.entries(mapping)) {
         for (const match of matches) {
-            if (type === match) {
+            if (match === value) {
                 return newType;
             }
 
-            if (match instanceof RegExp && type.match(match)) {
+            if (match instanceof RegExp && value.match(match)) {
                 return newType;
             }
         }
     }
 
-    return type;
+    return null;
 };
 
-const getActualType = (type: string): string => {
-    const finalType = mapType(type);
+const getActualType = (cast: string | null, type: string): string => {
+    const finalType = findInMapping(castMapping, cast) ?? findInMapping(typeMapping, type) ?? "mixed";
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;
