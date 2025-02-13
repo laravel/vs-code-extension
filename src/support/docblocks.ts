@@ -199,10 +199,10 @@ const getAttributeBlocks = (
 };
 
 const getAttributeType = (attr: Eloquent.Attribute): string => {
-    const type = getActualType(attr.cast || attr.type);
+    const type = getActualType(attr.cast, attr.type);
 
     if (attr.nullable && type !== "mixed") {
-        return `${type}|null`
+        return `${type}|null`;
     }
     
     return type;
