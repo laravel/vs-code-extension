@@ -26,7 +26,7 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
 
         return [
           "class" => $m,
-          "path" => vsCodeToRelativePath($reflected->getFileName()),
+          "path" => LaravelVsCode::relativePath($reflected->getFileName()),
           "line" =>
               $reflectedMethod->getFileName() === $reflected->getFileName()
               ? $reflectedMethod->getStartLine()
@@ -42,7 +42,7 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
 
     $result = array_merge($result, [
       "class" => $middleware,
-      "path" => vsCodeToRelativePath($reflected->getFileName()),
+      "path" => LaravelVsCode::relativePath($reflected->getFileName()),
       "line" => $reflectedMethod->getStartLine(),
     ]);
 
