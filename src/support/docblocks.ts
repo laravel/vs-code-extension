@@ -273,7 +273,7 @@ const typeMapping: Record<string, (string | RegExp)[]> = {
         /^macaddr(8)?$/,
         /^(long|medium)?text$/,
         /^(var)?char(acter)?( varying)??(\(\d+\))?$/,
-        /^time(stamp)?\(\d+\)( (with|without) time zone)?$/,
+        /^time(stamp)?(\(\d+\))?( (with|without) time zone)?$/,
     ],
 };
 
