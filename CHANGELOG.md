@@ -5,6 +5,7 @@ All notable changes to the Laravel extension will be documented in this file.
 ## [Unreleased]
 
 - Improved Gate/Policy support ([#254](https://github.com/laravel/vs-code-extension/pull/254))
+- Translation performance improvements ([#256](https://github.com/laravel/vs-code-extension/pull/256))
 
 ## [0.1.19]
 
