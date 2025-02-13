@@ -264,6 +264,7 @@ const typeMapping: Record<string, (string | RegExp)[]> = {
         "path",
         "time",
         "uuid",
+        "year",
         "point",
         "circle",
         "polygon",
