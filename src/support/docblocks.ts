@@ -258,7 +258,6 @@ const typeMapping: Record<string, (string | RegExp)[]> = {
     string: [
         "box",
         "cidr",
-        "date",
         "inet",
         "line",
         "lseg",
@@ -270,6 +269,7 @@ const typeMapping: Record<string, (string | RegExp)[]> = {
         "polygon",
         "interval",
         /^json(b)?$/,
+        /^date(time)?$/,
         /^macaddr(8)?$/,
         /^(long|medium)?text$/,
         /^(var)?char(acter)?( varying)??(\(\d+\))?$/,
