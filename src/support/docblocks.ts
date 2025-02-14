@@ -302,7 +302,7 @@ const findInMapping = (
 };
 
 const getActualType = (cast: string | null, type: string): string => {
-    const finalType = findInMapping(castMapping, cast) ?? findInMapping(typeMapping, type) ?? "mixed";
+    const finalType = findInMapping(castMapping, cast) || cast || findInMapping(typeMapping, type) || "mixed";
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;
