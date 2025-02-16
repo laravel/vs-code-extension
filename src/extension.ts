@@ -116,6 +116,11 @@ export function activate(context: vscode.ExtensionContext) {
             LANGUAGES,
         vscode.languages.registerCompletionItemProvider(
             BLADE_LANGUAGES,
+            livewireComponentCompletion,
+            ":",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
             new BladeCompletion(),
             "@",
         ),

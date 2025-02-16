@@ -38,3 +38,29 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
     return Promise.resolve(links);
 };
+
+export const completionProvider: vscode.CompletionItemProvider = {
+    provideCompletionItems(
+        doc: vscode.TextDocument,
+        pos: vscode.Position,
+    ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        const componentPrefix = "<livewire:";
+        const pathPrefix = "livewire.";
+        const line = doc.lineAt(pos.line).text;
+        const linePrefix = line.substring(
+            pos.character - componentPrefix.length,
+            pos.character,
+        );
+
+        if (linePrefix !== componentPrefix) {
+            return undefined;
+        }
+
+        return getViews()
+            .items.filter((view) => view.key.startsWith(pathPrefix))
+            .map(
+                (view) =>
+                    new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
+            );
+    },
+};
