@@ -8,6 +8,7 @@ import { linkProvider as config } from "@src/features/config";
 import { linkProvider as controllerAction } from "@src/features/controllerAction";
 import { linkProvider as env } from "@src/features/env";
 import { linkProvider as inertia } from "@src/features/inertia";
+import { linkProvider as livewireComponent } from "@src/features/livewireComponent";
 import { linkProvider as middleware } from "@src/features/middleware";
 import { linkProvider as mix } from "@src/features/mix";
 import { linkProvider as paths } from "@src/features/paths";
@@ -28,17 +29,18 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     "appBinding.link": appBinding,
     "asset.link": asset,
     "auth.link": auth,
+    "bladeComponent.link": bladeComponent,
     "config.link": config,
     "controllerAction.link": controllerAction,
     "env.link": env,
     "inertia.link": inertia,
+    "livewireComponent.link": livewireComponent,
     "middleware.link": middleware,
     "mix.link": mix,
+    "paths.link": paths,
     "route.link": route,
     "translation.link": translation,
     "view.link": view,
-    "paths.link": paths,
-    "bladeComponent.link": bladeComponent,
 };
 
 export const linkProviders: DocumentLinkProvider[] = Object.entries(

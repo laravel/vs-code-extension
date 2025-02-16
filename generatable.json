@@ -50,5 +50,12 @@
         "features": [
             "link"
         ]
+    },
+    {
+        "type": "livewireComponent",
+        "label": "Livewire components",
+        "features": [
+            "link"
+        ]
     }
 ]

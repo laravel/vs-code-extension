@@ -284,6 +284,12 @@
                     "generated": true,
                     "description": null
                 },
+                "Laravel.livewireComponent.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for Livewire components."
+                },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
                     "default": true,
