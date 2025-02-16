@@ -1,4 +1,5 @@
 import { getViews } from "@src/repositories/views";
+import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
@@ -44,6 +45,10 @@ export const completionProvider: vscode.CompletionItemProvider = {
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        if (!config("livewireComponent.completion", true)) {
+            return undefined;
+        }
+
         const componentPrefix = "<livewire:";
         const pathPrefix = "livewire.";
         const line = doc.lineAt(pos.line).text;

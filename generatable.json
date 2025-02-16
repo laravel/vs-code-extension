@@ -55,7 +55,8 @@
         "type": "livewireComponent",
         "label": "Livewire components",
         "features": [
-            "link"
+            "link",
+            "completion"
         ]
     }
 ]
