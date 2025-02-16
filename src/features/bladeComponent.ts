@@ -10,10 +10,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const views = getViews().items;
 
     lines.forEach((line, index) => {
-        const match = line.match(/<\/?(x-[^\s>]+)/);
+        const match = line.match(/<\/?x-([^\s>]+)/);
 
         if (match && match.index !== undefined) {
-            const componentName = match[1].replace("x-", "");
+            const componentName = match[1];
             // Standard component
             const viewName = "components." + componentName;
             // Index component
