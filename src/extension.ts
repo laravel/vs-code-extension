@@ -54,11 +54,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     console.log("Laravel VS Code Started...");
 
-    const LANGUAGES = [
-        { scheme: "file", language: "php" },
+    const BLADE_LANGUAGES = [
         { scheme: "file", language: "blade" },
         { scheme: "file", language: "laravel-blade" },
     ];
+
+    const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
     initVendorWatchers();
     setParserBinaryPath(context);
@@ -113,6 +114,8 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
             new BladeCompletion(),
             "@",
         ),
