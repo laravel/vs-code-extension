@@ -188,6 +188,12 @@
                     "generated": true,
                     "description": "Enable linking for Blade components."
                 },
+                "Laravel.bladeComponent.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Blade components."
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,

@@ -13,6 +13,8 @@ import EloquentCompletion from "./completion/Eloquent";
 import Registry from "./completion/Registry";
 import ValidationCompletion from "./completion/Validation";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
+import { completionProvider as bladeComponentCompletion } from "./features/bladeComponent";
+import { completionProvider as livewireComponentCompletion } from "./features/livewireComponent";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
@@ -113,7 +115,11 @@ export function activate(context: vscode.ExtensionContext) {
             ...TRIGGER_CHARACTERS.concat(["|"]),
         ),
         vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
+            BLADE_LANGUAGES,
+            bladeComponentCompletion,
+            "x",
+            "-",
+        ),
         vscode.languages.registerCompletionItemProvider(
             BLADE_LANGUAGES,
             livewireComponentCompletion,

@@ -48,7 +48,8 @@
         "type": "bladeComponent",
         "label": "Blade components",
         "features": [
-            "link"
+            "link",
+            "completion"
         ]
     },
     {
