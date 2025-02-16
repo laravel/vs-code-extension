@@ -7,12 +7,8 @@ define('LARAVEL_START', microtime(true));
 require_once __DIR__ . '/../autoload.php';
 $app = require_once __DIR__ . '/../../bootstrap/app.php';
 
-class VsCodeLaravel extends \\Illuminate\\Support\\ServiceProvider
+$app->register(new class($app) extends \\Illuminate\\Support\\ServiceProvider
 {
-    public function register()
-    {
-    }
-
     public function boot()
     {
         config([
@@ -23,18 +19,20 @@ class VsCodeLaravel extends \\Illuminate\\Support\\ServiceProvider
             'logging.default' => 'null',
         ]);
     }
-}
+});
 
-function vsCodeToRelativePath($path)
+class LaravelVsCode
 {
-    if (!str_contains($path, base_path())) {
-        return (string) $path;
-    }
+    public static function relativePath($path)
+    {
+        if (!str_contains($path, base_path())) {
+            return (string) $path;
+        }
 
-    return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
+        return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
+    }
 }
 
-$app->register(new VsCodeLaravel($app));
 $kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);
 $kernel->bootstrap();
 

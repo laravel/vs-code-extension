@@ -17,7 +17,9 @@ import {
 import { md5 } from "./util";
 
 const toTemplateVar = (str: string) => {
-    return `__VSCODE_LARAVEL_${str.toUpperCase()}__`;
+    const suffix = str === "output" ? ";" : "";
+
+    return `__VSCODE_LARAVEL_${str.toUpperCase()}__${suffix}`;
 };
 
 let defaultPhpCommand: string | null = null;
@@ -273,17 +275,19 @@ const getHashedFile = (code: string) => {
     return fixFilePath(hashedFile);
 };
 
+export const getCommandTemplate = (): string => {
+    return config<string>("phpCommand", "") || getDefaultPhpCommand();
+};
+
 export const runPhp = (
     code: string,
     description: string | null = null,
-    maxBuffer: number = 1024 * 1024 * 2, // 2MB default buffer size
 ): Promise<string> => {
     if (!code.startsWith("<?php")) {
         code = "<?php\n\n" + code;
     }
 
-    const commandTemplate =
-        config<string>("phpCommand", "") || getDefaultPhpCommand();
+    const commandTemplate = getCommandTemplate();
 
     const hashedFile = getHashedFile(code);
 
@@ -291,43 +295,30 @@ export const runPhp = (
         ? commandTemplate.replace("{code}", hashedFile)
         : `${commandTemplate} "${hashedFile}"`;
 
-    const out = new Promise<string>(function (resolve, error) {
-        cp.exec(
-            command,
-            {
-                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
-                maxBuffer,
-            },
-            (err, stdout, stderr) => {
-                // Check if the error is specifically a buffer error
-                if (
-                    err &&
-                    (err as any).code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER"
-                ) {
-                    // If we have stdout despite the buffer error, we can still use it
-                    if (stdout && stdout.length > 0) {
-                        return resolve(stdout);
-                    }
-                }
+    return new Promise<string>(function (resolve, error) {
+        let result = "";
 
-                // Handle normal execution results
-                if (!err || (stdout && !stderr)) {
-                    return resolve(stdout);
-                }
+        const child = cp.spawn(command, {
+            cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+            shell: true,
+        });
 
-                const errorOutput = stderr.length > 0 ? stderr : stdout;
+        child.stdout.on("data", (data) => {
+            result += data;
+        });
 
-                showErrorPopup(
-                    "Error:\n " + (description ?? "") + "\n\n" + errorOutput,
-                    command,
-                );
+        child.stderr.on("data", (data) => {
+            showErrorPopup(
+                "Error:\n " + (description ?? "") + "\n\n" + data,
+                command,
+            );
+            error(data);
+        });
 
-                error(errorOutput);
-            },
-        );
+        child.on("close", (code) => {
+            resolve(result);
+        });
     });
-
-    return out;
 };
 
 export const artisan = (command: string): Promise<string> => {

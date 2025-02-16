@@ -36,7 +36,7 @@ export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.37";
+    const binaryVersion = "0.1.41";
     const osPlatform = os.platform();
     const osArch = os.arch();
     const extension = osPlatform === "win32" ? ".exe" : "";
@@ -235,6 +235,10 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     validParamTypes: ValidDetectParamTypes[] = ["string"],
 ): Promise<T[]> => {
     return detect(document).then((results) => {
+        if (!results) {
+            return Promise.resolve([]);
+        }
+
         return Promise.all(
             results
                 .filter(

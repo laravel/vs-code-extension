@@ -13,7 +13,7 @@ echo collect(app()->getBindings())
 
         return [
             $key => [
-                'path' => vsCodeToRelativePath($closureClass->getFileName()),
+                'path' => LaravelVsCode::relativePath($closureClass->getFileName()),
                 'class' => $closureClass->getName(),
                 'line' => $boundTo->getStartLine(),
             ],

@@ -3,7 +3,7 @@ export default `
 $config = config('inertia.testing', []);
 
 $pagePaths = collect($config['page_paths'] ?? [])->map(function($path) {
-    return vsCodeToRelativePath($path);
+    return LaravelVsCode::relativePath($path);
 });
 
 $pageHints = collect(app('inertia.testing.view-finder')->getHints())->mapWithKeys(function ($value, $key) {

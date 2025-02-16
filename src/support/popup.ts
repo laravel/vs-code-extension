@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { config } from "./config";
+import { debugInfo } from "./debug";
 import { channel, error } from "./logger";
 
 let showErrorPopups = config<boolean>("showErrorPopups", false);
@@ -28,7 +29,17 @@ export const showErrorPopup = (...errors: string[]) => {
         {
             title: "Copy Error to Clipboard",
             command: () => {
-                vscode.env.clipboard.writeText(errors.join("\n"));
+                const finalMessage = [
+                    "Debug Info",
+                    "",
+                    JSON.stringify(debugInfo, null, 2),
+                    "",
+                    "-".repeat(40),
+                    "",
+                    ...errors,
+                ];
+
+                vscode.env.clipboard.writeText(finalMessage.join("\n"));
             },
         },
         {
