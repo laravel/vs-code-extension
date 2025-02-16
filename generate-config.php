@@ -23,6 +23,7 @@ foreach ($items as $item) {
                 'diagnostics' => "Enable diagnostics for {$label}.",
                 'hover' => "Enable hover information for {$label}.",
                 'link' => "Enable linking for {$label}.",
+                'completion' => "Enable completion for {$label}.",
                 default => null,
             },
         ];

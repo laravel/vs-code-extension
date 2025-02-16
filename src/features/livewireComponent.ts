@@ -11,15 +11,14 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const views = getViews().items;
 
     lines.forEach((line, index) => {
-        const match = line.match(/<\/?x-([^\s>]+)/);
+        const match = line.match(/<\/?livewire:([^\s>]+)/);
 
         if (match && match.index !== undefined) {
             const componentName = match[1];
             // Standard component
-            const viewName = "components." + componentName;
+            const viewName = `livewire.${componentName}`;
             // Index component
-            const altName = `${viewName}.${componentName}`;
-            const view = views.find((v) => [viewName, altName].includes(v.key));
+            const view = views.find((v) => v.key === viewName);
 
             if (view) {
                 links.push(
@@ -46,24 +45,19 @@ export const completionProvider: vscode.CompletionItemProvider = {
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.CompletionItem[]> {
-        if (!config("bladeComponent.completion", true)) {
+        if (!config("livewireComponent.completion", true)) {
             return undefined;
         }
 
-        const componentPrefixes = ["x", "x-"];
-        const pathPrefix = "components.";
+        const componentPrefix = "<livewire:";
+        const pathPrefix = "livewire.";
         const line = doc.lineAt(pos.line).text;
+        const linePrefix = line.substring(
+            pos.character - componentPrefix.length,
+            pos.character,
+        );
 
-        const match = componentPrefixes.find((prefix) => {
-            const linePrefix = line.substring(
-                pos.character - prefix.length,
-                pos.character,
-            );
-
-            return linePrefix !== prefix;
-        });
-
-        if (!match) {
+        if (linePrefix !== componentPrefix) {
             return undefined;
         }
 
@@ -71,9 +65,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
             .items.filter((view) => view.key.startsWith(pathPrefix))
             .map(
                 (view) =>
-                    new vscode.CompletionItem(
-                        "x-" + view.key.replace(pathPrefix, ""),
-                    ),
+                    new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
             );
     },
 };

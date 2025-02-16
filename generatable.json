@@ -48,7 +48,16 @@
         "type": "bladeComponent",
         "label": "Blade components",
         "features": [
-            "link"
+            "link",
+            "completion"
+        ]
+    },
+    {
+        "type": "livewireComponent",
+        "label": "Livewire components",
+        "features": [
+            "link",
+            "completion"
         ]
     }
 ]

@@ -12,14 +12,6 @@ export default class Blade implements vscode.CompletionItemProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        let isBlade =
-            ["blade", "laravel-blade"].includes(document.languageId) ||
-            document.fileName.endsWith(".blade.php");
-
-        if (!isBlade) {
-            return [];
-        }
-
         return this.getDefaultDirectives(document, position).concat(
             getCustomBladeDirectives().items.map((directive) => {
                 let completeItem = new vscode.CompletionItem(

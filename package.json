@@ -132,7 +132,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for app bindings."
                 },
                 "Laravel.asset.diagnostics": {
                     "type": "boolean",
@@ -156,7 +156,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for asset."
                 },
                 "Laravel.auth.diagnostics": {
                     "type": "boolean",
@@ -180,13 +180,19 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for auth."
                 },
                 "Laravel.bladeComponent.link": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
                     "description": "Enable linking for Blade components."
+                },
+                "Laravel.bladeComponent.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Blade components."
                 },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
@@ -210,7 +216,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for config."
                 },
                 "Laravel.controllerAction.diagnostics": {
                     "type": "boolean",
@@ -234,7 +240,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for controller actions."
                 },
                 "Laravel.env.diagnostics": {
                     "type": "boolean",
@@ -258,7 +264,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for env."
                 },
                 "Laravel.inertia.diagnostics": {
                     "type": "boolean",
@@ -282,7 +288,19 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for Inertia."
+                },
+                "Laravel.livewireComponent.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for Livewire components."
+                },
+                "Laravel.livewireComponent.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Livewire components."
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
@@ -306,7 +324,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for middleware."
                 },
                 "Laravel.mix.diagnostics": {
                     "type": "boolean",
@@ -330,7 +348,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for mix."
                 },
                 "Laravel.paths.link": {
                     "type": "boolean",
@@ -360,7 +378,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for route."
                 },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",
@@ -384,7 +402,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for translation."
                 },
                 "Laravel.view.diagnostics": {
                     "type": "boolean",
@@ -408,7 +426,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable completion for view."
                 }
             }
         }
