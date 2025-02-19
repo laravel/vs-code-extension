@@ -6,7 +6,12 @@ $pagePaths = collect($config['page_paths'] ?? [])->map(function($path) {
     return LaravelVsCode::relativePath($path);
 });
 
-$config['page_paths'] = $pagePaths->toArray();
+$pageHints = collect(app('inertia.testing.view-finder')->getHints())->mapWithKeys(function ($value, $key) {
+    return ["{$value[0]}" => $key];
+});
+
+$config['page_paths'] = $pagePaths->concat($pageHints->keys())->toArray();
+$config['page_hints'] = $pageHints->toArray();
 
 echo json_encode($config);
 `;
