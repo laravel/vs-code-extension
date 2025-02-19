@@ -100,8 +100,18 @@ $translator = new class
     protected function linesFromJsonFile($file)
     {
         $contents = file_get_contents($file);
+
+        try {
+            $json = json_decode($contents, true) ?? [];
+        } catch (Exception $e) {
+            return [[], []];
+        }
+
+        if (count($json) === 0) {
+            return [[], []];
+        }
+
         $lines = explode(PHP_EOL, $contents);
-        $json = json_decode($contents, true);
         $encoded = array_map(
             fn($k) => [json_encode($k), $k],
             array_keys($json),
