@@ -1,0 +1,26 @@
+{
+    "Hash-check.sublime-snippet": {
+        "prefix": "Hash::check",
+        "body": [
+            "Hash::check(${1:\\$value}, ${2:\\$hashedValue})$3"
+        ],
+        "description": "Check the given plain value against a hash."
+    },
+    "Hash-make.sublime-snippet": {
+        "prefix": "Hash::make",
+        "body": [
+            "Hash::make(${1:\\$value})$2"
+        ],
+        "description": "Hash the given value."
+    },
+    "Hash-needsRehash.sublime-snippet": {
+        "prefix": "Hash::needsRehash",
+        "body": [
+            "if (Hash::needsRehash(${1:\\$hashedValue}))",
+            "{",
+            "    ${2:\\$hashed} = Hash::make(${3:\\$value});",
+            "}$4"
+        ],
+        "description": "Check if the given hash has been hashed using the given options."
+    }
+}

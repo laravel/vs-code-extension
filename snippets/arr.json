@@ -1,0 +1,17 @@
+{
+    "Arr-keyBy": {
+        "prefix": "Arr::keyBy",
+        "body": "Arr::keyBy(${1:\\$array}, '${2:key}')",
+        "description": "Key an associative array by a field or using a callback (Laravel v9.2)"
+    },
+    "Arr-join": {
+        "prefix": "Arr::join",
+        "body": "Arr::join(${1:\\$array}, '${2:glue}')",
+        "description": "Join array elements with a string (Laravel v9.11)"
+    },
+    "Arr-map": {
+        "prefix": "Arr::map",
+        "body": "Arr::map(${1:\\$array}, ${2:\\$callback})",
+        "description": "Arr::map iterates through the array and passes each value and key to the given callback (Laravel v9.13)"
+    }
+}
