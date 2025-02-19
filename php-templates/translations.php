@@ -100,8 +100,18 @@ $translator = new class
     protected function linesFromJsonFile($file)
     {
         $contents = file_get_contents($file);
+
+        try {
+            $json = json_decode($contents, true) ?? [];
+        } catch (\Throwable $e) {
+            return [[], []];
+        }
+
+        if (count($json) === 0) {
+            return [[], []];
+        }
+
         $lines = explode(PHP_EOL, $contents);
-        $json = json_decode($contents, true);
         $encoded = array_map(
             fn($k) => [json_encode($k), $k],
             array_keys($json),
@@ -110,7 +120,7 @@ $translator = new class
         $searchRange = 2;
 
         foreach ($encoded as $index => $keys) {
-            // Pretty likely the be on the line that is the index, go happy path first
+            // Pretty likely to be on the line that is the index, go happy path first
             if (strpos($lines[$index + 1] ?? '', $keys[0]) !== false) {
                 $result[$keys[1]] = $index + 2;
                 continue;
