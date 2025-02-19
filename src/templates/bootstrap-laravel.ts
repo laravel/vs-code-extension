@@ -5,7 +5,35 @@ error_reporting(E_ERROR | E_PARSE);
 define('LARAVEL_START', microtime(true));
 
 require_once __DIR__ . '/../autoload.php';
-$app = require_once __DIR__ . '/../../bootstrap/app.php';
+
+class LaravelVsCode
+{
+    public static function relativePath($path)
+    {
+        if (!str_contains($path, base_path())) {
+            return (string) $path;
+        }
+
+        return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
+    }
+
+    public static function outputMarker($key)
+    {
+        return '__VSCODE_LARAVEL_' . $key . '__';
+    }
+
+    public static function startupError(\\Throwable $e)
+    {
+        throw new Error(self::outputMarker('STARTUP_ERROR') . ': ' . $e->getMessage());
+    }
+}
+
+try {
+    $app = require_once __DIR__ . '/../../bootstrap/app.php';
+} catch (\\Throwable $e) {
+    LaravelVsCode::startupError($e);
+    exit(1);
+}
 
 $app->register(new class($app) extends \\Illuminate\\Support\\ServiceProvider
 {
@@ -21,24 +49,17 @@ $app->register(new class($app) extends \\Illuminate\\Support\\ServiceProvider
     }
 });
 
-class LaravelVsCode
-{
-    public static function relativePath($path)
-    {
-        if (!str_contains($path, base_path())) {
-            return (string) $path;
-        }
-
-        return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
-    }
+try {
+    $kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);
+    $kernel->bootstrap();
+} catch (\\Throwable $e) {
+    LaravelVsCode::startupError($e);
+    exit(1);
 }
 
-$kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);
-$kernel->bootstrap();
-
-echo '__VSCODE_LARAVEL_START_OUTPUT__';
+echo LaravelVsCode::outputMarker('START_OUTPUT');
 __VSCODE_LARAVEL_OUTPUT__;
-echo '__VSCODE_LARAVEL_END_OUTPUT__';
+echo LaravelVsCode::outputMarker('END_OUTPUT');
 
 exit(0);
 `;

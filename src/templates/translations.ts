@@ -103,7 +103,7 @@ $translator = new class
 
         try {
             $json = json_decode($contents, true) ?? [];
-        } catch (Exception $e) {
+        } catch (\\Throwable $e) {
             return [[], []];
         }
 
@@ -120,7 +120,7 @@ $translator = new class
         $searchRange = 2;
 
         foreach ($encoded as $index => $keys) {
-            // Pretty likely the be on the line that is the index, go happy path first
+            // Pretty likely to be on the line that is the index, go happy path first
             if (strpos($lines[$index + 1] ?? '', $keys[0]) !== false) {
                 $result[$keys[1]] = $index + 2;
                 continue;
