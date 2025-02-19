@@ -199,54 +199,89 @@ const getAttributeBlocks = (
 };
 
 const getAttributeType = (attr: Eloquent.Attribute): string => {
-    const type = getActualType(attr.cast || attr.type);
+    const type = getActualType(attr.cast, attr.type);
 
-    return attr.nullable ? `${type}|null` : type;
-};
-
-const mapType = (type: string): string => {
-    const mapping: Record<string, (string | RegExp)[]> = {
-        bool: [
-            "boolean(1)",
-            "boolean(0)",
-            "tinyint",
-            "tinyint unsigned",
-            "boolean",
-            /tinyint\(\d+\)/,
-        ],
-        string: [
-            "longtext",
-            "mediumtext",
-            "text",
-            /varchar\(\d+\)/,
-            /char\(\d+\)/,
-        ],
-        float: [/double\(\d+\,\d+\)/],
-        int: ["bigint", "bigint unsigned", "integer", "int unsigned"],
-        mixed: ["attribute", "accessor", "encrypted"],
-        array: ["encrypted:json", "encrypted:array", "json"],
-        "\\Illuminate\\Support\\Carbon": ["datetime", "timestamp"],
-        "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
-        object: ["encrypted:object"],
-    };
-
-    for (const [newType, matches] of Object.entries(mapping)) {
-        for (const match of matches) {
-            if (type === match) {
-                return newType;
-            }
-
-            if (match instanceof RegExp && type.match(match)) {
-                return newType;
-            }
-        }
+    if (attr.nullable && type !== "mixed") {
+        return `${type}|null`;
     }
 
     return type;
 };
 
-const getActualType = (type: string): string => {
-    const finalType = mapType(type);
+type TypeMapping = Record<string, (string | RegExp)[]>;
+
+const castMapping: TypeMapping = {
+    array: ["json", "encrypted:json", "encrypted:array"],
+    int: ["timestamp"],
+    mixed: ["attribute", "accessor", "encrypted"],
+    object: ["encrypted:object"],
+    string: ["hashed"],
+    "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
+    "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
+};
+
+const typeMapping: TypeMapping = {
+    bool: [/^boolean(\((0|1)\))?$/, /^tinyint( unsigned)?(\(\d+\))?$/],
+    float: [
+        "real",
+        "money",
+        "double precision",
+        /^(double|decimal|numeric)(\(\d+\,\d+\))?$/,
+    ],
+    int: [/^(big)?serial$/, /^(small|big)?int(eger)?( unsigned)?$/],
+    resource: ["bytea"],
+    string: [
+        "box",
+        "cidr",
+        "inet",
+        "line",
+        "lseg",
+        "path",
+        "time",
+        "uuid",
+        "year",
+        "point",
+        "circle",
+        "polygon",
+        "interval",
+        /^json(b)?$/,
+        /^date(time)?$/,
+        /^macaddr(8)?$/,
+        /^(long|medium)?text$/,
+        /^(var)?char(acter)?( varying)??(\(\d+\))?$/,
+        /^time(stamp)?(\(\d+\))?( (with|without) time zone)?$/,
+    ],
+};
+
+const findInMapping = (
+    mapping: TypeMapping,
+    value: string | null,
+): string | null => {
+    if (value === null) {
+        return null;
+    }
+
+    for (const [newType, matches] of Object.entries(mapping)) {
+        for (const match of matches) {
+            if (match === value) {
+                return newType;
+            }
+
+            if (match instanceof RegExp && value.match(match)) {
+                return newType;
+            }
+        }
+    }
+
+    return null;
+};
+
+const getActualType = (cast: string | null, type: string): string => {
+    const finalType =
+        findInMapping(castMapping, cast) ||
+        cast ||
+        findInMapping(typeMapping, type) ||
+        "mixed";
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;
