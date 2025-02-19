@@ -9,7 +9,7 @@ $modelPolicies = collect(get_declared_classes())
         \Illuminate\Foundation\Auth\User::class,
     ]))
     ->flatMap(fn($class) => [
-        $class => Gate::getPolicyFor($class),
+        $class => \Illuminate\Support\Facades\Gate::getPolicyFor($class),
     ])
     ->filter(fn($policy) => $policy !== null);
 
