@@ -204,57 +204,32 @@ const getAttributeType = (attr: Eloquent.Attribute): string => {
     if (attr.nullable && type !== "mixed") {
         return `${type}|null`;
     }
-    
+
     return type;
 };
 
-const castMapping: Record<string, (string | RegExp)[]> = {
-    array: [
-        "json",
-        "encrypted:json",
-        "encrypted:array",
-    ],
-    int: [
-        "timestamp",
-    ],
-    mixed: [
-        "attribute",
-        "accessor",
-        "encrypted",
-    ],
-    object: [
-        "encrypted:object",
-    ],
-    string: [
-        "hashed",
-    ],
-    "\\Illuminate\\Support\\Carbon": [
-        "date",
-        "datetime",
-    ],
-    "\\Illuminate\\Support\\Collection": [
-        "encrypted:collection",
-    ],
+type TypeMapping = Record<string, (string | RegExp)[]>;
+
+const castMapping: TypeMapping = {
+    array: ["json", "encrypted:json", "encrypted:array"],
+    int: ["timestamp"],
+    mixed: ["attribute", "accessor", "encrypted"],
+    object: ["encrypted:object"],
+    string: ["hashed"],
+    "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
+    "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
 };
 
-const typeMapping: Record<string, (string | RegExp)[]> = {
-    bool: [
-        /^boolean(\((0|1)\))?$/,
-        /^tinyint( unsigned)?(\(\d+\))?$/,
-    ],
+const typeMapping: TypeMapping = {
+    bool: [/^boolean(\((0|1)\))?$/, /^tinyint( unsigned)?(\(\d+\))?$/],
     float: [
         "real",
         "money",
         "double precision",
         /^(double|decimal|numeric)(\(\d+\,\d+\))?$/,
     ],
-    int: [
-        /^(big)?serial$/,
-        /^(small|big)?int(eger)?( unsigned)?$/,
-    ],
-    resource: [
-        "bytea",
-    ],
+    int: [/^(big)?serial$/, /^(small|big)?int(eger)?( unsigned)?$/],
+    resource: ["bytea"],
     string: [
         "box",
         "cidr",
@@ -279,8 +254,8 @@ const typeMapping: Record<string, (string | RegExp)[]> = {
 };
 
 const findInMapping = (
-    mapping: Record<string, (string | RegExp)[]>,
-    value: string | null
+    mapping: TypeMapping,
+    value: string | null,
 ): string | null => {
     if (value === null) {
         return null;
@@ -302,7 +277,11 @@ const findInMapping = (
 };
 
 const getActualType = (cast: string | null, type: string): string => {
-    const finalType = findInMapping(castMapping, cast) || cast || findInMapping(typeMapping, type) || "mixed";
+    const finalType =
+        findInMapping(castMapping, cast) ||
+        cast ||
+        findInMapping(typeMapping, type) ||
+        "mixed";
 
     if (finalType.includes("\\") && !finalType.startsWith("\\")) {
         return `\\${finalType}`;
