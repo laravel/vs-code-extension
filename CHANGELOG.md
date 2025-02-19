@@ -8,6 +8,7 @@ All notable changes to the Laravel extension will be documented in this file.
 - Translation script fixes ([#266](https://github.com/laravel/vs-code-extension/pull/266))
 - Add missing namespace to Gate in auth template ([#265](https://github.com/laravel/vs-code-extension/pull/265))
 - Reduce error popups ([#267](https://github.com/laravel/vs-code-extension/pull/267))
+- Improvements to Eloquent docblocks ([#258](https://github.com/laravel/vs-code-extension/pull/258))
 
 ## [0.1.20]
 
