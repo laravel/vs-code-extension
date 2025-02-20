@@ -242,8 +242,11 @@ export const runInLaravel = <T>(
             throw new Error(result);
         })
         .catch((e) => {
-            if (e.toString().includes("ParseError")) {
-                // If we it's a parse error let's not show the popup,
+            if (
+                e.toString().includes("ParseError") ||
+                e.toString().includes(toTemplateVar("STARTUP_ERROR"))
+            ) {
+                // If we it's a parse error or an app-wide error let's not show the popup,
                 // probably just a momentary syntax error
                 error(e);
                 return;

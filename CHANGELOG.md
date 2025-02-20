@@ -6,6 +6,14 @@ All notable changes to the Laravel extension will be documented in this file.
 
 - Nothing yet
 
+## [0.1.21]
+
+- Additional Livewire, Volt, and Blade support ([#261](https://github.com/laravel/vs-code-extension/pull/261))
+- Translation script fixes ([#266](https://github.com/laravel/vs-code-extension/pull/266))
+- Add missing namespace to Gate in auth template ([#265](https://github.com/laravel/vs-code-extension/pull/265))
+- Reduce error popups ([#267](https://github.com/laravel/vs-code-extension/pull/267))
+- Improvements to Eloquent docblocks ([#258](https://github.com/laravel/vs-code-extension/pull/258))
+
 ## [0.1.20]
 
 - Improved Gate/Policy support ([#254](https://github.com/laravel/vs-code-extension/pull/254))

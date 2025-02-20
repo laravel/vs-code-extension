@@ -13,6 +13,8 @@ import EloquentCompletion from "./completion/Eloquent";
 import Registry from "./completion/Registry";
 import ValidationCompletion from "./completion/Validation";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
+import { completionProvider as bladeComponentCompletion } from "./features/bladeComponent";
+import { completionProvider as livewireComponentCompletion } from "./features/livewireComponent";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
@@ -54,11 +56,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     console.log("Laravel VS Code Started...");
 
-    const LANGUAGES = [
-        { scheme: "file", language: "php" },
+    const BLADE_LANGUAGES = [
         { scheme: "file", language: "blade" },
         { scheme: "file", language: "laravel-blade" },
     ];
+
+    const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
     initVendorWatchers();
     setParserBinaryPath(context);
@@ -112,7 +115,18 @@ export function activate(context: vscode.ExtensionContext) {
             ...TRIGGER_CHARACTERS.concat(["|"]),
         ),
         vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
+            BLADE_LANGUAGES,
+            bladeComponentCompletion,
+            "x",
+            "-",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
+            livewireComponentCompletion,
+            ":",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
             new BladeCompletion(),
             "@",
         ),

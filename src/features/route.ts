@@ -1,11 +1,12 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getRoutes } from "@src/repositories/routes";
+import { getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -17,6 +18,11 @@ const toFind: FeatureTag = [
         class: [...facade("Redirect"), ...facade("URL"), "redirect", "url"],
         method: ["route", "signedRoute", "temporarySignedRoute"],
     },
+    {
+        class: ["Livewire\\Volt\\Volt"],
+        method: ["route"],
+        argumentIndex: 1,
+    },
 ];
 
 const isCorrectIndexForMethod = (
@@ -26,6 +32,11 @@ const isCorrectIndexForMethod = (
     // @ts-ignore
     if (facade("Redirect").includes(item.className)) {
         return index === 0;
+    }
+
+    // @ts-ignore
+    if (item.className === "Livewire\\Volt\\Volt") {
+        return index === 1;
     }
 
     return true;
@@ -39,6 +50,22 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         ({ param, item, index }) => {
             if (!isCorrectIndexForMethod(item, index)) {
                 return null;
+            }
+
+            // @ts-ignore
+            if (item.className === "Livewire\\Volt\\Volt") {
+                const view = getViews().items.find(
+                    (v) => v.key === `livewire.${param.value}`,
+                );
+
+                if (!view) {
+                    return null;
+                }
+
+                return new vscode.DocumentLink(
+                    detectedRange(param),
+                    vscode.Uri.file(projectPath(view.path)),
+                );
             }
 
             const route = getRoutes().items.find(
