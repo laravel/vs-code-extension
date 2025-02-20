@@ -1,5 +1,11 @@
 <?php
 
+if (config()->has('modules')) {
+    $modulePath = config('modules.paths.modules');
+    $moduleModelPath = config('modules.paths.generator.model.path');
+    collect(glob("$modulePath/**/$moduleModelPath/*.php"))->each(fn ($file) => include_once ($file));
+}
+
 collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
 
 if (class_exists('\phpDocumentor\Reflection\DocBlockFactory')) {
