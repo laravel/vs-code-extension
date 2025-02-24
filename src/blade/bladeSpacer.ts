@@ -43,19 +43,25 @@ const charsForChange = (doc: TextDocument, change: TextDocumentContentChangeEven
 
 const spaceReplace = (editor: TextEditor, tagType: number, ranges: Array<Range>) => {
     const twigEnabled = config('bladeSpacer.enableTwig', true);
+    
+    const snippets: Record<number, string> = {
+        [TAG_DOUBLE]: '{{ ${1:${TM_SELECTED_TEXT/[{}]//g}} }}$0',
+        [TAG_UNESCAPED]: '{!! ${1:${TM_SELECTED_TEXT/[{} !]//g}} !!}$0',
+        [TAG_COMMENT]: '{{-- ${1:${TM_SELECTED_TEXT/(--)|[{} ]//g}} --}}$0',
+        [TAG_TWIG_PER]: '{% $1 %}$0',
+        [TAG_TWIG_HASH]: '{# $1 #}$0'
+    };
 
-    if (tagType === TAG_DOUBLE) {
-        return editor.insertSnippet(new SnippetString('{{ ${1:${TM_SELECTED_TEXT/[{}]//g}} }}$0'), ranges);
-    } else if (tagType === TAG_UNESCAPED) {
-        return editor.insertSnippet(new SnippetString('{!! ${1:${TM_SELECTED_TEXT/[{} !]//g}} !!}$0'), ranges);
-    } else if (tagType === TAG_COMMENT) {
-        return editor.insertSnippet(new SnippetString('{{-- ${1:${TM_SELECTED_TEXT/(--)|[{} ]//g}} --}}$0'), ranges);
-    } else if (twigEnabled && tagType === TAG_TWIG_PER) {
-        return editor.insertSnippet(new SnippetString('{% $1 %}$0'), ranges);
-    } else if (twigEnabled && tagType === TAG_TWIG_HASH) {
-        return editor.insertSnippet(new SnippetString('{# $1 #}$0'), ranges);
+    if (!twigEnabled && (tagType === TAG_TWIG_PER || tagType === TAG_TWIG_HASH)) {
+        return;
+    }
+    
+    const snippet = snippets[tagType];
+    if (snippet) {
+        return editor.insertSnippet(new SnippetString(snippet), ranges);
     }
 };
+
 
 export const bladeSpacer = async (e: TextDocumentChangeEvent, editor?: TextEditor) => {
     if (!editor) {
