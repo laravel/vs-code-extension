@@ -68,23 +68,25 @@ const getBuilderReturnType = (
         return "mixed";
     }
 
-    const returnType = method.return
-        .replace(
-            "$this",
-            `\\Illuminate\\Database\\Eloquent\\Builder|${className}`,
-        )
-        .replace("\\TReturn", "mixed")
-        .replace("TReturn", "mixed")
-        .replace("\\TValue", "mixed")
-        .replace("TValue", "mixed");
-
-    if (["static", "self"].includes(method.return)) {
-        return `\\Illuminate\\Database\\Eloquent\\Builder|${className}`;
-    }
-
     if (method.return === "never") {
         return "void";
     }
+
+    if (["static", "self"].includes(method.return)) {
+        return `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`;
+    }
+
+    const certainOfType = ["sole", "first", "firstOrFail"].includes(method.name);
+
+    const returnType = method.return
+        .replace(
+            "$this",
+            `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`,
+        )
+        .replace("\\TReturn", "mixed")
+        .replace("TReturn", "mixed")
+        .replace("\\TValue", certainOfType ? className : "mixed")
+        .replace("TValue", certainOfType ? className : "mixed");
 
     return returnType;
 };
@@ -99,7 +101,7 @@ const getBlocks = (
         .concat(
             [...model.scopes, "newModelQuery", "newQuery", "query"].map(
                 (method) => {
-                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder|${className} ${method}()`;
+                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}> ${method}()`;
                 },
             ),
         )
@@ -191,7 +193,7 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static \\Illuminate\\Database\\Eloquent\\Builder|${className} where${attr.title_case}($value)`,
+            `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}> where${attr.title_case}($value)`,
         );
     }
 
