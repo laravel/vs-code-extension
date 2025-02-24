@@ -92,6 +92,10 @@ const getBuilderReturnType = (
         .replace("\\TValue", certainOfType ? className : "mixed")
         .replace("TValue", certainOfType ? className : "mixed")
         .replace("object", certainOfType ? className : "mixed");
+    
+    if (returnType.includes("mixed")) {
+        return "mixed";
+    };
 
     return returnType;
 };
