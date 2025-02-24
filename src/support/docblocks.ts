@@ -80,7 +80,7 @@ const getBuilderReturnType = (
         return `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`;
     }
 
-    const certainOfType = ["sole", "first", "firstOrFail"].includes(method.name);
+    const certainOfType = ["sole", "find", "first", "firstOrFail"].includes(method.name);
 
     const returnType = method.return
         .replace(
