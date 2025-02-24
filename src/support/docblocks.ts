@@ -72,6 +72,10 @@ const getBuilderReturnType = (
         return "void";
     }
 
+    if (["when", "unless"].includes(method.name)) {
+        return "mixed";
+    }
+
     if (["static", "self"].includes(method.return)) {
         return `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`;
     }
