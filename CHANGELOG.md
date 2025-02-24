@@ -6,6 +6,10 @@ All notable changes to the Laravel extension will be documented in this file.
 
 - Nothing yet
 
+## [v1.0.0]
+
+- Stable release!
+
 ## [0.1.21]
 
 - Additional Livewire, Volt, and Blade support ([#261](https://github.com/laravel/vs-code-extension/pull/261))
