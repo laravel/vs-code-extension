@@ -90,7 +90,8 @@ const getBuilderReturnType = (
         .replace("\\TReturn", "mixed")
         .replace("TReturn", "mixed")
         .replace("\\TValue", certainOfType ? className : "mixed")
-        .replace("TValue", certainOfType ? className : "mixed");
+        .replace("TValue", certainOfType ? className : "mixed")
+        .replace("object", certainOfType ? className : "mixed");
 
     return returnType;
 };
