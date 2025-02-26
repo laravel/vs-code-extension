@@ -77,7 +77,7 @@ const getBuilderReturnType = (
     }
 
     if (["static", "self"].includes(method.return)) {
-        return `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`;
+        return `\\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className}`;
     }
 
     const certainOfType = ["sole", "find", "first", "firstOrFail"].includes(method.name);
@@ -85,7 +85,7 @@ const getBuilderReturnType = (
     const returnType = method.return
         .replace(
             "$this",
-            `\\Illuminate\\Database\\Eloquent\\Builder<${className}>`,
+            `\\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className}`,
         )
         .replace("\\TReturn", "mixed")
         .replace("TReturn", "mixed")
@@ -202,7 +202,7 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}> where${attr.title_case}($value)`,
+            `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className}> where${attr.title_case}($value)`,
         );
     }
 
