@@ -202,7 +202,7 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className}> where${attr.title_case}($value)`,
+            `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className} where${attr.title_case}($value)`,
         );
     }
 
