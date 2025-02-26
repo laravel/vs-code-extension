@@ -110,7 +110,7 @@ const getBlocks = (
         .concat(
             [...model.scopes, "newModelQuery", "newQuery", "query"].map(
                 (method) => {
-                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}> ${method}()`;
+                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className} ${method}()`;
                 },
             ),
         )
