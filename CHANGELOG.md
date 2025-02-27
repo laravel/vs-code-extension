@@ -4,7 +4,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
-- Nothing yet
+- Better support for Blade component index files ([#284](https://github.com/laravel/vs-code-extension/pull/284))
 
 ## [v1.0.0]
 
