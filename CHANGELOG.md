@@ -6,6 +6,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 - Better support for Blade component index files ([#284](https://github.com/laravel/vs-code-extension/pull/284))
 - Enable Eloquent Model property auto-complete after sole, find, first, or firstOrFail ([#274](https://github.com/laravel/vs-code-extension/pull/274))
+- Added cast custom return type from get method ([#283](https://github.com/laravel/vs-code-extension/pull/283))
 
 ## [v1.0.0]
 
