@@ -51,7 +51,27 @@ function getBuilderMethod($method, $factory)
         "parameters" => $params,
         "return" => $return,
     ];
-};
+}
+
+function getCastReturnType($className)
+{
+    if ($className === null) {
+        return null;
+    }
+
+    try {
+        $class = new \\ReflectionClass($className);
+        $method = $class->getMethod('get');
+
+        if ($method->hasReturnType()) {
+            return $method->getReturnType()->getName();
+        }
+
+        return $className;
+    } catch (\\Exception | \\Throwable $e) {
+        return $className;
+    }
+}
 
 function getModelInfo($className, $factory)
 {
@@ -91,6 +111,7 @@ function getModelInfo($className, $factory)
         ->map(fn($attrs) => array_merge($attrs, [
             'title_case' => str_replace('_', '', \\Illuminate\\Support\\Str::title($attrs['name'])),
             'documented' => $existingProperties->contains($attrs['name']),
+            'cast' =>  getCastReturnType($attrs['cast'])
         ]))
         ->toArray();
 
