@@ -18,23 +18,30 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             // Standard component
             const viewName = "components." + componentName;
             // Index component
-            const altName = `${viewName}.${componentName}`;
-            const view = views.find((v) => [viewName, altName].includes(v.key));
+            const indexName = `${viewName}.index`;
+            // Index component (via same name)
+            const sameIndexName = `${viewName}.${componentName.split(".").pop()}`;
 
-            if (view) {
-                links.push(
-                    new vscode.DocumentLink(
-                        new vscode.Range(
-                            new vscode.Position(index, match.index + 1),
-                            new vscode.Position(
-                                index,
-                                match.index + match[0].length,
-                            ),
-                        ),
-                        vscode.Uri.parse(projectPath(view.path)),
-                    ),
-                );
+            const view = views.find((v) =>
+                [viewName, indexName, sameIndexName].includes(v.key),
+            );
+
+            if (!view) {
+                return;
             }
+
+            links.push(
+                new vscode.DocumentLink(
+                    new vscode.Range(
+                        new vscode.Position(index, match.index + 1),
+                        new vscode.Position(
+                            index,
+                            match.index + match[0].length,
+                        ),
+                    ),
+                    vscode.Uri.parse(projectPath(view.path)),
+                ),
+            );
         }
     });
 
@@ -69,11 +76,23 @@ export const completionProvider: vscode.CompletionItemProvider = {
 
         return getViews()
             .items.filter((view) => view.key.startsWith(pathPrefix))
-            .map(
-                (view) =>
-                    new vscode.CompletionItem(
-                        "x-" + view.key.replace(pathPrefix, ""),
-                    ),
-            );
+            .map((view) => {
+                const parts = view.key.split(".");
+
+                if (parts[parts.length - 1] === "index") {
+                    parts.pop();
+                }
+
+                while (
+                    parts.length > 1 &&
+                    parts[parts.length - 1] === parts[parts.length - 2]
+                ) {
+                    parts.pop();
+                }
+
+                return new vscode.CompletionItem(
+                    "x-" + parts.join(".").replace(pathPrefix, ""),
+                );
+            });
     },
 };
