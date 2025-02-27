@@ -55,8 +55,6 @@ function getBuilderMethod($method, $factory)
 
 function getCastReturnType($className)
 {
-    return $className;
-
     if ($className === null) {
         return null;
     }
