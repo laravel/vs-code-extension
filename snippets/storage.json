@@ -1,0 +1,170 @@
+{
+    "Storage-allDirectories.sublime-snippet": {
+        "prefix": "Storage::allDirectories",
+        "body": [
+            "Storage::allDirectories(${1:directory});$2"
+        ],
+        "description": "Returns an array of all the directories within a given directory and all of its sub-directories"
+    },
+    "Storage-allFiles.sublime-snippet": {
+        "prefix": "Storage::allFiles",
+        "body": [
+            "Storage::allFiles(${1:directory});$2"
+        ],
+        "description": "Returns an array of all of the files in a directory and it's sub-directories"
+    },
+    "Storage-append.sublime-snippet": {
+        "prefix": "Storage::append",
+        "body": [
+            "Storage::append(${1:filePath}, ${2:Appended Text});$3"
+        ],
+        "description": "Insert content at the end of a file"
+    },
+    "Storage-cleanDirectory.sublime-snippet": {
+        "prefix": "Storage::cleanDirectory",
+        "body": [
+            "Storage::cleanDirectory(${1:directory});$2"
+        ],
+        "description": "Empty the specified directory of all files and folders."
+    },
+    "Storage-copy.sublime-snippet": {
+        "prefix": "Storage::copy",
+        "body": [
+            "Storage::copy(${1:path}, ${2:target});$3"
+        ],
+        "description": "Copy an existing file to another location on the disk"
+    },
+    "Storage-delete.sublime-snippet": {
+        "prefix": "Storage::delete",
+        "body": [
+            "Storage::delete(${1:['file', 'otherFile']});$2"
+        ],
+        "description": "Remove one or multiple files from the disk"
+    },
+    "Storage-deleteDirectory.sublime-snippet": {
+        "prefix": "Storage::deleteDirectory",
+        "body": [
+            "Storage::deleteDirectory(${1:directory});$2"
+        ],
+        "description": "May be used to remove a directory, including all of its files, from the disk"
+    },
+    "Storage-directories.sublime-snippet": {
+        "prefix": "Storage::directories",
+        "body": [
+            "Storage::directories(${1:directory});$2"
+        ],
+        "description": "Returns an array of all the directories within a given directory"
+    },
+    "Storage-exists.sublime-snippet": {
+        "prefix": "Storage::exists",
+        "body": [
+            "Storage::exists(${1:filePath});$2"
+        ],
+        "description": "Determine if a file exists."
+    },
+    "Storage-extension.sublime-snippet": {
+        "prefix": "Storage::extension",
+        "body": [
+            "Storage::extension(${1:filePath});$2"
+        ],
+        "description": "Extract the file extension from a file path."
+    },
+    "Storage-files.sublime-snippet": {
+        "prefix": "Storage::files",
+        "body": [
+            "Storage::files(${1:directory});$2"
+        ],
+        "description": "Returns an array of all of the files in a directory"
+    },
+    "Storage-get.sublime-snippet": {
+        "prefix": "Storage::get",
+        "body": [
+            "Storage::get(${1:filePath});$2"
+        ],
+        "description": "Retrieve the contents of a given file"
+    },
+    "Storage-isDirectory.sublime-snippet": {
+        "prefix": "Storage::isDirectory",
+        "body": [
+            "Storage::isDirectory(${1:directory});$2"
+        ],
+        "description": "Determine if the given path is a directory."
+    },
+    "Storage-isFile.sublime-snippet": {
+        "prefix": "Storage::isFile",
+        "body": [
+            "Storage::isFile(${1:path});$2"
+        ],
+        "description": "Determine if the given path is a directory."
+    },
+    "Storage-isWritable.sublime-snippet": {
+        "prefix": "Storage::iswritable",
+        "body": [
+            "Storage::isWritable(${1:path});$2"
+        ],
+        "description": "Determine if the given path is writable."
+    },
+    "Storage-lastModified.sublime-snippet": {
+        "prefix": "Storage::lastModified",
+        "body": [
+            "Storage::lastModified(${1:filePath});$2"
+        ],
+        "description": "Returns the UNIX timestamp of the last time the file was modified"
+    },
+    "Storage-makeDirectory.sublime-snippet": {
+        "prefix": "Storage::makeDirectory",
+        "body": [
+            "Storage::makeDirectory(${1:directory});$2"
+        ],
+        "description": "Will create the given directory, including any needed sub-directories"
+    },
+    "Storage-mimeType.sublime-snippet": {
+        "prefix": "Storage::mimeType",
+        "body": [
+            "Storage::mimeType(${1:path});$2"
+        ],
+        "description": "Get the mime-type of a given file."
+    },
+    "Storage-move.sublime-snippet": {
+        "prefix": "Storage::move",
+        "body": [
+            "Storage::move(${1:path}, ${2:target});$3"
+        ],
+        "description": "Move an existing file to a new location on the disk"
+    },
+    "Storage-name.sublime-snippet": {
+        "prefix": "Storage::name",
+        "body": [
+            "Storage::name(${1:filePath});$2"
+        ],
+        "description": "Extract the file name from a file path."
+    },
+    "Storage-prepend.sublime-snippet": {
+        "prefix": "Storage::prepend",
+        "body": [
+            "Storage::prepend(${1:filePath}, ${2:Prepended Text});$3"
+        ],
+        "description": "Insert content at the beginning of a file"
+    },
+    "Storage-put.sublime-snippet": {
+        "prefix": "Storage::put",
+        "body": [
+            "Storage::put(${1:filePath}, ${2:\\$contents});$3"
+        ],
+        "description": "Store a file on disk"
+    },
+    "Storage-size.sublime-snippet": {
+        "prefix": "Storage::size",
+        "body": [
+            "Storage::size(${1:filePath});$2"
+        ],
+        "description": "Get the size of the file in bytes"
+    },
+    "Storage-type.sublime-snippet": {
+        "prefix": "Storage::type",
+        "body": [
+            "Storage::type(${1:filePath});$2"
+        ],
+        "description": "Get the file type of a given file."
+    }
+}
