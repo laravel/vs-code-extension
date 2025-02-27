@@ -9,8 +9,9 @@ interface ClassBlock {
     blocks: string[];
 }
 
-// TODO: Chunk into several files if we have a lot of models?
-// TODO: Check if doc block is already in model file, skip if it is
+const modelBuilderType = (className: string) =>
+    `\\Illuminate\\Database\\Eloquent\\Builder<${className}>|${className}`;
+
 export const writeEloquentDocBlocks = (
     models: Eloquent.Models,
     builderMethods: Eloquent.BuilderMethod[],
@@ -68,22 +69,35 @@ const getBuilderReturnType = (
         return "mixed";
     }
 
-    const returnType = method.return
-        .replace(
-            "$this",
-            `\\Illuminate\\Database\\Eloquent\\Builder|${className}`,
-        )
-        .replace("\\TReturn", "mixed")
-        .replace("TReturn", "mixed")
-        .replace("\\TValue", "mixed")
-        .replace("TValue", "mixed");
-
-    if (["static", "self"].includes(method.return)) {
-        return `\\Illuminate\\Database\\Eloquent\\Builder|${className}`;
-    }
-
     if (method.return === "never") {
         return "void";
+    }
+
+    if (["when", "unless"].includes(method.name)) {
+        return "mixed";
+    }
+
+    if (["static", "self"].includes(method.return)) {
+        return modelBuilderType(className);
+    }
+
+    const returnsSingleModel = [
+        "sole",
+        "find",
+        "first",
+        "firstOrFail",
+    ].includes(method.name);
+
+    const returnType = method.return
+        .replace("$this", modelBuilderType(className))
+        .replace("\\TReturn", "mixed")
+        .replace("TReturn", "mixed")
+        .replace("\\TValue", returnsSingleModel ? className : "mixed")
+        .replace("TValue", returnsSingleModel ? className : "mixed")
+        .replace("object", returnsSingleModel ? className : "mixed");
+
+    if (returnType.includes("mixed")) {
+        return "mixed";
     }
 
     return returnType;
@@ -99,7 +113,7 @@ const getBlocks = (
         .concat(
             [...model.scopes, "newModelQuery", "newQuery", "query"].map(
                 (method) => {
-                    return `@method static \\Illuminate\\Database\\Eloquent\\Builder|${className} ${method}()`;
+                    return `@method static ${modelBuilderType(className)} ${method}()`;
                 },
             ),
         )
@@ -191,7 +205,7 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static \\Illuminate\\Database\\Eloquent\\Builder|${className} where${attr.title_case}($value)`,
+            `@method static ${modelBuilderType(className)} where${attr.title_case}($value)`,
         );
     }
 
