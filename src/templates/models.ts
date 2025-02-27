@@ -53,25 +53,25 @@ function getBuilderMethod($method, $factory)
     ];
 }
 
-function getCastReturnType($classname)
+function getCastReturnType($className)
 {
-    if ($classname === null) {
+    return $className;
+
+    if ($className === null) {
         return null;
     }
 
-    $returnType = $classname;
-
     try {
-        $class = new \\ReflectionClass($classname);
+        $class = new \\ReflectionClass($className);
         $method = $class->getMethod('get');
 
         if ($method->hasReturnType()) {
-            $returnType = $method->getReturnType()->getName();
+            return $method->getReturnType()->getName();
         }
 
-        return $returnType;
+        return $className;
     } catch (\\Exception | \\Throwable $e) {
-        return $returnType;
+        return $className;
     }
 }
 
