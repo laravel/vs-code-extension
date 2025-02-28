@@ -13,8 +13,6 @@ import { config } from '@src/support/config';
 const TAG_DOUBLE = 0;
 const TAG_UNESCAPED = 1;
 const TAG_COMMENT = 2;
-const TAG_TWIG_PER = 3;
-const TAG_TWIG_HASH = 4;
 
 const charsForChange = (doc: TextDocument, change: TextDocumentContentChangeEvent) => {
     if (change.text === '!') {
@@ -42,19 +40,11 @@ const charsForChange = (doc: TextDocument, change: TextDocumentContentChangeEven
 };
 
 const spaceReplace = (editor: TextEditor, tagType: number, ranges: Array<Range>) => {
-    const twigEnabled = config('bladeSpacer.enableTwig', true);
-    
     const snippets: Record<number, string> = {
         [TAG_DOUBLE]: '{{ ${1:${TM_SELECTED_TEXT/[{}]//g}} }}$0',
         [TAG_UNESCAPED]: '{!! ${1:${TM_SELECTED_TEXT/[{} !]//g}} !!}$0',
         [TAG_COMMENT]: '{{-- ${1:${TM_SELECTED_TEXT/(--)|[{} ]//g}} --}}$0',
-        [TAG_TWIG_PER]: '{% $1 %}$0',
-        [TAG_TWIG_HASH]: '{# $1 #}$0'
     };
-
-    if (!twigEnabled && (tagType === TAG_TWIG_PER || tagType === TAG_TWIG_HASH)) {
-        return;
-    }
     
     const snippet = snippets[tagType];
     if (snippet) {

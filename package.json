@@ -427,11 +427,6 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable completion for view."
-                },
-                "Laravel.bladeSpacer.enableTwig": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable support for Twig templating tags (e.g. {% %} or {#  #})"
                 }
             }
         }
