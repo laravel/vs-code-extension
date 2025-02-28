@@ -8,8 +8,6 @@ import {
     TextDocumentChangeEvent
 } from 'vscode';
 
-import { config } from '@src/support/config';
-
 const TAG_DOUBLE = 0;
 const TAG_UNESCAPED = 1;
 const TAG_COMMENT = 2;
