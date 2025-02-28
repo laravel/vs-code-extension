@@ -231,6 +231,7 @@ const castMapping: TypeMapping = {
     object: ["encrypted:object"],
     string: ["hashed"],
     "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
+    "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
 };
 
