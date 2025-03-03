@@ -7,13 +7,23 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
 const toFind: FeatureTag = [
     { method: ["route", "signedRoute", "to_route"] },
+    {
+        class: [contract("Routing\\UrlGenerator")],
+        method: ["route", "signedRoute", "temporarySignedRoute"],
+        argumentIndex: 0,
+    },
+    {
+        class: [contract("Routing\\ResponseFactory")],
+        method: "redirectToRoute",
+        argumentIndex: 0,        
+    },
     {
         class: [...facade("Redirect"), ...facade("URL"), "redirect", "url"],
         method: ["route", "signedRoute", "temporarySignedRoute"],

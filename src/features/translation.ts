@@ -9,11 +9,16 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
 const toFind: FeatureTag = [
+    {
+        class: [contract("Translation\\Translator")],
+        method: ["get", "choice"],
+        argumentIndex: 0,        
+    },    
     {
         class: facade("Lang"),
         method: ["has", "hasForLocale", "get", "getForLocale", "choice"],

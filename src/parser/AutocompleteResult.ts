@@ -1,4 +1,4 @@
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 
 export default class AutocompleteResult {
@@ -57,6 +57,14 @@ export default class AutocompleteResult {
         return this.isClass(facade(className));
     }
 
+    public isContracts(classNames: string[]) {
+        return classNames.some((className: string) => this.isContract(className));
+    }
+
+    public isContract(className: string) {
+        return this.isClass(contract(className));
+    }
+
     public func() {
         // @ts-ignore
         return this.result.methodName ?? null;
@@ -81,6 +89,10 @@ export default class AutocompleteResult {
 
             context = context.parent;
         }
+    }
+
+    public isFuncs(funcs: string[]) {
+        return funcs.some((func: string) => this.isFunc(func));
     }
 
     public isFunc(func: string) {

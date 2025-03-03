@@ -6,7 +6,7 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import * as vscode from "vscode";
 import {
     CompletionProvider,
@@ -16,6 +16,11 @@ import {
 } from "..";
 
 const toFind: FeatureTag = [
+    {
+        class: [contract("Container\\Container"), contract("Foundation\\Application")],
+        method: ["make", "bound"],
+        argumentIndex: 0,
+    },
     {
         class: [...facade("App"), "app"],
         method: ["make", "bound", "isShared"],

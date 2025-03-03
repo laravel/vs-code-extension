@@ -5,7 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { facade, relativeMarkdownLink } from "@src/support/util";
+import { contract, facade, relativeMarkdownLink } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
@@ -17,6 +17,19 @@ import {
 } from "..";
 
 const toFind: FeatureTag = [
+    {
+        class: contract("Auth\\Access\\Gate"),
+        method: [
+            "has",
+            "allows",
+            "denies",
+            "check",
+            "any",
+            "authorize",
+            "inspect",            
+        ],
+        argumentIndex: 0,
+    },
     {
         class: facade("Gate"),
         method: [
