@@ -5,27 +5,41 @@ import { getRoutes } from "@src/repositories/routes";
 import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
 
-const toFind = {
-    class: facade("Route"),
-    method: [
-        "get",
-        "post",
-        "patch",
-        "put",
-        "delete",
-        "options",
-        "any",
-        "match",
-        "fallback",
-        "addRoute",
-        "newRoute",
-    ],
-};
+const toFind = [
+    {
+        class: contract("Routing\\Registrar"),
+        method: [
+            "get",
+            "post",
+            "patch",
+            "put",
+            "delete",
+            "options",
+            "match",            
+        ]
+    },
+    {
+        class: facade("Route"),
+        method: [
+            "get",
+            "post",
+            "patch",
+            "put",
+            "delete",
+            "options",
+            "any",
+            "match",
+            "fallback",
+            "addRoute",
+            "newRoute",
+        ],
+    }
+];
 
 const isCorrectIndexForMethod = (
     item: AutocompleteParsingResult.ContextValue,
