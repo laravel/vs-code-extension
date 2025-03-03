@@ -25,6 +25,7 @@ import { setParserBinaryPath } from "./support/parser";
 import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
+import { bladeSpacer } from "./blade/bladeSpacer";
 
 let client: LanguageClient;
 
@@ -91,6 +92,9 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
+        }),
+        vscode.workspace.onDidChangeTextDocument((event) => {
+            bladeSpacer(event, vscode.window.activeTextEditor);
         }),
         // vscode.languages.registerDocumentHighlightProvider(
         //     documentSelector,
