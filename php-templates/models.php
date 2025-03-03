@@ -1,127 +1,183 @@
 <?php
 
-collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
-
 if (class_exists('\phpDocumentor\Reflection\DocBlockFactory')) {
     $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
 } else {
     $factory = null;
 }
 
-function getMethodDocblocks($method, $factory)
-{
-    if ($factory !== null) {
-        $docblock = $factory->create($method->getDocComment());
-        $params = collect($docblock->getTagsByName("param"))->map(fn($p) => (string) $p)->all();
-        $return = (string) $docblock->getTagsByName("return")[0] ?? null;
+$docblocks = new class($factory) {
+    public function __construct(protected $factory) {}
+
+    public function forMethod($method)
+    {
+        if ($this->factory !== null) {
+            $docblock = $this->factory->create($method->getDocComment());
+            $params = collect($docblock->getTagsByName("param"))->map(fn($p) => (string) $p)->all();
+            $return = (string) $docblock->getTagsByName("return")[0] ?? null;
+
+            return [$params, $return];
+        }
+
+
+        $params = collect($method->getParameters())
+            ->map(function (\ReflectionParameter $param) {
+                $types = match ($param?->getType()) {
+                    null => [],
+                    default => method_exists($param->getType(), "getTypes")
+                        ? $param->getType()->getTypes()
+                        : [$param->getType()]
+                };
+
+                $types = collect($types)
+                    ->filter()
+                    ->values()
+                    ->map(fn($t) => $t->getName());
+
+                return trim($types->join("|") . " $" . $param->getName());
+            })
+            ->all();
+
+        $return = $method->getReturnType()?->getName();
 
         return [$params, $return];
     }
-
-
-    $params = collect($method->getParameters())
-        ->map(function (\ReflectionParameter $param) {
-            $types = match ($param?->getType()) {
-                null => [],
-                default => method_exists($param->getType(), "getTypes")
-                    ? $param->getType()->getTypes()
-                    : [$param->getType()]
-            };
-
-            $types = collect($types)
-                ->filter()
-                ->values()
-                ->map(fn($t) => $t->getName());
-
-            return trim($types->join("|") . " $" . $param->getName());
-        })
-        ->all();
-
-    $return = $method->getReturnType()?->getName();
-
-    return [$params, $return];
-}
-
-function getBuilderMethod($method, $factory)
-{
-    [$params, $return] = getMethodDocblocks($method, $factory);
-
-    return [
-        "name" => $method->getName(),
-        "parameters" => $params,
-        "return" => $return,
-    ];
 };
 
-function getModelInfo($className, $factory)
-{
-    $output = new \Symfony\Component\Console\Output\BufferedOutput();
+$models = new class($factory) {
+    protected $output;
 
-    try {
-        \Illuminate\Support\Facades\Artisan::call(
-            "model:show",
-            [
-                "model" => $className,
-                "--json" => true,
-            ],
-            $output
-        );
-    } catch (\Exception | \Throwable $e) {
-        return null;
+    public function __construct(protected $factory)
+    {
+        $this->output = new \Symfony\Component\Console\Output\BufferedOutput();
     }
 
-    $data = json_decode($output->fetch(), true);
+    public function all()
+    {
+        collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
 
-    if ($data === null) {
-        return null;
+        return collect(get_declared_classes())
+            ->filter(fn($class) => is_subclass_of($class, \Illuminate\Database\Eloquent\Model::class))
+            ->filter(fn($class) => !in_array($class, [\Illuminate\Database\Eloquent\Relations\Pivot::class, \Illuminate\Foundation\Auth\User::class]))
+            ->values()
+            ->flatMap(fn(string $className) => $this->getInfo($className))
+            ->filter();
     }
 
-    $reflection = (new \ReflectionClass($className));
+    protected function getCastReturnType($className)
+    {
+        if ($className === null) {
+            return null;
+        }
 
-    if ($factory !== null && ($comment = $reflection->getDocComment())) {
-        $docblock = $factory->create($comment);
-        $existingProperties = collect($docblock->getTagsByName("property"))->map(fn($p) => $p->getVariableName());
-        $existingReadProperties = collect($docblock->getTagsByName("property-read"))->map(fn($p) => $p->getVariableName());
-        $existingProperties = $existingProperties->merge($existingReadProperties);
-    } else {
-        $existingProperties = collect();
+        try {
+            $method = (new \ReflectionClass($className))->getMethod('get');
+
+            if ($method->hasReturnType()) {
+                return $method->getReturnType()->getName();
+            }
+
+            return $className;
+        } catch (\Exception | \Throwable $e) {
+            return $className;
+        }
     }
 
-    $data['attributes'] = collect($data['attributes'])
-        ->map(fn($attrs) => array_merge($attrs, [
-            'title_case' => str_replace('_', '', \Illuminate\Support\Str::title($attrs['name'])),
-            'documented' => $existingProperties->contains($attrs['name']),
-        ]))
-        ->toArray();
+    protected function fromArtisan($className)
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call(
+                "model:show",
+                [
+                    "model" => $className,
+                    "--json" => true,
+                ],
+                $this->output
+            );
+        } catch (\Exception | \Throwable $e) {
+            return null;
+        }
 
-    $data['scopes'] = collect($reflection->getMethods())
-        ->filter(fn($method) => $method->isPublic() && !$method->isStatic() && $method->name !== '__construct')
-        ->filter(fn($method) => str_starts_with($method->name, 'scope'))
-        ->map(fn($method) => str_replace('scope', '', $method->name))
-        ->map(fn($method) => strtolower(substr($method, 0, 1)) . substr($method, 1))
-        ->values()
-        ->toArray();
+        return json_decode($this->output->fetch(), true);
+    }
 
-    $data['uri'] = $reflection->getFileName();
+    protected function collectExistingProperties($reflection)
+    {
+        if ($this->factory === null) {
+            return collect();
+        }
 
-    return [
-        $className => $data,
-    ];
-}
+        if ($comment = $reflection->getDocComment()) {
+            $docblock = $this->factory->create($comment);
 
-$reflection = new \ReflectionClass(\Illuminate\Database\Query\Builder::class);
-$builderMethods = collect($reflection->getMethods(\ReflectionMethod::IS_PUBLIC))
-    ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__"))
-    ->map(fn(\ReflectionMethod $method) => getBuilderMethod($method, $factory))
-    ->filter()
-    ->values();
+            $existingProperties = collect($docblock->getTagsByName("property"))->map(fn($p) => $p->getVariableName());
+            $existingReadProperties = collect($docblock->getTagsByName("property-read"))->map(fn($p) => $p->getVariableName());
 
-echo collect([
-    'builderMethods' => $builderMethods,
-    'models' => collect(get_declared_classes())
-        ->filter(fn($class) => is_subclass_of($class, \Illuminate\Database\Eloquent\Model::class))
-        ->filter(fn($class) => !in_array($class, [\Illuminate\Database\Eloquent\Relations\Pivot::class, \Illuminate\Foundation\Auth\User::class]))
-        ->values()
-        ->flatMap(fn(string $className) => getModelInfo($className, $factory))
-        ->filter(),
-])->toJson();
+            return $existingProperties->merge($existingReadProperties);
+        }
+
+        return collect();
+    }
+
+    protected function getInfo($className)
+    {
+        if (($data = $this->fromArtisan($className)) === null) {
+            return null;
+        }
+
+        $reflection = (new \ReflectionClass($className));
+
+        $existingProperties = $this->collectExistingProperties($reflection);
+
+        $data['attributes'] = collect($data['attributes'])
+            ->map(fn($attrs) => array_merge($attrs, [
+                'title_case' => \Illuminate\Support\Str::of($attrs['name'])->title()->replace('_', '')->toString(),
+                'documented' => $existingProperties->contains($attrs['name']),
+                'cast' =>  $this->getCastReturnType($attrs['cast'])
+            ]))
+            ->toArray();
+
+        $data['scopes'] = collect($reflection->getMethods())
+            ->filter(fn($method) => $method->isPublic() && !$method->isStatic() && str_starts_with($method->name, 'scope'))
+            ->map(fn($method) => \Illuminate\Support\Str::of($method->name)->replace('scope', '')->lcfirst()->toString())
+            ->values()
+            ->toArray();
+
+        $data['uri'] = $reflection->getFileName();
+
+        return [
+            $className => $data,
+        ];
+    }
+};
+
+$builder = new class($docblocks) {
+    public function __construct(protected $docblocks) {}
+
+    public function methods()
+    {
+        $reflection = new \ReflectionClass(\Illuminate\Database\Query\Builder::class);
+
+        return collect($reflection->getMethods(\ReflectionMethod::IS_PUBLIC))
+            ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__"))
+            ->map(fn(\ReflectionMethod $method) => $this->getMethodInfo($method))
+            ->filter()
+            ->values();
+    }
+
+    protected function getMethodInfo($method)
+    {
+        [$params, $return] = $this->docblocks->forMethod($method);
+
+        return [
+            "name" => $method->getName(),
+            "parameters" => $params,
+            "return" => $return,
+        ];
+    }
+};
+
+echo json_encode([
+    'builderMethods' => $builder->methods(),
+    'models' => $models->all(),
+]);
