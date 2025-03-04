@@ -17,6 +17,11 @@ class LaravelVsCode
         return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
     }
 
+    public static function isVendor($path)
+    {
+        return str_contains($path, base_path("vendor"));
+    }
+
     public static function outputMarker($key)
     {
         return '__VSCODE_LARAVEL_' . $key . '__';

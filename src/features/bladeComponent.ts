@@ -1,47 +1,46 @@
-import { getViews } from "@src/repositories/views";
+import { getBladeComponents } from "@src/repositories/bladeComponents";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { HoverProvider, LinkProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
+    const views = getBladeComponents().items;
 
     lines.forEach((line, index) => {
-        const match = line.match(/<\/?x-([^\s>]+)/);
+        const regexes = [
+            new RegExp(/<\/?x-([^\s>]+)/),
+            new RegExp(/<\/?((flux|what)\:[^\s>]+)/),
+        ];
 
-        if (match && match.index !== undefined) {
-            const componentName = match[1];
-            // Standard component
-            const viewName = "components." + componentName;
-            // Index component
-            const indexName = `${viewName}.index`;
-            // Index component (via same name)
-            const sameIndexName = `${viewName}.${componentName.split(".").pop()}`;
+        for (const regex of regexes) {
+            const match = line.match(regex);
+            // get reflection properties for classes
+            // auto complete them + hover?
 
-            const view = views.find((v) =>
-                [viewName, indexName, sameIndexName].includes(v.key),
-            );
+            if (match && match.index !== undefined) {
+                const component = views[match[1]];
 
-            if (!view) {
-                return;
-            }
+                if (!component) {
+                    return;
+                }
 
-            links.push(
-                new vscode.DocumentLink(
-                    new vscode.Range(
-                        new vscode.Position(index, match.index + 1),
-                        new vscode.Position(
-                            index,
-                            match.index + match[0].length,
+                links.push(
+                    new vscode.DocumentLink(
+                        new vscode.Range(
+                            new vscode.Position(index, match.index + 1),
+                            new vscode.Position(
+                                index,
+                                match.index + match[0].length,
+                            ),
                         ),
+                        vscode.Uri.parse(projectPath(component.paths[0])),
                     ),
-                    vscode.Uri.parse(projectPath(view.path)),
-                ),
-            );
+                );
+            }
         }
     });
 
@@ -74,7 +73,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getViews()
+        return getBladeComponents()
             .items.filter((view) => view.key.startsWith(pathPrefix))
             .map((view) => {
                 const parts = view.key.split(".");
@@ -95,4 +94,79 @@ export const completionProvider: vscode.CompletionItemProvider = {
                 );
             });
     },
+};
+
+export const hoverProvider: HoverProvider = (
+    doc: vscode.TextDocument,
+    pos: vscode.Position,
+): vscode.ProviderResult<vscode.Hover> => {
+    return null;
+    // const links: vscode.DocumentLink[] = [];
+    // const text = doc.getText();
+    // const lines = text.split("\n");
+    // const views = getBladeComponents().items;
+
+    // lines.forEach((line, index) => {
+    //     const match = line.match(/<\/?x-([^\s>]+)/);
+
+    //     if (match && match.index !== undefined) {
+    //         const componentName = match[1];
+    //         // Standard component
+    //         const viewName = `components.${componentName}`;
+    //         // Index component
+    //         const indexName = `${viewName}.index`;
+    //         // Index component (via same name)
+    //         const sameIndexName = `${viewName}.${componentName.split(".").pop()}`;
+
+    //         const possibleNames = [
+    //             componentName,
+    //             viewName,
+    //             indexName,
+    //             sameIndexName,
+    //         ];
+
+    //         const view = views.find((v) => possibleNames.includes(v.key));
+
+    //         if (!view) {
+    //             return;
+    //         }
+
+    //         // return new vscode.Hover(
+    //         //     new vscode.MarkdownString(
+    //         //         `[${item.path}](${
+    //         //             vscode.Uri.file(projectPath(item.path)).fsPath
+    //         //         })`,
+    //         //     ),
+    //         // );
+    //         //     new vscode.DocumentLink(
+    //         //         new vscode.Range(
+    //         //             new vscode.Position(index, match.index + 1),
+    //         //             new vscode.Position(
+    //         //                 index,
+    //         //                 match.index + match[0].length,
+    //         //             ),
+    //         //         ),
+    //         //         vscode.Uri.parse(projectPath(view.path)),
+    //         //     ),
+    //         // );
+    //     }
+    // });
+
+    // return null;
+    // return Promise.resolve(links);
+    // return findHoverMatchesInDoc(doc, pos, toFind, getBladeComponents, (match) => {
+    //     const item = getBladeComponents().items.find((view) => view.key === match);
+
+    //     if (!item) {
+    //         return null;
+    //     }
+
+    //     return new vscode.Hover(
+    //         new vscode.MarkdownString(
+    //             `[${item.path}](${
+    //                 vscode.Uri.file(projectPath(item.path)).fsPath
+    //             })`,
+    //         ),
+    //     );
+    // });
 };

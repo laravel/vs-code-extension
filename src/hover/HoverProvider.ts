@@ -2,6 +2,7 @@
 
 import { hoverProvider as appBinding } from "@src/features/appBinding";
 import { hoverProvider as auth } from "@src/features/auth";
+import { hoverProvider as bladeComponent } from "@src/features/bladeComponent";
 import { hoverProvider as config } from "@src/features/config";
 import { hoverProvider as env } from "@src/features/env";
 import { hoverProvider as inertia } from "@src/features/inertia";
@@ -32,6 +33,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     "route.hover": route,
     "translation.hover": translation,
     "view.hover": view,
+    "bladeComponent.hover": bladeComponent,
 };
 
 export const hoverProviders: HoverProvider[] = Object.entries(allProviders).map(
