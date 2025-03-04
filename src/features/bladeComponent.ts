@@ -8,39 +8,47 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getBladeComponents().items;
+    const components = getBladeComponents().items;
+    const regexes = [new RegExp(/<\/?x-([^\s>]+)/)];
+
+    if (components.prefixes.length > 0) {
+        regexes.push(
+            new RegExp(`<\\/?((${components.prefixes.join("|")})\\:[^\\s>]+)`),
+        );
+    }
 
     lines.forEach((line, index) => {
-        const regexes = [
-            new RegExp(/<\/?x-([^\s>]+)/),
-            new RegExp(/<\/?((flux|what)\:[^\s>]+)/),
-        ];
-
         for (const regex of regexes) {
             const match = line.match(regex);
             // get reflection properties for classes
             // auto complete them + hover?
 
-            if (match && match.index !== undefined) {
-                const component = views[match[1]];
-
-                if (!component) {
-                    return;
-                }
-
-                links.push(
-                    new vscode.DocumentLink(
-                        new vscode.Range(
-                            new vscode.Position(index, match.index + 1),
-                            new vscode.Position(
-                                index,
-                                match.index + match[0].length,
-                            ),
-                        ),
-                        vscode.Uri.parse(projectPath(component.paths[0])),
-                    ),
-                );
+            if (!match || match.index === undefined) {
+                continue;
             }
+
+            const component = components.components[match[1]];
+
+            if (!component) {
+                return;
+            }
+
+            const path =
+                component.paths.find((p) => p.endsWith(".blade.php")) ||
+                component.paths[0];
+
+            links.push(
+                new vscode.DocumentLink(
+                    new vscode.Range(
+                        new vscode.Position(index, match.index + 1),
+                        new vscode.Position(
+                            index,
+                            match.index + match[0].length,
+                        ),
+                    ),
+                    vscode.Uri.parse(projectPath(path)),
+                ),
+            );
         }
     });
 

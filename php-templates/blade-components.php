@@ -3,6 +3,8 @@
 $components = new class {
     protected $autoloaded = [];
 
+    protected $prefixes = [];
+
     public function __construct()
     {
         $this->autoloaded = require base_path("vendor/composer/autoload_psr4.php");
@@ -10,7 +12,7 @@ $components = new class {
 
     public function all()
     {
-        return collect(array_merge(
+        $components = collect(array_merge(
             $this->getStandardClasses(),
             $this->getStandardViews(),
             $this->getNamespaced(),
@@ -21,6 +23,11 @@ $components = new class {
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
         ]);
+
+        return [
+            'components' => $components,
+            'prefixes' => $this->prefixes,
+        ];
     }
 
     protected function getStandardViews()
@@ -139,6 +146,10 @@ $components = new class {
                         })
                 )
             );
+
+            if (!in_array($item['prefix'], $this->prefixes)) {
+                $this->prefixes[] = $item['prefix'];
+            }
         }
 
         return $components;

@@ -2,10 +2,13 @@ import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
 export interface BladeComponents {
-    [key: string]: {
-        paths: string[];
-        isVendor: boolean;
+    components: {
+        [key: string]: {
+            paths: string[];
+            isVendor: boolean;
+        };
     };
+    prefixes: string[];
 }
 
 const load = () => {
@@ -15,6 +18,9 @@ const load = () => {
 export const getBladeComponents = repository<BladeComponents>(
     load,
     "{,**/}{view,views}/{*,**/*}",
-    {},
+    {
+        components: {},
+        prefixes: [],
+    },
     ["create", "delete"],
 );
