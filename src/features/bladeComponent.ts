@@ -64,8 +64,9 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        const componentPrefixes = ["x", "x-"];
-        const pathPrefix = "components.";
+        const components = getBladeComponents().items;
+
+        const componentPrefixes = ["x", "x-"].concat(components.prefixes);
         const line = doc.lineAt(pos.line).text;
 
         const match = componentPrefixes.find((prefix) => {
@@ -81,26 +82,13 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getBladeComponents()
-            .items.filter((view) => view.key.startsWith(pathPrefix))
-            .map((view) => {
-                const parts = view.key.split(".");
+        return Object.keys(components.components).map((key) => {
+            if (key.includes("::") || !key.includes(":")) {
+                return new vscode.CompletionItem(`x-${key}`);
+            }
 
-                if (parts[parts.length - 1] === "index") {
-                    parts.pop();
-                }
-
-                while (
-                    parts.length > 1 &&
-                    parts[parts.length - 1] === parts[parts.length - 2]
-                ) {
-                    parts.pop();
-                }
-
-                return new vscode.CompletionItem(
-                    "x-" + parts.join(".").replace(pathPrefix, ""),
-                );
-            });
+            return new vscode.CompletionItem(key);
+        });
     },
 };
 
