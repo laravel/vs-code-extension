@@ -57,7 +57,8 @@ $components = new class {
                 ->replace($pathRealPath, '')
                 ->ltrim('/\\\\')
                 ->replace('.' . $extension, '')
-                ->replace(['/', '\\\\'], '.');
+                ->replace(['/', '\\\\'], '.')
+                ->pipe(fn($str) => $this->handleIndexComponents($str));
 
             $components[] = [
                 "path" => LaravelVsCode::relativePath($realPath),
@@ -138,26 +139,7 @@ $components = new class {
                     fn($key) => $key
                         ->kebab()
                         ->prepend(($item['prefix'] ?? ':') . ':')
-                        ->ltrim(':')
-                        ->when(true, function ($str) {
-                            if ($str->endsWith('.index')) {
-                                return $str->replaceLast('.index', '');
-                            }
-
-                            if (!$str->contains('.')) {
-                                return $str;
-                            }
-
-                            $parts = $str->explode('.');
-
-                            if ($parts->slice(-2)->unique()->count() === 1) {
-                                $parts->pop();
-
-                                return $str->of($parts->implode('.'));
-                            }
-
-                            return $str;
-                        })
+                        ->ltrim(':'),
                 )
             );
 
@@ -167,6 +149,27 @@ $components = new class {
         }
 
         return $components;
+    }
+
+    protected function handleIndexComponents($str)
+    {
+        if ($str->endsWith('.index')) {
+            return $str->replaceLast('.index', '');
+        }
+
+        if (!$str->contains('.')) {
+            return $str;
+        }
+
+        $parts = $str->explode('.');
+
+        if ($parts->slice(-2)->unique()->count() === 1) {
+            $parts->pop();
+
+            return \\Illuminate\\Support\\Str::of($parts->implode('.'));
+        }
+
+        return $str;
     }
 
     protected function getNamespaced()
