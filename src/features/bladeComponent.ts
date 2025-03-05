@@ -1,34 +1,39 @@
-import { getViews } from "@src/repositories/views";
+import { getBladeComponents } from "@src/repositories/bladeComponents";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { HoverProvider, LinkProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
+    const components = getBladeComponents().items;
+    const regexes = [new RegExp(/<\/?x-([^\s>]+)/)];
+
+    if (components.prefixes.length > 0) {
+        regexes.push(
+            new RegExp(`<\\/?((${components.prefixes.join("|")})\\:[^\\s>]+)`),
+        );
+    }
 
     lines.forEach((line, index) => {
-        const match = line.match(/<\/?x-([^\s>]+)/);
+        for (const regex of regexes) {
+            const match = line.match(regex);
 
-        if (match && match.index !== undefined) {
-            const componentName = match[1];
-            // Standard component
-            const viewName = "components." + componentName;
-            // Index component
-            const indexName = `${viewName}.index`;
-            // Index component (via same name)
-            const sameIndexName = `${viewName}.${componentName.split(".").pop()}`;
+            if (!match || match.index === undefined) {
+                continue;
+            }
 
-            const view = views.find((v) =>
-                [viewName, indexName, sameIndexName].includes(v.key),
-            );
+            const component = components.components[match[1]];
 
-            if (!view) {
+            if (!component) {
                 return;
             }
+
+            const path =
+                component.paths.find((p) => p.endsWith(".blade.php")) ||
+                component.paths[0];
 
             links.push(
                 new vscode.DocumentLink(
@@ -39,7 +44,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                             match.index + match[0].length,
                         ),
                     ),
-                    vscode.Uri.parse(projectPath(view.path)),
+                    vscode.Uri.file(projectPath(path)),
                 ),
             );
         }
@@ -57,8 +62,9 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        const componentPrefixes = ["x", "x-"];
-        const pathPrefix = "components.";
+        const components = getBladeComponents().items;
+
+        const componentPrefixes = ["x", "x-"].concat(components.prefixes);
         const line = doc.lineAt(pos.line).text;
 
         const match = componentPrefixes.find((prefix) => {
@@ -74,25 +80,64 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getViews()
-            .items.filter((view) => view.key.startsWith(pathPrefix))
-            .map((view) => {
-                const parts = view.key.split(".");
+        return Object.keys(components.components).map((key) => {
+            if (key.includes("::") || !key.includes(":")) {
+                return new vscode.CompletionItem(`x-${key}`);
+            }
 
-                if (parts[parts.length - 1] === "index") {
-                    parts.pop();
-                }
-
-                while (
-                    parts.length > 1 &&
-                    parts[parts.length - 1] === parts[parts.length - 2]
-                ) {
-                    parts.pop();
-                }
-
-                return new vscode.CompletionItem(
-                    "x-" + parts.join(".").replace(pathPrefix, ""),
-                );
-            });
+            return new vscode.CompletionItem(key);
+        });
     },
+};
+
+export const hoverProvider: HoverProvider = (
+    doc: vscode.TextDocument,
+    pos: vscode.Position,
+): vscode.ProviderResult<vscode.Hover> => {
+    const components = getBladeComponents().items;
+    const regexes = [new RegExp(/<\/?x-([^\s>]+)/)];
+
+    if (components.prefixes.length > 0) {
+        regexes.push(
+            new RegExp(`<\\/?((${components.prefixes.join("|")})\\:[^\\s>]+)`),
+        );
+    }
+
+    for (const regex of regexes) {
+        const linkRange = doc.getWordRangeAtPosition(pos, regex);
+
+        if (!linkRange) {
+            continue;
+        }
+
+        const match = doc
+            .getText(linkRange)
+            .replace("<", "")
+            .replace("/", "")
+            .replace("x-", "");
+
+        const component = components.components[match];
+
+        if (!component) {
+            return null;
+        }
+
+        const lines = component.paths.map(
+            (path) => `[${path}](${vscode.Uri.file(projectPath(path))})`,
+        );
+
+        lines.push(
+            ...component.props.map((prop) =>
+                [
+                    "`" + prop.type + "` ",
+                    "`" + prop.name + "`",
+                    prop.default ? ` = ${prop.default}` : "",
+                ].join(""),
+            ),
+        );
+
+        return new vscode.Hover(new vscode.MarkdownString(lines.join("\n\n")));
+    }
+
+    return null;
 };

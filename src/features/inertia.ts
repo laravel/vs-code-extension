@@ -103,9 +103,9 @@ export const hoverProvider: HoverProvider = (
 
             return new vscode.Hover(
                 new vscode.MarkdownString(
-                    `[${found.path}](${
-                        vscode.Uri.file(projectPath(found.path)).fsPath
-                    })`,
+                    `[${found.path}](${vscode.Uri.file(
+                        projectPath(found.path),
+                    )})`,
                 ),
             );
         },

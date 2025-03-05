@@ -194,6 +194,12 @@
                     "generated": true,
                     "description": "Enable completion for Blade components."
                 },
+                "Laravel.bladeComponent.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable hover information for Blade components."
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,
