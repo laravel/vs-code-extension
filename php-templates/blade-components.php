@@ -22,6 +22,7 @@ $components = new class {
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
+            'props' => $items->pluck('props')->values()->filter()->flatMap(fn($i) => $i),
         ]);
 
         return [
@@ -74,13 +75,54 @@ $components = new class {
     {
         $path = app_path('View/Components');
 
-        return $this->findFiles(
+        $appNamespace = collect($this->autoloaded)
+            ->filter(fn($paths) => in_array(app_path(), $paths))
+            ->keys()
+            ->first() ?? '';
+
+        return collect($this->findFiles(
             $path,
             'php',
             fn($key) => $key->explode('.')
                 ->map(fn($p) => \Illuminate\Support\Str::kebab($p))
                 ->implode('.'),
-        );
+        ))->map(function ($item) use ($appNamespace) {
+            $class = \Illuminate\Support\Str::of($item['path'])
+                ->after('View/Components/')
+                ->replace('.php', '')
+                ->prepend($appNamespace . 'View\\Components\\')
+                ->toString();
+
+            if (!class_exists($class)) {
+                return $item;
+            }
+
+            $reflection = new \ReflectionClass($class);
+            $parameters = collect($reflection->getConstructor()->getParameters())
+                ->filter(fn($p) => $p->isPromoted())
+                ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $p->getDefaultValue() : null])
+                ->all();
+
+            $props = collect($reflection->getProperties())
+                ->filter(fn($p) => $p->isPublic() && $p->getDeclaringClass()->getName() === $class)
+                ->map(fn($p) => [
+                    'name' => \Illuminate\Support\Str::kebab($p->getName()),
+                    'type' => (string) ($p->getType() ?? 'mixed'),
+                    'default' => $p->getDefaultValue() ?? $parameters[$p->getName()] ?? null,
+                ]);
+
+            [$except, $props] = $props->partition(fn($p) => $p['name'] === 'except');
+
+            if ($except->isNotEmpty()) {
+                $except = $except->first()['default'];
+                $props = $props->reject(fn($p) => in_array($p['name'], $except));
+            }
+
+            return [
+                ...$item,
+                'props' => $props,
+            ];
+        })->all();
     }
 
     protected function getAliases()

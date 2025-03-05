@@ -122,18 +122,21 @@ export const hoverProvider: HoverProvider = (
             return null;
         }
 
-        return new vscode.Hover(
-            new vscode.MarkdownString(
-                component.paths
-                    .map(
-                        (path) =>
-                            `[${path}](${
-                                vscode.Uri.file(projectPath(path)).fsPath
-                            })`,
-                    )
-                    .join("\n\n"),
+        const lines = component.paths.map(
+            (path) => `[${path}](${vscode.Uri.file(projectPath(path)).fsPath})`,
+        );
+
+        lines.push(
+            ...component.props.map((prop) =>
+                [
+                    "`" + prop.type + "` ",
+                    "`" + prop.name + "`",
+                    prop.default ? ` = ${prop.default}` : "",
+                ].join(""),
             ),
         );
+
+        return new vscode.Hover(new vscode.MarkdownString(lines.join("\n\n")));
     }
 
     return null;
