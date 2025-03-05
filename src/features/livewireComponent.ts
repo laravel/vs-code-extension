@@ -30,7 +30,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                                 match.index + match[0].length,
                             ),
                         ),
-                        vscode.Uri.parse(projectPath(view.path)),
+                        vscode.Uri.file(projectPath(view.path)),
                     ),
                 );
             }

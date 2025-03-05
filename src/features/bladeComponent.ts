@@ -44,7 +44,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                             match.index + match[0].length,
                         ),
                     ),
-                    vscode.Uri.parse(projectPath(path)),
+                    vscode.Uri.file(projectPath(path)),
                 ),
             );
         }
@@ -123,7 +123,7 @@ export const hoverProvider: HoverProvider = (
         }
 
         const lines = component.paths.map(
-            (path) => `[${path}](${vscode.Uri.file(projectPath(path)).fsPath})`,
+            (path) => `[${path}](${vscode.Uri.file(projectPath(path))})`,
         );
 
         lines.push(
