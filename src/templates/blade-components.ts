@@ -47,12 +47,14 @@ $components = new class {
             ->files()
             ->name("*." . $extension)
             ->in($path);
+        $components = [];
+        $pathRealPath = realpath($path);
 
         foreach ($files as $file) {
             $realPath = $file->getRealPath();
 
             $key = \\Illuminate\\Support\\Str::of($realPath)
-                ->replace(realpath($path), '')
+                ->replace($pathRealPath, '')
                 ->ltrim('/\\\\')
                 ->replace('.' . $extension, '')
                 ->replace(['/', '\\\\'], '.');
@@ -99,16 +101,28 @@ $components = new class {
         return $components;
     }
 
-    protected function getExtensions()
-    {
-        // \\Illuminate\\Support\\Facades\\Blade::getExtensions(),
-        return [];
-    }
-
     protected function getAnonymousNamespaced()
     {
-        // \\Illuminate\\Support\\Facades\\Blade::getAnonymousComponentNamespaces();
-        return [];
+        $components = [];
+
+        foreach (\\Illuminate\\Support\\Facades\\Blade::getAnonymousComponentNamespaces() as $key => $dir) {
+            $path = collect([$dir, resource_path('views/' . $dir)])->first(fn($p) => is_dir($p));
+
+            if (!$path) {
+                continue;
+            }
+
+            array_push(
+                $components,
+                ...$this->findFiles(
+                    $path,
+                    'blade.php',
+                    fn($k) => $k->kebab()->prepend($key . "::"),
+                )
+            );
+        }
+
+        return $components;
     }
 
     protected function getAnonymous()
