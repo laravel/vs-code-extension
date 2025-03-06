@@ -10,6 +10,7 @@ All notable changes to the Laravel extension will be documented in this file.
 - Blade component improvements ([#305](https://github.com/laravel/vs-code-extension/pull/305))
 - Add parsing of immutable dates ([#290](https://github.com/laravel/vs-code-extension/pull/290))
 - Add auto-spacing for Blade tags ([#273](https://github.com/laravel/vs-code-extension/pull/273))
+- Add Lando to list of detectable PHP environments ([#241](https://github.com/laravel/vs-code-extension/pull/241))
 
 ## [v1.0.0]
 
