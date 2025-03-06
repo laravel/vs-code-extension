@@ -110,6 +110,11 @@
                     "default": true,
                     "description": "Show popups for errors."
                 },
+                "Laravel.blade.autoSpaceTags": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically add spacing around Blade echo and comment tags."
+                },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
                     "default": true,
