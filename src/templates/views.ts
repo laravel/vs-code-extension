@@ -1,60 +1,111 @@
 // This file was generated from php-templates/views.php, do not edit directly
 export default `
 $blade = new class {
-  public function findFiles($path)
-  {
-    $paths = [];
+    public function getAllViews()
+    {
+        $finder = app("view")->getFinder();
 
-    if (!is_dir($path)) {
-      return $paths;
+        $paths = collect($finder->getPaths())->flatMap(fn($path) => $this->findViews($path));
+
+        $hints = collect($finder->getHints())->flatMap(
+            fn($paths, $key) => collect($paths)->flatMap(
+                fn($path) => collect($this->findViews($path))->map(
+                    fn($value) => array_merge($value, ["key" => "{$key}::{$value["key"]}"])
+                )
+            )
+        );
+
+        [$local, $vendor] = $paths
+            ->merge($hints)
+            ->values()
+            ->partition(fn($v) => !$v["isVendor"]);
+
+        return $local
+            ->sortBy("key", SORT_NATURAL)
+            ->merge($vendor->sortBy("key", SORT_NATURAL));
     }
 
-    $files = \\Symfony\\Component\\Finder\\Finder::create()
-      ->files()
-      ->name("*.blade.php")
-      ->in($path);
+    public function getAllComponents()
+    {
+        $namespaced = \\Illuminate\\Support\\Facades\\Blade::getClassComponentNamespaces();
+        $autoloaded = require base_path("vendor/composer/autoload_psr4.php");
+        $components = [];
 
-    foreach ($files as $file) {
-      $paths[] = [
-        "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $file->getRealPath()),
-        "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
-        "key" => \\Illuminate\\Support\\Str::of($file->getRealPath())
-          ->replace(realpath($path), "")
-          ->replace(".blade.php", "")
-          ->ltrim(DIRECTORY_SEPARATOR)
-          ->replace(DIRECTORY_SEPARATOR, ".")
-      ];
+        foreach ($namespaced as $key => $ns) {
+            $path = null;
+
+            foreach ($autoloaded as $namespace => $paths) {
+                if (str_starts_with($ns, $namespace)) {
+                    foreach ($paths as $p) {
+                        $test = \\Illuminate\\Support\\Str::of($ns)->replace($namespace, '')->replace('\\\\', '/')->prepend($p . DIRECTORY_SEPARATOR)->toString();
+
+                        if (is_dir($test)) {
+                            $path = $test;
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            if (!$path) {
+                continue;
+            }
+
+            $files = \\Symfony\\Component\\Finder\\Finder::create()
+                ->files()
+                ->name("*.php")
+                ->in($path);
+
+            foreach ($files as $file) {
+                $realPath = $file->getRealPath();
+
+                $components[] = [
+                    "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $realPath),
+                    "isVendor" => str_contains($realPath, base_path("vendor")),
+                    "key" =>  \\Illuminate\\Support\\Str::of($realPath)
+                        ->replace(realpath($path), "")
+                        ->replace(".php", "")
+                        ->ltrim(DIRECTORY_SEPARATOR)
+                        ->replace(DIRECTORY_SEPARATOR, ".")
+                        ->kebab()
+                        ->prepend($key . "::"),
+                ];
+            }
+        }
+
+        return $components;
     }
 
-    return $paths;
-  }
+    protected function findViews($path)
+    {
+        $paths = [];
+
+        if (!is_dir($path)) {
+            return $paths;
+        }
+
+        $files = \\Symfony\\Component\\Finder\\Finder::create()
+            ->files()
+            ->name("*.blade.php")
+            ->in($path);
+
+        foreach ($files as $file) {
+            $paths[] = [
+                "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $file->getRealPath()),
+                "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
+                "key" => \\Illuminate\\Support\\Str::of($file->getRealPath())
+                    ->replace(realpath($path), "")
+                    ->replace(".blade.php", "")
+                    ->ltrim(DIRECTORY_SEPARATOR)
+                    ->replace(DIRECTORY_SEPARATOR, ".")
+            ];
+        }
+
+        return $paths;
+    }
 };
 
-$paths = collect(
-  app("view")
-    ->getFinder()
-    ->getPaths()
-)->flatMap(fn($path) => $blade->findFiles($path));
-
-$hints = collect(
-  app("view")
-    ->getFinder()
-    ->getHints()
-)->flatMap(
-  fn($paths, $key) => collect($paths)->flatMap(
-    fn($path) => collect($blade->findFiles($path))->map(
-      fn($value) => array_merge($value, ["key" => "{$key}::{$value["key"]}"])
-    )
-  )
-);
-
-[$local, $vendor] = $paths
-  ->merge($hints)
-  ->values()
-  ->partition(fn($v) => !$v["isVendor"]);
-
-echo $local
-  ->sortBy("key", SORT_NATURAL)
-  ->merge($vendor->sortBy("key", SORT_NATURAL))
-  ->toJson();
+echo json_encode($blade->getAllViews()->merge($blade->getAllComponents()));
 `;

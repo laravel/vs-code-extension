@@ -1,5 +1,6 @@
 import app from "./app";
 import auth from "./auth";
+import bladeComponents from "./blade-components";
 import bladeDirectives from "./blade-directives";
 import bootstrapLaravel from "./bootstrap-laravel";
 import configs from "./configs";
@@ -13,6 +14,7 @@ import views from "./views";
 const templates = {
     app,
     auth,
+    bladeComponents,
     bladeDirectives,
     bootstrapLaravel,
     configs,
