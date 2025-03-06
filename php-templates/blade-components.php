@@ -98,7 +98,7 @@ $components = new class {
             }
 
             $reflection = new \ReflectionClass($class);
-            $parameters = collect($reflection->getConstructor()->getParameters())
+            $parameters = collect($reflection->getConstructor()?->getParameters() ?? [])
                 ->filter(fn($p) => $p->isPromoted())
                 ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $p->getDefaultValue() : null])
                 ->all();
