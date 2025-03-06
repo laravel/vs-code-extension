@@ -21,4 +21,10 @@ export const configAffected = (
     ...keys: ConfigKey[]
 ): boolean => keys.some((key) => event.affectsConfiguration(configKey(key)));
 
-export type PhpEnvironment = "auto" | "herd" | "valet" | "sail" | "local";
+export type PhpEnvironment =
+    | "auto"
+    | "herd"
+    | "valet"
+    | "sail"
+    | "local"
+    | "lando";
