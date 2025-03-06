@@ -138,6 +138,181 @@
         "blade": {
             "patterns": [
                 {
+                    "begin": "((?:\\b(?:(?<!<|<\/))x-[-a-zA-Z0-9]+:?)|(?:(?<=\\s)@(?:(?=[-a-zA-Z0-9]+=)))|(?:(?<=\\s)::))(?:([-a-zA-Z0-9]+)([.]{1}[-a-zA-Z0-9.]+)?)?(?![\\w:-])",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "entity.other.attribute-name.html"
+                        },
+                        "1": {
+                            "name": "alpine.directive.name"
+                        },
+                        "2": {
+                            "name": "alpine.directive.event"
+                        },
+                        "3": {
+                            "name": ".modifier"
+                        }
+                    },
+                    "end": "(?=\\s*+[^=\\s])",
+                    "name": "alpine.directive",
+                    "patterns": [
+                        {
+                            "begin": "=",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "punctuation.separator.key-value.html"
+                                }
+                            },
+                            "end": "(?<=[^\\s=])(?!\\s*=)|(?=/?>)",
+                            "patterns": [
+                                {
+                                    "begin": "(?=[^\\s=<>`/]|/(?!>))",
+                                    "end": "(?!\\G)",
+                                    "name": "meta.embedded.line.js",
+                                    "patterns": [
+                                        {
+                                            "captures": {
+                                                "0": {
+                                                    "name": "source.js"
+                                                },
+                                                "1": {
+                                                    "patterns": [
+                                                        {
+                                                            "include": "source.js"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "match": "(([^\\s\"'=<>`/]|/(?!>))+)",
+                                            "name": "string.unquoted.html"
+                                        },
+                                        {
+                                            "begin": "\"",
+                                            "beginCaptures": {
+                                                "0": {
+                                                    "name": "punctuation.definition.string.begin.html"
+                                                }
+                                            },
+                                            "contentName": "source.js",
+                                            "end": "(\")",
+                                            "endCaptures": {
+                                                "0": {
+                                                    "name": "punctuation.definition.string.end.html"
+                                                },
+                                                "1": {
+                                                    "name": "source.js-ignored-vscode"
+                                                }
+                                            },
+                                            "name": "string.quoted.double.html",
+                                            "patterns": [
+                                                {
+                                                    "captures": {
+                                                        "0": {
+                                                            "patterns": [
+                                                                {
+                                                                    "include": "source.js"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "match": "([^\\n\"/]|/(?![/*]))+"
+                                                },
+                                                {
+                                                    "begin": "//",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.js"
+                                                        }
+                                                    },
+                                                    "end": "(?=\")|\\n",
+                                                    "name": "comment.line.double-slash.js"
+                                                },
+                                                {
+                                                    "begin": "/\\*",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.begin.js"
+                                                        }
+                                                    },
+                                                    "end": "(?=\")|\\*/",
+                                                    "endCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.end.js"
+                                                        }
+                                                    },
+                                                    "name": "comment.block.js"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "begin": "'",
+                                            "beginCaptures": {
+                                                "0": {
+                                                    "name": "punctuation.definition.string.begin.html"
+                                                }
+                                            },
+                                            "contentName": "source.js",
+                                            "end": "(')",
+                                            "endCaptures": {
+                                                "0": {
+                                                    "name": "punctuation.definition.string.end.html"
+                                                },
+                                                "1": {
+                                                    "name": "source.js-ignored-vscode"
+                                                }
+                                            },
+                                            "name": "string.quoted.single.html",
+                                            "patterns": [
+                                                {
+                                                    "captures": {
+                                                        "0": {
+                                                            "patterns": [
+                                                                {
+                                                                    "include": "source.js"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "match": "([^\\n'/]|/(?![/*]))+"
+                                                },
+                                                {
+                                                    "begin": "//",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.js"
+                                                        }
+                                                    },
+                                                    "end": "(?=')|\\n",
+                                                    "name": "comment.line.double-slash.js"
+                                                },
+                                                {
+                                                    "begin": "/\\*",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.begin.js"
+                                                        }
+                                                    },
+                                                    "end": "(?=')|\\*/",
+                                                    "endCaptures": {
+                                                        "0": {
+                                                            "name": "punctuation.definition.comment.end.js"
+                                                        }
+                                                    },
+                                                    "name": "comment.block.js"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "match": "=",
+                                    "name": "invalid.illegal.unexpected-equals-sign.html"
+                                }
+                            ]
+                        }
+                    ]
+                },                
+                {
                     "begin": "{{--",
                     "beginCaptures": {
                         "0": {
