@@ -90,6 +90,7 @@ $components = new class {
             $class = \\Illuminate\\Support\\Str::of($item['path'])
                 ->after('View/Components/')
                 ->replace('.php', '')
+                ->replace('/', '\\\\')
                 ->prepend($appNamespace . 'View\\\\Components\\\\')
                 ->toString();
 
