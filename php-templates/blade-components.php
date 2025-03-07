@@ -90,6 +90,7 @@ $components = new class {
             $class = \Illuminate\Support\Str::of($item['path'])
                 ->after('View/Components/')
                 ->replace('.php', '')
+                ->replace('/', '\\')
                 ->prepend($appNamespace . 'View\\Components\\')
                 ->toString();
 
@@ -98,7 +99,7 @@ $components = new class {
             }
 
             $reflection = new \ReflectionClass($class);
-            $parameters = collect($reflection->getConstructor()->getParameters())
+            $parameters = collect($reflection->getConstructor()?->getParameters() ?? [])
                 ->filter(fn($p) => $p->isPromoted())
                 ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $p->getDefaultValue() : null])
                 ->all();
