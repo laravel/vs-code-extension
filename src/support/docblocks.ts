@@ -8,6 +8,7 @@ interface ClassBlock {
     namespace: string;
     className: string;
     blocks: string[];
+    extends: string | null;
 }
 
 const modelBuilderType = (className: string) =>
@@ -29,6 +30,7 @@ export const writeEloquentDocBlocks = (
             namespace: pathParts.join("\\"),
             className: cls || "",
             blocks: getBlocks(model, cls || "", builderMethods),
+            extends: model.extends || null,
         };
     });
 
@@ -181,7 +183,9 @@ const classToDocBlock = (block: ClassBlock, namespace: string) => {
         ...block.blocks,
         " * @mixin \\Illuminate\\Database\\Query\\Builder",
         " */",
-        `class ${block.className} extends \\Illuminate\\Database\\Eloquent\\Model`,
+        `class ${block.className} extends ${
+            block.extends ?? "\\Illuminate\\Database\\Eloquent\\Model"
+        }`,
         `{`,
         indent("//"),
         `}`,
