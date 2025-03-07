@@ -113,6 +113,11 @@
                     "default": true,
                     "description": "Show popups for errors."
                 },
+                "Laravel.eloquent.generateDocBlocks": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically generate Eloquent doc blocks for models as IDE helpers."
+                },
                 "Laravel.blade.autoSpaceTags": {
                     "type": "boolean",
                     "default": true,

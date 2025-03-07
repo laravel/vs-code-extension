@@ -1,5 +1,6 @@
 import fs from "fs";
 import { Eloquent } from "..";
+import { config } from "./config";
 import { internalVendorPath } from "./project";
 import { indent } from "./util";
 
@@ -16,7 +17,7 @@ export const writeEloquentDocBlocks = (
     models: Eloquent.Models,
     builderMethods: Eloquent.BuilderMethod[],
 ) => {
-    if (!models) {
+    if (!models || !config("eloquent.generateDocBlocks", true)) {
         return;
     }
 
@@ -113,7 +114,9 @@ const getBlocks = (
         .concat(
             [...model.scopes, "newModelQuery", "newQuery", "query"].map(
                 (method) => {
-                    return `@method static ${modelBuilderType(className)} ${method}()`;
+                    return `@method static ${modelBuilderType(
+                        className,
+                    )} ${method}()`;
                 },
             ),
         )
@@ -205,7 +208,9 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static ${modelBuilderType(className)} where${attr.title_case}($value)`,
+            `@method static ${modelBuilderType(className)} where${
+                attr.title_case
+            }($value)`,
         );
     }
 
