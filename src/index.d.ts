@@ -82,6 +82,7 @@ declare namespace Eloquent {
         events: Event[];
         observers: Observer[];
         scopes: string[];
+        extends: string | null;
     }
 
     interface Attribute {

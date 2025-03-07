@@ -119,13 +119,30 @@ $models = new class($factory) {
         return collect();
     }
 
+    protected function getParentClass(\ReflectionClass $reflection)
+    {
+        if (!$reflection->getParentClass()) {
+            return null;
+        }
+
+        $parent = $reflection->getParentClass()->getName();
+
+        if ($parent === \Illuminate\Database\Eloquent\Model::class) {
+            return null;
+        }
+
+        return \Illuminate\Support\Str::start($parent, '\\');
+    }
+
     protected function getInfo($className)
     {
         if (($data = $this->fromArtisan($className)) === null) {
             return null;
         }
 
-        $reflection = (new \ReflectionClass($className));
+        $reflection = new \ReflectionClass($className);
+
+        $data["extends"] = $this->getParentClass($reflection);
 
         $existingProperties = $this->collectExistingProperties($reflection);
 
