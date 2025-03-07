@@ -209,9 +209,9 @@ $components = new class {
 
         foreach ($views as $key => $paths) {
             // First is always optional override in the resources/views folder
-            $path = $paths[0].'/components';
+            $path = $paths[0] . '/components';
 
-            if (! is_dir($path)) {
+            if (!is_dir($path)) {
                 continue;
             }
 
