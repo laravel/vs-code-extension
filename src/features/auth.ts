@@ -115,7 +115,7 @@ const analyzeParam = (
     const nextArg = item.arguments.children[1].children[0];
     let classArg: string | null = null;
 
-    if (nextArg.type === "array") {
+    if (nextArg?.type === "array") {
         classArg = nextArg.children[0]?.value?.className;
     } else {
         classArg = nextArg?.className;
