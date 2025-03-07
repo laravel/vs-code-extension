@@ -7,6 +7,7 @@ All notable changes to the Laravel extension will be documented in this file.
 - Basic Folio support ([#319](https://github.com/laravel/vs-code-extension/pull/319))
 - Add link to Blade file for MailMessage::markdown/view ([#317](https://github.com/laravel/vs-code-extension/pull/317))
 - Fix TypeError: Cannot read properties of undefined (reading 'type') ([#296](https://github.com/laravel/vs-code-extension/pull/296))
+- Support for contracts ([#298](https://github.com/laravel/vs-code-extension/pull/298))
 
 ## [v1.0.2]
 
