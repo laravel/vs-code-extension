@@ -19,6 +19,7 @@ $components = new class {
             $this->getAnonymousNamespaced(),
             $this->getAnonymous(),
             $this->getAliases(),
+            $this->getVendorComponents(),
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
@@ -188,6 +189,40 @@ $components = new class {
             if (!in_array($item['prefix'], $this->prefixes)) {
                 $this->prefixes[] = $item['prefix'];
             }
+        }
+
+        return $components;
+    }
+
+    protected function getVendorComponents(): array
+    {
+        $components = [];
+
+        /** @var \Illuminate\View\Factory $view */
+        $view = \Illuminate\Support\Facades\App::make('view');
+
+        /** @var \Illuminate\View\FileViewFinder $finder */
+        $finder = $view->getFinder();
+
+        /** @var array<string, array<int, string>> $views */
+        $views = $finder->getHints();
+
+        foreach ($views as $key => $paths) {
+            // First is always optional override in the resources/views folder
+            $path = $paths[0].'/components';
+
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            array_push(
+                $components,
+                ...$this->findFiles(
+                    $path,
+                    'blade.php',
+                    fn (\Illuminate\Support\Stringable $k) => $k->kebab()->prepend($key.'::'),
+                )
+            );
         }
 
         return $components;
