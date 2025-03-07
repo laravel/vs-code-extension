@@ -466,7 +466,7 @@
         "@typescript-eslint/parser": "^7.7.1",
         "@vscode/test-cli": "^0.0.9",
         "@vscode/test-electron": "^2.3.9",
-        "esbuild": "^0.21.5",
+        "esbuild": ">=0.25.0",
         "eslint": "^8.57.0",
         "typescript": "^5.4.5"
     },
