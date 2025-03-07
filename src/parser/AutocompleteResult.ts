@@ -57,12 +57,12 @@ export default class AutocompleteResult {
         return this.isClass(facade(className));
     }
 
-    public isContracts(classNames: string[]) {
-        return classNames.some((className: string) => this.isContract(className));
-    }
+    public isContract(classNames: string | string[]) {
+        classNames = Array.isArray(classNames) ? classNames : [classNames];
 
-    public isContract(className: string) {
-        return this.isClass(contract(className));
+        return classNames.some((className: string) =>
+            this.isClass(contract(className)),
+        );
     }
 
     public func() {
@@ -91,12 +91,10 @@ export default class AutocompleteResult {
         }
     }
 
-    public isFuncs(funcs: string[]) {
-        return funcs.some((func: string) => this.isFunc(func));
-    }
+    public isFunc(funcs: string | string[]) {
+        funcs = Array.isArray(funcs) ? funcs : [funcs];
 
-    public isFunc(func: string) {
-        return this.func() === func;
+        return funcs.some((func: string) => this.func() === func);
     }
 
     public param(index?: number) {

@@ -136,7 +136,7 @@ export default class Validation implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.isFuncs(["validate", "make"])) {
+        if (result.isFunc(["validate", "make"])) {
             return this.handleValidateMethod(document, position, result);
         }
 
@@ -174,9 +174,10 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: AutocompleteResult,
     ): vscode.CompletionItem[] | undefined {
-        if (result.isFacade("Validator") || result.isContracts([
-            "Validation\\Factory", "Validation\\Validator"
-        ])) {
+        if (
+            result.isFacade("Validator") ||
+            result.isContract(["Validation\\Factory", "Validation\\Validator"])
+        ) {
             return this.getRules(document, position);
         }
     }

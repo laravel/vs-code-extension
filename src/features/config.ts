@@ -4,7 +4,7 @@ import { getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
-import { controllerActionRegex, wordMatchRegex } from "@src/support/patterns";
+import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
 import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
