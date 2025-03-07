@@ -72,14 +72,14 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 (route) => route.name === param.value,
             );
 
-            if (!route || !route.filename || !route.line) {
+            if (!route || !route.filename) {
                 return null;
             }
 
             return new vscode.DocumentLink(
                 detectedRange(param),
                 vscode.Uri.file(route.filename).with({
-                    fragment: `L${route.line}`,
+                    fragment: `L${route.line ?? 0}`,
                 }),
             );
         },
