@@ -3,7 +3,7 @@ export default `
 $local = collect(glob(config_path("/*.php")))
   ->merge(glob(config_path("**/*.php")))
   ->map(fn ($path) => [
-      (string) \\Illuminate\\Support\\Str::of($path)
+      (string) str($path)
         ->replace([config_path('/'), ".php"], "")
         ->replace(DIRECTORY_SEPARATOR, "."),
       $path
@@ -12,7 +12,7 @@ $local = collect(glob(config_path("/*.php")))
 $vendor = collect(glob(base_path("vendor/**/**/config/*.php")))->map(fn (
   $path
 ) => [
-    (string) \\Illuminate\\Support\\Str::of($path)
+    (string) str($path)
       ->afterLast(DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR)
       ->replace(".php", "")
       ->replace(DIRECTORY_SEPARATOR, "."),
@@ -57,7 +57,7 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
         $cachedContents[$path] ??= file_get_contents($path);
         $cachedParsed[$path] ??= token_get_all($cachedContents[$path]);
 
-        $keysToFind = \\Illuminate\\Support\\Str::of($key)
+        $keysToFind = str($key)
           ->replaceFirst($found, "")
           ->ltrim(".")
           ->explode(".");

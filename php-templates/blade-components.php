@@ -54,7 +54,7 @@ $components = new class {
         foreach ($files as $file) {
             $realPath = $file->getRealPath();
 
-            $key = \Illuminate\Support\Str::of($realPath)
+            $key = str($realPath)
                 ->replace($pathRealPath, '')
                 ->ltrim('/\\')
                 ->replace('.' . $extension, '')
@@ -87,7 +87,7 @@ $components = new class {
                 ->map(fn($p) => \Illuminate\Support\Str::kebab($p))
                 ->implode('.'),
         ))->map(function ($item) use ($appNamespace) {
-            $class = \Illuminate\Support\Str::of($item['path'])
+            $class = str($item['path'])
                 ->after('View/Components/')
                 ->replace('.php', '')
                 ->replace('/', '\\')
@@ -209,7 +209,7 @@ $components = new class {
         if ($parts->slice(-2)->unique()->count() === 1) {
             $parts->pop();
 
-            return \Illuminate\Support\Str::of($parts->implode('.'));
+            return str($parts->implode('.'));
         }
 
         return $str;
@@ -248,7 +248,7 @@ $components = new class {
             }
 
             foreach ($paths as $p) {
-                $dir = \Illuminate\Support\Str::of($classNamespace)
+                $dir = str($classNamespace)
                     ->replace($ns, '')
                     ->replace('\\', '/')
                     ->prepend($p . DIRECTORY_SEPARATOR)

@@ -131,7 +131,7 @@ $models = new class($factory) {
 
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
-                'title_case' => \\Illuminate\\Support\\Str::of($attrs['name'])->title()->replace('_', '')->toString(),
+                'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
@@ -139,7 +139,7 @@ $models = new class($factory) {
 
         $data['scopes'] = collect($reflection->getMethods())
             ->filter(fn($method) => $method->isPublic() && !$method->isStatic() && str_starts_with($method->name, 'scope'))
-            ->map(fn($method) => \\Illuminate\\Support\\Str::of($method->name)->replace('scope', '')->lcfirst()->toString())
+            ->map(fn($method) => str($method->name)->replace('scope', '')->lcfirst()->toString())
             ->values()
             ->toArray();
 
