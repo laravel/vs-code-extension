@@ -1,0 +1,77 @@
+{
+    "Relation-belongsTo.sublime-snippet": {
+        "prefix": "Relation::belongsTo",
+        "body": [
+            "/**",
+            " * Get the ${1:user} that owns the ${TM_FILENAME_BASE}",
+            " *",
+            " * @return \\Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+            " */",
+            "public function ${1:user}(): BelongsTo",
+            "{",
+            "    return \\$this->belongsTo(${2:User}::class${3:, '${4:foreign_key}'}${5:, '${6:other_key}'});",
+            "}$7"
+        ],
+        "description": "A one-to-one inverse relationship."
+    },
+    "Relation-belongsToMany.sublime-snippet": {
+        "prefix": "Relation::belongsToMany",
+        "body": [
+            "/**",
+            " * The ${1:roles} that belong to the ${TM_FILENAME_BASE}",
+            " *",
+            " * @return \\Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany",
+            " */",
+            "public function ${1:roles}(): BelongsToMany",
+            "{",
+            "    return \\$this->belongsToMany(${2:Role}::class${3:, '${4:role_user_table}'}${5:, '${6:user_id}'}${7:, '${8:role_id}'});",
+            "}$9"
+        ],
+        "description": "A many-to-many relationship."
+    },
+    "Relation-hasMany.sublime-snippet": {
+        "prefix": "Relation::hasMany",
+        "body": [
+            "/**",
+            " * Get all of the ${1:comments} for the ${TM_FILENAME_BASE}",
+            " *",
+            " * @return \\Illuminate\\Database\\Eloquent\\Relations\\HasMany",
+            " */",
+            "public function ${1:comments}(): HasMany",
+            "{",
+            "    return \\$this->hasMany(${2:Comment}::class${3:, '${4:foreign_key}'}${5:, '${6:local_key}'});",
+            "}$7"
+        ],
+        "description": "A one-to-many relationship."
+    },
+    "Relation-hasManyThrough.sublime-snippet": {
+        "prefix": "Relation::hasManyThrough",
+        "body": [
+            "/**",
+            " * Get all of the ${1:comments} for the ${TM_FILENAME_BASE}",
+            " *",
+            " * @return \\Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough",
+            " */",
+            "public function ${1:comments}(): HasManyThrough",
+            "{",
+            "    return \\$this->hasManyThrough(${2:Comment}::class, ${3:Post}::class);",
+            "}$4"
+        ],
+        "description": "A Has Many Through relationship."
+    },
+    "Relation-hasOne.sublime-snippet": {
+        "prefix": "Relation::hasOne",
+        "body": [
+            "/**",
+            " * Get the ${1:user} associated with the ${TM_FILENAME_BASE}",
+            " *",
+            " * @return \\Illuminate\\Database\\Eloquent\\Relations\\HasOne",
+            " */",
+            "public function ${1:user}(): HasOne",
+            "{",
+            "    return \\$this->hasOne(${2:User}::class${3:, '${4:foreign_key}'}${5:, '${6:local_key}'});",
+            "}$7"
+        ],
+        "description": "A one-to-one relationship."
+    }
+}
