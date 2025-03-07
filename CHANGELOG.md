@@ -4,7 +4,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
-- Nothing yet
+- Fix fetching Blade component properties when constructor is missing ([#307](https://github.com/laravel/vs-code-extension/pull/307))
 
 ## [v1.0.1]
 
