@@ -37,6 +37,11 @@ const toFind: FeatureTag = [
         argumentIndex: 1,
     },
     {
+        class: "Illuminate\\Notifications\\Messages\\MailMessage",
+        method: ["markdown", "view"],
+        argumentIndex: 0,
+    },
+    {
         class: "Illuminate\\Mail\\Mailables\\Content",
         argumentName: ["view", "markdown"],
     },
