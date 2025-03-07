@@ -189,11 +189,16 @@ $translator = new class
 
     protected function getDotted($key, $lang)
     {
-        return \\Illuminate\\Support\\Arr::dot(
-            \\Illuminate\\Support\\Arr::wrap(
-                __($key, [], $lang),
-            ),
-        );
+        try {
+            return \\Illuminate\\Support\\Arr::dot(
+                \\Illuminate\\Support\\Arr::wrap(
+                    __($key, [], $lang),
+                ),
+            );
+        } catch (\\Throwable $e) {
+            // Most likely, in this case, the lang file doesn't return an array
+            return [];
+        }
     }
 
     protected function getPathIndex($file)
