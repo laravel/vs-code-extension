@@ -4,7 +4,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
-- Nothing yet
+- Improve file watcher performance ([#327](https://github.com/laravel/vs-code-extension/pull/327))
 
 ## [v1.0.3]
 
