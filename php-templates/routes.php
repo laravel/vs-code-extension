@@ -93,5 +93,4 @@ $routes = new class {
     }
 };
 
-
 echo $routes->all()->toJson();
