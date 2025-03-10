@@ -75,12 +75,12 @@ const collectControllers = (path: string): string[] => {
     return [...controllers];
 };
 
-export const getControllers = repository<string[]>(
-    () => {
+export const getControllers = repository<string[]>({
+    load: () => {
         return new Promise((resolve) => {
             resolve(load());
         });
     },
-    inAppDirs("{,**/}{Controllers}{.php,/*.php,/**/*.php}"),
-    [],
-);
+    pattern: inAppDirs("{,**/}{Controllers}{.php,/*.php,/**/*.php}"),
+    itemsDefault: [],
+});

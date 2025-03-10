@@ -21,15 +21,15 @@ const load = () => {
     return runInLaravel<BladeComponents>(template("bladeComponents"));
 };
 
-export const getBladeComponents = repository<BladeComponents>(
+export const getBladeComponents = repository<BladeComponents>({
     load,
-    [
+    pattern: [
         inAppDirs("{,**/}{view,views}/{*,**/*}"),
         "app/View/Components/{,*,**/*}.php",
     ],
-    {
+    itemsDefault: {
         components: {},
         prefixes: [],
     },
-    ["create", "delete"],
-);
+    fileWatcherEvents: ["create", "delete"],
+});

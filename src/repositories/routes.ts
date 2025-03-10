@@ -14,10 +14,10 @@ interface RouteItem {
 
 const routesPattern = "{[Rr]oute}{,s}{.php,/*.php,/**/*.php}";
 
-export const getRoutes = repository<RouteItem[]>(
-    () => {
+export const getRoutes = repository<RouteItem[]>({
+    load: () => {
         return runInLaravel<RouteItem[]>(template("routes"), "HTTP Routes");
     },
-    [inAppDirs(`{,**/}${routesPattern}`), routesPattern],
-    [],
-);
+    pattern: [inAppDirs(`{,**/}${routesPattern}`), routesPattern],
+    itemsDefault: [],
+});

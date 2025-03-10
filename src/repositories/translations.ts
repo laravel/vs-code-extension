@@ -67,9 +67,9 @@ const load = () => {
     });
 };
 
-export const getTranslations = repository<TranslationGroupResult>(
+export const getTranslations = repository<TranslationGroupResult>({
     load,
-    () =>
+    pattern: () =>
         waitForValue(() => dirsToWatch).then((value) => {
             if (value === null || value.length === 0) {
                 return null;
@@ -77,8 +77,8 @@ export const getTranslations = repository<TranslationGroupResult>(
 
             return `{${value.join(",")}}/{*,**/*}`;
         }),
-    {
+    itemsDefault: {
         default: "",
         translations: {},
     },
-);
+});

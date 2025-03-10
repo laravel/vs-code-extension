@@ -77,8 +77,8 @@ const collectViews = (
         .flat();
 };
 
-export const getInertiaViews = repository<ViewItem>(
-    () =>
+export const getInertiaViews = repository<ViewItem>({
+    load: () =>
         runInLaravel<{
             page_paths?: string[];
             page_extensions?: string[];
@@ -88,7 +88,7 @@ export const getInertiaViews = repository<ViewItem>(
                 result?.page_extensions ?? [],
             );
         }),
-    () =>
+    pattern: () =>
         waitForValue(() => inertiaPagePaths).then((pagePaths) => {
             if (pagePaths === null || pagePaths.length === 0) {
                 return null;
@@ -96,6 +96,6 @@ export const getInertiaViews = repository<ViewItem>(
 
             return `{${pagePaths.join(",")}}/{*,**/*}`;
         }),
-    {},
-    ["create", "delete"],
-);
+    itemsDefault: {},
+    fileWatcherEvents: ["create", "delete"],
+});

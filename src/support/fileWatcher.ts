@@ -1,9 +1,9 @@
 import { readdirSync } from "fs";
 import * as vscode from "vscode";
 import { getWorkspaceFolders, hasWorkspace } from "./project";
-import { leadingDebounce } from "./util";
+import { debounce, leadingDebounce } from "./util";
 
-type FileEvent = "change" | "create" | "delete";
+export type FileEvent = "change" | "create" | "delete";
 
 let watchers: vscode.FileSystemWatcher[] = [];
 
@@ -18,6 +18,7 @@ export const loadAndWatch = (
     load: () => void,
     patterns: WatcherPattern,
     events: FileEvent[] = defaultFileEvents,
+    reloadOnComposerChanges: boolean = true,
 ): void => {
     if (!hasWorkspace()) {
         return;
@@ -25,24 +26,21 @@ export const loadAndWatch = (
 
     load();
 
-    const debounceTime = 1000;
+    const loadFunc = leadingDebounce(load, 1000);
 
     if (patterns instanceof Function) {
         patterns().then((result) => {
             if (result !== null) {
                 createFileWatcher(
                     result,
-                    leadingDebounce(load, debounceTime),
+                    loadFunc,
                     events,
+                    reloadOnComposerChanges,
                 );
             }
         });
     } else {
-        createFileWatcher(
-            patterns,
-            leadingDebounce(load, debounceTime),
-            events,
-        );
+        createFileWatcher(patterns, loadFunc, events, reloadOnComposerChanges);
     }
 };
 
@@ -77,15 +75,42 @@ const patternWatchers: Record<
             {
                 callback: (e: vscode.Uri) => void;
                 events: FileEvent[];
+                reloadOnComposerChanges: boolean;
             },
         ];
     }
 > = {};
 
+export const watchForComposerChanges = () => {
+    const onChange = debounce((e) => {
+        for (const pattern in patternWatchers) {
+            patternWatchers[pattern].callbacks.forEach((cb) => {
+                if (cb.reloadOnComposerChanges) {
+                    cb.callback(e);
+                }
+            });
+        }
+    }, 1000);
+
+    const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(
+            getWorkspaceFolders()[0],
+            "vendor/composer/autoload_*.php",
+        ),
+    );
+
+    watcher.onDidChange(onChange);
+    watcher.onDidCreate(onChange);
+    watcher.onDidDelete(onChange);
+
+    registerWatcher(watcher);
+};
+
 export const createFileWatcher = (
     patterns: string | string[],
     callback: (e: vscode.Uri) => void,
     events: FileEvent[] = defaultFileEvents,
+    reloadOnComposerChanges: boolean = true,
 ): vscode.FileSystemWatcher[] => {
     if (!hasWorkspace()) {
         return [];
@@ -95,7 +120,11 @@ export const createFileWatcher = (
 
     return patterns.map((pattern) => {
         if (patternWatchers[pattern]) {
-            patternWatchers[pattern].callbacks.push({ callback, events });
+            patternWatchers[pattern].callbacks.push({
+                callback,
+                events,
+                reloadOnComposerChanges,
+            });
 
             return patternWatchers[pattern].watcher;
         }
@@ -130,7 +159,7 @@ export const createFileWatcher = (
 
         patternWatchers[pattern] = {
             watcher,
-            callbacks: [{ callback, events }],
+            callbacks: [{ callback, events, reloadOnComposerChanges }],
         };
 
         registerWatcher(watcher);

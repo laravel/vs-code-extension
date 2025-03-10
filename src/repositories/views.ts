@@ -26,9 +26,9 @@ const load = () => {
     });
 };
 
-export const getViews = repository<ViewItem[]>(
+export const getViews = repository<ViewItem[]>({
     load,
-    inAppDirs("{,**/}{view,views}/{*,**/*}"),
-    [],
-    ["create", "delete"],
-);
+    pattern: inAppDirs("{,**/}{view,views}/{*,**/*}"),
+    itemsDefault: [],
+    fileWatcherEvents: ["create", "delete"],
+});
