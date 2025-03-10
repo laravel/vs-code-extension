@@ -1,3 +1,4 @@
+import { readdirSync } from "fs";
 import * as vscode from "vscode";
 import { getWorkspaceFolders, hasWorkspace } from "./project";
 import { leadingDebounce } from "./util";
@@ -36,11 +37,36 @@ export const loadAndWatch = (
                 );
             }
         });
+    } else {
+        createFileWatcher(
+            patterns,
+            leadingDebounce(load, debounceTime),
+            events,
+        );
+    }
+};
 
-        return;
+let appDirsRead = false;
+const appDirs: string[] = [];
+const ignoreDirs = ["node_modules", ".git", "vendor", "storage"];
+
+export const inAppDirs = (pattern: string) => {
+    if (!appDirsRead) {
+        appDirsRead = true;
+        readdirSync(getWorkspaceFolders()[0].uri.fsPath, {
+            withFileTypes: true,
+        }).forEach((file) => {
+            if (file.isDirectory() && !ignoreDirs.includes(file.name)) {
+                appDirs.push(file.name);
+            }
+        });
     }
 
-    createFileWatcher(patterns, leadingDebounce(load, debounceTime), events);
+    if (appDirs.length === 0) {
+        return pattern;
+    }
+
+    return `{${appDirs.join(",")}}${pattern}`;
 };
 
 const patternWatchers: Record<
@@ -74,8 +100,13 @@ export const createFileWatcher = (
             return patternWatchers[pattern].watcher;
         }
 
+        const relativePattern = new vscode.RelativePattern(
+            getWorkspaceFolders()[0],
+            pattern,
+        );
+
         const watcher = vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
+            relativePattern,
             !events.includes("create"),
             !events.includes("change"),
             !events.includes("delete"),

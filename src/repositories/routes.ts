@@ -1,3 +1,4 @@
+import { inAppDirs } from "@src/support/fileWatcher";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
@@ -11,10 +12,12 @@ interface RouteItem {
     line: number | null;
 }
 
+const routesPattern = "{[Rr]oute}{,s}{.php,/*.php,/**/*.php}";
+
 export const getRoutes = repository<RouteItem[]>(
     () => {
         return runInLaravel<RouteItem[]>(template("routes"), "HTTP Routes");
     },
-    "{,**/}{[Rr]oute}{,s}{.php,/*.php,/**/*.php}",
+    [inAppDirs(`{,**/}${routesPattern}`), routesPattern],
     [],
 );

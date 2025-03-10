@@ -1,5 +1,6 @@
 import { runInLaravel, template } from "@src/support/php";
 import { projectPath } from "@src/support/project";
+import { waitForValue } from "@src/support/util";
 import { repository } from ".";
 
 export interface TranslationItem {
@@ -28,7 +29,10 @@ interface TranslationGroupPhpResult {
     params: string[][];
     paths: string[];
     values: string[];
+    to_watch: string[];
 }
+
+let dirsToWatch: string[] | null = null;
 
 const load = () => {
     return runInLaravel<TranslationGroupPhpResult>(
@@ -54,6 +58,8 @@ const load = () => {
             },
         );
 
+        dirsToWatch = res.to_watch;
+
         return {
             default: res.default,
             translations: result,
@@ -63,7 +69,14 @@ const load = () => {
 
 export const getTranslations = repository<TranslationGroupResult>(
     load,
-    "{,**/}{lang,localization,localizations,trans,translation,translations}/{*,**/*}",
+    () =>
+        waitForValue(() => dirsToWatch).then((value) => {
+            if (value === null || value.length === 0) {
+                return null;
+            }
+
+            return `{${value.join(",")}}/{*,**/*}`;
+        }),
     {
         default: "",
         translations: {},

@@ -1,3 +1,4 @@
+import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
@@ -22,7 +23,10 @@ const load = () => {
 
 export const getBladeComponents = repository<BladeComponents>(
     load,
-    ["{,**/}{view,views}/{*,**/*}", "app/View/Components/{,*,**/*}.php"],
+    [
+        inAppDirs("{,**/}{view,views}/{*,**/*}"),
+        "app/View/Components/{,*,**/*}.php",
+    ],
     {
         components: {},
         prefixes: [],

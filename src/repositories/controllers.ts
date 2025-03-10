@@ -1,3 +1,4 @@
+import { inAppDirs } from "@src/support/fileWatcher";
 import * as fs from "fs";
 import { repository } from ".";
 import { projectPath } from "../support/project";
@@ -80,6 +81,6 @@ export const getControllers = repository<string[]>(
             resolve(load());
         });
     },
-    "{,**/}{Controllers}{.php,/*.php,/**/*.php}",
+    inAppDirs("{,**/}{Controllers}{.php,/*.php,/**/*.php}"),
     [],
 );

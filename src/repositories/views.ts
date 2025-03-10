@@ -1,3 +1,4 @@
+import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
@@ -27,7 +28,7 @@ const load = () => {
 
 export const getViews = repository<ViewItem[]>(
     load,
-    "{,**/}{view,views}/{*,**/*}",
+    inAppDirs("{,**/}{view,views}/{*,**/*}"),
     [],
     ["create", "delete"],
 );
