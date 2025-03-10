@@ -12,7 +12,7 @@ import { CompletionProvider, FeatureTag, LinkProvider } from "..";
 
 const toFind: FeatureTag = {
     class: facade("Storage"),
-    method: ["disk"],
+    method: ["disk", "fake", "persistentFake", "forgetDisk"],
     argumentIndex: 0,
 };
 
