@@ -12,6 +12,8 @@ $translator = new class
 
     public $emptyParams = [];
 
+    public $directoriesToWatch = [];
+
     public function all()
     {
         $final = [];
@@ -80,6 +82,10 @@ $translator = new class
 
         if (!is_dir($realPath)) {
             return [];
+        }
+
+        if (!LaravelVsCode::isVendor($realPath)) {
+            $this->directoriesToWatch[] = LaravelVsCode::relativePath($realPath);
         }
 
         return array_map(
@@ -342,5 +348,6 @@ echo json_encode([
     'paths' => array_keys($translator->paths),
     'values' => array_keys($translator->values),
     'params' => array_map(fn($p) => json_decode($p, true), array_keys($translator->paramResults)),
+    'to_watch' => $translator->directoriesToWatch,
 ]);
 `;

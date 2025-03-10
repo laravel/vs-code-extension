@@ -1,15 +1,10 @@
 <?php
 
-$config = config('inertia.testing', []);
+echo json_encode([
+    ...config('inertia.testing', []),
+    'page_paths' => collect(config('inertia.testing.page_paths', []))->flatMap(function($path) {
+        $relativePath = LaravelVsCode::relativePath($path);
 
-$pagePaths = collect($config['page_paths'] ?? [])->flatMap(function($path) {
-    $relativePath = LaravelVsCode::relativePath($path);
-
-    // Folder with inertia pages views is usually uppercase (resources/js/Pages),
-    // but Laravel starter kits use lowercase (resources/js/pages)
-    return [$relativePath, mb_strtolower($relativePath)];
-})->unique();
-
-$config['page_paths'] = $pagePaths->toArray();
-
-echo json_encode($config);
+        return [$relativePath, mb_strtolower($relativePath)];
+    })->unique()->values(),
+]);

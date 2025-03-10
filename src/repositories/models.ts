@@ -22,8 +22,10 @@ const load = () => {
     });
 };
 
-export const getModels = repository<Eloquent.Models>(
+export const getModels = repository<Eloquent.Models>({
     load,
-    modelPaths.concat(["database/migrations"]).map((path) => `${path}/*.php`),
-    {},
-);
+    pattern: modelPaths
+        .concat(["database/migrations"])
+        .map((path) => `${path}/*.php`),
+    itemsDefault: {},
+});

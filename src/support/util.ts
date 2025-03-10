@@ -100,3 +100,28 @@ export const leadingDebounce = <T extends (...args: any[]) => any>(
         lastInvocation = Date.now();
     } as T;
 };
+
+export const waitForValue = <T>(
+    value: () => T,
+    interval = 100,
+    maxAttempts = 20,
+): Promise<T> =>
+    new Promise((resolve) => {
+        let attempts = 0;
+
+        const checkForValue = () => {
+            attempts++;
+
+            if (attempts > maxAttempts) {
+                return resolve(value());
+            }
+
+            if (value() === null) {
+                return setTimeout(checkForValue, 100);
+            }
+
+            resolve(value());
+        };
+
+        checkForValue();
+    });

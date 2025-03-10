@@ -399,6 +399,24 @@
                     "generated": true,
                     "description": "Enable completion for route."
                 },
+                "Laravel.storage.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for storage."
+                },
+                "Laravel.storage.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for storage."
+                },
+                "Laravel.storage.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable diagnostics for storage."
+                },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",
                     "default": true,

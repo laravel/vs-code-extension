@@ -53,8 +53,8 @@ const getFilesInDirectory = (dir: string, depth: number = 0): Item[] => {
         .flat();
 };
 
-export const getAssets = repository<Item[]>(
-    () =>
+export const getAssets = repository<Item[]>({
+    load: () =>
         new Promise((resolve, reject) => {
             try {
                 resolve(getFilesInDirectory("public"));
@@ -62,6 +62,7 @@ export const getAssets = repository<Item[]>(
                 reject(exception);
             }
         }),
-    "public/**/*",
-    [],
-);
+    pattern: "public/**/*",
+    itemsDefault: [],
+    reloadOnComposerChanges: false,
+});

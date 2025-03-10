@@ -1,5 +1,6 @@
 import { runInLaravel, template } from "@src/support/php";
 import { projectPath, relativePath } from "@src/support/project";
+import { waitForValue } from "@src/support/util";
 import * as fs from "fs";
 import * as sysPath from "path";
 import { repository } from ".";
@@ -76,8 +77,8 @@ const collectViews = (
         .flat();
 };
 
-export const getInertiaViews = repository<ViewItem>(
-    () =>
+export const getInertiaViews = repository<ViewItem>({
+    load: () =>
         runInLaravel<{
             page_paths?: string[];
             page_extensions?: string[];
@@ -87,22 +88,14 @@ export const getInertiaViews = repository<ViewItem>(
                 result?.page_extensions ?? [],
             );
         }),
-    () =>
-        new Promise((resolve) => {
-            const checkForPagePaths = () => {
-                if (inertiaPagePaths === null) {
-                    return setTimeout(checkForPagePaths, 100);
-                }
+    pattern: () =>
+        waitForValue(() => inertiaPagePaths).then((pagePaths) => {
+            if (pagePaths === null || pagePaths.length === 0) {
+                return null;
+            }
 
-                if (inertiaPagePaths.length === 0) {
-                    resolve(null);
-                } else {
-                    resolve(`{${inertiaPagePaths.join(",")}}/{*,**/*}`);
-                }
-            };
-
-            checkForPagePaths();
+            return `{${pagePaths.join(",")}}/{*,**/*}`;
         }),
-    {},
-    ["create", "delete"],
-);
+    itemsDefault: {},
+    fileWatcherEvents: ["create", "delete"],
+});
