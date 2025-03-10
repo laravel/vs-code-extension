@@ -25,4 +25,5 @@ export type DiagnosticCode =
     | "mix"
     | "route"
     | "translation"
-    | "view";
+    | "view"
+    | "storage_disk";
