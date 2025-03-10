@@ -100,16 +100,8 @@ export const createFileWatcher = (
             return patternWatchers[pattern].watcher;
         }
 
-        const relativePattern = new vscode.RelativePattern(
-            getWorkspaceFolders()[0],
-            pattern,
-        );
-
         const watcher = vscode.workspace.createFileSystemWatcher(
-            relativePattern,
-            !events.includes("create"),
-            !events.includes("change"),
-            !events.includes("delete"),
+            new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
         );
 
         watcher.onDidChange((...args) => {
