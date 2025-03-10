@@ -5,6 +5,7 @@ All notable changes to the Laravel extension will be documented in this file.
 ## [Unreleased]
 
 - Improve file watcher performance ([#327](https://github.com/laravel/vs-code-extension/pull/327))
+- Autocompletion, linking, and diagnostics for Storage Disks ([#328](https://github.com/laravel/vs-code-extension/pull/328))
 
 ## [v1.0.3]
 
