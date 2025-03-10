@@ -43,6 +43,19 @@ export const loadAndWatch = (
     createFileWatcher(patterns, leadingDebounce(load, debounceTime), events);
 };
 
+const patternWatchers: Record<
+    string,
+    {
+        watcher: vscode.FileSystemWatcher;
+        callbacks: [
+            {
+                callback: (e: vscode.Uri) => void;
+                events: FileEvent[];
+            },
+        ];
+    }
+> = {};
+
 export const createFileWatcher = (
     patterns: string | string[],
     callback: (e: vscode.Uri) => void,
@@ -55,6 +68,12 @@ export const createFileWatcher = (
     patterns = typeof patterns === "string" ? [patterns] : patterns;
 
     return patterns.map((pattern) => {
+        if (patternWatchers[pattern]) {
+            patternWatchers[pattern].callbacks.push({ callback, events });
+
+            return patternWatchers[pattern].watcher;
+        }
+
         const watcher = vscode.workspace.createFileSystemWatcher(
             new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
             !events.includes("create"),
@@ -62,17 +81,34 @@ export const createFileWatcher = (
             !events.includes("delete"),
         );
 
-        if (events.includes("change")) {
-            watcher.onDidChange(callback);
-        }
+        watcher.onDidChange((...args) => {
+            patternWatchers[pattern].callbacks.forEach((cb) => {
+                if (cb.events.includes("change")) {
+                    cb.callback(...args);
+                }
+            });
+        });
 
-        if (events.includes("create")) {
-            watcher.onDidCreate(callback);
-        }
+        watcher.onDidCreate((...args) => {
+            patternWatchers[pattern].callbacks.forEach((cb) => {
+                if (cb.events.includes("create")) {
+                    cb.callback(...args);
+                }
+            });
+        });
 
-        if (events.includes("delete")) {
-            watcher.onDidDelete(callback);
-        }
+        watcher.onDidDelete((...args) => {
+            patternWatchers[pattern].callbacks.forEach((cb) => {
+                if (cb.events.includes("delete")) {
+                    cb.callback(...args);
+                }
+            });
+        });
+
+        patternWatchers[pattern] = {
+            watcher,
+            callbacks: [{ callback, events }],
+        };
 
         registerWatcher(watcher);
 
