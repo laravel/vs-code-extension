@@ -2,6 +2,10 @@
 export default `
 echo json_encode([
     ...config('inertia.testing', []),
-    'page_paths' => collect(config('inertia.testing.page_paths', []))->map(fn($path) => LaravelVsCode::relativePath($path))->toArray(),
+    'page_paths' => collect(config('inertia.testing.page_paths', []))->flatMap(function($path) {
+        $relativePath = LaravelVsCode::relativePath($path);
+
+        return [$relativePath, mb_strtolower($relativePath)];
+    })->unique()->values(),
 ]);
 `;
