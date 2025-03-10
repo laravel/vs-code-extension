@@ -1,0 +1,93 @@
+{
+    "Command-anticipate.sublime-snippet": {
+        "prefix": "Console::anticipate",
+        "body": [
+            "\\$this->anticipate('${1:Message}');$2"
+        ],
+        "description": "Give the user options for repsonse"
+    },
+    "Command-ask.sublime-snippet": {
+        "prefix": "Console::ask",
+        "body": [
+            "\\$this->ask('${1:Question}');$2"
+        ],
+        "description": "Prompts the user with a question in the console"
+    },
+    "Command-choice.sublime-snippet": {
+        "prefix": "Console::choice",
+        "body": [
+            "\\$this->choice('${1:Question?}', [${2'Choice1', 'Choice2'}], ${3:\\$default});$4"
+        ],
+        "description": "Give the user a predefined set of choices"
+    },
+    "Command-comment.sublime-snippet": {
+        "prefix": "Console::comment",
+        "body": [
+            "\\$this->comment('${1:Message}');$2"
+        ],
+        "description": "Log a comment to the console"
+    },
+    "Command-confirm.sublime-snippet": {
+        "prefix": "",
+        "body": [
+            "\\$this->confirm('${1:Do you wish to continue? [Y|N]}');$2"
+        ],
+        "description": "Logs a confirmation prompt to the console"
+    },
+    "Command-error.sublime-snippet": {
+        "prefix": "Console::error",
+        "body": [
+            "\\$this->error('${1:Message}');$2"
+        ],
+        "description": "Log error to the console in red"
+    },
+    "Command-info.sublime-snippet": {
+        "prefix": "Console::info",
+        "body": [
+            "\\$this->info('${1:Message}');$2"
+        ],
+        "description": "Log information to the console in green"
+    },
+    "Command-line.sublime-snippet": {
+        "prefix": "Console::line",
+        "body": [
+            "\\$this->line('${1:Display this on the screen}');$2"
+        ],
+        "description": "Log plain information to the console"
+    },
+    "Command-option.sublime-snippet": {
+        "prefix": "Console::option",
+        "body": [
+            "\\$this->option('$1');$2"
+        ],
+        "description": "Get an option from constructor"
+    },
+    "Command-question.sublime-snippet": {
+        "prefix": "Console::question",
+        "body": [
+            "\\$this->question('${1:Message}');$2"
+        ],
+        "description": "Logs a question to the console"
+    },
+    "Command-secret.sublime-snippet": {
+        "prefix": "Console::secret",
+        "body": [
+            "\\$this->secret('${1:What is the password?}');$2"
+        ],
+        "description": "Prompt the user for hidden input"
+    },
+    "Command-table.sublime-snippet": {
+        "prefix": "Console::table",
+        "body": [
+            "\\$this->table('${1:\\$header}, ${2:\\$row}');$3"
+        ],
+        "description": "Prints a nicely formatted table to the console"
+    },
+    "Command-warn.sublime-snippet": {
+        "prefix": "Console::warn",
+        "body": [
+            "\\$this->warn('${1:Message}');$2"
+        ],
+        "description": "Logs a warn message to the console"
+    }
+}

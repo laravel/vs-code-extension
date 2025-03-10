@@ -1,0 +1,86 @@
+{
+    "Event-createClassListener.sublime-snippet": {
+        "prefix": "Event::createClassListener",
+        "body": [
+            "Event::createClassListener(${1:listener});$2"
+        ],
+        "description": "Create a class based listener using the IoC container."
+    },
+    "Event-fire.sublime-snippet": {
+        "prefix": "Event::fire",
+        "body": [
+            "Event::fire(${1:new MyCustomEvent()});$2"
+        ],
+        "description": "Fire an event and call the listeners."
+    },
+    "Event-firing.sublime-snippet": {
+        "prefix": "Event::firing",
+        "body": [
+            "Event::firing();"
+        ],
+        "description": "Get the event that is currently firing."
+    },
+    "Event-flush.sublime-snippet": {
+        "prefix": "Event::flush",
+        "body": [
+            "Event::flush('${1:event}');$2"
+        ],
+        "description": "Flush a set of pushed events."
+    },
+    "Event-forget.sublime-snippet": {
+        "prefix": "Event::forget",
+        "body": [
+            "Event::forget('${1:event}');$2"
+        ],
+        "description": "Remove a set of listeners from the dispatcher."
+    },
+    "Event-getListeners.sublime-snippet": {
+        "prefix": "Event::getListeners",
+        "body": [
+            "Event::getListeners('${1:eventName}');$2"
+        ],
+        "description": "Get all of the listeners for a given event name."
+    },
+    "Event-hasListeners.sublime-snippet": {
+        "prefix": "Event::hasListeners",
+        "body": [
+            "Event::hasListeners('${1:eventName}');$2"
+        ],
+        "description": "Determine if a given event has listeners."
+    },
+    "Event-listen.sublime-snippet": {
+        "prefix": "Event::listen",
+        "body": [
+            "Event::listen(${1:events}, ${2:listener}, ${3:priority});$4"
+        ],
+        "description": "Register an event listener with the dispatcher."
+    },
+    "Event-makeListener.sublime-snippet": {
+        "prefix": "Event::makeListener",
+        "body": [
+            "Event::makeListener(${1:listener});$2"
+        ],
+        "description": "Register an event listener with the dispatcher."
+    },
+    "Event-push.sublime-snippet": {
+        "prefix": "Event::push",
+        "body": [
+            "Event::push(${1:event}, ${2:payload});$3"
+        ],
+        "description": "Register an event and payload to be fired later."
+    },
+    "Event-subscribe.sublime-snippet": {
+        "prefix": "Event::subscribe",
+        "body": [
+            "Event::subscribe(${1:subscriber});$2"
+        ],
+        "description": "Register an event subscriber with the dispatcher."
+    },
+    "Event-until.sublime-snippet": {
+        "prefix": "Event::until",
+        "body": [
+            "Event::until(${1:event}, ${2:payload});$3"
+        ],
+        "description": "Fire an event until the first non-null response is returned."
+    }
+}

@@ -1,0 +1,348 @@
+{
+    /* Table Schema */
+
+    "Schema-connection.sublime-snippet": {
+        "prefix": "Schema::connection",
+        "body": [
+            "Schema::connection('${1:foo}')->create('${2:users}', function (${3:\\$table}) {",
+            "    \\$table->bigIncrements('id');$0",
+            "});"
+        ],
+        "description": "Specify connection for schema operation"
+    },
+    "Schema-create-table.sublime-snippet": {
+        "prefix": "Schema::create-table",
+        "body": [
+            "Schema::create('${1:users}', function (Blueprint \\$table) {",
+            "    \\$table->bigIncrements('id');",
+            "    $0",
+            "    \\$table->timestamps();",
+            "});"
+        ],
+        "description": "Create new table"
+    },
+    "Schema-drop.sublime-snippet": {
+        "prefix": "Schema::drop",
+        "body": [
+            "Schema::drop('${1:table}');$0"
+        ],
+        "description": "Drop an existing database table"
+    },
+    "Schema-dropIfExists.sublime-snippet": {
+        "prefix": "Schema::dropIfExists",
+        "body": [
+            "Schema::dropIfExists('${1:table}');$0"
+        ],
+        "description": "Drop an existing database table if it exists"
+    },
+    "Schema-hasColumn.sublime-snippet": {
+        "prefix": "Schema::hasColumn",
+        "body": [
+            "if (Schema::hasColumn('${1:table}', '${2:column}')) {",
+            "    $0",
+            "}"
+        ],
+        "description": "Check for existence of column(s)"
+    },
+    "Schema-hasTable.sublime-snippet": {
+        "prefix": "Schema::hasTable",
+        "body": [
+            "if (Schema::hasTable('${1:table}')) {",
+            "    $0",
+            "}"
+        ],
+        "description": "Check for existence of table"
+    },
+    "Schema-rename-table.sublime-snippet": {
+        "prefix": "Schema::rename-table",
+        "body": [
+            "Schema::rename(${1:\\$from}, ${2:\\$to});$0"
+        ],
+        "description": "Rename an existing database table"
+    },
+    "Schema-table-update.sublime-snippet": {
+        "prefix": "Schema::table-update",
+        "body": [
+            "Schema::table('${1:users}', function (Blueprint \\$table) {",
+            "    $0",
+            "});"
+        ],
+        "description": "Update an existing table"
+    },
+
+    /* Table Column */
+
+    "table-bigIncrements.sublime-snippet": {
+        "prefix": "Column::bigIncrements",
+        "body": [
+            "\\$table->bigIncrements('${1:id}');$2"
+        ],
+        "description": "Incrementing ID using a \"big integer\" equivalent."
+    },
+    "table-bigInteger.sublime-snippet": {
+        "prefix": "Column::bigInteger",
+        "body": [
+            "\\$table->bigInteger('${1:votes}')${2:->nullable()}${3:->default(${4:12})};$0"
+        ],
+        "description": "BIGINT equivalent to the table"
+    },
+    "table-binary.sublime-snippet": {
+        "prefix": "Column::binary",
+        "body": [
+            "\\$table->binary('${1:data}')${2:->nullable()}${3:->default(${4:12})};$0"
+        ],
+        "description": "BLOB equivalent to the table"
+    },
+    "table-boolean.sublime-snippet": {
+        "prefix": "Column::boolean",
+        "body": [
+            "\\$table->boolean('${1:confirmed}')${2:->nullable()}${3:->default(${4:false})};$0"
+        ],
+        "description": "BOOLEAN equivalent to the table"
+    },
+    "table-char.sublime-snippet": {
+        "prefix": "Column::char",
+        "body": [
+            "\\$table->char('${1:name}', ${2:4})${2:->nullable()}${3:->default(${4:'text'})};$0"
+        ],
+        "description": "CHAR equivalent with a length (optional)"
+    },
+    "table-date.sublime-snippet": {
+        "prefix": "Column::date",
+        "body": [
+            "\\$table->date('${1:created_at}')${2:->nullable()}${3:->default(${4:new DateTime()})};$0"
+        ],
+        "description": "DATE equivalent to the table"
+    },
+    "table-dateTime.sublime-snippet": {
+        "prefix": "Column::dateTime",
+        "body": [
+            "\\$table->dateTime('${1:created_at}')${2:->nullable()}${3:->default(${4:new DateTime()})};$0"
+        ],
+        "description": "DATETIME equivalent to the table"
+    },
+    "table-decimal.sublime-snippet": {
+        "prefix": "Column::decimal",
+        "body": [
+            "\\$table->decimal('${1:amount}', ${2:5}, ${3:2})${4:->nullable()}${5:->default(${6:123.45})};$0"
+        ],
+        "description": "DECIMAL equivalent with a precision and scale"
+    },
+    "table-double.sublime-snippet": {
+        "prefix": "Column::double",
+        "body": [
+            "\\$table->double('${1:column}', ${2:15}, ${3:8})${4:->nullable()}${5:->default(${6:123.4567})};$0"
+        ],
+        "description": "DOUBLE equivalent with precision"
+    },
+    "table-dropColumn.sublime-snippet": {
+        "prefix": "Column::dropColumn",
+        "body": [
+            "\\$table->dropColumn('${1:column}');$0"
+        ],
+        "description": "Drop a column"
+    },
+    "table-dropForeign.sublime-snippet": {
+        "prefix": "Column::dropForeign",
+        "body": [
+            "\\$table->dropForeign('${1:posts_user_id_foreign}');$0"
+        ],
+        "description": "Drop a Foreign Key"
+    },
+    "table-dropIndex.sublime-snippet": {
+        "prefix": "Column::dropIndex",
+        "body": [
+            "\\$table->dropIndex('${1:geo_state_index}');$0"
+        ],
+        "description": "Drop a basic Index"
+    },
+    "table-dropPrimary.sublime-snippet": {
+        "prefix": "Column::dropPrimary",
+        "body": [
+            "\\$table->dropPrimary('${1:users_id_primary}');$0"
+        ],
+        "description": "Drop a Primary key"
+    },
+    "table-dropUnique.sublime-snippet": {
+        "prefix": "Column::dropUnique",
+        "body": [
+            "\\$table->dropUnique('${1:users_email_unique}');$0"
+        ],
+        "description": "Drop a Unique Index"
+    },
+    "table-engine.sublime-snippet": {
+        "prefix": "Column::engine",
+        "body": [
+            "\\$table->engine = '${1:InnoDB}';$0"
+        ],
+        "description": "Set the storage engine for a table"
+    },
+    "table-enum.sublime-snippet": {
+        "prefix": "Column::enum",
+        "body": [
+            "\\$table->enum('${1:choices}', ${2:['foo', 'bar']})${3:->nullable()}${4:->default(${5:['foo', 'bar']})};$0"
+        ],
+        "description": "ENUM equivalent to the table"
+    },
+    "table-float.sublime-snippet": {
+        "prefix": "Column::float",
+        "body": [
+            "\\$table->float('${1:amount}')${2:->nullable()}${3:->default(${4:123.45})};$0"
+        ],
+        "description": "FLOAT equivalent to the table"
+    },
+    "table-increments.sublime-snippet": {
+        "prefix": "Column::increments",
+        "body": [
+            "\\$table->increments('${1:id}');$0"
+        ],
+        "description": "Incrementing ID"
+    },
+    "table-index-foreign.sublime-snippet": {
+        "prefix": "Column::index-foreign",
+        "body": [
+            "\\$table->foreign('${1:user_id}')->references('${2:id}')->on('${3:users}')${4:->onDelete('${5:cascade}')};$0"
+        ],
+        "description": "Add a Foreign Key to a table"
+    },
+    "table-index-index.sublime-snippet": {
+        "prefix": "Column::index",
+        "body": [
+            "\\$table->index('${1:column}');$0"
+        ],
+        "description": "Adding a basic index"
+    },
+    "table-index-primary.sublime-snippet": {
+        "prefix": "Column::index-primary",
+        "body": [
+            "\\$table->primary('${1:id}');$0"
+        ],
+        "description": "Add a primary or array of composite keys"
+    },
+    "table-index-unique.sublime-snippet": {
+        "prefix": "Column::index-unique",
+        "body": [
+            "\\$table->unique('${1:column}');$0"
+        ],
+        "description": "Add a unique index"
+    },
+    "table-integer.sublime-snippet": {
+        "prefix": "Column::integer",
+        "body": [
+            "\\$table->integer('${1:votes}')${2:->unsigned()}${3:->nullable()}${4:->default(${5:12})};$0"
+        ],
+        "description": "INTEGER equivalent to the table"
+    },
+    "table-json.sublime-snippet": {
+        "prefix": "Column::json",
+        "body": [
+            "\\$table->json('${1:column}')${2:->nullable()};$0"
+        ],
+        "description": "JSON equivalent to the table"
+    },
+    "table-jsonb.sublime-snippet": {
+        "prefix": "Column::jsonb",
+        "body": [
+            "\\$table->jsonb('${1:column}')${2:->nullable()};$0"
+        ],
+        "description": "JSON equivalent to the table"
+    },
+    "table-longText.sublime-snippet": {
+        "prefix": "Column::longText",
+        "body": [
+            "\\$table->longText('${1:description}')${2:->nullable()}${3:->default(${4:'text'})};$0"
+        ],
+        "description": "LONGTEXT equivalent to the table"
+    },
+    "table-mediumText.sublime-snippet": {
+        "prefix": "Column::mediumText",
+        "body": [
+            "\\$table->mediumText('${1:mediumText}')${2:->nullable()}${3:->default(${4:'text'})};$0"
+        ],
+        "description": "MEDIUMTEXT equivalent to the table"
+    },
+    "table-morphs.sublime-snippet": {
+        "prefix": "Column::morphs",
+        "body": [
+            "\\$table->morphs('${1:taggable}');$0"
+        ],
+        "description": "Adds INTEGER taggable_id and STRING taggable_type"
+    },
+    "table-rememberToken.sublime-snippet": {
+        "prefix": "Column::rememberToken",
+        "body": [
+            "\\$table->rememberToken();"
+        ],
+        "description": "Adds remember_token as VARCHAR(100) NULL"
+    },
+    "table-renameColumn.sublime-snippet": {
+        "prefix": "Column::renameColumn",
+        "body": [
+            "\\$table->renameColumn('${1:from}', '${2:to}');$0"
+        ],
+        "description": "Rename a column"
+    },
+    "table-smallInteger.sublime-snippet": {
+        "prefix": "Column::smallInteger",
+        "body": [
+            "\\$table->smallInteger('${1:votes}')${2:->nullable()}${3:->default(${4:12})};$0"
+        ],
+        "description": "SMALLINT equivalent to the table"
+    },
+    "table-softDeletes.sublime-snippet": {
+        "prefix": "Column::softDeletes",
+        "body": [
+            "\\$table->softDeletes();"
+        ],
+        "description": "Adds deleted_at column for soft deletes"
+    },
+    "table-string.sublime-snippet": {
+        "prefix": "Column::string",
+        "body": [
+            "\\$table->string('${1:name}', ${2:100})${3:->nullable()}${5:->default(${6:'text'})};$0"
+        ],
+        "description": "VARCHAR equivalent with a length (optional)"
+    },
+    "table-text.sublime-snippet": {
+        "prefix": "Column::text",
+        "body": [
+            "\\$table->text('${1:description}')${2:->nullable()}${3:->default(${4:'text'})};$0"
+        ],
+        "description": "TEXT equivalent to the table"
+    },
+    "table-time.sublime-snippet": {
+        "prefix": "Column::time",
+        "body": [
+            "\\$table->time('${1:sunrise}')${2:->nullable()}${3:->default(${4:new DateTime()})};$0"
+        ],
+        "description": "TIME equivalent to the table"
+    },
+    "table-timestamp.sublime-snippet": {
+        "prefix": "Column::timestamp",
+        "body": [
+            "\\$table->timestamp('${1:added_on}')${2:->nullable()}${3:->default(${4:time()})};$0"
+        ],
+        "description": "TIMESTAMP equivalent to the table"
+    },
+    "table-timestamps.sublime-snippet": {
+        "prefix": "Column::timestamps",
+        "body": [
+            "\\$table->timestamps();"
+        ],
+        "description": "Adds created_at and updated_at columns"
+    },
+    "table-tinyInteger.sublime-snippet": {
+        "prefix": "Column::tinyInteger",
+        "body": [
+            "\\$table->tinyInteger('${1:numbers}');$0"
+        ],
+        "description": "TINYINT equivalent to the table"
+    },
+    "table-uuid.sublime-snippet": {
+        "prefix": "Column::uuid",
+        "body": [
+            "\\$table->uuid('${1:id}')${2:->nullable()}${3:->default(${4:null})};$0"
+        ],
+        "description": "UUID equivalent to the table"
+    }
+}
