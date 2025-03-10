@@ -45,8 +45,8 @@ const load = () => {
     return items;
 };
 
-export const getEnv = repository<EnvItem>(
-    () =>
+export const getEnv = repository<EnvItem>({
+    load: () =>
         new Promise<EnvItem>((resolve, reject) => {
             try {
                 resolve(load());
@@ -54,6 +54,7 @@ export const getEnv = repository<EnvItem>(
                 reject(error);
             }
         }),
-    ".env",
-    {},
-);
+    pattern: ".env",
+    itemsDefault: {},
+    reloadOnComposerChanges: false,
+});

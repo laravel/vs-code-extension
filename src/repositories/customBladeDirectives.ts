@@ -6,12 +6,12 @@ interface CustomDirectiveItem {
     hasParams: boolean;
 }
 
-export const getCustomBladeDirectives = repository<CustomDirectiveItem[]>(
-    () =>
+export const getCustomBladeDirectives = repository<CustomDirectiveItem[]>({
+    load: () =>
         runInLaravel<CustomDirectiveItem[]>(
             template("bladeDirectives"),
             "Custom Blade Directives",
         ),
-    "app/{,*,**/*}Provider.php",
-    [],
-);
+    pattern: "app/{,*,**/*}Provider.php",
+    itemsDefault: [],
+});

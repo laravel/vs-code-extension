@@ -2,8 +2,8 @@ import { repository } from ".";
 import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
 
-export const getConfigs = repository<Config[]>(
-    () => {
+export const getConfigs = repository<Config[]>({
+    load: () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(
             (result) =>
                 result.map((item) => {
@@ -16,6 +16,6 @@ export const getConfigs = repository<Config[]>(
                 }),
         );
     },
-    ["config/{,*,**/*}.php", ".env"],
-    [],
-);
+    pattern: ["config/{,*,**/*}.php", ".env"],
+    itemsDefault: [],
+});

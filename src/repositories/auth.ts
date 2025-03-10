@@ -16,8 +16,8 @@ const load = () => {
     return runInLaravel<AuthItems>(template("auth"), "Auth Data");
 };
 
-export const getPolicies = repository<AuthItems>(
+export const getPolicies = repository<AuthItems>({
     load,
-    "app/Providers/{,*,**/*}.php",
-    {},
-);
+    pattern: "app/Providers/{,*,**/*}.php",
+    itemsDefault: {},
+});

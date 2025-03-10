@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
+import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
@@ -19,13 +20,15 @@ import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
-import { disposeWatchers } from "./support/fileWatcher";
+import {
+    disposeWatchers,
+    watchForComposerChanges,
+} from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
 import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
-import { bladeSpacer } from "./blade/bladeSpacer";
 
 let client: LanguageClient;
 
@@ -65,6 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
     initVendorWatchers();
+    watchForComposerChanges();
     setParserBinaryPath(context);
 
     const TRIGGER_CHARACTERS = ["'", '"'];
