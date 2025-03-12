@@ -50,7 +50,9 @@ const getTranslation = (match: string): Translation => {
 
     if (!translationItem) {
         // If we can't find exact match, try to find a first nested element
-        firstNestedMatch = Object.keys(translations).find(key => key.startsWith(match));
+        firstNestedMatch = Object.keys(translations).find(
+            key => key.startsWith(match + '.')
+        );
 
         if (firstNestedMatch) {
             translationItem = translations[firstNestedMatch];
