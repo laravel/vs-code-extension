@@ -31,27 +31,22 @@ const toFind: FeatureTag = [
     },
 ];
 
-const getLang = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
-    let lang = undefined;
+const getLangKey = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
+    let langKey = undefined;
 
-    const children = item.arguments.children;
-    const locale = (children as AutocompleteParsingResult.Argument[]).find(
+    const locale = (item.arguments.children as AutocompleteParsingResult.Argument[]).find(
         (arg) => arg.name === "locale",
     );
 
     if (locale && locale.children.length) {
-        lang = (locale.children as AutocompleteParsingResult.StringValue[])[0].value;
+        langKey = (locale.children as AutocompleteParsingResult.StringValue[])[0].value;
     }
 
-    return lang;
+    return langKey;
 };
 
-const getTranslationItem = (translation: TranslationItem, lang?: string) => {
-    if (!lang) {
-        lang = getTranslations().items.default;
-    }
-
-    return translation[lang] ?? translation[Object.keys(translation)[0]];
+const getTranslationItem = (translation: TranslationItem, langKey?: string) => {
+    return translation[langKey ?? getTranslations().items.default] ?? translation[Object.keys(translation)[0]];
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -73,7 +68,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             const def = getTranslationItem(
                 translation, 
-                getLang(item as AutocompleteParsingResult.MethodCall)
+                getLangKey(item as AutocompleteParsingResult.MethodCall)
             );
 
             return new vscode.DocumentLink(
