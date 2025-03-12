@@ -10,6 +10,7 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
 import { contract, facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
@@ -30,10 +31,27 @@ const toFind: FeatureTag = [
     },
 ];
 
-const getDefault = (translation: TranslationItem) => {
-    const langDefault = getTranslations().items.default;
+const getLang = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
+    let lang = undefined;
 
-    return translation[langDefault] ?? translation[Object.keys(translation)[0]];
+    const children = item.arguments.children;
+    const locale = (children as AutocompleteParsingResult.Argument[]).find(
+        (arg) => arg.name === "locale",
+    );
+
+    if (locale && locale.children.length) {
+        lang = (locale.children as AutocompleteParsingResult.StringValue[])[0].value;
+    }
+
+    return lang;
+};
+
+const getTranslationItem = (translation: TranslationItem, lang?: string) => {
+    if (!lang) {
+        lang = getTranslations().items.default;
+    }
+
+    return translation[lang] ?? translation[Object.keys(translation)[0]];
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -41,7 +59,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
@@ -53,7 +71,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const def = getDefault(translation);
+            const def = getTranslationItem(
+                translation, 
+                getLang(item as AutocompleteParsingResult.MethodCall)
+            );
 
             return new vscode.DocumentLink(
                 detectedRange(param),
@@ -157,7 +178,7 @@ export const completionProvider = {
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
                     // 200 is an arbitrary but probably safe number
-                    completionItem.detail = getDefault(translations).value;
+                    completionItem.detail = getTranslationItem(translations).value;
                 }
 
                 return completionItem;
@@ -182,7 +203,7 @@ export const completionProvider = {
         return Object.entries(getTranslations().items.translations)
             .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
-                return getDefault(value)
+                return getTranslationItem(value)
                     .params.filter((param) => {
                         return true;
                         // TODO: Fix this....
