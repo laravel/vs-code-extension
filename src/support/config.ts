@@ -11,7 +11,8 @@ type ConfigKey =
     | "tests.suiteSuffix"
     | "showErrorPopups"
     | "blade.autoSpaceTags"
-    | "eloquent.generateDocBlocks";
+    | "eloquent.generateDocBlocks"
+    | "env.viteQuickFix";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);
