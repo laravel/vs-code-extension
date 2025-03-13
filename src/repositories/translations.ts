@@ -2,6 +2,11 @@ import { runInLaravel, template } from "@src/support/php";
 import { projectPath } from "@src/support/project";
 import { repository } from ".";
 
+export interface NestedTranslationItem {
+    translationItem: TranslationItem | undefined;
+    isNested: boolean;
+}
+
 export interface TranslationItem {
     [key: string]: {
         value: string;

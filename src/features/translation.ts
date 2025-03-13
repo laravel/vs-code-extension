@@ -2,6 +2,7 @@ import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslations,
+    NestedTranslationItem,
     TranslationItem,
 } from "@src/repositories/translations";
 import { config } from "@src/support/config";
@@ -36,33 +37,30 @@ const getDefault = (translation: TranslationItem) => {
     return translation[langDefault] ?? translation[Object.keys(translation)[0]];
 };
 
-interface Translation {
-    translationItem: TranslationItem | undefined;
-    isNested: boolean;
-}
+const getNestedTranslationItem = (match: string): NestedTranslationItem | undefined => {
+    const translations = getTranslations().items.translations;
 
-const getTranslation = (match: string): Translation => {
+    const firstNestedMatch = Object.keys(translations).find(
+        key => key.startsWith(match + '.')
+    );
+
+    return firstNestedMatch ? {
+        translationItem: translations[firstNestedMatch],
+        isNested: true
+    } as NestedTranslationItem : undefined;
+};
+
+const getTranslationItem = (match: string): NestedTranslationItem | undefined => {
     const translations = getTranslations().items.translations;
 
     // First, try to find exact match
-    let translationItem: TranslationItem | undefined = translations[match];
-    let firstNestedMatch: string | undefined = undefined;
+    const translationItem = translations[match];
 
-    if (!translationItem) {
-        // If we can't find exact match, try to find a first nested element
-        firstNestedMatch = Object.keys(translations).find(
-            key => key.startsWith(match + '.')
-        );
-
-        if (firstNestedMatch) {
-            translationItem = translations[firstNestedMatch];
-        }
-    }
-
-    return {
+    // If we can't find exact match, try to find a first nested element
+    return translationItem ? {
         translationItem: translationItem,
-        isNested: typeof firstNestedMatch !== "undefined",
-    } as Translation;
+        isNested: false
+    } as NestedTranslationItem : getNestedTranslationItem(match);
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -75,8 +73,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translation = getTranslation(param.value);
-            const translationItem = translation.translationItem;
+            const translationItem = getTranslationItem(param.value)?.translationItem;
     
             if (!translationItem) {
                 return null;
@@ -99,19 +96,19 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const translation = getTranslation(match);
-        const translationItem = translation.translationItem;
-        const isNested = translation.isNested;
+        const translationItem = getTranslationItem(match);
 
-        if (!translationItem) {
+        if (!translationItem?.translationItem) {
             return null;
         }
 
-        const text = Object.entries(translationItem)
+        const text = Object.entries(translationItem.translationItem)
             .filter(([key]) => key !== "default")
             .map(([key, translation]) => {
                 return [
-                    ...(!isNested ? [`\`${key}\`: ${translation.value}`] : []),
+                    ...(!translationItem.isNested ? [
+                        `\`${key}\`: ${translation.value}`
+                    ] : []),
                     `[${relativePath(translation.path)}](${vscode.Uri.file(
                         translation.path,
                     ).with({
@@ -137,8 +134,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const translation = getTranslation(param.value);
-            const translationItem = translation.translationItem;
+            const translationItem = getTranslationItem(param.value)?.translationItem;
 
             if (translationItem) {
                 return null;
