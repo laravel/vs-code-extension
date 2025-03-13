@@ -31,22 +31,17 @@ const toFind: FeatureTag = [
     },
 ];
 
-const getLangKey = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
-    let langKey = undefined;
-
+const getLang = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
     const locale = (item.arguments.children as AutocompleteParsingResult.Argument[]).find(
         (arg) => arg.name === "locale",
     );
 
-    if (locale && locale.children.length) {
-        langKey = (locale.children as AutocompleteParsingResult.StringValue[])[0].value;
-    }
-
-    return langKey;
+    return locale?.children.length ? 
+        (locale.children as AutocompleteParsingResult.StringValue[])[0].value : undefined;
 };
 
-const getTranslationItem = (translation: TranslationItem, langKey?: string) => {
-    return translation[langKey ?? getTranslations().items.default] ?? translation[Object.keys(translation)[0]];
+const getTranslationItemByLang = (translation: TranslationItem, lang?: string) => {
+    return translation[lang ?? getTranslations().items.default] ?? translation[Object.keys(translation)[0]];
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -66,9 +61,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const def = getTranslationItem(
+            const def = getTranslationItemByLang(
                 translation, 
-                getLangKey(item as AutocompleteParsingResult.MethodCall)
+                getLang(item as AutocompleteParsingResult.MethodCall)
             );
 
             return new vscode.DocumentLink(
@@ -173,7 +168,7 @@ export const completionProvider = {
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
                     // 200 is an arbitrary but probably safe number
-                    completionItem.detail = getTranslationItem(translations).value;
+                    completionItem.detail = getTranslationItemByLang(translations).value;
                 }
 
                 return completionItem;
@@ -198,7 +193,7 @@ export const completionProvider = {
         return Object.entries(getTranslations().items.translations)
             .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
-                return getTranslationItem(value)
+                return getTranslationItemByLang(value)
                     .params.filter((param) => {
                         return true;
                         // TODO: Fix this....
