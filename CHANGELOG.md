@@ -4,7 +4,7 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
-- Nothing yet
+- Ability to quickly add `VITE_` env variables from existing ([#332](https://github.com/laravel/vs-code-extension/pull/332))
 
 ## [v1.0.4]
 
