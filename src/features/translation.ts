@@ -25,7 +25,7 @@ const toFind: FeatureTag = [
         argumentIndex: [0, 1],
     },
     {
-        method: ["__", "trans", "@lang"],
+        method: ["__", "trans", "trans_choice", "@lang"],
         argumentIndex: [0, 1],
     },
 ];
