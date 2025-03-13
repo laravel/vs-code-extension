@@ -41,7 +41,8 @@ const getLang = (item: AutocompleteParsingResult.MethodCall): string | undefined
 };
 
 const getTranslationItemByLang = (translation: TranslationItem, lang?: string) => {
-    return translation[lang ?? getTranslations().items.default] ?? translation[Object.keys(translation)[0]];
+    return translation[lang ?? getTranslations().items.default] 
+        ?? translation[Object.keys(translation)[0]];
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
