@@ -18,8 +18,8 @@ const toFind: FeatureTag = [
     {
         class: [contract("Translation\\Translator")],
         method: ["get", "choice"],
-        argumentIndex: 0,        
-    },    
+        argumentIndex: 0,
+    },
     {
         class: facade("Lang"),
         method: ["has", "hasForLocale", "get", "getForLocale", "choice"],
@@ -27,22 +27,30 @@ const toFind: FeatureTag = [
     },
     {
         method: ["__", "trans", "@lang"],
-        argumentIndex: [0, 1],
+        argumentIndex: [0, 1, 2],
     },
 ];
 
-const getLang = (item: AutocompleteParsingResult.MethodCall): string | undefined => {
-    const locale = (item.arguments.children as AutocompleteParsingResult.Argument[]).find(
-        (arg) => arg.name === "locale",
-    );
+const getLang = (
+    item: AutocompleteParsingResult.MethodCall,
+): string | undefined => {
+    const locale = (
+        item.arguments.children as AutocompleteParsingResult.Argument[]
+    ).find((arg, i) => arg.name === "locale" || i === 2);
 
-    return locale?.children.length ? 
-        (locale.children as AutocompleteParsingResult.StringValue[])[0].value : undefined;
+    return locale?.children.length
+        ? (locale.children as AutocompleteParsingResult.StringValue[])[0].value
+        : undefined;
 };
 
-const getTranslationItemByLang = (translation: TranslationItem, lang?: string) => {
-    return translation[lang ?? getTranslations().items.default] 
-        ?? translation[Object.keys(translation)[0]];
+const getTranslationItemByLang = (
+    translation: TranslationItem,
+    lang?: string,
+) => {
+    return (
+        translation[lang ?? getTranslations().items.default] ??
+        translation[Object.keys(translation)[0]]
+    );
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -63,8 +71,8 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             }
 
             const def = getTranslationItemByLang(
-                translation, 
-                getLang(item as AutocompleteParsingResult.MethodCall)
+                translation,
+                getLang(item as AutocompleteParsingResult.MethodCall),
             );
 
             return new vscode.DocumentLink(
@@ -150,6 +158,22 @@ export const completionProvider = {
             return this.getParameterCompletionItems(result, document, position);
         }
 
+        if (result.isParamIndex(2) || result.isArgumentNamed("locale")) {
+            return getTranslations().items.languages.map((lang) => {
+                let completionItem = new vscode.CompletionItem(
+                    lang,
+                    vscode.CompletionItemKind.Value,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+
+                return completionItem;
+            });
+        }
+
         const totalTranslationItems = Object.entries(
             getTranslations().items.translations,
         ).length;
@@ -169,7 +193,8 @@ export const completionProvider = {
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
                     // 200 is an arbitrary but probably safe number
-                    completionItem.detail = getTranslationItemByLang(translations).value;
+                    completionItem.detail =
+                        getTranslationItemByLang(translations).value;
                 }
 
                 return completionItem;
