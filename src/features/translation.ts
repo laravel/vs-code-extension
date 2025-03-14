@@ -18,25 +18,86 @@ const toFind: FeatureTag = [
     {
         class: [contract("Translation\\Translator")],
         method: ["get", "choice"],
-        argumentIndex: 0,
     },
     {
         class: facade("Lang"),
-        method: ["has", "hasForLocale", "get", "getForLocale", "choice"],
-        argumentIndex: [0, 1],
+        method: ["has", "hasForLocale", "get", "choice"],
     },
     {
         method: ["__", "trans", "@lang"],
-        argumentIndex: [0, 1, 2],
     },
 ];
+
+type ArgIndexMap = Record<string, Record<string, number>>;
+
+const paramArgIndexes: ArgIndexMap = {
+    [contract("Translation\\Translator")]: {
+        get: 1,
+        choice: 2,
+    },
+    "": {
+        __: 1,
+        trans: 1,
+        "@lang": 1,
+    },
+};
+
+const localeArgIndexes: ArgIndexMap = {
+    [contract("Translation\\Translator")]: {
+        get: 2,
+        choice: 3,
+    },
+    "": {
+        __: 2,
+        trans: 2,
+        "@lang": 2,
+    },
+};
+
+facade("Lang").forEach((cl) => {
+    paramArgIndexes[cl] = {
+        get: 1,
+        choice: 2,
+    };
+
+    localeArgIndexes[cl] = {
+        has: 1,
+        hasForLocale: 1,
+        get: 2,
+        choice: 3,
+    };
+});
+
+const getFromMapping = (
+    className: string | null,
+    methodName: string | null,
+    mapping: ArgIndexMap,
+) => {
+    return mapping[className ?? ""][methodName ?? ""] ?? null;
+};
+
+const getLocaleArgIndex = (
+    className: string | null,
+    methodName: string | null,
+) => {
+    return getFromMapping(className, methodName, localeArgIndexes);
+};
+
+const getParamArgIndex = (
+    className: string | null,
+    methodName: string | null,
+) => {
+    return getFromMapping(className, methodName, paramArgIndexes);
+};
 
 const getLang = (
     item: AutocompleteParsingResult.MethodCall,
 ): string | undefined => {
+    const localeArgIndex = getLocaleArgIndex(item.className, item.methodName);
+
     const locale = (
         item.arguments.children as AutocompleteParsingResult.Argument[]
-    ).find((arg, i) => arg.name === "locale" || i === 2);
+    ).find((arg, i) => arg.name === "locale" || i === localeArgIndex);
 
     return locale?.children.length
         ? (locale.children as AutocompleteParsingResult.StringValue[])[0].value
@@ -154,11 +215,17 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.isParamIndex(1)) {
+        const localeArgIndex = getLocaleArgIndex(result.class(), result.func());
+        const paramArgIndex = getParamArgIndex(result.class(), result.func());
+
+        if (result.isParamIndex(paramArgIndex ?? -1)) {
             return this.getParameterCompletionItems(result, document, position);
         }
 
-        if (result.isParamIndex(2) || result.isArgumentNamed("locale")) {
+        if (
+            result.isParamIndex(localeArgIndex ?? -1) ||
+            result.isArgumentNamed("locale")
+        ) {
             return getTranslations().items.languages.map((lang) => {
                 let completionItem = new vscode.CompletionItem(
                     lang,
@@ -172,6 +239,10 @@ export const completionProvider = {
 
                 return completionItem;
             });
+        }
+
+        if (!result.isParamIndex(0)) {
+            return [];
         }
 
         const totalTranslationItems = Object.entries(
