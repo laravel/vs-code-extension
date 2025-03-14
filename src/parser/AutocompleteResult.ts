@@ -117,6 +117,10 @@ export default class AutocompleteResult {
         return this.param()?.name ?? null;
     }
 
+    public isArgumentNamed(name: string) {
+        return this.argumentName() === name;
+    }
+
     public isParamIndex(index: number) {
         return this.paramIndex() === index;
     }

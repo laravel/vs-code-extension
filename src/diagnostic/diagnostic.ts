@@ -8,6 +8,7 @@ import { diagnosticProvider as inertia } from "@src/features/inertia";
 import { diagnosticProvider as middleware } from "@src/features/middleware";
 import { diagnosticProvider as mix } from "@src/features/mix";
 import { diagnosticProvider as route } from "@src/features/route";
+import { diagnosticProvider as storage } from "@src/features/storage";
 import { diagnosticProvider as translation } from "@src/features/translation";
 import { diagnosticProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
@@ -30,6 +31,7 @@ const providers: {
     { provider: middleware, configKey: "middleware.diagnostics" },
     { provider: mix, configKey: "mix.diagnostics" },
     { provider: route, configKey: "route.diagnostics" },
+    { provider: storage, configKey: "storage.diagnostics" },
     { provider: translation, configKey: "translation.diagnostics" },
     { provider: view, configKey: "view.diagnostics" },
 ];

@@ -1,15 +1,23 @@
 import {
+    type FileEvent,
     WatcherPattern,
     defaultFileEvents,
     loadAndWatch,
 } from "../support/fileWatcher";
 
-export const repository = <T>(
-    load: () => Promise<T>,
-    pattern: WatcherPattern,
-    itemsDefault: T,
+export const repository = <T>({
+    load,
+    pattern,
+    itemsDefault,
     fileWatcherEvents = defaultFileEvents,
-) => {
+    reloadOnComposerChanges = true,
+}: {
+    load: () => Promise<T>;
+    pattern: WatcherPattern;
+    itemsDefault: T;
+    fileWatcherEvents?: FileEvent[];
+    reloadOnComposerChanges?: boolean;
+}) => {
     let items: T = itemsDefault;
     let loaded = false;
 
@@ -30,6 +38,7 @@ export const repository = <T>(
         },
         pattern,
         fileWatcherEvents,
+        reloadOnComposerChanges,
     );
 
     const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {

@@ -9,10 +9,10 @@ type AppBindingItem = {
     };
 };
 
-export const getAppBindings = repository<AppBindingItem>(
-    () => {
+export const getAppBindings = repository<AppBindingItem>({
+    load: () => {
         return runInLaravel<AppBindingItem>(template("app"), "App Bindings");
     },
-    "app/Providers/{,*,**/*}.php",
-    {},
-);
+    pattern: "app/Providers/{,*,**/*}.php",
+    itemsDefault: {},
+});

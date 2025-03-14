@@ -26,7 +26,7 @@ const toFind: FeatureTag = [
             "check",
             "any",
             "authorize",
-            "inspect",            
+            "inspect",
         ],
         argumentIndex: 0,
     },
@@ -106,7 +106,7 @@ const analyzeParam = (
     }
 
     const policies = values
-        .map((value) => getPolicies().items[value.value])
+        .map((value) => getPolicies().items.policies[value.value])
         .flat();
 
     if (["has"].includes(item.methodName)) {
@@ -301,26 +301,28 @@ export const completionProvider: CompletionProvider = {
             return [];
         }
 
-        return Object.entries(getPolicies().items).map(([key, value]) => {
-            let completeItem = new vscode.CompletionItem(
-                key,
-                vscode.CompletionItemKind.Value,
-            );
+        return Object.entries(getPolicies().items.policies).map(
+            ([key, value]) => {
+                let completeItem = new vscode.CompletionItem(
+                    key,
+                    vscode.CompletionItemKind.Value,
+                );
 
-            completeItem.range = document.getWordRangeAtPosition(
-                position,
-                wordMatchRegex,
-            );
+                completeItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
 
-            const policyClasses = value
-                .map((item) => item.policy)
-                .filter(String);
+                const policyClasses = value
+                    .map((item) => item.policy)
+                    .filter(String);
 
-            if (policyClasses.length > 0) {
-                completeItem.detail = policyClasses.join("\n\n");
-            }
+                if (policyClasses.length > 0) {
+                    completeItem.detail = policyClasses.join("\n\n");
+                }
 
-            return completeItem;
-        });
+                return completeItem;
+            },
+        );
     },
 };

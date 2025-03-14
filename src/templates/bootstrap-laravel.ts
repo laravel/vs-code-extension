@@ -14,7 +14,7 @@ class LaravelVsCode
             return (string) $path;
         }
 
-        return ltrim(str_replace(base_path(), '', realpath($path)), DIRECTORY_SEPARATOR);
+        return ltrim(str_replace(base_path(), '', realpath($path) ?: $path), DIRECTORY_SEPARATOR);
     }
 
     public static function isVendor($path)

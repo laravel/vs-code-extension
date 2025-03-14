@@ -60,5 +60,13 @@
             "link",
             "completion"
         ]
+    },
+    {
+        "type": "storage",
+        "features": [
+            "link",
+            "completion",
+            "diagnostics"
+        ]
     }
 ]

@@ -6,8 +6,8 @@ interface PathItem {
     path: string;
 }
 
-export const getPaths = repository<PathItem[]>(
-    () => {
+export const getPaths = repository<PathItem[]>({
+    load: () => {
         return runInLaravel<{ key: string; path: string }[]>(
             `
             echo json_encode([
@@ -48,6 +48,7 @@ export const getPaths = repository<PathItem[]>(
             "Paths",
         );
     },
-    "config/{,*,**/*}.php",
-    [],
-);
+    pattern: "config/{,*,**/*}.php",
+    itemsDefault: [],
+    reloadOnComposerChanges: false,
+});

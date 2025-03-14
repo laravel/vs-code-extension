@@ -6,6 +6,20 @@ All notable changes to the Laravel extension will be documented in this file.
 
 - Nothing yet
 
+## [v1.0.5]
+
+- Ability to quickly add `VITE_` env variables from existing ([#332](https://github.com/laravel/vs-code-extension/pull/332))
+- Add trans_choice helper ([#331](https://github.com/laravel/vs-code-extension/pull/331))
+- Support for locale parameter in translations ([PR #330](https://github.com/laravel/vs-code-extension/pull/330))
+- Better resolution for `$request->user()`, `auth()->user()`, and `Auth::user()` ([#333](https://github.com/laravel/vs-code-extension/pull/333))
+
+## [v1.0.4]
+
+- Improve file watcher performance ([#327](https://github.com/laravel/vs-code-extension/pull/327))
+- Autocompletion, linking, and diagnostics for Storage Disks ([#328](https://github.com/laravel/vs-code-extension/pull/328))
+- Fix relative path when path does not exist ([#322](https://github.com/laravel/vs-code-extension/pull/322))
+- Automatically check lowercase Inertia view paths ([#323](https://github.com/laravel/vs-code-extension/pull/323))
+
 ## [v1.0.3]
 
 - Basic Folio support ([#319](https://github.com/laravel/vs-code-extension/pull/319))
