@@ -13,6 +13,36 @@ $modelPolicies = collect(get_declared_classes())
     ])
     ->filter(fn($policy) => $policy !== null);
 
+function vsCodeGetAuthenticatable() {
+    try {
+        $guard = auth()->guard();
+
+        $reflection = new \\ReflectionClass($guard);
+
+        if (!$reflection->hasProperty("provider")) {
+            return null;
+        }
+
+        $property = $reflection->getProperty("provider");
+        $provider = $property->getValue($guard);
+
+        if ($provider instanceof \\Illuminate\\Auth\\EloquentUserProvider) {
+            $providerReflection = new \\ReflectionClass($provider);
+            $modelProperty = $providerReflection->getProperty("model");
+
+            return str($modelProperty->getValue($provider))->prepend("\\\\")->toString();
+        }
+
+        if ($provider instanceof \\Illuminate\\Auth\\DatabaseUserProvider) {
+            return str(\\Illuminate\\Auth\\GenericUser::class)->prepend("\\\\")->toString();
+        }
+    } catch (\\Exception | \\Throwable $e) {
+        return null;
+    }
+
+    return null;
+}
+
 function vsCodeGetPolicyInfo($policy, $model)
 {
     $methods = (new ReflectionClass($policy))->getMethods();
@@ -26,39 +56,41 @@ function vsCodeGetPolicyInfo($policy, $model)
     ])->filter(fn($ability) => !in_array($ability['key'], ['allow', 'deny']));
 }
 
-echo collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
-    ->map(function ($policy, $key) {
-        $reflection = new \\ReflectionFunction($policy);
-        $policyClass = null;
-        $closureThis = $reflection->getClosureThis();
+echo json_encode([
+    'authenticatable' => vsCodeGetAuthenticatable(),
+    'policies' => collect(\\Illuminate\\Support\\Facades\\Gate::abilities())
+                    ->map(function ($policy, $key) {
+                        $reflection = new \\ReflectionFunction($policy);
+                        $policyClass = null;
+                        $closureThis = $reflection->getClosureThis();
 
-        if ($closureThis !== null) {
-            if (get_class($closureThis) === \\Illuminate\\Auth\\Access\\Gate::class) {
-                $vars = $reflection->getClosureUsedVariables();
+                        if ($closureThis !== null) {
+                            if (get_class($closureThis) === \\Illuminate\\Auth\\Access\\Gate::class) {
+                                $vars = $reflection->getClosureUsedVariables();
 
-                if (isset($vars['callback'])) {
-                    [$policyClass, $method] = explode('@', $vars['callback']);
+                                if (isset($vars['callback'])) {
+                                    [$policyClass, $method] = explode('@', $vars['callback']);
 
-                    $reflection = new \\ReflectionMethod($policyClass, $method);
-                }
-            }
-        }
+                                    $reflection = new \\ReflectionMethod($policyClass, $method);
+                                }
+                            }
+                        }
 
-        return [
-            'key' => $key,
-            'uri' => $reflection->getFileName(),
-            'policy' => $policyClass,
-            'line' => $reflection->getStartLine(),
-        ];
-    })
-    ->merge(
-        collect(\\Illuminate\\Support\\Facades\\Gate::policies())->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
-    )
-    ->merge(
-        $modelPolicies->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
-    )
-    ->values()
-    ->groupBy('key')
-    ->map(fn($item) => $item->map(fn($i) => \\Illuminate\\Support\\Arr::except($i, 'key')))
-    ->toJson();
+                        return [
+                            'key' => $key,
+                            'uri' => $reflection->getFileName(),
+                            'policy' => $policyClass,
+                            'line' => $reflection->getStartLine(),
+                        ];
+                    })
+                    ->merge(
+                        collect(\\Illuminate\\Support\\Facades\\Gate::policies())->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
+                    )
+                    ->merge(
+                        $modelPolicies->flatMap(fn($policy, $model) => vsCodeGetPolicyInfo($policy, $model)),
+                    )
+                    ->values()
+                    ->groupBy('key')
+                    ->map(fn($item) => $item->map(fn($i) => \\Illuminate\\Support\\Arr::except($i, 'key'))),
+]);
 `;

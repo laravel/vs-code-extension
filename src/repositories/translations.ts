@@ -83,5 +83,6 @@ export const getTranslations = repository<TranslationGroupResult>({
     itemsDefault: {
         default: "",
         translations: {},
+        languages: [],
     },
 });
