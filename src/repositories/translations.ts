@@ -17,6 +17,7 @@ interface TranslationGroupResult {
     translations: {
         [key: string]: TranslationItem;
     };
+    languages: string[];
 }
 
 interface TranslationGroupPhpResult {
@@ -30,6 +31,7 @@ interface TranslationGroupPhpResult {
     paths: string[];
     values: string[];
     to_watch: string[];
+    languages: string[];
 }
 
 let dirsToWatch: string[] | null = null;
@@ -63,6 +65,7 @@ const load = () => {
         return {
             default: res.default,
             translations: result,
+            languages: res.languages,
         };
     });
 };
