@@ -9,7 +9,7 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
-import { contract, facade } from "@src/support/util";
+import { contract, createIndexMapping, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
@@ -30,70 +30,65 @@ const toFind: FeatureTag = [
 
 type ArgIndexMap = Record<string, Record<string, number>>;
 
-const paramArgIndexes: ArgIndexMap = {
-    [contract("Translation\\Translator")]: {
-        get: 1,
-        choice: 2,
-    },
-    "": {
-        __: 1,
-        trans: 1,
-        "@lang": 1,
-    },
-};
+const paramArgIndexes = createIndexMapping([
+    [
+        contract("Translation\\Translator"),
+        {
+            get: 1,
+            choice: 2,
+        },
+    ],
+    [
+        "",
+        {
+            __: 1,
+            trans: 1,
+            "@lang": 1,
+        },
+    ],
+    [
+        facade("Lang"),
+        {
+            get: 1,
+            choice: 2,
+        },
+    ],
+]);
 
-const localeArgIndexes: ArgIndexMap = {
-    [contract("Translation\\Translator")]: {
-        get: 2,
-        choice: 3,
-    },
-    "": {
-        __: 2,
-        trans: 2,
-        "@lang": 2,
-    },
-};
-
-facade("Lang").forEach((cl) => {
-    paramArgIndexes[cl] = {
-        get: 1,
-        choice: 2,
-    };
-
-    localeArgIndexes[cl] = {
-        has: 1,
-        hasForLocale: 1,
-        get: 2,
-        choice: 3,
-    };
-});
-
-const getFromMapping = (
-    className: string | null,
-    methodName: string | null,
-    mapping: ArgIndexMap,
-) => {
-    return mapping[className ?? ""][methodName ?? ""] ?? null;
-};
-
-const getLocaleArgIndex = (
-    className: string | null,
-    methodName: string | null,
-) => {
-    return getFromMapping(className, methodName, localeArgIndexes);
-};
-
-const getParamArgIndex = (
-    className: string | null,
-    methodName: string | null,
-) => {
-    return getFromMapping(className, methodName, paramArgIndexes);
-};
+const localeArgIndexes = createIndexMapping([
+    [
+        contract("Translation\\Translator"),
+        {
+            get: 2,
+            choice: 3,
+        },
+    ],
+    [
+        "",
+        {
+            __: 2,
+            trans: 2,
+            "@lang": 2,
+        },
+    ],
+    [
+        facade("Lang"),
+        {
+            has: 1,
+            hasForLocale: 1,
+            get: 2,
+            choice: 3,
+        },
+    ],
+]);
 
 const getLang = (
     item: AutocompleteParsingResult.MethodCall,
 ): string | undefined => {
-    const localeArgIndex = getLocaleArgIndex(item.className, item.methodName);
+    const localeArgIndex = localeArgIndexes.get(
+        item.className,
+        item.methodName,
+    );
 
     const locale = (
         item.arguments.children as AutocompleteParsingResult.Argument[]
@@ -215,8 +210,14 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        const localeArgIndex = getLocaleArgIndex(result.class(), result.func());
-        const paramArgIndex = getParamArgIndex(result.class(), result.func());
+        const localeArgIndex = localeArgIndexes.get(
+            result.class(),
+            result.func(),
+        );
+        const paramArgIndex = paramArgIndexes.get(
+            result.class(),
+            result.func(),
+        );
 
         if (result.isParamIndex(paramArgIndex ?? -1)) {
             return this.getParameterCompletionItems(result, document, position);

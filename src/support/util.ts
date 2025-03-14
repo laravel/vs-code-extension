@@ -125,3 +125,24 @@ export const waitForValue = <T>(
 
         checkForValue();
     });
+
+export const createIndexMapping = (
+    items: [string | string[], Record<string, number>][],
+) => {
+    const mapping: Record<string, Record<string, number>> = {};
+
+    items.forEach(([keys, value]) => {
+        keys = toArray(keys);
+
+        keys.forEach((key) => {
+            mapping[key] = value;
+        });
+    });
+
+    return {
+        mapping,
+        get(className: string | null, methodName: string | null) {
+            return mapping[className ?? ""][methodName ?? ""] ?? null;
+        },
+    };
+};
