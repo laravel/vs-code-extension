@@ -50,7 +50,7 @@ interface Request
     /**
      * @return ${authenticatable}|null
      */
-    public function user();
+    public function user($guard = null);
 }`,
         },
         {
@@ -63,9 +63,39 @@ namespace Illuminate\\Support\\Facades;
 interface Auth
 {
     /**
+     * @return ${authenticatable}|false
+     */
+    public static function loginUsingId(mixed $id, bool $remember = false);
+
+    /**
+     * @return ${authenticatable}|false
+     */
+    public static function onceUsingId(mixed $id);
+
+    /**
      * @return ${authenticatable}|null
      */
-    public function user();
+    public static function getUser();
+
+    /**
+     * @return ${authenticatable}
+     */
+    public static function authenticate();
+
+    /**
+     * @return ${authenticatable}|null
+     */
+    public static function user();
+
+    /**
+     * @return ${authenticatable}|null
+     */
+    public static function logoutOtherDevices(string $password);
+
+    /**
+     * @return ${authenticatable}
+     */
+    public static function getLastAttempted();
 }`,
         },
     ];
