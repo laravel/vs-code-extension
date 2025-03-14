@@ -24,7 +24,7 @@ const toFind: FeatureTag = [
         method: ["has", "hasForLocale", "get", "choice"],
     },
     {
-        method: ["__", "trans", "@lang"],
+        method: ["__", "trans", "trans_choice", "@lang"],
     },
 ];
 

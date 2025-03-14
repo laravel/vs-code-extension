@@ -15,6 +15,7 @@ import Registry from "./completion/Registry";
 import ValidationCompletion from "./completion/Validation";
 import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { completionProvider as bladeComponentCompletion } from "./features/bladeComponent";
+import { viteEnvCodeActionProvider } from "./features/env";
 import { completionProvider as livewireComponentCompletion } from "./features/livewireComponent";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
@@ -152,6 +153,16 @@ export function activate(context: vscode.ExtensionContext) {
             {
                 providedCodeActionKinds:
                     CodeActionProvider.providedCodeActionKinds,
+            },
+        ),
+        vscode.languages.registerCodeActionsProvider(
+            [
+                { scheme: "file", language: "plaintext" },
+                { scheme: "file", language: "ini" },
+            ],
+            viteEnvCodeActionProvider,
+            {
+                providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),

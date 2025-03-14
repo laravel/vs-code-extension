@@ -113,6 +113,11 @@
                     "default": true,
                     "description": "Show popups for errors."
                 },
+                "Laravel.env.viteQuickFix": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable quickfix for adding VITE_ variables from regular env variables."
+                },
                 "Laravel.eloquent.generateDocBlocks": {
                     "type": "boolean",
                     "default": true,

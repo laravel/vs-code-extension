@@ -4,7 +4,8 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
-- Nothing yet
+- Ability to quickly add `VITE_` env variables from existing ([#332](https://github.com/laravel/vs-code-extension/pull/332))
+- Add trans_choice helper ([#331](https://github.com/laravel/vs-code-extension/pull/331))
 
 ## [v1.0.4]
 
