@@ -53,6 +53,21 @@ interface Request
     public function user();
 }`,
         },
+        {
+            file: "_facade.php",
+            content: `
+<?php
+
+namespace Illuminate\\Support\\Facades;
+
+interface Auth
+{
+    /**
+     * @return ${authenticatable}|null
+     */
+    public function user();
+}`,
+        },
     ];
 
     blocks.forEach((block) => {
