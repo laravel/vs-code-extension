@@ -4,9 +4,14 @@ All notable changes to the Laravel extension will be documented in this file.
 
 ## [Unreleased]
 
+- Nothing yet
+
+## [v1.0.5]
+
 - Ability to quickly add `VITE_` env variables from existing ([#332](https://github.com/laravel/vs-code-extension/pull/332))
 - Add trans_choice helper ([#331](https://github.com/laravel/vs-code-extension/pull/331))
 - Support for locale parameter in translations ([PR #330](https://github.com/laravel/vs-code-extension/pull/330))
+- Better resolution for `$request->user()`, `auth()->user()`, and `Auth::user()` ([#333](https://github.com/laravel/vs-code-extension/pull/333))
 
 ## [v1.0.4]
 
