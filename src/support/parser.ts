@@ -121,7 +121,7 @@ const cleanArg = (arg: string): string => {
     ) {
         replacements.push([/\$/g, "\\$"]);
         replacements.push([/\\'/g, "\\\\'"]);
-        replacements.push([/\\"/g, '\\\\"']);
+        replacements.push([/\\"/g, '\\\"']);
     }
 
     replacements.push([/\"/g, '\\"']);
