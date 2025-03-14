@@ -44,6 +44,7 @@ const paramArgIndexes = createIndexMapping([
             __: 1,
             trans: 1,
             "@lang": 1,
+            trans_choice: 2,
         },
     ],
     [
@@ -69,6 +70,7 @@ const localeArgIndexes = createIndexMapping([
             __: 2,
             trans: 2,
             "@lang": 2,
+            trans_choice: 3,
         },
     ],
     [
