@@ -54,7 +54,7 @@ $models = new class($factory) {
 
     public function all()
     {
-        collect(Illuminate\Support\Facades\File::allFiles(base_path('app/Models')))
+        collect(\Illuminate\Support\Facades\File::allFiles(base_path('app/Models')))
             ->filter(fn(\Symfony\Component\Finder\SplFileInfo $file) => $file->getExtension() === 'php')
             ->each(fn($file) => include_once($file));
 
