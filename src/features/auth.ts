@@ -127,24 +127,29 @@ const analyzeParam = (
 
     // @ts-ignore
     const nextArg = item.arguments.children[1].children[0];
-    let classArg: string | null = null;
+    let classArg = null;
+    let modelClass = null;
 
     if (nextArg?.type === "array") {
-        classArg = nextArg.children[0]?.value?.className;
-    } else if (nextArg?.type === "variable") {
-        classArg = getModelByName(nextArg.name)?.class ?? null;
+        classArg = nextArg.children[0]?.value;
     } else {
-        classArg = nextArg?.className;
+        classArg = nextArg;
     }
 
-    if (!classArg) {
+    if (classArg?.type === "variable") {
+        modelClass = getModelByName(classArg.name)?.class ?? null;
+    } else {
+        modelClass = classArg?.className;
+    }
+
+    if (!modelClass) {
         // If it's not a class we can even identify, just ignore it
         return {
             missingReason: "ignored",
         };
     }
 
-    const found = policies.find((items) => items.model === classArg);
+    const found = policies.find((items) => items.model === modelClass);
 
     if (!found) {
         return {
