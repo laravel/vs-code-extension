@@ -23,7 +23,7 @@ const load = () => {
     });
 };
 
-export const getModelByVariable = (variable: string): Eloquent.Model | undefined => {
+export const getModelByName = (name: string): Eloquent.Model | undefined => {
     const model = Object.entries(getModels().items).find(([key]) => {
         const modelName = key.split("\\").pop();
 
@@ -36,7 +36,7 @@ export const getModelByVariable = (variable: string): Eloquent.Model | undefined
             modelName.toLowerCase(), 
             camel(modelName), 
             snake(modelName)
-        ].includes(variable);
+        ].includes(name);
     });
 
     return model?.[1];
