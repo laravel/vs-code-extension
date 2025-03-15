@@ -1,3 +1,4 @@
+import { camel, snake } from "@src/support/str";
 import { repository } from ".";
 import { Eloquent } from "..";
 import { writeEloquentDocBlocks } from "../support/docblocks";
@@ -20,6 +21,25 @@ const load = () => {
 
         return result.models;
     });
+};
+
+export const getModelByVariable = (variable: string): Eloquent.Model | undefined => {
+    const model = Object.entries(getModels().items).find(([key]) => {
+        const modelName = key.split("\\").pop();
+
+        if (!modelName) {
+            return undefined;
+        }
+
+        return [
+            modelName, 
+            modelName.toLowerCase(), 
+            camel(modelName), 
+            snake(modelName)
+        ].includes(variable);
+    });
+
+    return model?.[1];
 };
 
 export const getModels = repository<Eloquent.Models>({

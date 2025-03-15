@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { AuthItem, getPolicies } from "@src/repositories/auth";
+import { getModelByVariable } from "@src/repositories/models";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -130,6 +131,8 @@ const analyzeParam = (
 
     if (nextArg?.type === "array") {
         classArg = nextArg.children[0]?.value?.className;
+    } else if (nextArg?.type === "variable") {
+        classArg = getModelByVariable(nextArg.name)?.class ?? null;
     } else {
         classArg = nextArg?.className;
     }
