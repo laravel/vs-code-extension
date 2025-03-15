@@ -127,20 +127,12 @@ const analyzeParam = (
 
     // @ts-ignore
     const nextArg = item.arguments.children[1].children[0];
-    let classArg = null;
-    let modelClass: string | null = null;
 
-    if (nextArg?.type === "array") {
-        classArg = nextArg.children[0]?.value;
-    } else {
-        classArg = nextArg;
-    }
+    const classArg = nextArg?.type === "array" ? 
+        nextArg.children[0]?.value : nextArg;
 
-    if (classArg?.type === "variable") {
-        modelClass = getModelByName(classArg.name)?.class ?? null;
-    } else {
-        modelClass = classArg?.className;
-    }
+    const modelClass = classArg?.type === "variable" ? 
+        getModelByName(classArg.name)?.class : classArg?.className;
 
     if (!modelClass) {
         // If it's not a class we can even identify, just ignore it
