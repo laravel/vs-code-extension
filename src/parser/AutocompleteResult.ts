@@ -65,6 +65,46 @@ export default class AutocompleteResult {
         );
     }
 
+    public isClassDefinitionExtends(classNames: string | string[]) {
+        classNames = Array.isArray(classNames) ? classNames : [classNames];
+
+        let check = false;
+
+        this.loop((context) => {
+            if (classNames.some((className: string) => {
+                return (context as AutocompleteParsingResult.ClassDefinition).extends === className;
+            })) {
+                check = true;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return check;
+    }
+
+    public isMethodDefinition(methodNames: string | string[]) {
+        methodNames = Array.isArray(methodNames) ? methodNames : [methodNames];
+
+        let check = false;
+
+        this.loop((context) => {
+            if (methodNames.some((methodName: string) => {
+                return (context as AutocompleteParsingResult.MethodDefinition).methodName === methodName;
+            })) {
+                check = true;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return check;
+    }
+
     public func() {
         // @ts-ignore
         return this.result.methodName ?? null;
