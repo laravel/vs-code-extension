@@ -32,6 +32,10 @@ export default class AutocompleteResult {
         );
     }
 
+    public fillingInRulesArrayKey(): boolean {
+        return this.result.parent?.type !== "array_item";
+    }
+
     public fillingInArrayKey(): boolean {
         return this.param()?.autocompletingKey ?? false;
     }
