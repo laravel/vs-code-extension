@@ -128,7 +128,7 @@ export default class Validation implements CompletionProvider {
                     "Livewire\\Form",
                 ],
                 methodDefinition: "rules",
-            },            
+            },
         ];
     }
 
