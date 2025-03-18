@@ -32,14 +32,15 @@ export default class AutocompleteResult {
         );
     }
 
-    public fillingInRulesArrayKey(): boolean {
-        // I'm not sure if this is enough to determine 
-        // if we're filling in a rules array key but I don't
-        // have better idea at this moment :/
-        return this.result.parent?.type !== "array_item";
-    }
-
     public fillingInArrayKey(): boolean {
+        if (this.result.type === "array") {
+            // I'm not sure if this is enough to determine 
+            // if we're filling in a rules array key but I don't
+            // have better idea at this moment :/
+            return this.result.parent?.type !== "array_item" 
+                && this.result.autocompletingKey;
+        }
+
         return this.param()?.autocompletingKey ?? false;
     }
 

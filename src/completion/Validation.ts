@@ -188,7 +188,7 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: AutocompleteResult,
     ): vscode.CompletionItem[] {
-        if (result.fillingInRulesArrayKey()) {
+        if (result.fillingInArrayKey()) {
             return [];
         }
 
