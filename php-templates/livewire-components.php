@@ -114,7 +114,7 @@ $components = new class {
 
         $items = $this->findFiles(
             $path,
-            'php',
+            'blade.php',
             fn(\Illuminate\Support\Stringable $key): string => $key->explode('.')
                 ->map(fn(string $p): string => \Illuminate\Support\Str::kebab($p))
                 ->implode('.'),
