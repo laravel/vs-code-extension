@@ -76,7 +76,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     const components = getLivewireComponents().items;
-    const regex = new RegExp(/<\/?livewire:([^\s>]+)/);
+    const regex = new RegExp(/<livewire:([^\s>]+)/);
 
     const linkRange = doc.getWordRangeAtPosition(pos, regex);
 
@@ -90,8 +90,6 @@ export const hoverProvider: HoverProvider = (
         .replace("livewire:", "");
 
     const component = components.components[match];
-
-    console.log('wchodzimy', components);
 
     if (!component) {
         return null;
