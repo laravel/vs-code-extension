@@ -1,5 +1,5 @@
 import { runInLaravel, template } from "@src/support/php";
-import { projectPath, relativePath } from "@src/support/project";
+import { relativePath } from "@src/support/project";
 import { lcfirst } from "@src/support/str";
 import { waitForValue } from "@src/support/util";
 import { repository } from ".";
