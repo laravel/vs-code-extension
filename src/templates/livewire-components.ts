@@ -1,32 +1,5 @@
 // This file was generated from php-templates/livewire-components.php, do not edit directly
 export default `
-class LaravelVsCode
-{
-    public static function relativePath($path)
-    {
-        if (!str_contains($path, base_path())) {
-            return (string) $path;
-        }
-
-        return ltrim(str_replace(base_path(), '', realpath($path) ?: $path), DIRECTORY_SEPARATOR);
-    }
-
-    public static function isVendor($path)
-    {
-        return str_contains($path, base_path("vendor"));
-    }
-
-    public static function outputMarker($key)
-    {
-        return '__VSCODE_LARAVEL_' . $key . '__';
-    }
-
-    public static function startupError(\\Throwable $e)
-    {
-        throw new Error(self::outputMarker('STARTUP_ERROR') . ': ' . $e->getMessage());
-    }
-}
-
 $components = new class {
     public function all(): array
     {
