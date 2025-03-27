@@ -1,5 +1,5 @@
 import { runInLaravel, template } from "@src/support/php";
-import { projectPath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { lcfirst } from "@src/support/str";
 import { waitForValue } from "@src/support/util";
 import { repository } from ".";
@@ -24,8 +24,8 @@ export interface LivewireComponents {
 const load = () => {
     getConfigs().whenLoaded(() => {
         livewirePaths = [
-            projectPath(lcfirst(getConfigByName('livewire.class_namespace')?.value?.replace('\\', '/') ?? 'app/Livewire')),
-            getConfigByName('livewire.view_path')?.value ?? 'resources/views/livewire'
+            lcfirst(getConfigByName('livewire.class_namespace')?.value?.replace(/\\/g, '/') ?? 'app/Livewire'),
+            relativePath(getConfigByName('livewire.view_path')?.value ?? 'resources/views/livewire')
         ];
     });
 
