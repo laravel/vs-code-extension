@@ -58,7 +58,8 @@
         "label": "Livewire components",
         "features": [
             "link",
-            "completion"
+            "completion",
+            "hover"
         ]
     },
     {

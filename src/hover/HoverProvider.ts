@@ -6,6 +6,7 @@ import { hoverProvider as bladeComponent } from "@src/features/bladeComponent";
 import { hoverProvider as config } from "@src/features/config";
 import { hoverProvider as env } from "@src/features/env";
 import { hoverProvider as inertia } from "@src/features/inertia";
+import { hoverProvider as livewireComponent } from "@src/features/livewireComponent";
 import { hoverProvider as middleware } from "@src/features/middleware";
 import { hoverProvider as mix } from "@src/features/mix";
 import { hoverProvider as route } from "@src/features/route";
@@ -34,6 +35,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     "translation.hover": translation,
     "view.hover": view,
     "bladeComponent.hover": bladeComponent,
+    "livewireComponent.hover": livewireComponent,
 };
 
 export const hoverProviders: HoverProvider[] = Object.entries(allProviders).map(
