@@ -1,11 +1,38 @@
 <?php
 
+class LaravelVsCode
+{
+    public static function relativePath($path)
+    {
+        if (!str_contains($path, base_path())) {
+            return (string) $path;
+        }
+
+        return ltrim(str_replace(base_path(), '', realpath($path) ?: $path), DIRECTORY_SEPARATOR);
+    }
+
+    public static function isVendor($path)
+    {
+        return str_contains($path, base_path("vendor"));
+    }
+
+    public static function outputMarker($key)
+    {
+        return '__VSCODE_LARAVEL_' . $key . '__';
+    }
+
+    public static function startupError(\Throwable $e)
+    {
+        throw new Error(self::outputMarker('STARTUP_ERROR') . ': ' . $e->getMessage());
+    }
+}
+
 $components = new class {
     public function all(): array
     {
         $components = collect(array_merge(
-            $this->getStandardComponents(),
-            $this->getVoltComponents()
+            $this->getStandardClasses(),
+            $this->getStandardViews()
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
@@ -53,7 +80,7 @@ $components = new class {
         return $components;
     }
 
-    protected function getStandardComponents(): array
+    protected function getStandardClasses(): array
     {
         /** @var string|null $classNamespace */
         $classNamespace = config('livewire.class_namespace');
@@ -75,35 +102,35 @@ $components = new class {
                 ->implode('.'),
         );
 
-        $components = [];
-
-        foreach ($items as $item) {
-            $class = str($item['path'])
+        return collect($items)
+            ->map(function ($item) {
+                $class = str($item['path'])
                 ->replace('.php', '')
                 ->replace('/', '\\')
                 ->ucfirst()
                 ->toString();
 
-            if (! class_exists($class)) {
-                continue;
-            }
+                if (! class_exists($class)) {
+                    return null;
+                }
 
-            $reflection = new \ReflectionClass($class);
+                $reflection = new \ReflectionClass($class);
 
-            if (! $reflection->isSubclassOf('Livewire\Component')) {
-                continue;
-            }
+                if (! $reflection->isSubclassOf('Livewire\Component')) {
+                    return null;
+                }
 
-            $components[] = [
-                ...$item,
-                'props' => $this->getComponentProps($reflection),
-            ];
-        }
-
-        return $components;
+                return [
+                    ...$item,
+                    'props' => $this->getComponentProps($reflection),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
-    protected function getVoltComponents(): array
+    protected function getStandardViews(): array
     {
         /** @var string|null $viewPath */
         $path = config('livewire.view_path');
@@ -120,41 +147,47 @@ $components = new class {
                 ->implode('.'),
         );
 
-        $components = [];
+        $previousClass = null;
 
-        foreach ($items as $item) {
-            // This is ugly, I know, but I don't have better idea how to get
-            // anonymous classes from Volt components
-            ob_start();
+        return collect($items)
+            ->map(function ($item) use (&$previousClass) {
+                // This is ugly, I know, but I don't have better idea how to get
+                // anonymous classes from Volt components
+                ob_start();
 
-            try {
-                require_once $item['path'];
-            } catch (\Throwable $e) {
-                continue;
-            }
+                try {
+                    require_once $item['path'];
+                } catch (\Throwable $e) {
+                    return $item;
+                }
 
-            ob_get_clean();
+                ob_clean();
 
-            $declaredClasses = get_declared_classes();
-            $class = end($declaredClasses);
+                $declaredClasses = get_declared_classes();
+                $class = end($declaredClasses);
 
-            if (! \Illuminate\Support\Str::contains($class, '@anonymous')) {
-                continue;
-            }
+                if ($previousClass === $class) {
+                    return $item;
+                }
 
-            $reflection = new \ReflectionClass($class);
+                $previousClass = $class;
 
-            if (! $reflection->isSubclassOf('Livewire\Volt\Component')) {
-                continue;
-            }
+                if (! \Illuminate\Support\Str::contains($class, '@anonymous')) {
+                    return $item;
+                }
 
-            $components[] = [
-                ...$item,
-                'props' => $this->getComponentProps($reflection),
-            ];
-        }
+                $reflection = new \ReflectionClass($class);
 
-        return $components;
+                if (! $reflection->isSubclassOf('Livewire\Volt\Component')) {
+                    return $item;
+                }
+
+                return [
+                    ...$item,
+                    'props' => $this->getComponentProps($reflection),
+                ];
+            })
+            ->all();
     }
 
     /**
