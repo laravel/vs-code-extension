@@ -24,7 +24,7 @@ export interface LivewireComponents {
 const load = () => {
     getConfigs().whenLoaded(() => {
         livewirePaths = [
-            projectPath(lcfirst(getConfigByName('livewire.class_namespace')?.value?.replace('\\', '/') ?? 'app/Livewire')),
+            lcfirst(getConfigByName('livewire.class_namespace')?.value?.replace('\\', '/') ?? 'app/Livewire'),
             getConfigByName('livewire.view_path')?.value ?? 'resources/views/livewire'
         ];
     });
