@@ -6,10 +6,10 @@ $components = new class {
         $components = collect(array_merge(
             $this->getStandardClasses(),
             $this->getStandardViews()
-        ))->groupBy('key')->map(fn($items) => [
+        ))->groupBy('key')->map(fn (\\Illuminate\\Support\\Collection $items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
-            'props' => $items->pluck('props')->values()->filter()->flatMap(fn($i) => $i),
+            'props' => $items->pluck('props')->values()->filter()->flatMap(fn ($i) => $i),
         ]);
 
         return [
@@ -41,7 +41,7 @@ $components = new class {
                 ->ltrim('/\\\\')
                 ->replace('.' . $extension, '')
                 ->replace(['/', '\\\\'], '.')
-                ->pipe(fn(string $str): string => $str);
+                ->pipe(fn (string $str): string => $str);
 
             $components[] = [
                 "path" => LaravelVsCode::relativePath($realPath),
@@ -64,24 +64,24 @@ $components = new class {
 
         $path = str($classNamespace)
             ->replace('\\\\', DIRECTORY_SEPARATOR)
-            ->replace('App', 'app')
+            ->lcfirst()
             ->toString();
 
         $items = $this->findFiles(
             $path,
             'php',
-            fn(\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
-                ->map(fn(string $p): string => \\Illuminate\\Support\\Str::kebab($p))
+            fn (\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
+                ->map(fn (string $p): string => \\Illuminate\\Support\\Str::kebab($p))
                 ->implode('.'),
         );
 
         return collect($items)
             ->map(function ($item) {
                 $class = str($item['path'])
-                ->replace('.php', '')
-                ->replace('/', '\\\\')
-                ->ucfirst()
-                ->toString();
+                    ->replace('.php', '')
+                    ->replace(DIRECTORY_SEPARATOR, '\\\\')
+                    ->ucfirst()
+                    ->toString();
 
                 if (! class_exists($class)) {
                     return null;
@@ -115,7 +115,7 @@ $components = new class {
         $items = $this->findFiles(
             $path,
             'blade.php',
-            fn(\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
+            fn (\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
                 ->map(fn(string $p): string => \\Illuminate\\Support\\Str::kebab($p))
                 ->implode('.'),
         );
@@ -177,14 +177,15 @@ $components = new class {
 
         $mountMethods = array_filter(
             $methods,
-            fn (\\ReflectionMethod $method): bool => strpos($method->getName(), 'mount') === 0
+            fn (\\ReflectionMethod $method): bool =>
+                \\Illuminate\\Support\\Str::startsWith($method->getName(), 'mount')
         );
 
         foreach ($mountMethods as $method) {
             $parameters = $method->getParameters();
 
             $parameters = collect($parameters)
-                ->map(fn(\\ReflectionParameter $p) => [
+                ->map(fn (\\ReflectionParameter $p): array => [
                     'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                     'type' => (string) ($p->getType() ?? 'mixed'),
                     'default' => $p->isOptional() ? $p->getDefaultValue() : null
@@ -197,8 +198,10 @@ $components = new class {
         // Then we need to get the public properties
 
         $properties = collect($reflection->getProperties())
-            ->filter(fn(\\ReflectionProperty $p) => $p->isPublic() && $p->getDeclaringClass()->getName() === $reflection->getName())
-            ->map(fn(\\ReflectionProperty $p) => [
+            ->filter(fn (\\ReflectionProperty $p): bool =>
+                $p->isPublic() && $p->getDeclaringClass()->getName() === $reflection->getName()
+            )
+            ->map(fn (\\ReflectionProperty $p): array => [
                 'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                 'type' => (string) ($p->getType() ?? 'mixed'),
                 'default' => $p->getDefaultValue()
