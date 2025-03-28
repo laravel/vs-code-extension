@@ -188,7 +188,7 @@ $components = new class {
                 ->map(fn (\\ReflectionParameter $p): array => [
                     'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                     'type' => (string) ($p->getType() ?? 'mixed'),
-                    // We need to add isOptional, because null can be also a default value,
+                    // We need to add hasDefault, because null can be also a default value,
                     // it can't be a flag of no default
                     'hasDefault' => $p->isDefaultValueAvailable(), 
                     'default' => $p->isOptional() ? $p->getDefaultValue() : null
