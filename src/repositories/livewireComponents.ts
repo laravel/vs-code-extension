@@ -15,6 +15,7 @@ export interface LivewireComponents {
             props: {
                 name: string;
                 type: string;
+                hasDefault: boolean;
                 default: string | null;
             }[];
         };

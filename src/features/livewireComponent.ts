@@ -105,7 +105,7 @@ export const hoverProvider: HoverProvider = (
             [
                 "`" + prop.type + "` ",
                 "`" + prop.name + "`",
-                prop.default ? ` = ${defaultToString(prop.default)}` : "",
+                prop.hasDefault ? ` = ${defaultToString(prop.default)}` : "",
             ].join(""),
         ),
     );
