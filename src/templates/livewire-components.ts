@@ -164,7 +164,7 @@ $components = new class {
     }
 
     /**
-     * @return array<int, array{name: string, type: string, default: mixed}>
+     * @return array<int, array{name: string, type: string, hasDefault: bool, default: mixed}>
      */
     protected function getComponentProps(ReflectionClass $reflection): array
     {
