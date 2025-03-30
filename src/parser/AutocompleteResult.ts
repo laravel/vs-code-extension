@@ -40,6 +40,19 @@ export default class AutocompleteResult {
         return this.param()?.autocompletingValue ?? false;
     }
 
+    public name() {
+        // @ts-ignore
+        return this.result.name ?? null;
+    }
+
+    public isName(name: string | string[]) {
+        if (Array.isArray(name)) {
+            return name.includes(this.name());
+        }
+
+        return this.name() === name;
+    }
+
     public class() {
         // @ts-ignore
         return this.result.className ?? null;

@@ -374,6 +374,12 @@
                     "generated": true,
                     "description": "Enable completion for mix."
                 },
+                "Laravel.model.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for model."
+                },
                 "Laravel.paths.link": {
                     "type": "boolean",
                     "default": true,

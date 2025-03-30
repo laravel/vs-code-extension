@@ -48,6 +48,7 @@ type LinkProvider = (
 interface FeatureTagParam {
     class?: string | string[] | null;
     method?: string | string[] | null;
+    name?: string | string[] | null;
     argumentName?: string | string[];
     classDefinition?: string;
     methodDefinition?: string;
