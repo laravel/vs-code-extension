@@ -33,7 +33,7 @@ export const completionProvider: CompletionProvider = {
                     name: [...modelNames]
                 }
             ];
-        }).filter(item => item !== null) as FeatureTag;
+        }).filter(item => !item) as FeatureTag;
     },
 
     provideCompletionItems(
