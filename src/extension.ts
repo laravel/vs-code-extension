@@ -17,6 +17,7 @@ import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { completionProvider as bladeComponentCompletion } from "./features/bladeComponent";
 import { viteEnvCodeActionProvider } from "./features/env";
 import { completionProvider as livewireComponentCompletion } from "./features/livewireComponent";
+import { completionProvider as modelCompletion } from "./features/model";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
@@ -113,6 +114,11 @@ export function activate(context: vscode.ExtensionContext) {
         //     documentSelector,
         //     new BladeFormattingEditProvider(),
         // ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
+            new Registry(modelCompletion),
+            ">",
+        ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             delegatedRegistry,

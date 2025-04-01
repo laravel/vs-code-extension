@@ -68,5 +68,11 @@
             "completion",
             "diagnostics"
         ]
+    },
+    {
+        "type": "model",
+        "features": [
+            "completion"
+        ]
     }
 ]
