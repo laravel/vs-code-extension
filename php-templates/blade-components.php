@@ -209,21 +209,22 @@ $components = new class {
         $views = $finder->getHints();
 
         foreach ($views as $key => $paths) {
-            // First is always optional override in the resources/views folder
-            $path = $paths[0] . '/components';
+            foreach ($paths as $path) {
+                $path .= '/components';
 
-            if (!is_dir($path)) {
-                continue;
+                if (!is_dir($path)) {
+                    continue;
+                }
+
+                array_push(
+                    $components,
+                    ...$this->findFiles(
+                        $path,
+                        'blade.php',
+                        fn (\Illuminate\Support\Stringable $k) => $k->kebab()->prepend($key.'::'),
+                    )
+                );
             }
-
-            array_push(
-                $components,
-                ...$this->findFiles(
-                    $path,
-                    'blade.php',
-                    fn (\Illuminate\Support\Stringable $k) => $k->kebab()->prepend($key.'::'),
-                )
-            );
         }
 
         return $components;
