@@ -12,6 +12,10 @@ $translator = new class
 
     public $emptyParams = [];
 
+    public $directoriesToWatch = [];
+
+    public $languages = [];
+
     public function all()
     {
         $final = [];
@@ -22,12 +26,20 @@ $translator = new class
                     $dotKey = $val["k"];
                     $final[$dotKey] ??= [];
 
+                    if (!in_array($val["la"], $this->languages)) {
+                      $this->languages[] = $val["la"];
+                    }
+
                     $final[$dotKey][$val["la"]] = $val["vs"];
                 }
             } else {
                 foreach ($value["vs"] as $v) {
                     $dotKey = "{$value["k"]}.{$v['k']}";
                     $final[$dotKey] ??= [];
+
+                    if (!in_array($$value["la"], $this->languages)) {
+                      $this->languages[] = $$value["la"];
+                    }
 
                     $final[$dotKey][$value["la"]] = $v['arr'];
                 }
@@ -80,6 +92,10 @@ $translator = new class
 
         if (!is_dir($realPath)) {
             return [];
+        }
+
+        if (!LaravelVsCode::isVendor($realPath)) {
+            $this->directoriesToWatch[] = LaravelVsCode::relativePath($realPath);
         }
 
         return array_map(
@@ -339,8 +355,10 @@ $translator = new class
 echo json_encode([
     'default' => \\Illuminate\\Support\\Facades\\App::currentLocale(),
     'translations' => $translator->all(),
+    'languages' => $translator->languages,
     'paths' => array_keys($translator->paths),
     'values' => array_keys($translator->values),
     'params' => array_map(fn($p) => json_decode($p, true), array_keys($translator->paramResults)),
+    'to_watch' => $translator->directoriesToWatch,
 ]);
 `;

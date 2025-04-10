@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -112,6 +112,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Show popups for errors."
+                },
+                "Laravel.env.viteQuickFix": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable quickfix for adding VITE_ variables from regular env variables."
                 },
                 "Laravel.eloquent.generateDocBlocks": {
                     "type": "boolean",
@@ -398,6 +403,24 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable completion for route."
+                },
+                "Laravel.storage.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for storage."
+                },
+                "Laravel.storage.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for storage."
+                },
+                "Laravel.storage.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable diagnostics for storage."
                 },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",

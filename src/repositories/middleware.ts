@@ -15,8 +15,8 @@ interface MiddlewareItem {
     };
 }
 
-export const getMiddleware = repository<MiddlewareItem>(
-    () => {
+export const getMiddleware = repository<MiddlewareItem>({
+    load: () => {
         return runInLaravel<MiddlewareItem>(
             template("middleware"),
             "Middlewares",
@@ -40,7 +40,7 @@ export const getMiddleware = repository<MiddlewareItem>(
             return items;
         });
     },
-    "app/Http/Kernel.php",
-    {},
-    ["change"],
-);
+    pattern: "app/Http/Kernel.php",
+    itemsDefault: {},
+    fileWatcherEvents: ["change"],
+});

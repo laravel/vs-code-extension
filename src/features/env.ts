@@ -96,6 +96,101 @@ export const diagnosticProvider = (
     );
 };
 
+export const viteEnvCodeActionProvider: vscode.CodeActionProvider = {
+    async provideCodeActions(document, range, context, token) {
+        if (
+            !config("env.viteQuickFix", true) ||
+            !document.uri.path.includes(".env")
+        ) {
+            return [];
+        }
+
+        let envVariables = [];
+        let start = range.start.line;
+        const vitePrefix = "VITE_";
+
+        while (start <= range.end.line) {
+            const envVariable = document
+                .lineAt(start)
+                .text.split("=")[0]
+                .trim();
+
+            if (
+                envVariable !== "" &&
+                !envVariable.startsWith("#") &&
+                !envVariable.startsWith(vitePrefix)
+            ) {
+                envVariables.push(envVariable);
+            }
+            start++;
+        }
+
+        if (envVariables.length === 0) {
+            return [];
+        }
+
+        const envContents = document.getText();
+        const lines = envContents.toString().split("\n");
+
+        envVariables = envVariables.filter(
+            (envVariable) =>
+                !lines.find((line) =>
+                    line.startsWith(vitePrefix + envVariable + "="),
+                ),
+        );
+
+        if (envVariables.length === 0) {
+            return [];
+        }
+
+        // Default to the end of the file
+        let lineNumber = lines.length;
+        let foundGroup = false;
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith(vitePrefix)) {
+                lineNumber = i + 1;
+                foundGroup = true;
+            }
+        }
+
+        const finalValue = envVariables
+            .map(
+                (envVariable) =>
+                    `${vitePrefix}${envVariable}="\${${envVariable}}"`,
+            )
+            .join("\n");
+
+        const edit = new vscode.WorkspaceEdit();
+
+        const newLine = (() => {
+            if (lineNumber === lines.length) {
+                return true;
+            }
+
+            return !foundGroup;
+        })();
+
+        edit.insert(
+            document.uri,
+            new vscode.Position(lineNumber, 0),
+            `${newLine ? "\n" : ""}${finalValue}`,
+        );
+
+        const action = new vscode.CodeAction(
+            envVariables.length === 1
+                ? `Create Vite env variable from "${envVariables[0]}"`
+                : `Create Vite env variables from selection`,
+            vscode.CodeActionKind.QuickFix,
+        );
+
+        action.edit = edit;
+        action.command = openFile(document.uri, lineNumber, finalValue.length);
+
+        return [action];
+    },
+};
+
 export const codeActionProvider: CodeActionProviderFunction = async (
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,

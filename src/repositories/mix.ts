@@ -27,8 +27,8 @@ const load = () => {
     }));
 };
 
-export const getMixManifest = repository<MixManifestItem[]>(
-    () => {
+export const getMixManifest = repository<MixManifestItem[]>({
+    load: () => {
         return new Promise((resolve, reject) => {
             try {
                 resolve(load());
@@ -37,6 +37,7 @@ export const getMixManifest = repository<MixManifestItem[]>(
             }
         });
     },
-    "public/mix-manifest.json",
-    [],
-);
+    pattern: "public/mix-manifest.json",
+    itemsDefault: [],
+    reloadOnComposerChanges: false,
+});

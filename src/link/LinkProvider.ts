@@ -13,6 +13,7 @@ import { linkProvider as middleware } from "@src/features/middleware";
 import { linkProvider as mix } from "@src/features/mix";
 import { linkProvider as paths } from "@src/features/paths";
 import { linkProvider as route } from "@src/features/route";
+import { linkProvider as storage } from "@src/features/storage";
 import { linkProvider as translation } from "@src/features/translation";
 import { linkProvider as view } from "@src/features/view";
 import { LinkProvider as LinkProviderType } from "@src/index";
@@ -39,6 +40,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     "mix.link": mix,
     "paths.link": paths,
     "route.link": route,
+    "storage.link": storage,
     "translation.link": translation,
     "view.link": view,
 };
