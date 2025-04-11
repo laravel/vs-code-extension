@@ -144,11 +144,20 @@ $models = new class($factory) {
 
         $data["extends"] = $this->getParentClass($reflection);
 
+        $name = str($className)->afterLast('\\\\');
+
+        $data['name_cases'] = array_merge(...array_map(
+            null,
+            $this->getNameCases($name->toString()),
+            $this->getNameCases($name->plural()->toString())
+        ));
+
         $existingProperties = $this->collectExistingProperties($reflection);
 
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
                 'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
+                'name_cases' => $this->getNameCases($attrs['name']),  
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
@@ -166,6 +175,20 @@ $models = new class($factory) {
             $className => $data,
         ];
     }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function getNameCases(string $name): array
+    {
+        return collect([
+            str($name)->camel()->toString(),
+            $name,
+            str($name)->snake()->toString(),
+            str($name)->studly()->toString(),
+            str($name)->studly()->lower()->toString(),
+        ])->unique()->values()->toArray();
+    }     
 };
 
 $builder = new class($docblocks) {
