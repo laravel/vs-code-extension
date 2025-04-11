@@ -12,25 +12,12 @@ import {
 export const completionProvider: CompletionProvider = {
     tags() {
         return Object.values(getModels().items).flatMap(model => {
-            const modelName = model.class.split("\\").pop();
-
-            if (!modelName) {
-                return null;
-            }
-
-            const modelNames = [
-                modelName,
-                modelName.toLowerCase(),
-                camel(modelName),
-                snake(modelName)
-            ];
-
             return [
                 {
-                    method: [...modelNames],
+                    method: [...model.name_cases],
                 },
                 {
-                    name: [...modelNames]
+                    name: [...model.name_cases]
                 }
             ];
         }).filter(item => item !== null) as FeatureTag;
