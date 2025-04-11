@@ -144,7 +144,13 @@ $models = new class($factory) {
 
         $data["extends"] = $this->getParentClass($reflection);
 
-        $data['name_cases'] = $this->getNameCases(str($className)->afterLast('\\')->toString());
+        $name = str($className)->afterLast('\\');
+
+        $data['name_cases'] = array_merge(...array_map(
+            null,
+            $this->getNameCases($name->toString()),
+            $this->getNameCases($name->plural()->toString())
+        ));
 
         $existingProperties = $this->collectExistingProperties($reflection);
 
@@ -176,8 +182,8 @@ $models = new class($factory) {
     protected function getNameCases(string $name): array
     {
         return collect([
-            $name,
             str($name)->camel()->toString(),
+            $name,
             str($name)->snake()->toString(),
             str($name)->studly()->toString(),
             str($name)->studly()->lower()->toString(),
