@@ -9,7 +9,37 @@ import {
     FeatureTag,
 } from "..";
 
-export const completionProvider: CompletionProvider = {
+export const completionModelProvider: vscode.CompletionItemProvider = {
+    provideCompletionItems(
+        doc: vscode.TextDocument,
+        pos: vscode.Position,
+    ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        if (!config("model.completion_model", true)) {
+            return undefined;
+        }
+
+        const line = doc.lineAt(pos.line).text;
+        const linePrefix = line.substring(pos.character - 1, pos.character);
+
+        if (linePrefix !== '$') {
+            return undefined;
+        }
+
+        console.log('models', Object.entries(getModels().items).flatMap(([, value]) => {
+            return value.name_cases.map((name) => {
+                return new vscode.CompletionItem(name);
+            });
+        }));
+
+        return Object.entries(getModels().items).flatMap(([, value]) => {
+            return value.name_cases.map((name) => {
+                return new vscode.CompletionItem(name);
+            });
+        });
+    },
+};
+
+export const completionPropertyProvider: CompletionProvider = {
     tags() {
         return Object.values(getModels().items).flatMap(model => {
             return [
@@ -26,7 +56,7 @@ export const completionProvider: CompletionProvider = {
     provideCompletionItems(
         result: AutocompleteResult,
     ): vscode.CompletionItem[] {
-        if (!config("model.completion", true)) {
+        if (!config("model.completion_property", true)) {
             return [];
         }
 
