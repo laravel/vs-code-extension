@@ -10,7 +10,7 @@ import {
 
 export const completionModelProvider: vscode.CompletionItemProvider = {
     provideCompletionItems(): vscode.ProviderResult<vscode.CompletionItem[]> {
-        if (!config("model.completion_model", true)) {
+        if (!config("model.completion", true)) {
             return undefined;
         }
 
