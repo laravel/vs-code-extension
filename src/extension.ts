@@ -17,7 +17,7 @@ import { updateDiagnostics } from "./diagnostic/diagnostic";
 import { completionProvider as bladeComponentCompletion } from "./features/bladeComponent";
 import { viteEnvCodeActionProvider } from "./features/env";
 import { completionProvider as livewireComponentCompletion } from "./features/livewireComponent";
-import { completionModelProvider, completionPropertyProvider } from "./features/model";
+import { completionAttributeProvider, completionModelProvider } from "./features/model";
 import { hoverProviders } from "./hover/HoverProvider";
 import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
@@ -116,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
         // ),
         vscode.languages.registerCompletionItemProvider(
             BLADE_LANGUAGES,
-            new Registry(completionPropertyProvider),
+            new Registry(completionAttributeProvider),
             ">",
         ),
         vscode.languages.registerCompletionItemProvider(

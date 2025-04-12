@@ -22,7 +22,7 @@ export const completionModelProvider: vscode.CompletionItemProvider = {
     },
 };
 
-export const completionPropertyProvider: CompletionProvider = {
+export const completionAttributeProvider: CompletionProvider = {
     tags() {
         return Object.values(getModels().items).flatMap(model => {
             return [
@@ -39,7 +39,7 @@ export const completionPropertyProvider: CompletionProvider = {
     provideCompletionItems(
         result: AutocompleteResult,
     ): vscode.CompletionItem[] {
-        if (!config("model.completion_property", true)) {
+        if (!config("model.completion_attribute", true)) {
             return [];
         }
 

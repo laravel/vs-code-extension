@@ -72,7 +72,7 @@
     {
         "type": "model",
         "features": [
-            "completion_property",
+            "completion_attribute",
             "completion_model"
         ]
     }

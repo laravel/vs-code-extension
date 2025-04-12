@@ -374,7 +374,7 @@
                     "generated": true,
                     "description": "Enable completion for mix."
                 },
-                "Laravel.model.completion_property": {
+                "Laravel.model.completion_attribute": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
