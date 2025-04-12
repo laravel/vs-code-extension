@@ -2,6 +2,10 @@ import { repository } from ".";
 import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
 
+export const getConfigByName = (name: string): Config | undefined => {
+    return getConfigs().items.find((item) => item.name === name);
+};
+
 export const getConfigs = repository<Config[]>({
     load: () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(
