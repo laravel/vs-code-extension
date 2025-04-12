@@ -65,11 +65,11 @@ export const completionAttributeProvider: vscode.CompletionItemProvider = {
         const components = getBladeComponents().items;
         const text = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
 
-        const regexes = [new RegExp(/<x-([^\s>]+)[^>]*:$/)];
+        const regexes = [new RegExp(/<x-([^\s>]+)[^<]*:$/)];
 
         if (components.prefixes.length > 0) {
             regexes.push(
-                new RegExp(`<((${components.prefixes.join("|")})\\:[^\\s>]+)[^>]*:$`),
+                new RegExp(`<((${components.prefixes.join("|")})\\:[^\\s>]+)[^<]*:$`),
             );
         }
 

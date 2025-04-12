@@ -53,7 +53,7 @@ export const completionAttributeProvider: vscode.CompletionItemProvider = {
         const components = getLivewireComponents().items;
         const text = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
 
-        const regexes = [new RegExp(/<livewire:([^\s>]+)[^>]*:$/)];
+        const regexes = [new RegExp(/<livewire:([^\s>]+)[^<]*:$/)];
 
         for (const regex of regexes) {
             const match = text.match(regex);
