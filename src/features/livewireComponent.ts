@@ -89,7 +89,7 @@ export const completionComponentProvider: vscode.CompletionItemProvider = {
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.CompletionItem[]> {
-        if (!config("livewireComponent.completion_component", true)) {
+        if (!config("livewireComponent.completion", true)) {
             return undefined;
         }
 

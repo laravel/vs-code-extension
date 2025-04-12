@@ -24,6 +24,7 @@ foreach ($items as $item) {
                 'hover' => "Enable hover information for {$label}.",
                 'link' => "Enable linking for {$label}.",
                 'completion' => "Enable completion for {$label}.",
+                'completion_attribute' => "Enable completion for {$label} attributes.",
                 default => null,
             },
         ];

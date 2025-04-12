@@ -107,7 +107,7 @@ export const completionComponentProvider: vscode.CompletionItemProvider = {
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.CompletionItem[]> {
-        if (!config("bladeComponent.completion_component", true)) {
+        if (!config("bladeComponent.completion", true)) {
             return undefined;
         }
 
