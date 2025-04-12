@@ -206,11 +206,17 @@
                     "generated": true,
                     "description": "Enable linking for Blade components."
                 },
-                "Laravel.bladeComponent.completion": {
+                "Laravel.bladeComponent.completion_component": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable completion for Blade components."
+                    "description": null
+                },
+                "Laravel.bladeComponent.completion_attribute": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.bladeComponent.hover": {
                     "type": "boolean",
@@ -320,11 +326,17 @@
                     "generated": true,
                     "description": "Enable linking for Livewire components."
                 },
-                "Laravel.livewireComponent.completion": {
+                "Laravel.livewireComponent.completion_component": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": "Enable completion for Livewire components."
+                    "description": null
+                },
+                "Laravel.livewireComponent.completion_attribute": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",

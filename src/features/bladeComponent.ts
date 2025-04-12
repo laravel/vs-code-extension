@@ -53,12 +53,61 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return Promise.resolve(links);
 };
 
-export const completionProvider: vscode.CompletionItemProvider = {
+export const completionAttributeProvider: vscode.CompletionItemProvider = {
     provideCompletionItems(
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.CompletionItem[]> {
-        if (!config("bladeComponent.completion", true)) {
+        if (!config("bladeComponent.completion_attribute", true)) {
+            return undefined;
+        }
+
+        const components = getBladeComponents().items;
+        const text = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
+
+        const regexes = [new RegExp(/<x-([^\s>]+)[^>]*:$/)];
+
+        if (components.prefixes.length > 0) {
+            regexes.push(
+                new RegExp(`<((${components.prefixes.join("|")})\\:[^\\s>]+)[^>]*:$`),
+            );
+        }
+
+        for (const regex of regexes) {
+            const match = text.match(regex);
+
+            if (!match || match.index === undefined) {
+                continue;
+            }
+
+            const component = components.components[match[1]];
+
+            if (!component) {
+                return undefined;
+            }
+
+            return Object.entries(component.props).map(([, value]) => {
+                let completeItem = new vscode.CompletionItem(
+                    value.name,
+                    vscode.CompletionItemKind.Property,
+                );
+
+                completeItem.detail = value.type;
+
+                return completeItem;
+            });
+        }
+
+        return undefined;
+    }
+};
+
+export const completionComponentProvider: vscode.CompletionItemProvider = {
+    provideCompletionItems(
+        doc: vscode.TextDocument,
+        pos: vscode.Position,
+    ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        if (!config("bladeComponent.completion_component", true)) {
             return undefined;
         }
 

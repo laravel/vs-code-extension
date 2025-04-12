@@ -49,7 +49,8 @@
         "label": "Blade components",
         "features": [
             "link",
-            "completion",
+            "completion_component",
+            "completion_attribute",
             "hover"
         ]
     },
@@ -58,7 +59,8 @@
         "label": "Livewire components",
         "features": [
             "link",
-            "completion"
+            "completion_component",
+            "completion_attribute"
         ]
     },
     {
