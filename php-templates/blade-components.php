@@ -323,7 +323,9 @@ $components = new class {
             }
         }
 
-        return $components;
+        return \Composer\InstalledVersions::isInstalled('nikic/php-parser')
+            ? $this->runConcurrency($components, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
+            : $components;
     }
 
     protected function getVendorComponents(): array

@@ -323,7 +323,9 @@ $components = new class {
             }
         }
 
-        return $components;
+        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser')
+            ? $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
+            : $components;
     }
 
     protected function getVendorComponents(): array
@@ -341,12 +343,10 @@ $components = new class {
 
         foreach ($views as $key => $paths) {
             foreach ($paths as $path) {
-                // Flux components are directly in the components directory and have hashed key
-                if (str($path)->endsWith('flux')) {
-                    $key = 'flux:';
-                } else {
-                    $key .= '::';
-                    $path .= '/components';
+                $path .= '/components';
+
+                if (!is_dir($path)) {
+                    continue;
                 }
 
                 array_push(
@@ -354,7 +354,7 @@ $components = new class {
                     ...$this->findFiles(
                         $path,
                         'blade.php',
-                        fn (\\Illuminate\\Support\\Stringable $k) => $k->kebab()->prepend($key),
+                        fn (\\Illuminate\\Support\\Stringable $k) => $k->kebab()->prepend($key.'::'),
                     )
                 );
             }
