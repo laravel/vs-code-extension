@@ -112,7 +112,7 @@ $components = new class {
                             ],
                             $item->value instanceof \PhpParser\Node\Expr\ConstFetch => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
-                                'type' => $item->value->name->toString() !== "null" ? 'boolean' : null,
+                                'type' => $item->value->name->toString() !== 'null' ? 'boolean' : 'mixed',
                                 'hasDefault' => true,
                                 'default' => $item->value->name->toString(),
                             ],

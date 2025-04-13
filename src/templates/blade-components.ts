@@ -112,7 +112,7 @@ $components = new class {
                             ],
                             $item->value instanceof \\PhpParser\\Node\\Expr\\ConstFetch => [
                                 'name' => \\Illuminate\\Support\\Str::kebab($item->key->value),
-                                'type' => $item->value->name->toString() !== "null" ? 'boolean' : null,
+                                'type' => $item->value->name->toString() !== 'null' ? 'boolean' : 'mixed',
                                 'hasDefault' => true,
                                 'default' => $item->value->name->toString(),
                             ],
@@ -341,10 +341,12 @@ $components = new class {
 
         foreach ($views as $key => $paths) {
             foreach ($paths as $path) {
-                $path .= '/components';
-
-                if (!is_dir($path)) {
-                    continue;
+                // Flux components are directly in the components directory and have hashed key
+                if (str($path)->endsWith('flux')) {
+                    $key = 'flux:';
+                } else {
+                    $key .= '::';
+                    $path .= '/components';
                 }
 
                 array_push(
