@@ -210,12 +210,10 @@ $components = new class {
 
         foreach ($views as $key => $paths) {
             foreach ($paths as $path) {
-                // Flux components are directly in the components directory and have hashed key
-                if (str($path)->endsWith('flux')) {
-                    $key = 'flux:';
-                } else {
-                    $key .= '::';
-                    $path .= '/components';
+                $path .= '/components';
+
+                if (!is_dir($path)) {
+                    continue;
                 }
 
                 array_push(
