@@ -223,7 +223,7 @@ $components = new class {
                     ...$this->findFiles(
                         $path,
                         'blade.php',
-                        fn (\Illuminate\Support\Stringable $k) => $k->kebab()->prepend($key.'::'),
+                        fn (\Illuminate\Support\Stringable $k) => $k->kebab()->prepend($key),
                     )
                 );
             }
