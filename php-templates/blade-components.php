@@ -55,7 +55,10 @@ $components = new class {
 
         $contents = \Illuminate\Support\Facades\File::get($path);
 
-        $propsAsString = str($contents)->match('/\@props\((.*?)\)/s')->toString();
+        $propsAsString = str($contents)
+            ->match('/\@props\(\[(.*?)\]\)/s')
+            ->wrap('[', ']')
+            ->toString();
 
         if (empty($propsAsString)) {
             return [];
@@ -73,19 +76,62 @@ $components = new class {
         $visitor = new class extends \PhpParser\NodeVisitorAbstract {
             public array $props = [];
 
-            /**
-             * @param array<int, \PhpParser\Node\ArrayItem> $items
-             */
-            private function getItemsAsArray(array $items): array
+            private function getConstNodeValue(\PhpParser\Node\Expr\ConstFetch $node): string
+            {
+                return $node->name->toString();
+            }
+
+            private function getStringNodeValue(\PhpParser\Node\Scalar\String_ $node): string
+            {
+                return $node->value;
+            }
+
+            private function getIntNodeValue(\PhpParser\Node\Scalar\Int_ $node): int
+            {
+                return $node->value;
+            }
+
+            private function getFloatNodeValue(\PhpParser\Node\Scalar\Float_ $node): float
+            {
+                return $node->value;
+            }
+
+            private function getNodeValue(\PhpParser\Node $node): mixed
+            {
+                return match (true) {
+                    $node instanceof \PhpParser\Node\Expr\ConstFetch => $this->getConstNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\String_ => $this->getStringNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\Int_ => $this->getIntNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\Float_ => $this->getFloatNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\Array_ => $this->getArrayNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\New_ => $this->getObjectNodeValue($node),
+                    default => null
+                };
+            }
+
+            private function getObjectNodeValue(\PhpParser\Node\Expr\New_ $node): array
             {
                 $array = [];
 
-                foreach ($items as $item) {
-                    $value = $item->value->value;
+                if (!$node->class instanceof \PhpParser\Node\Stmt\Class_) {
+                    return $array;
+                }
 
-                    if ($item->value instanceof \PhpParser\Node\Expr\Array_) {
-                        $value = $this->getItemsAsArray($item->value->items);
+                foreach ($node->class->getProperties() as $property) {
+                    foreach ($property->props as $item) {
+                        $array[$item->name->name] = $this->getNodeValue($item->default);
                     }
+                }
+
+                return array_filter($array);
+            }
+
+            private function getArrayNodeValue(\PhpParser\Node\Expr\Array_ $node): array
+            {
+                $array = [];
+
+                foreach ($node->items as $item) {
+                    $value = $this->getNodeValue($item->value);
 
                     if ($item->key) {
                         $array[$item->key->value] = $value;
@@ -94,7 +140,7 @@ $components = new class {
                     }
                 }
 
-                return $array;
+                return array_filter($array);
             }
 
             public function enterNode(\PhpParser\Node $node) {
@@ -107,26 +153,38 @@ $components = new class {
                             $item->value instanceof \PhpParser\Node\Scalar\String_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key?->value ?? $item->value->value),
                                 'type' => $item->key ? 'string' : 'mixed',
-                                'hasDefault' => $item->key ? true : false, 
-                                'default' => $item->key ? $item->value->value : null,
+                                'hasDefault' => $item->key ? true : false,
+                                'default' => $item->key ? $this->getStringNodeValue($item->value) : null,
                             ],
                             $item->value instanceof \PhpParser\Node\Expr\ConstFetch => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
                                 'type' => $item->value->name->toString() !== 'null' ? 'boolean' : 'mixed',
                                 'hasDefault' => true,
-                                'default' => $item->value->name->toString(),
+                                'default' => $this->getConstNodeValue($item->value),
                             ],
                             $item->value instanceof \PhpParser\Node\Scalar\Int_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
                                 'type' => 'integer',
                                 'hasDefault' => true,
-                                'default' => $item->value->value,
+                                'default' => $this->getIntNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Scalar\Float_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => 'float',
+                                'hasDefault' => true,
+                                'default' => $this->getFloatNodeValue($item->value),
                             ],
                             $item->value instanceof \PhpParser\Node\Expr\Array_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
                                 'type' => 'array',
                                 'hasDefault' => true,
-                                'default' => $this->getItemsAsArray($item->value->items),
+                                'default' => $this->getArrayNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Expr\New_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => $item->value->class->name ?? 'object',
+                                'hasDefault' => true,
+                                'default' => $this->getObjectNodeValue($item->value),
                             ],
                             default => null
                         };
@@ -162,8 +220,8 @@ $components = new class {
 
         $files = $this->findFiles($path, 'blade.php');
 
-        return \Composer\InstalledVersions::isInstalled('nikic/php-parser')
-            ? $this->runConcurrency($files, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
+        return \Composer\InstalledVersions::isInstalled('nikic/php-parser') ?
+            $this->runConcurrency($files, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
             : $files;
     }
 
@@ -240,7 +298,7 @@ $components = new class {
                     'type' => (string) ($p->getType() ?? 'mixed'),
                     // We need to add hasDefault, because null can be also a default value,
                     // it can't be a flag of no default
-                    'hasDefault' => $p->hasDefaultValue(), 
+                    'hasDefault' => $p->hasDefaultValue(),
                     'default' => $p->getDefaultValue() ?? $parameters[$p->getName()] ?? null,
                 ]);
 
@@ -323,8 +381,8 @@ $components = new class {
             }
         }
 
-        return \Composer\InstalledVersions::isInstalled('nikic/php-parser')
-            ? $this->runConcurrency($components, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
+        return \Composer\InstalledVersions::isInstalled('nikic/php-parser') ?
+            $this->runConcurrency($components, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
             : $components;
     }
 
@@ -360,8 +418,8 @@ $components = new class {
             }
         }
 
-        return \Composer\InstalledVersions::isInstalled('nikic/php-parser')
-            ? $this->runConcurrency($components, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
+        return \Composer\InstalledVersions::isInstalled('nikic/php-parser') ?
+            $this->runConcurrency($components, fn (\Illuminate\Support\Collection $files): array => $this->mapComponentProps($files))
             : $components;
     }
 
