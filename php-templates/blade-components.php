@@ -87,7 +87,11 @@ $components = new class {
                         $value = $this->getItemsAsArray($item->value->items);
                     }
 
-                    $array[$item->key?->value] = $value;
+                    if ($item->key) {
+                        $array[$item->key->value] = $value;
+                    } else {
+                        $array[] = $value;
+                    }
                 }
 
                 return $array;
