@@ -32,11 +32,133 @@ $components = new class {
         ];
     }
 
+    private function runConcurrency(array $items, \\Closure $callback, int $concurrency = 4): array
+    {
+        $tasks = collect($items)
+            ->split($concurrency)
+            ->map(fn (\\Illuminate\\Support\\Collection $chunk) => fn (): array => $callback($chunk))
+            ->toArray();
+
+        $results = \\Illuminate\\Support\\Facades\\Concurrency::driver(match (true) {
+            \\Composer\\InstalledVersions::isInstalled('spatie/fork') => 'fork',
+            default => 'sync',
+        })->run($tasks);
+
+        return array_merge(...$results);
+    }
+
+    private function getComponentPropsFromDirective(string $path): array
+    {
+        if (!\\Illuminate\\Support\\Facades\\File::exists($path)) {
+            return [];
+        }
+
+        $contents = \\Illuminate\\Support\\Facades\\File::get($path);
+
+        $propsAsString = str($contents)->match('/\\@props\\((.*?)\\)/s')->toString();
+
+        if (empty($propsAsString)) {
+            return [];
+        }
+
+        $parser = (new \\PhpParser\\ParserFactory)->createForNewestSupportedVersion();
+
+        try {
+            $ast = $parser->parse("<?php return {$propsAsString};");
+        } catch (\\Throwable $e) {
+            return [];
+        }
+
+        $traverser = new \\PhpParser\\NodeTraverser();
+        $visitor = new class extends \\PhpParser\\NodeVisitorAbstract {
+            public array $props = [];
+
+            /**
+             * @param array<int, \\PhpParser\\Node\\ArrayItem> $items
+             */
+            private function getItemsAsArray(array $items): array
+            {
+                $array = [];
+
+                foreach ($items as $item) {
+                    $value = $item->value->value;
+
+                    if ($item->value instanceof \\PhpParser\\Node\\Expr\\Array_) {
+                        $value = $this->getItemsAsArray($item->value->items);
+                    }
+
+                    $array[$item->key?->value] = $value;
+                }
+
+                return $array;
+            }
+
+            public function enterNode(\\PhpParser\\Node $node) {
+                if (
+                    $node instanceof \\PhpParser\\Node\\Stmt\\Return_
+                    && $node->expr instanceof \\PhpParser\\Node\\Expr\\Array_
+                ) {
+                    foreach ($node->expr->items as $item) {
+                        array_push($this->props, match (true) {
+                            $item->value instanceof \\PhpParser\\Node\\Scalar\\String_ => [
+                                'name' => \\Illuminate\\Support\\Str::kebab($item->key?->value ?? $item->value->value),
+                                'type' => 'string',
+                                'hasDefault' => $item->key ?? false, 
+                                'default' => $item->key ? $item->value->value : null,
+                            ],
+                            $item->value instanceof \\PhpParser\\Node\\Expr\\ConstFetch => [
+                                'name' => \\Illuminate\\Support\\Str::kebab($item->key->value),
+                                'type' => $item->value->name->toString() !== "null" ? 'boolean' : null,
+                                'hasDefault' => true,
+                                'default' => $item->value->name->toString(),
+                            ],
+                            $item->value instanceof \\PhpParser\\Node\\Scalar\\Int_ => [
+                                'name' => \\Illuminate\\Support\\Str::kebab($item->key->value),
+                                'type' => 'integer',
+                                'hasDefault' => true,
+                                'default' => $item->value->value,
+                            ],
+                            $item->value instanceof \\PhpParser\\Node\\Expr\\Array_ => [
+                                'name' => \\Illuminate\\Support\\Str::kebab($item->key->value),
+                                'type' => 'array',
+                                'hasDefault' => true,
+                                'default' => $this->getItemsAsArray($item->value->items),
+                            ],
+                            default => null
+                        });
+                    }
+                }
+            }
+        };
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return array_filter($visitor->props);
+    }
+
+    private function mapComponentProps(\\Illuminate\\Support\\Collection $files): array
+    {
+        return $files->map(function (array $item): array {
+            $props = $this->getComponentPropsFromDirective($item['path']);
+
+            if ($props !== []) {
+                $item = [
+                    ...$item,
+                    'props' => $props,
+                ];
+            }
+
+            return $item;
+        })->all();
+    }
+
     protected function getStandardViews()
     {
         $path = resource_path('views/components');
 
-        return $this->findFiles($path, 'blade.php');
+        $files = $this->findFiles($path, 'blade.php');
+
+        return $this->runConcurrency($files, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files));
     }
 
     protected function findFiles($path, $extension, $keyCallback = null)
@@ -110,6 +232,9 @@ $components = new class {
                 ->map(fn($p) => [
                     'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                     'type' => (string) ($p->getType() ?? 'mixed'),
+                    // We need to add hasDefault, because null can be also a default value,
+                    // it can't be a flag of no default
+                    'hasDefault' => $p->hasDefaultValue(), 
                     'default' => $p->getDefaultValue() ?? $parameters[$p->getName()] ?? null,
                 ]);
 
@@ -226,7 +351,7 @@ $components = new class {
             );
         }
 
-        return $components;
+        return $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files));;
     }
 
     protected function handleIndexComponents($str)
