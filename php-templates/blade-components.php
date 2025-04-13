@@ -76,6 +76,14 @@ $components = new class {
         $visitor = new class extends \PhpParser\NodeVisitorAbstract {
             public array $props = [];
 
+            private function getClassConstNodeValue(\PhpParser\Node\Expr\ClassConstFetch $node): string
+            {
+                return match (true) {
+                    $node->name instanceof \PhpParser\Node\Identifier => "{$node->class->toString()}::{$node->name->toString()}",
+                    default => $node->class->toString(),
+                };
+            }
+
             private function getConstNodeValue(\PhpParser\Node\Expr\ConstFetch $node): string
             {
                 return $node->name->toString();
@@ -100,6 +108,7 @@ $components = new class {
             {
                 return match (true) {
                     $node instanceof \PhpParser\Node\Expr\ConstFetch => $this->getConstNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\ClassConstFetch => $this->getClassConstNodeValue($node),
                     $node instanceof \PhpParser\Node\Scalar\String_ => $this->getStringNodeValue($node),
                     $node instanceof \PhpParser\Node\Scalar\Int_ => $this->getIntNodeValue($node),
                     $node instanceof \PhpParser\Node\Scalar\Float_ => $this->getFloatNodeValue($node),
@@ -162,6 +171,12 @@ $components = new class {
                                 'hasDefault' => true,
                                 'default' => $this->getConstNodeValue($item->value),
                             ],
+                            $item->value instanceof \PhpParser\Node\Expr\ClassConstFetch => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => $item->value->class->toString(),
+                                'hasDefault' => true,
+                                'default' => $this->getClassConstNodeValue($item->value),
+                            ],                            
                             $item->value instanceof \PhpParser\Node\Scalar\Int_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
                                 'type' => 'integer',
@@ -182,7 +197,7 @@ $components = new class {
                             ],
                             $item->value instanceof \PhpParser\Node\Expr\New_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key->value),
-                                'type' => $item->value->class->name ?? 'object',
+                                'type' => $item->value->class->toString(),
                                 'hasDefault' => true,
                                 'default' => $this->getObjectNodeValue($item->value),
                             ],
