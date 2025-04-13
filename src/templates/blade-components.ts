@@ -55,16 +55,15 @@ $components = new class {
 
         $contents = \\Illuminate\\Support\\Facades\\File::get($path);
 
-        $propsAsString = str($contents)
-            ->match('/\\@props\\(\\[(.*?)\\]\\)/s')
-            ->wrap('[', ']')
-            ->toString();
+        $match = str($contents)->match('/\\@props\\(\\[(.*?)\\]\\)/s');
 
-        if (empty($propsAsString)) {
+        if (empty($match)) {
             return [];
         }
 
         $parser = (new \\PhpParser\\ParserFactory)->createForNewestSupportedVersion();
+
+        $propsAsString = str($match)->wrap('[', ']')->toString();
 
         try {
             $ast = $parser->parse("<?php return {$propsAsString};");
