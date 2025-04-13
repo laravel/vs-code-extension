@@ -103,7 +103,7 @@ $components = new class {
                     && $node->expr instanceof \\PhpParser\\Node\\Expr\\Array_
                 ) {
                     foreach ($node->expr->items as $item) {
-                        array_push($this->props, match (true) {
+                        $this->props[] = match (true) {
                             $item->value instanceof \\PhpParser\\Node\\Scalar\\String_ => [
                                 'name' => \\Illuminate\\Support\\Str::kebab($item->key?->value ?? $item->value->value),
                                 'type' => $item->key ? 'string' : 'mixed',
@@ -129,7 +129,7 @@ $components = new class {
                                 'default' => $this->getItemsAsArray($item->value->items),
                             ],
                             default => null
-                        });
+                        };
                     }
                 }
             }
