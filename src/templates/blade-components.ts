@@ -57,13 +57,13 @@ $components = new class {
 
         $match = str($contents)->match('/\\@props\\(\\[(.*?)\\]\\)/s');
 
-        if (empty($match)) {
+        if ($match->isEmpty()) {
             return [];
         }
 
         $parser = (new \\PhpParser\\ParserFactory)->createForNewestSupportedVersion();
 
-        $propsAsString = str($match)->wrap('[', ']')->toString();
+        $propsAsString = $match->wrap('[', ']')->toString();
 
         try {
             $ast = $parser->parse("<?php return {$propsAsString};");
