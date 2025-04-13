@@ -102,7 +102,7 @@ $components = new class {
                         array_push($this->props, match (true) {
                             $item->value instanceof \PhpParser\Node\Scalar\String_ => [
                                 'name' => \Illuminate\Support\Str::kebab($item->key?->value ?? $item->value->value),
-                                'type' => $item->key ? 'string' : 'undefined',
+                                'type' => $item->key ? 'string' : 'mixed',
                                 'hasDefault' => $item->key ? true : false, 
                                 'default' => $item->key ? $item->value->value : null,
                             ],
