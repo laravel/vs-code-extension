@@ -102,8 +102,8 @@ $components = new class {
                         array_push($this->props, match (true) {
                             $item->value instanceof \\PhpParser\\Node\\Scalar\\String_ => [
                                 'name' => \\Illuminate\\Support\\Str::kebab($item->key?->value ?? $item->value->value),
-                                'type' => 'string',
-                                'hasDefault' => $item->key ?? false, 
+                                'type' => $item->key ? 'string' : 'undefined',
+                                'hasDefault' => $item->key ? true : false, 
                                 'default' => $item->key ? $item->value->value : null,
                             ],
                             $item->value instanceof \\PhpParser\\Node\\Expr\\ConstFetch => [
@@ -158,7 +158,9 @@ $components = new class {
 
         $files = $this->findFiles($path, 'blade.php');
 
-        return $this->runConcurrency($files, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files));
+        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser')
+            ? $this->runConcurrency($files, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
+            : $files;
     }
 
     protected function findFiles($path, $extension, $keyCallback = null)
@@ -351,7 +353,9 @@ $components = new class {
             );
         }
 
-        return $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files));;
+        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser')
+            ? $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
+            : $components;
     }
 
     protected function handleIndexComponents($str)
