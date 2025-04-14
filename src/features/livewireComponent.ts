@@ -53,34 +53,30 @@ export const completionAttributeProvider: vscode.CompletionItemProvider = {
         const components = getLivewireComponents().items;
         const text = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
 
-        const regexes = [new RegExp(/<livewire:([^\s>]+)[^<]*:$/)];
+        const regex = new RegExp(/<livewire:([^\s>]+)[^<]*:$/);
 
-        for (const regex of regexes) {
-            const match = text.match(regex);
+        const match = text.match(regex);
 
-            if (!match || match.index === undefined) {
-                continue;
-            }
-
-            const component = components.components[match[1]];
-
-            if (!component) {
-                return undefined;
-            }
-
-            return Object.entries(component.props).map(([, value]) => {
-                let completeItem = new vscode.CompletionItem(
-                    value.name,
-                    vscode.CompletionItemKind.Property,
-                );
-
-                completeItem.detail = value.type;
-
-                return completeItem;
-            });
+        if (!match || match.index === undefined) {
+            return undefined;
         }
 
-        return undefined;
+        const component = components.components[match[1]];
+
+        if (!component) {
+            return undefined;
+        }
+
+        return Object.entries(component.props).map(([, value]) => {
+            let completeItem = new vscode.CompletionItem(
+                value.name,
+                vscode.CompletionItemKind.Property,
+            );
+
+            completeItem.detail = value.type;
+
+            return completeItem;
+        });
     }
 };
 
