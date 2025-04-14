@@ -23,7 +23,7 @@ $components = new class {
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
-            'props' => $items->pluck('props')->values()->filter()->flatMap(fn($i) => $i),
+            'props' => $items->pluck('props')->unique()->values()->filter()->flatMap(fn($i) => $i),
         ]);
 
         return [
