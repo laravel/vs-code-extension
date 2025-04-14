@@ -157,7 +157,7 @@ $models = new class($factory) {
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
                 'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
-                'name_cases' => $this->getNameCases($attrs['name']),  
+                'name_cases' => $this->getNameCases(str($attrs['name'])),  
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
@@ -179,7 +179,7 @@ $models = new class($factory) {
     /**
      * @return array<int, string>
      */
-    protected function getNameCases(\Illuminate\Support\Stringable $name): array
+    private function getNameCases(\Illuminate\Support\Stringable $name): array
     {
         return collect([
             $name->camel()->toString(),
