@@ -148,8 +148,8 @@ $models = new class($factory) {
 
         $data['name_cases'] = array_merge(...array_map(
             null,
-            $this->getNameCases($name->toString()),
-            $this->getNameCases($name->plural()->toString())
+            $this->getNameCases($name),
+            $this->getNameCases($name->plural())
         ));
 
         $existingProperties = $this->collectExistingProperties($reflection);
@@ -179,14 +179,14 @@ $models = new class($factory) {
     /**
      * @return array<int, string>
      */
-    protected function getNameCases(string $name): array
+    protected function getNameCases(\Illuminate\Support\Stringable $name): array
     {
         return collect([
-            str($name)->camel()->toString(),
-            $name,
-            str($name)->snake()->toString(),
-            str($name)->studly()->toString(),
-            str($name)->studly()->lower()->toString(),
+            $name->camel()->toString(),
+            $name->toString(),
+            $name->snake()->toString(),
+            $name->studly()->toString(),
+            $name->studly()->lower()->toString(),
         ])->unique()->values()->toArray();
     }     
 };
