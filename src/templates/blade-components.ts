@@ -32,7 +32,7 @@ $components = new class {
         ];
     }
 
-    private function runConcurrency(array $items, \\Closure $callback, int $concurrency = 4): array
+    private function runConcurrency(array $items, \\Closure $callback, int $concurrency = 8): array
     {
         $tasks = collect($items)
             ->split($concurrency)
@@ -119,11 +119,11 @@ $components = new class {
 
             private function getObjectNodeValue(\\PhpParser\\Node\\Expr\\New_ $node): array
             {
-                $array = [];
-
-                if (!$node->class instanceof \\PhpParser\\Node\\Stmt\\Class_) {
-                    return $array;
+                if (! $node->class instanceof \\PhpParser\\Node\\Stmt\\Class_) {
+                    return [];
                 }
+
+                $array = [];
 
                 foreach ($node->class->getProperties() as $property) {
                     foreach ($property->props as $item) {
@@ -137,15 +137,12 @@ $components = new class {
             private function getArrayNodeValue(\\PhpParser\\Node\\Expr\\Array_ $node): array
             {
                 $array = [];
+                $i = 0;
 
                 foreach ($node->items as $item) {
                     $value = $this->getNodeValue($item->value);
 
-                    if ($item->key) {
-                        $array[$item->key->value] = $value;
-                    } else {
-                        $array[] = $value;
-                    }
+                    $array[$item->key?->value ?? $i++] = $value;
                 }
 
                 return array_filter($array);
@@ -212,31 +209,31 @@ $components = new class {
         return array_filter($visitor->props);
     }
 
-    private function mapComponentProps(\\Illuminate\\Support\\Collection $files): array
+    private function mapComponentPropsFromDirective(array $files): array
     {
-        return $files->map(function (array $item): array {
-            $props = $this->getComponentPropsFromDirective($item['path']);
+        if (! \\Composer\\InstalledVersions::isInstalled('nikic/php-parser')) {
+            return $files;
+        }
 
-            if ($props !== []) {
-                $item = [
-                    ...$item,
-                    'props' => $props,
-                ];
-            }
-
-            return $item;
-        })->all();
+        return $this->runConcurrency(
+            $files, 
+            fn (\\Illuminate\\Support\\Collection $files): array => $files->map(function (array $item): array {
+                $props = $this->getComponentPropsFromDirective($item['path']);
+    
+                if ($props !== []) {
+                    $item['props'] = $props;
+                }
+    
+                return $item;                
+            })->all()
+        );
     }
 
     protected function getStandardViews()
     {
         $path = resource_path('views/components');
 
-        $files = $this->findFiles($path, 'blade.php');
-
-        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser') ?
-            $this->runConcurrency($files, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
-            : $files;
+        return $this->mapComponentPropsFromDirective($this->findFiles($path, 'blade.php'));
     }
 
     protected function findFiles($path, $extension, $keyCallback = null)
@@ -395,9 +392,7 @@ $components = new class {
             }
         }
 
-        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser') ?
-            $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
-            : $components;
+        return $this->mapComponentPropsFromDirective($components);
     }
 
     protected function getVendorComponents(): array
@@ -432,9 +427,7 @@ $components = new class {
             }
         }
 
-        return \\Composer\\InstalledVersions::isInstalled('nikic/php-parser') ?
-            $this->runConcurrency($components, fn (\\Illuminate\\Support\\Collection $files): array => $this->mapComponentProps($files))
-            : $components;
+        return $this->mapComponentPropsFromDirective($components);
     }
 
     protected function handleIndexComponents($str)
