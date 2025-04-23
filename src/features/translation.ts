@@ -101,6 +101,10 @@ const getLang = (
         : undefined;
 };
 
+const getTranslationItem = (match: string): TranslationItem | undefined => {
+    return getTranslations().items.translations[match.replaceAll('\\', '')];
+};
+
 const getTranslationItemByLang = (
     translation: TranslationItem,
     lang?: string,
@@ -121,8 +125,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translation =
-                getTranslations().items.translations[param.value];
+            const translation = getTranslationItem(param.value);
 
             if (!translation) {
                 return null;
@@ -148,7 +151,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslations().items.translations[match];
+        const item = getTranslationItem(match);
 
         if (!item) {
             return null;
@@ -184,7 +187,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const item = getTranslations().items.translations[param.value];
+            const item = getTranslationItem(param.value);
 
             if (item) {
                 return null;
