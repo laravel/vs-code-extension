@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getTranslationItemByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -101,10 +102,6 @@ const getLang = (
         : undefined;
 };
 
-const getTranslationItem = (match: string): TranslationItem | undefined => {
-    return getTranslations().items.translations[match.replaceAll('\\', '')];
-};
-
 const getTranslationItemByLang = (
     translation: TranslationItem,
     lang?: string,
@@ -125,7 +122,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translation = getTranslationItem(param.value);
+            const translation = getTranslationItemByName(param.value);
 
             if (!translation) {
                 return null;
@@ -151,7 +148,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslationItem(match);
+        const item = getTranslationItemByName(match);
 
         if (!item) {
             return null;
@@ -187,7 +184,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const item = getTranslationItem(param.value);
+            const item = getTranslationItemByName(param.value);
 
             if (item) {
                 return null;
