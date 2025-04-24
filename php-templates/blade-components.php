@@ -32,19 +32,20 @@ $components = new class {
         ];
     }
 
-    private function runConcurrency(array $items, \Closure $callback, int $concurrency = 8): array
+    private function runConcurrently(\Illuminate\Support\Collection $items, \Closure $callback, int $concurrency = 8): array
     {
-        $tasks = collect($items)
-            ->split($concurrency)
-            ->map(fn (\Illuminate\Support\Collection $chunk) => fn (): array => $callback($chunk))
-            ->toArray();
+        if (app()->version() > 11 && \Composer\InstalledVersions::isInstalled('spatie/fork')) {
+            $tasks = $items
+                ->split($concurrency)
+                ->map(fn (\Illuminate\Support\Collection $chunk) => fn (): array => $callback($chunk))
+                ->toArray();
 
-        $results = \Illuminate\Support\Facades\Concurrency::driver(match (true) {
-            \Composer\InstalledVersions::isInstalled('spatie/fork') => 'fork',
-            default => 'sync',
-        })->run($tasks);
+            $results = \Illuminate\Support\Facades\Concurrency::driver('fork')->run($tasks);
 
-        return array_merge(...$results);
+            return array_merge(...$results);
+        }
+
+        return $callback($items);
     }
 
     private function getComponentPropsFromDirective(string $path): array
@@ -215,8 +216,8 @@ $components = new class {
             return $files;
         }
 
-        return $this->runConcurrency(
-            $files, 
+        return $this->runConcurrently(
+            collect($files), 
             fn (\Illuminate\Support\Collection $files): array => $files->map(function (array $item): array {
                 $props = $this->getComponentPropsFromDirective($item['path']);
     
