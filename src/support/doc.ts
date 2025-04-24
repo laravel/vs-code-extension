@@ -69,7 +69,7 @@ export const findHoverMatchesInDoc = (
 ): ProviderResult<Hover> => {
     const linkRange = doc.getWordRangeAtPosition(
         pos,
-        new RegExp(/(?:(?<!=))(['"])(.*?)\1/),
+        new RegExp(/(?<!=)(['"])(.*?)\1/),
     );
 
     if (!linkRange) {
