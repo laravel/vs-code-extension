@@ -1,5 +1,12 @@
 <?php
 
+function getReflectionMethod(ReflectionClass $reflected): ReflectionMethod {
+  return match (true) {
+    $reflected->hasMethod('__invoke') => $reflected->getMethod('__invoke'),
+    default => $reflected->getMethod('handle'),
+  };
+}
+
 echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
   ->merge(app("Illuminate\Contracts\Http\Kernel")->getRouteMiddleware())
   ->map(function ($middleware, $key) {
@@ -22,7 +29,7 @@ echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
         }
 
         $reflected = new ReflectionClass($m);
-        $reflectedMethod = $reflected->getMethod("handle");
+        $reflectedMethod = getReflectionMethod($reflected);
 
         return [
           "class" => $m,
@@ -38,7 +45,7 @@ echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
     }
 
     $reflected = new ReflectionClass($middleware);
-    $reflectedMethod = $reflected->getMethod("handle");
+    $reflectedMethod = getReflectionMethod($reflected);
 
     $result = array_merge($result, [
       "class" => $middleware,
