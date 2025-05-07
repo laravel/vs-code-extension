@@ -1,8 +1,10 @@
+import { getLivewireComponents } from "@src/repositories/livewireComponents";
 import { getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
+import { defaultToString } from "@src/support/util";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { HoverProvider, LinkProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -68,4 +70,45 @@ export const completionProvider: vscode.CompletionItemProvider = {
                     new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
             );
     },
+};
+
+export const hoverProvider: HoverProvider = (
+    doc: vscode.TextDocument,
+    pos: vscode.Position,
+): vscode.ProviderResult<vscode.Hover> => {
+    const components = getLivewireComponents().items;
+    const regex = new RegExp(/<livewire:([^\s>]+)/);
+
+    const linkRange = doc.getWordRangeAtPosition(pos, regex);
+
+    if (!linkRange) {
+        return null;
+    }
+
+    const match = doc
+        .getText(linkRange)
+        .replace("<", "")
+        .replace("livewire:", "");
+
+    const component = components.components[match];
+
+    if (!component) {
+        return null;
+    }
+
+    const lines = component.paths.map(
+        (path) => `[${path}](${vscode.Uri.file(projectPath(path))})`,
+    );
+
+    lines.push(
+        ...component.props.map((prop) =>
+            [
+                "`" + prop.type + "` ",
+                "`" + prop.name + "`",
+                prop.hasDefault ? ` = ${defaultToString(prop.default)}` : "",
+            ].join(""),
+        ),
+    );
+
+    return new vscode.Hover(new vscode.MarkdownString(lines.join("\n\n")));
 };
