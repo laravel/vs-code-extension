@@ -1,6 +1,6 @@
 // This file was generated from php-templates/middleware.php, do not edit directly
 export default `
-function getReflectionMethod(ReflectionClass $reflected): ReflectionMethod {
+function vsCodeGetReflectionMethod(ReflectionClass $reflected): ReflectionMethod {
   return match (true) {
     $reflected->hasMethod('__invoke') => $reflected->getMethod('__invoke'),
     default => $reflected->getMethod('handle'),
@@ -29,7 +29,7 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
         }
 
         $reflected = new ReflectionClass($m);
-        $reflectedMethod = getReflectionMethod($reflected);
+        $reflectedMethod = vsCodeGetReflectionMethod($reflected);
 
         return [
           "class" => $m,
@@ -45,7 +45,7 @@ echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
     }
 
     $reflected = new ReflectionClass($middleware);
-    $reflectedMethod = getReflectionMethod($reflected);
+    $reflectedMethod = vsCodeGetReflectionMethod($reflected);
 
     $result = array_merge($result, [
       "class" => $middleware,
