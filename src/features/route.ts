@@ -135,7 +135,8 @@ export const diagnosticProvider = (
             }
 
             return notFound(
-                "Route",
+                // @ts-ignore
+                item.className === "Livewire\\Volt\\Volt" ? "Component" : "Route",
                 param.value,
                 detectedRange(param),
                 "route",
