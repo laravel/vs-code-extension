@@ -82,6 +82,18 @@ export default class Registry implements vscode.CompletionItemProvider {
             );
         };
 
+        const hasName = (names: FeatureTagParam["name"]) => {
+            if (typeof names === "undefined" || names === null) {
+                return parseResult.name() === null;
+            }
+
+            if (typeof names === "string") {
+                return names === parseResult.name();
+            }
+
+            return names.find((fn) => fn === parseResult.name()) !== undefined;
+        };
+
         const isArgumentIndex = (
             argumentIndex: number | number[] | undefined,
         ) => {
@@ -117,6 +129,7 @@ export default class Registry implements vscode.CompletionItemProvider {
                     (tag) =>
                         hasClass(tag.class) &&
                         hasFunc(tag.method) &&
+                        hasName(tag.name) &&
                         isArgumentIndex(tag.argumentIndex) &&
                         isNamedArg(tag.argumentName),
                 );
