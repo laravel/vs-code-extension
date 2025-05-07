@@ -123,7 +123,10 @@ export default class Validation implements CompletionProvider {
                 argumentIndex: 0,
             },
             {
-                classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
+                classExtends: [
+                    "Illuminate\\Foundation\\Http\\FormRequest",
+                    "Livewire\\Form",
+                ],
                 methodDefinition: "rules",
             },
         ];
@@ -144,9 +147,7 @@ export default class Validation implements CompletionProvider {
             return this.validatorValidation(document, position, result) || [];
         }
 
-        // TODO: Deal with FormRequest@rules method
-
-        return [];
+        return this.handleFormRequestRulesMethod(document, position, result);
     }
 
     private handleValidateMethod(
@@ -180,6 +181,18 @@ export default class Validation implements CompletionProvider {
         ) {
             return this.getRules(document, position);
         }
+    }
+
+    private handleFormRequestRulesMethod(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        result: AutocompleteResult,
+    ): vscode.CompletionItem[] {
+        if (result.fillingInArrayKey()) {
+            return [];
+        }
+
+        return this.getRules(document, position);
     }
 
     private getRules(
