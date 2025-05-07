@@ -50,6 +50,7 @@
         "features": [
             "link",
             "completion",
+            "completion_attribute",
             "hover"
         ]
     },
@@ -58,7 +59,8 @@
         "label": "Livewire components",
         "features": [
             "link",
-            "completion"
+            "completion",
+            "completion_attribute"
         ]
     },
     {
