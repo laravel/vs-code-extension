@@ -1,6 +1,7 @@
 import { getBladeComponents } from "@src/repositories/bladeComponents";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
+import { defaultToString } from "@src/support/util";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
 
@@ -131,7 +132,7 @@ export const hoverProvider: HoverProvider = (
                 [
                     "`" + prop.type + "` ",
                     "`" + prop.name + "`",
-                    prop.default ? ` = ${prop.default}` : "",
+                    prop.hasDefault ? ` = ${defaultToString(prop.default)}` : "",
                 ].join(""),
             ),
         );
