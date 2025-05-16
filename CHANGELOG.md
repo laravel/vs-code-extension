@@ -6,6 +6,13 @@ All notable changes to the Laravel extension will be documented in this file.
 
 -   Nothing yet
 
+## [v1.0.8]
+
+-   Add the bootstrap/app.php pattern to the middleware repository ([#358](https://github.com/laravel/vs-code-extension/pull/358))
+-   Add support for @pushIf, @pushOnce, and @use directives in Blade completion ([#378](https://github.com/laravel/vs-code-extension/pull/378))
+-   Fix Middleware "handle" does not exist on invokable middleware files ([#381](https://github.com/laravel/vs-code-extension/pull/381))
+-   Fix Cannot access offset of type array on array ([#341](https://github.com/laravel/vs-code-extension/pull/341))
+
 ## [v1.0.6]
 
 -   Support for Laravel 12 scope attributes ([#357](https://github.com/laravel/vs-code-extension/pull/357))
