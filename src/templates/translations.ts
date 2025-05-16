@@ -298,6 +298,10 @@ $translator = new class
             [$json, $lines] = $this->linesFromJsonFile($file);
 
             foreach ($json as $key => $value) {
+                if (!array_key_exists($key, $lines) || is_array($value)) {
+                    continue;
+                }
+
                 yield [
                     "k" => $key,
                     "la" => $lang,
