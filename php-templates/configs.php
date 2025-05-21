@@ -117,6 +117,10 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
       }
     }
 
+    if (is_object($value)) {
+      $value = get_class($value);
+    }
+
     return [
       "name" => $key,
       "value" => $value,
