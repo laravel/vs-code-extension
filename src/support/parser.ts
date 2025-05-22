@@ -147,7 +147,7 @@ export const detect = async (
 
     const promise = runCommand(`detect "${cleanArg(code)}"`)
         .then((result: string) => {
-            return JSON.parse(result);
+            return result.length > 0 ? JSON.parse(result) : result;
         })
         .catch((err) => {
             showErrorPopup(err);
