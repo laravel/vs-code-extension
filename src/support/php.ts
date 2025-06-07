@@ -359,3 +359,16 @@ export const artisan = (command: string): Promise<string> => {
         );
     });
 };
+
+export const usesRelativePaths = () => phpEnvsThatUseRelativePaths.includes(phpEnvKey!)
+
+export const resolveProjectPath = (path: string) => {
+    switch (phpEnvKey) {
+        case 'ddev':
+            const relativePath = path.replace(new RegExp('^/var/www/html/'),'')
+            return projectPath(relativePath)
+
+        default:
+            return path;
+    }
+}
