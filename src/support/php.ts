@@ -30,7 +30,7 @@ let hasVendor = projectPathExists("vendor/autoload.php");
 const hasBootstrap = projectPathExists("bootstrap/app.php");
 
 let phpEnvKey: PhpEnvironment | null = null;
-const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando"];
+const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando", "ddev"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -117,6 +117,11 @@ const getPhpCommand = (): string => {
     options.set("lando", {
         check: "lando php -r 'echo PHP_BINARY;'",
         command: "lando php",
+    });
+
+    options.set("ddev", {
+        check: "ddev php -r 'echo PHP_BINARY;'",
+        command: "ddev php",
     });
 
     options.set("local", {

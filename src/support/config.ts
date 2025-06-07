@@ -29,5 +29,6 @@ export type PhpEnvironment =
     | "herd"
     | "valet"
     | "sail"
-    | "local"
-    | "lando";
+    | "lando"
+    | "ddev"
+    | "local";
