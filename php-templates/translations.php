@@ -133,7 +133,7 @@ $translator = new class
             array_keys($json),
         );
         $result = [];
-        $searchRange = 2;
+        $searchRange = 3;
 
         foreach ($encoded as $index => $keys) {
             // Pretty likely to be on the line that is the index, go happy path first
