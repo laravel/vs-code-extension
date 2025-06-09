@@ -6,6 +6,10 @@ All notable changes to the Laravel extension will be documented in this file.
 
 -   Nothing yet
 
+## [v1.0.10]
+
+-   Memory improvements ([PR #402](https://github.com/laravel/vs-code-extension/pull/402))
+
 ## [v1.0.9]
 
 -   Fix False positive "Translation not found" with partial string in Laravel JSON translation ([#375](https://github.com/laravel/vs-code-extension/pull/375))
