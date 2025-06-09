@@ -252,6 +252,15 @@ export const completionProvider = {
             getTranslations().items.translations,
         ).length;
 
+        const precedingCharacter = document.getText(
+            new vscode.Range(
+                position.line,
+                position.character - 1,
+                position.line,
+                position.character,
+            ),
+        );
+
         return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -263,6 +272,12 @@ export const completionProvider = {
                     position,
                     wordMatchRegex,
                 );
+
+                if (precedingCharacter === "'") {
+                    completionItem.insertText = key.replaceAll("'", "\\'");
+                } else if (precedingCharacter === '"') {
+                    completionItem.insertText = key.replaceAll('"', '\\"');
+                }
 
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
