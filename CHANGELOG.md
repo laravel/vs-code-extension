@@ -6,6 +6,14 @@ All notable changes to the Laravel extension will be documented in this file.
 
 -   Nothing yet
 
+## [v1.0.9]
+
+-   Fix False positive "Translation not found" with partial string in Laravel JSON translation ([#375](https://github.com/laravel/vs-code-extension/pull/375))
+-   Fix Translation detection breaks when there are blank lines in a JSON file ([399](https://github.com/laravel/vs-code-extension/pull/399))
+-   Fix Translation not found when contains non-standard character ([#401](https://github.com/laravel/vs-code-extension/pull/401))
+-   Fix a bug with enums in config files ([#390](https://github.com/laravel/vs-code-extension/pull/390))
+-   Fix SyntaxError: Unexpected end of JSON input ([#391](https://github.com/laravel/vs-code-extension/pull/391))
+
 ## [v1.0.8]
 
 -   Add the bootstrap/app.php pattern to the middleware repository ([#358](https://github.com/laravel/vs-code-extension/pull/358))
