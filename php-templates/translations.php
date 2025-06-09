@@ -129,7 +129,7 @@ $translator = new class
 
         $lines = explode(PHP_EOL, $contents);
         $encoded = array_map(
-            fn($k) => [json_encode($k), $k],
+            fn($k) => [json_encode($k, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $k],
             array_keys($json),
         );
         $result = [];
@@ -364,4 +364,4 @@ echo json_encode([
     'values' => array_keys($translator->values),
     'params' => array_map(fn($p) => json_decode($p, true), array_keys($translator->paramResults)),
     'to_watch' => $translator->directoriesToWatch,
-]);
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
