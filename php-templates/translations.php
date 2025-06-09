@@ -133,7 +133,7 @@ $translator = new class
             array_keys($json),
         );
         $result = [];
-        $searchRange = 2;
+        $searchRange = 5;
 
         foreach ($encoded as $index => $keys) {
             // Pretty likely to be on the line that is the index, go happy path first
@@ -142,7 +142,7 @@ $translator = new class
                 continue;
             }
 
-            // Search around the index, like to be within 2 lines
+            // Search around the index, likely to be within $searchRange lines
             $start = max(0, $index - $searchRange);
             $end = min($index + $searchRange, count($lines) - 1);
             $current = $start;
