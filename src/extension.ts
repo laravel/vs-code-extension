@@ -6,25 +6,7 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
-import { CodeActionProvider } from "./codeAction/codeActionProvider";
 import { openFileCommand } from "./commands";
-import BladeCompletion from "./completion/Blade";
-import { completionProviders } from "./completion/CompletionProvider";
-import EloquentCompletion from "./completion/Eloquent";
-import Registry from "./completion/Registry";
-import ValidationCompletion from "./completion/Validation";
-import { updateDiagnostics } from "./diagnostic/diagnostic";
-import {
-    completionAttributeProvider as bladeComponentAttributeCompletion,
-    completionComponentProvider as bladeComponentCompletion
-} from "./features/bladeComponent";
-import { viteEnvCodeActionProvider } from "./features/env";
-import {
-    completionAttributeProvider as livewireComponentAttributeCompletion,
-    completionComponentProvider as livewireComponentCompletion
-} from "./features/livewireComponent";
-import { hoverProviders } from "./hover/HoverProvider";
-import { linkProviders } from "./link/LinkProvider";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -32,8 +14,13 @@ import {
     watchForComposerChanges,
 } from "./support/fileWatcher";
 import { info } from "./support/logger";
-import { setParserBinaryPath } from "./support/parser";
-import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
+import { clearParserCaches, setParserBinaryPath } from "./support/parser";
+import {
+    clearDefaultPhpCommand,
+    clearPhpFileCache,
+    initPhp,
+    initVendorWatchers,
+} from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 
@@ -53,7 +40,7 @@ function shouldActivate(): boolean {
     return true;
 }
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     info("Activating Laravel Extension...");
 
     if (!shouldActivate()) {
@@ -65,6 +52,40 @@ export function activate(context: vscode.ExtensionContext) {
 
     info("Started");
 
+    const [
+        { Registry },
+        { completionProviders },
+        { Eloquent: EloquentCompletion },
+        { Validation: ValidationCompletion },
+        { Blade: BladeCompletion },
+        {
+            completionComponentProvider: bladeComponentCompletion,
+            completionAttributeProvider: bladeComponentAttributeCompletion
+        },
+        {
+            completionComponentProvider: livewireComponentCompletion,
+            completionAttributeProvider: livewireComponentAttributeCompletion
+        },
+        { CodeActionProvider },
+        { updateDiagnostics },
+        { viteEnvCodeActionProvider },
+        { hoverProviders },
+        { linkProviders },
+    ] = await Promise.all([
+        import("./completion/Registry.js"),
+        import("./completion/CompletionProvider.js"),
+        import("./completion/Eloquent.js"),
+        import("./completion/Validation.js"),
+        import("./completion/Blade.js"),
+        import("./features/bladeComponent.js"),
+        import("./features/livewireComponent.js"),
+        import("./codeAction/codeActionProvider.js"),
+        import("./diagnostic/diagnostic.js"),
+        import("./features/env.js"),
+        import("./hover/HoverProvider.js"),
+        import("./link/LinkProvider.js"),
+    ]);
+
     console.log("Laravel VS Code Started...");
 
     const BLADE_LANGUAGES = [
@@ -74,6 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
+    initPhp();
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
@@ -201,6 +223,8 @@ export function deactivate() {
     }
 
     disposeWatchers();
+    clearParserCaches();
+    clearPhpFileCache();
 
     if (client) {
         client.stop();

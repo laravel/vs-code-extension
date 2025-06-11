@@ -175,4 +175,8 @@ export const registerWatcher = (watcher: vscode.FileSystemWatcher) => {
 export const disposeWatchers = () => {
     watchers.forEach((watcher) => watcher.dispose());
     watchers = [];
+
+    for (const pattern in patternWatchers) {
+        delete patternWatchers[pattern];
+    }
 };
