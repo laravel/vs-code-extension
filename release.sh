@@ -59,7 +59,7 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-release_url="https://github.com/laravel/vs-code-extension/releases/new?tag=$new_version
+release_url="https://github.com/laravel/vs-code-extension/releases/new?tag=$new_version"
 
 open "$release_url"
 
