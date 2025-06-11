@@ -36,7 +36,7 @@ export const initPhp = () => {
 };
 
 let phpEnvKey: PhpEnvironment | null = null;
-const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando"];
+const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando", "ddev"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -118,6 +118,11 @@ const getPhpCommand = (): string => {
     options.set("lando", {
         check: "lando php -r 'echo PHP_BINARY;'",
         command: "lando php",
+    });
+
+    options.set("ddev", {
+        check: "ddev php -r 'echo PHP_BINARY;'",
+        command: "ddev php",
     });
 
     options.set("local", {
@@ -359,3 +364,16 @@ export const artisan = (command: string): Promise<string> => {
         );
     });
 };
+
+export const usesRelativePaths = () => phpEnvsThatUseRelativePaths.includes(phpEnvKey!)
+
+export const resolveProjectPath = (path: string) => {
+    switch (phpEnvKey) {
+        case 'ddev':
+            const relativePath = path.replace(new RegExp('^/var/www/html/'),'')
+            return projectPath(relativePath)
+
+        default:
+            return path;
+    }
+}

@@ -78,6 +78,7 @@
                         "valet",
                         "sail",
                         "lando",
+                        "ddev",
                         "local"
                     ],
                     "enumItemLabels": [
@@ -86,6 +87,7 @@
                         "Valet",
                         "Sail",
                         "Lando",
+                        "DDEV",
                         "Local"
                     ],
                     "markdownEnumDescriptions": [
@@ -94,6 +96,7 @@
                         "Auto detect PHP version Valet is using for the project.",
                         "Sail",
                         "Lando",
+                        "DDEV",
                         "Use PHP installed on the local machine."
                     ],
                     "default": "auto",
