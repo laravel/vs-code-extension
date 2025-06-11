@@ -10,6 +10,7 @@ export interface BladeComponents {
             props: {
                 name: string;
                 type: string;
+                hasDefault: boolean;
                 default: string | null;
             }[];
         };
