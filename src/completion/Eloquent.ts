@@ -6,7 +6,7 @@ import AutocompleteResult from "../parser/AutocompleteResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Eloquent implements CompletionProvider {
+export class Eloquent implements CompletionProvider {
     private relationMethods = [
         "doesntHave",
         "doesntHaveMorph",

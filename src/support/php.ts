@@ -27,8 +27,13 @@ let defaultPhpCommand: string | null = null;
 
 const discoverFiles = new BoundedFileCache(50);
 
-let hasVendor = projectPathExists("vendor/autoload.php");
-const hasBootstrap = projectPathExists("bootstrap/app.php");
+let hasVendor: boolean | null = null;
+let hasBootstrap: boolean | null = null;
+
+export const initPhp = () => {
+    hasVendor = projectPathExists("vendor/autoload.php");
+    hasBootstrap = projectPathExists("bootstrap/app.php");
+};
 
 let phpEnvKey: PhpEnvironment | null = null;
 const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando"];
