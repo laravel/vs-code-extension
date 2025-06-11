@@ -5,6 +5,15 @@ set -e
 echo "🚀 Laravel VS Code Extension Release"
 echo "=========================================="
 
+BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
+
+read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
+
+if [ "$confirmation" != "y" ]; then
+  echo "Please update the binary version in src/support/parser.ts"
+  exit 1
+fi
+
 echo
 echo "Current version: $(node -p "require('./package.json').version")"
 echo
