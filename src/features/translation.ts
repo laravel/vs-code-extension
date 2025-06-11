@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getTranslationItemByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -121,8 +122,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translation =
-                getTranslations().items.translations[param.value];
+            const translation = getTranslationItemByName(param.value);
 
             if (!translation) {
                 return null;
@@ -148,7 +148,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslations().items.translations[match];
+        const item = getTranslationItemByName(match);
 
         if (!item) {
             return null;
@@ -184,7 +184,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const item = getTranslations().items.translations[param.value];
+            const item = getTranslationItemByName(param.value);
 
             if (item) {
                 return null;
@@ -252,6 +252,15 @@ export const completionProvider = {
             getTranslations().items.translations,
         ).length;
 
+        const precedingCharacter = document.getText(
+            new vscode.Range(
+                position.line,
+                position.character - 1,
+                position.line,
+                position.character,
+            ),
+        );
+
         return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -263,6 +272,12 @@ export const completionProvider = {
                     position,
                     wordMatchRegex,
                 );
+
+                if (precedingCharacter === "'") {
+                    completionItem.insertText = key.replaceAll("'", "\\'");
+                } else if (precedingCharacter === '"') {
+                    completionItem.insertText = key.replaceAll('"', '\\"');
+                }
 
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
