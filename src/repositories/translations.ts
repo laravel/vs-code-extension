@@ -75,6 +75,10 @@ const load = () => {
     });
 };
 
+export const getTranslationItemByName = (match: string): TranslationItem | undefined => {
+    return getTranslations().items.translations[match.replaceAll('\\', '')];
+};
+
 export const getTranslations = repository<TranslationGroupResult>({
     load,
     pattern: () =>

@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getTranslationItemByName,
     getTranslations,
     NestedTranslationItem,
     TranslationItem,
@@ -116,20 +117,18 @@ const getNestedTranslationItem = (match: string): NestedTranslationItem | undefi
     const translations = getTranslations().items.translations;
 
     const firstNestedMatch = Object.keys(translations).find(
-        key => key.startsWith(match + '.')
+        key => key.startsWith(match.replaceAll('\\', '') + '.')
     );
 
     return firstNestedMatch ? {
-        translationItem: translations[firstNestedMatch],
+        translationItem: getTranslationItemByName(firstNestedMatch),
         isNested: true
     } as NestedTranslationItem : undefined;
 };
 
 const getTranslationItem = (match: string): NestedTranslationItem | undefined => {
-    const translations = getTranslations().items.translations;
-
     // First, try to find exact match
-    const translationItem = translations[match];
+    const translationItem = getTranslationItemByName(match);
 
     // If we can't find exact match, try to find a first nested element
     return translationItem ? {
@@ -149,7 +148,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             }
 
             const translationItem = getTranslationItem(param.value)?.translationItem;
-    
+
             if (!translationItem) {
                 return null;
             }
@@ -280,6 +279,15 @@ export const completionProvider = {
             getTranslations().items.translations,
         ).length;
 
+        const precedingCharacter = document.getText(
+            new vscode.Range(
+                position.line,
+                position.character - 1,
+                position.line,
+                position.character,
+            ),
+        );
+
         return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -291,6 +299,12 @@ export const completionProvider = {
                     position,
                     wordMatchRegex,
                 );
+
+                if (precedingCharacter === "'") {
+                    completionItem.insertText = key.replaceAll("'", "\\'");
+                } else if (precedingCharacter === '"') {
+                    completionItem.insertText = key.replaceAll('"', '\\"');
+                }
 
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,

@@ -2,9 +2,40 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.0.11 - 2025-06-11
+
+### What's Changed
+
+* Improve startup time by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/404
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.10...v1.0.11
+
 ## [Unreleased]
 
 - Nothing yet
+
+## [v1.0.10]
+
+- Memory improvements ([PR #402](https://github.com/laravel/vs-code-extension/pull/402))
+
+## [v1.0.9]
+
+- Fix False positive "Translation not found" with partial string in Laravel JSON translation ([#375](https://github.com/laravel/vs-code-extension/pull/375))
+- Fix Translation detection breaks when there are blank lines in a JSON file ([399](https://github.com/laravel/vs-code-extension/pull/399))
+- Fix Translation not found when contains non-standard character ([#401](https://github.com/laravel/vs-code-extension/pull/401))
+- Fix a bug with enums in config files ([#390](https://github.com/laravel/vs-code-extension/pull/390))
+- Fix SyntaxError: Unexpected end of JSON input ([#391](https://github.com/laravel/vs-code-extension/pull/391))
+
+## [v1.0.8]
+
+- Add the bootstrap/app.php pattern to the middleware repository ([#358](https://github.com/laravel/vs-code-extension/pull/358))
+- Add support for @pushIf, @pushOnce, and @use directives in Blade completion ([#378](https://github.com/laravel/vs-code-extension/pull/378))
+- Fix Middleware "handle" does not exist on invokable middleware files ([#381](https://github.com/laravel/vs-code-extension/pull/381))
+- Fix Cannot access offset of type array on array ([#341](https://github.com/laravel/vs-code-extension/pull/341))
+
+## [v1.0.6]
+
+- Support for Laravel 12 scope attributes ([#357](https://github.com/laravel/vs-code-extension/pull/357))
 
 ## [v1.0.5]
 
@@ -141,7 +172,7 @@ All notable changes to the Laravel extension will be documented in this file.
 ## [0.1.12]
 
 - Now fetching OS/arch specific binaries for Mac and Linux (Windows coming soon)
-- Fixed translation loading when there were _a lot_ of translations
+- Fixed translation loading when there were *a lot* of translations
 - Fixed an issue regarding full name resolution for scoped property access
 
 ## [0.1.11]
@@ -176,6 +207,7 @@ All notable changes to the Laravel extension will be documented in this file.
     - `lang_path`
     - `public_path`
     - `storage_path`
+    
 
 ## [0.1.7]
 
