@@ -85,6 +85,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const BLADE_LANGUAGES = [
         { scheme: "file", language: "blade" },
         { scheme: "file", language: "laravel-blade" },
+        { scheme: "file", language: "html" },
     ];
 
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
