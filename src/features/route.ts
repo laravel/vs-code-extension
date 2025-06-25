@@ -34,8 +34,8 @@ const toFind: FeatureTag = [
         argumentIndex: 1,
     },
     {
-        class: [...facade("Route")],
-        method: ["is"]
+        class: facade("Route"),
+        method: "is"
     },
     {
         class: "Illuminate\\Http\\Request",
