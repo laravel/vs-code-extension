@@ -10,7 +10,7 @@ Below you'll find a list of features as well as a roadmap with features we will 
 
 ## Supported Versions
 
-The extension supports all Laravel versions currently listed under the [Support Policy](https://laravel.com/docs/releases#support-policy) and requires PHP >= 8.0 to run.
+The extension supports all Laravel versions currently listed under the [Support Policy](https://laravel.com/docs/releases#support-policy) and the minimum Php version is 8.2.
 
 ## Features
 
