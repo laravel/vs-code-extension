@@ -14,7 +14,7 @@ export const notFound = (
 });
 
 export type DiagnosticCodeObject = {
-    value: string | number;
+    value: DiagnosticCode;
     target: Uri;
 };
 
