@@ -1,10 +1,10 @@
-import { Diagnostic, DiagnosticSeverity, Range } from "vscode";
+import { Diagnostic, DiagnosticSeverity, Range, Uri } from "vscode";
 
 export const notFound = (
     descriptor: string,
     match: string,
     range: Range,
-    code: DiagnosticCode,
+    code: DiagnosticCode | DiagnosticCodeObject,
 ): Diagnostic => ({
     message: `${descriptor} [${match}] not found.`,
     severity: DiagnosticSeverity.Warning,
@@ -12,6 +12,11 @@ export const notFound = (
     source: "Laravel Extension",
     code,
 });
+
+export type DiagnosticCodeObject = {
+    value: string | number;
+    target: Uri;
+};
 
 export type DiagnosticCode =
     | "appBinding"

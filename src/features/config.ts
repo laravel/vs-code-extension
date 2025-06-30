@@ -1,6 +1,6 @@
-import { notFound } from "@src/diagnostic";
+import { DiagnosticCodeObject, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getConfigs } from "@src/repositories/configs";
+import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -75,7 +75,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const configItem = getConfigs().items.find(
+            const configItem = getConfigs().items.configs.find(
                 (config) => config.name === param.value,
             );
 
@@ -107,7 +107,7 @@ export const hoverProvider: HoverProvider = (
                 return null;
             }
 
-            const configItem = getConfigs().items.find(
+            const configItem = getConfigs().items.configs.find(
                 (config) => config.name === match,
             );
 
@@ -159,7 +159,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const config = getConfigs().items.find(
+            const config = getConfigs().items.configs.find(
                 (c) => c.name === param.value,
             );
 
@@ -167,11 +167,18 @@ export const diagnosticProvider = (
                 return null;
             }
 
+            const pathToFile = getConfigPathByName(param.value);
+
+            const code = pathToFile ? {
+                value: "config",
+                target: vscode.Uri.file(projectPath(pathToFile)),
+            } as DiagnosticCodeObject : "config";
+
             return notFound(
                 "Config",
                 param.value,
                 detectedRange(param),
-                "config",
+                code,
             );
         },
     );
@@ -197,7 +204,7 @@ export const completionProvider: CompletionProvider = {
             return [];
         }
 
-        return getConfigs().items.map((config) => {
+        return getConfigs().items.configs.map((config) => {
             let completeItem = new vscode.CompletionItem(
                 config.name,
                 vscode.CompletionItemKind.Value,
