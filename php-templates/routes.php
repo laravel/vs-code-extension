@@ -8,6 +8,15 @@ $routes = new class {
             ->merge($this->getFolioRoutes());
     }
 
+    protected function getRelativePath($path)
+    {
+        $basePath = base_path() . DIRECTORY_SEPARATOR;
+        if (str_starts_with($path, $basePath)) {
+            return substr($path, strlen($basePath));
+        }
+        return $path;
+    }
+
     protected function getFolioRoutes()
     {
         try {
@@ -43,7 +52,7 @@ $routes = new class {
             'name' => $route['name'],
             'action' => null,
             'parameters' => [],
-            'filename' => $path,
+            'filename' => $this->getRelativePath($path),
             'line' => 0,
         ];
     }
@@ -64,7 +73,7 @@ $routes = new class {
             'name' => $route->getName(),
             'action' => $route->getActionName(),
             'parameters' => $route->parameterNames(),
-            'filename' => $reflection ? $reflection->getFileName() : null,
+            'filename' => $reflection ? $this->getRelativePath($reflection->getFileName()) : null,
             'line' => $reflection ? $reflection->getStartLine() : null,
         ];
     }
