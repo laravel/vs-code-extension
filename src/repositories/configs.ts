@@ -8,10 +8,10 @@ interface ConfigGroupResult {
 }
 
 export const getConfigPathByName = (match: string): string | undefined => {
-    const fileName = match.replace(/\.[^.]+$/, '');
+    const filePath = match.replace(/\.[^.]+$/, '').replaceAll('.', '/');
 
     return getConfigs().items.paths.find((path) => {
-        return !path.startsWith('vendor/') && path.endsWith(`${fileName}.php`);
+        return !path.startsWith('vendor/') && path.endsWith(`${filePath}.php`);
     });
 };
 
