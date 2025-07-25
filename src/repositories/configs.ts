@@ -19,6 +19,8 @@ export const getConfigs = repository<ConfigGroupResult>({
     load: () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(
             (result) => {
+                console.log('result', result);
+
                 return {
                     configs: result.map((item) => {
                         return {
@@ -28,7 +30,7 @@ export const getConfigs = repository<ConfigGroupResult>({
                             line: item.line,
                         };
                     }),
-                    paths: [...new Set(result.map(item => item.file))]
+                    paths: [...new Set(result.filter(item => typeof item.file === 'string').map(item => item.file))]
                 } as ConfigGroupResult;
             }
         );
