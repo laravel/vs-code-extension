@@ -44,13 +44,17 @@
     "contributes": {
         "commands": [
             {
-                "command": "laravel.refactorClass",
-                "title": "Laravel: Refactor class attribute"
+                "command": "laravel.refactorSelectedClass",
+                "title": "Laravel: Refactor selected class attribute"
+            },
+            {
+                "command": "laravel.refactorAllClasses",
+                "title": "Laravel: Refactor all class attributes"
             }
         ],
         "keybindings": [
             {
-                "command": "laravel.refactorClass",
+                "command": "laravel.refactorSelectedClass",
                 "key": "shift+alt+c",
                 "when": "editorHasSelection && resourceLangId == blade"
             }
@@ -58,17 +62,27 @@
         "menus": {
             "commandPalette": [
                 {
-                    "command": "laravel.refactorClass",
+                    "command": "laravel.refactorSelectedClass",
                     "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllClasses",
+                    "when": "resourceLangId == blade",
                     "group": "laravel"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "laravel.refactorClass",
+                    "command": "laravel.refactorSelectedClass",
                     "when": "editorHasSelection && resourceLangId == blade",
                     "group": "laravel"
-                }                
+                },
+                {
+                    "command": "laravel.refactorAllClasses",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
             ]            
         },
         "languages": [

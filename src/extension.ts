@@ -7,7 +7,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { openFileCommand } from "./commands";
-import { refactorClassCommand } from "./commands/refactorClass";
+import { refactorAllClassesCommand, refactorSelectedClassCommand } from "./commands/refactorClass";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -189,7 +189,8 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand("laravel.refactorClass", refactorClassCommand),
+        vscode.commands.registerCommand("laravel.refactorSelectedClass", refactorSelectedClassCommand),
+        vscode.commands.registerCommand("laravel.refactorAllClasses", refactorAllClassesCommand),
     );
 
     collectDebugInfo();

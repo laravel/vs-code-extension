@@ -1,6 +1,40 @@
 import * as vscode from "vscode";
 
-export const refactorClassCommand = () => {
+const transformClass = (classList: string) => {
+    const classes = classList
+        .trim()
+        .split(/\s+/)
+        .map(cls => `'${cls}'`)
+        .join(', ');
+
+    return `@class([${classes}])`;
+};
+
+export const refactorAllClassesCommand = () => {
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor) {
+        return;
+    }
+
+    const document = editor.document;
+    const fullText = document.getText();
+
+    const transformed = fullText.replace(/(?<!:)class="([^"]+)"/g, (_, classList) => {
+        return transformClass(classList);
+    });
+
+    const entireRange = new vscode.Range(
+        document.positionAt(0),
+        document.positionAt(fullText.length)
+    );
+
+    editor.edit(editBuilder => {
+        editBuilder.replace(entireRange, transformed);
+    });
+};
+
+export const refactorSelectedClassCommand = () => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
@@ -10,19 +44,13 @@ export const refactorClassCommand = () => {
     const selection = editor.selection;
     const selectedText = editor.document.getText(selection);
 
-    const match = selectedText.match(/class="([\s\S]+)"/);
+    const match = selectedText.match(/(?<!:)class="([\s\S]+)"/);
 
     if (!match) {
         return;
     }
 
-    const classes = match[1]
-        .trim()
-        .split(/\s+/)
-        .map(cls => `'${cls}'`)
-        .join(', ');
-
-    const transformed = `@class([${classes}])`;
+    const transformed = selectedText.replace(/(?<!:)class="([\s\S]+)"/, transformClass(match[1]));
 
     editor.edit(editBuilder => {
         editBuilder.replace(selection, transformed);
