@@ -83,8 +83,7 @@
         "submenus": [
             {
                 "id": "laravel.wrapHelpers.submenu",
-                "label": "Laravel: Wrap selection with helpers",
-                "icon": "$(symbol-keyword)"
+                "label": "Laravel: Wrap selection with helpers"
             }
         ],
         "menus": {
