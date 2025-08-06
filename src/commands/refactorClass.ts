@@ -20,7 +20,7 @@ export const refactorAllClassesCommand = () => {
     const document = editor.document;
     const fullText = document.getText();
 
-    const transformed = fullText.replace(/(?<!:)class="([^"]+)"/g, (_, classList) => {
+    const transformed = fullText.replace(/(?<!:)class="(.+?)"/g, (_, classList) => {
         return transformClass(classList);
     });
 
@@ -44,13 +44,13 @@ export const refactorSelectedClassCommand = () => {
     const selection = editor.selection;
     const selectedText = editor.document.getText(selection);
 
-    const match = selectedText.match(/(?<!:)class="([\s\S]+)"/);
+    const match = selectedText.match(/(?<!:)class="(.+?)"/);
 
     if (!match) {
         return;
     }
 
-    const transformed = selectedText.replace(/(?<!:)class="([\s\S]+)"/, transformClass(match[1]));
+    const transformed = selectedText.replace(/(?<!:)class="(.+?)"/, transformClass(match[1]));
 
     editor.edit(editBuilder => {
         editBuilder.replace(selection, transformed);
