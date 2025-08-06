@@ -7,7 +7,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { openFileCommand } from "./commands";
-import { helpers, openSubmenu, unwrapSelection, wrapSelection } from "./commands/wrapHelpers";
+import { helpers, openSubmenuCommand, unwrapSelectionCommand, wrapSelectionCommand } from "./commands/wrapHelpers";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -189,10 +189,10 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand("laravel.wrapHelpers", openSubmenu),
-        vscode.commands.registerCommand("laravel.wrapHelpers.unwrap", unwrapSelection),
+        vscode.commands.registerCommand("laravel.wrapHelpers", openSubmenuCommand),
+        vscode.commands.registerCommand("laravel.wrapHelpers.unwrap", unwrapSelectionCommand),
         ...helpers.map((helper: string) => {
-            return vscode.commands.registerCommand(`laravel.wrapHelpers.${helper}`, () => wrapSelection(helper));
+            return vscode.commands.registerCommand(`laravel.wrapHelpers.${helper}`, () => wrapSelectionCommand(helper));
         })
     );
 

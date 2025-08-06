@@ -90,27 +90,33 @@
             "commandPalette": [
                 {
                     "command": "laravel.wrapHelpers",
-                    "when": "editorHasSelection"
+                    "when": "editorHasSelection",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.wrapHelpers.unwrap",
-                    "when": "editorHasSelection"
+                    "when": "editorHasSelection",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.wrapHelpers.dd",
-                    "when": "false"
+                    "when": "false",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.wrapHelpers.dump",
-                    "when": "false"
+                    "when": "false",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.wrapHelpers.collect",
-                    "when": "false"
+                    "when": "false",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.wrapHelpers.str",
-                    "when": "false"
+                    "when": "false",
+                    "group": "laravel"
                 }
             ], 
             "editor/context": [

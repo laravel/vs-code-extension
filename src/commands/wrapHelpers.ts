@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 
 export const helpers = ['dd', 'dump', 'collect', 'str'];
 
-export const openSubmenu = async () => {
+export const openSubmenuCommand = async () => {
     const choice = await vscode.window.showQuickPick(
         helpers.map((helper: string) => {
             return {
@@ -20,7 +20,7 @@ export const openSubmenu = async () => {
     }
 };
 
-export const wrapSelection = (wrapper: string) => {
+export const wrapSelectionCommand = (wrapper: string) => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
@@ -46,7 +46,7 @@ export const wrapSelection = (wrapper: string) => {
     });
 };
 
-export const unwrapSelection = () => {
+export const unwrapSelectionCommand = () => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
@@ -58,7 +58,11 @@ export const unwrapSelection = () => {
 
     const match = selectedText.match(/^([a-zA-Z0-9_]+)\(/);
 
-    if (match !== null && match[1] !== undefined && !helpers.includes(match[1])) {
+    if (!match) {
+        return;
+    }
+
+    if (!helpers.includes(match[1])) {
         return;
     }
 
