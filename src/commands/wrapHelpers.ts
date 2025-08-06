@@ -56,6 +56,12 @@ export const unwrapSelection = () => {
     const selection = editor.selection;
     const selectedText = editor.document.getText(selection);
 
+    const match = selectedText.match(/^([a-zA-Z0-9_]+)\(/);
+
+    if (match !== null && match[1] !== undefined && !helpers.includes(match[1])) {
+        return;
+    }
+
     const transformed = selectedText.replace(/[a-zA-Z0-9_]+\(([\s\S]+)\)(?!\))/, '$1');
 
     editor.edit(editBuilder => {
