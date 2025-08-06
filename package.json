@@ -42,6 +42,35 @@
         }
     ],
     "contributes": {
+        "commands": [
+            {
+                "command": "laravel.refactorClass",
+                "title": "Laravel: Refactor class attribute"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "laravel.refactorClass",
+                "key": "shift+alt+c",
+                "when": "editorHasSelection && resourceLangId == blade"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "laravel.refactorClass",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "laravel.refactorClass",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                }                
+            ]            
+        },
         "languages": [
             {
                 "id": "blade",
