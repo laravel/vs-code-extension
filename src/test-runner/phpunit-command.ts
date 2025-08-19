@@ -53,8 +53,8 @@ export default class PhpUnitCommand {
                 ? ` --filter '^.*::${this.method}'`
                 : ""
             : this.method
-            ? ` --filter '^.*::${this.method}( .*)?$'`
-            : "";
+              ? ` --filter '^.*::${this.method}( .*)?$'`
+              : "";
     }
 
     get configuration() {

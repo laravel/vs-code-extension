@@ -12,6 +12,9 @@ export default interface IHttpRequestHandler {
         retryDelayInMs: number,
         headers?: Record<string, string | number | boolean>,
         cancellationToken?: CancellationToken,
-        onDownloadProgressChange?: (downloadedBytes: number, totalBytes: number) => void
+        onDownloadProgressChange?: (
+            downloadedBytes: number,
+            totalBytes: number,
+        ) => void,
     ): Promise<Readable>;
 }

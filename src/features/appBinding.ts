@@ -17,7 +17,10 @@ import {
 
 const toFind: FeatureTag = [
     {
-        class: [contract("Container\\Container"), contract("Foundation\\Application")],
+        class: [
+            contract("Container\\Container"),
+            contract("Foundation\\Application"),
+        ],
         method: ["make", "bound"],
         argumentIndex: 0,
     },

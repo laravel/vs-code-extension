@@ -72,17 +72,25 @@ const load = () => {
     });
 };
 
-export const getTranslationItemByName = (match: string): TranslationItem | undefined => {
-    return getTranslations().items.translations[match.replaceAll('\\', '')];
+export const getTranslationItemByName = (
+    match: string,
+): TranslationItem | undefined => {
+    return getTranslations().items.translations[match.replaceAll("\\", "")];
 };
 
-export const getTranslationPathByName = (match: string, lang: string | undefined): string | undefined => {
+export const getTranslationPathByName = (
+    match: string,
+    lang: string | undefined,
+): string | undefined => {
     lang = lang ?? getTranslations().items.default;
 
-    const fileName = match.replace(/^.*::/, '').replace(/\.[^.]+$/, '');
+    const fileName = match.replace(/^.*::/, "").replace(/\.[^.]+$/, "");
 
     return getTranslations().items.paths.find((path) => {
-        return !path.startsWith('vendor/') && path.endsWith(`${lang}/${fileName}.php`);
+        return (
+            !path.startsWith("vendor/") &&
+            path.endsWith(`${lang}/${fileName}.php`)
+        );
     });
 };
 
