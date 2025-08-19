@@ -34,13 +34,13 @@ const toFind: FeatureTag = [
         argumentIndex: 1,
     },
     {
-        class: facade("Route"),
-        method: "is"
+        class: ["Illuminate\\Routing\\Router", ...facade("Route")],
+        method: "is",
     },
     {
-        class: "Illuminate\\Http\\Request",
-        method: "routeIs"
-    }
+        class: ["Illuminate\\Http\\Request", ...facade("Request")],
+        method: "routeIs",
+    },
 ];
 
 const isCorrectIndexForMethod = (
@@ -168,7 +168,15 @@ export const completionProvider = {
             return [];
         }
 
-        if (result.isFunc(["route", "signedRoute", "to_route", "temporarySignedRoute"]) && result.isParamIndex(1)) {
+        if (
+            result.isFunc([
+                "route",
+                "signedRoute",
+                "to_route",
+                "temporarySignedRoute",
+            ]) &&
+            result.isParamIndex(1)
+        ) {
             // Route parameters autocomplete
             return getRoutes()
                 .items.filter((route) => route.name === result.param(0).value)
