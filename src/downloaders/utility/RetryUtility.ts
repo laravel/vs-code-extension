@@ -9,12 +9,11 @@ export class RetryUtility {
         operationName: string,
         retries: number,
         initialDelayInMs: number,
-        errorHandlerFn?: (error: Error) => void
+        errorHandlerFn?: (error: Error) => void,
     ): Promise<T> {
         try {
             return await requestFn();
-        }
-        catch (error) {
+        } catch (error) {
             if (error instanceof Error) {
                 if (retries === 0) {
                     throw new RetriesExceededError(error, operationName);
@@ -27,7 +26,13 @@ export class RetryUtility {
             await new Promise((resolve): void => {
                 setTimeout(resolve, initialDelayInMs);
             });
-            return this.exponentialRetryAsync(requestFn, operationName, retries - 1, initialDelayInMs * 2, errorHandlerFn);
+            return this.exponentialRetryAsync(
+                requestFn,
+                operationName,
+                retries - 1,
+                initialDelayInMs * 2,
+                errorHandlerFn,
+            );
         }
     }
 }
