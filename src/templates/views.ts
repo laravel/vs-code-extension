@@ -86,9 +86,12 @@ $blade = new class {
             return $paths;
         }
 
+        $finder = app("view")->getFinder();
+        $extensions = array_map(fn($extension) => ".{$extension}", $finder->getExtensions());
+
         $files = \\Symfony\\Component\\Finder\\Finder::create()
             ->files()
-            ->name("*.blade.php")
+            ->name(array_map(fn ($ext) => "*{$ext}", $extensions))
             ->in($path);
 
         foreach ($files as $file) {
@@ -97,7 +100,7 @@ $blade = new class {
                 "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
                 "key" => str($file->getRealPath())
                     ->replace(realpath($path), "")
-                    ->replace(".blade.php", "")
+                    ->replace($extensions, "")
                     ->ltrim(DIRECTORY_SEPARATOR)
                     ->replace(DIRECTORY_SEPARATOR, ".")
             ];
