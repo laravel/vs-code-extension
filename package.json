@@ -483,7 +483,7 @@
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run package",
+        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run format",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
