@@ -8,11 +8,16 @@ interface ConfigGroupResult {
 }
 
 export const getConfigPathByName = (match: string): string | undefined => {
-    const filePath = match.replace(/\.[^.]+$/, '');
+    const filePath = match.replace(/\.[^.]+$/, "");
 
-    for (const tryPath of [filePath.replaceAll('.', '/'), filePath.replace(/^([^.]+)\..*$/, '$1')]) {
+    for (const tryPath of [
+        filePath.replaceAll(".", "/"),
+        filePath.replace(/^([^.]+)\..*$/, "$1"),
+    ]) {
         const configPath = getConfigs().items.paths.find((path) => {
-            return !path.startsWith('vendor/') && path.endsWith(`${tryPath}.php`);
+            return (
+                !path.startsWith("vendor/") && path.endsWith(`${tryPath}.php`)
+            );
         });
 
         if (configPath) {
@@ -25,8 +30,6 @@ export const getConfigs = repository<ConfigGroupResult>({
     load: () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(
             (result) => {
-                console.log('result', result);
-
                 return {
                     configs: result.map((item) => {
                         return {
@@ -36,9 +39,15 @@ export const getConfigs = repository<ConfigGroupResult>({
                             line: item.line,
                         };
                     }),
-                    paths: [...new Set(result.filter(item => typeof item.file === 'string').map(item => item.file))]
+                    paths: [
+                        ...new Set(
+                            result
+                                .filter((item) => typeof item.file === "string")
+                                .map((item) => item.file),
+                        ),
+                    ],
                 } as ConfigGroupResult;
-            }
+            },
         );
     },
     pattern: ["config/{,*,**/*}.php", ".env"],

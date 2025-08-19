@@ -1,4 +1,4 @@
-import { DiagnosticCodeObject, notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
@@ -169,17 +169,14 @@ export const diagnosticProvider = (
 
             const pathToFile = getConfigPathByName(param.value);
 
-            const code = pathToFile ? {
-                value: "config",
-                target: vscode.Uri.file(projectPath(pathToFile)),
-            } as DiagnosticCodeObject : "config";
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "config",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "config";
 
-            return notFound(
-                "Config",
-                param.value,
-                detectedRange(param),
-                code,
-            );
+            return notFound("Config", param.value, detectedRange(param), code);
         },
     );
 };

@@ -1,4 +1,4 @@
-import { DiagnosticCodeObject, notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslationItemByName,
@@ -193,13 +193,15 @@ export const diagnosticProvider = (
 
             const pathToFile = getTranslationPathByName(
                 param.value,
-                getLang(item as AutocompleteParsingResult.MethodCall)
+                getLang(item as AutocompleteParsingResult.MethodCall),
             );
 
-            const code = pathToFile ? {
-                value: "translation",
-                target: vscode.Uri.file(projectPath(pathToFile)),
-            } as DiagnosticCodeObject : "translation";
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "translation",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "translation";
 
             return notFound(
                 "Translation",
