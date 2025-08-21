@@ -180,10 +180,19 @@ $components = new class {
                 ...$this->findFiles(
                     $item['path'],
                     'blade.php',
-                    fn($key) => $key
-                        ->kebab()
-                        ->prepend(($item['prefix'] ?? ':') . ':')
-                        ->ltrim(':'),
+                    function (\\Illuminate\\Support\\Stringable $key) use ($item) {
+                        $prefix = $item['prefix'] ? $item['prefix'] . '::' : '';
+                        $key = $key->kebab();
+                        $keys = [];
+
+                        $keys[] = $key->prepend($prefix);
+
+                        if ($item['prefix'] === 'flux') {
+                            $keys[] = $key->prepend('flux:');
+                        }
+
+                        return $keys;
+                    },
                 )
             );
 
@@ -209,21 +218,22 @@ $components = new class {
         $views = $finder->getHints();
 
         foreach ($views as $key => $paths) {
-            // First is always optional override in the resources/views folder
-            $path = $paths[0] . '/components';
+            foreach ($paths as $path) {
+                $path .= '/components';
 
-            if (!is_dir($path)) {
-                continue;
+                if (!is_dir($path)) {
+                    continue;
+                }
+
+                array_push(
+                    $components,
+                    ...$this->findFiles(
+                        $path,
+                        'blade.php',
+                        fn (\\Illuminate\\Support\\Stringable $k) => $k->kebab()->prepend($key.'::'),
+                    )
+                );
             }
-
-            array_push(
-                $components,
-                ...$this->findFiles(
-                    $path,
-                    'blade.php',
-                    fn (\\Illuminate\\Support\\Stringable $k) => $k->kebab()->prepend($key.'::'),
-                )
-            );
         }
 
         return $components;

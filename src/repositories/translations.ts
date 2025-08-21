@@ -18,6 +18,7 @@ interface TranslationGroupResult {
         [key: string]: TranslationItem;
     };
     languages: string[];
+    paths: string[];
 }
 
 interface TranslationGroupPhpResult {
@@ -66,12 +67,31 @@ const load = () => {
             default: res.default,
             translations: result,
             languages: res.languages,
+            paths: res.paths,
         };
     });
 };
 
-export const getTranslationItemByName = (match: string): TranslationItem | undefined => {
-    return getTranslations().items.translations[match.replaceAll('\\', '')];
+export const getTranslationItemByName = (
+    match: string,
+): TranslationItem | undefined => {
+    return getTranslations().items.translations[match.replaceAll("\\", "")];
+};
+
+export const getTranslationPathByName = (
+    match: string,
+    lang: string | undefined,
+): string | undefined => {
+    lang = lang ?? getTranslations().items.default;
+
+    const fileName = match.replace(/^.*::/, "").replace(/\.[^.]+$/, "");
+
+    return getTranslations().items.paths.find((path) => {
+        return (
+            !path.startsWith("vendor/") &&
+            path.endsWith(`${lang}/${fileName}.php`)
+        );
+    });
 };
 
 export const getTranslations = repository<TranslationGroupResult>({
@@ -88,5 +108,6 @@ export const getTranslations = repository<TranslationGroupResult>({
         default: "",
         translations: {},
         languages: [],
+        paths: [],
     },
 });

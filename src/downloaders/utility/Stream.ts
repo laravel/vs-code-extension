@@ -4,7 +4,10 @@
 import { promisify } from "util";
 import { pipeline, finished } from "stream";
 
-type AnyStream = NodeJS.ReadableStream | NodeJS.WritableStream | NodeJS.ReadWriteStream;
+type AnyStream =
+    | NodeJS.ReadableStream
+    | NodeJS.WritableStream
+    | NodeJS.ReadWriteStream;
 
 export const finishedAsync = promisify(finished);
 export let pipelineAsync = promisify(pipeline);
