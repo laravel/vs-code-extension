@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.0.4",
+    "version": "1.0.12",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -482,13 +482,14 @@
     "scripts": {
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
+        "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
         "test": "vscode-test",
         "compile": "npm run check-types && node esbuild.js",
         "check-types": "tsc --noEmit",
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run package",
+        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run format",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
@@ -502,6 +503,7 @@
         "@vscode/test-electron": "^2.3.9",
         "esbuild": ">=0.25.0",
         "eslint": "^8.57.0",
+        "prettier": "^3.0.0",
         "typescript": "^5.4.5"
     },
     "dependencies": {
