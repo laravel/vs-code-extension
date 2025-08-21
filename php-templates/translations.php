@@ -295,12 +295,12 @@ $translator = new class
     {
         $relativePath = str(realpath($file))
             ->after(realpath($path)) // Firstly remove the path to the /lang folder
-            ->ltrim('/');
+            ->ltrim(DIRECTORY_SEPARATOR);
 
-        $lang = $relativePath->before('/')->toString();
+        $lang = $relativePath->before(DIRECTORY_SEPARATOR)->toString();
 
         $key = $relativePath
-            ->after('/') // Remove the language folder for example /en, /pl etc.
+            ->after(DIRECTORY_SEPARATOR) // Remove the language folder for example /en, /pl etc.
             ->replace('.php', '') // Then remove the .php extension
             ->toString();
 
