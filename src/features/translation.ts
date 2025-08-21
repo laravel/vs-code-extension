@@ -1,7 +1,8 @@
-import { notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslationItemByName,
+    getTranslationPathByName,
     getTranslations,
     NestedTranslationItem,
     TranslationItem,
@@ -10,7 +11,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { contract, createIndexMapping, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -113,28 +114,36 @@ const getTranslationItemByLang = (
     );
 };
 
-const getNestedTranslationItem = (match: string): NestedTranslationItem | undefined => {
+const getNestedTranslationItem = (
+    match: string,
+): NestedTranslationItem | undefined => {
     const translations = getTranslations().items.translations;
 
-    const firstNestedMatch = Object.keys(translations).find(
-        key => key.startsWith(match.replaceAll('\\', '') + '.')
+    const firstNestedMatch = Object.keys(translations).find((key) =>
+        key.startsWith(match.replaceAll("\\", "") + "."),
     );
 
-    return firstNestedMatch ? {
-        translationItem: getTranslationItemByName(firstNestedMatch),
-        isNested: true
-    } as NestedTranslationItem : undefined;
+    return firstNestedMatch
+        ? ({
+              translationItem: getTranslationItemByName(firstNestedMatch),
+              isNested: true,
+          } as NestedTranslationItem)
+        : undefined;
 };
 
-const getTranslationItem = (match: string): NestedTranslationItem | undefined => {
+const getTranslationItem = (
+    match: string,
+): NestedTranslationItem | undefined => {
     // First, try to find exact match
     const translationItem = getTranslationItemByName(match);
 
     // If we can't find exact match, try to find a first nested element
-    return translationItem ? {
-        translationItem: translationItem,
-        isNested: false
-    } as NestedTranslationItem : getNestedTranslationItem(match);
+    return translationItem
+        ? ({
+              translationItem: translationItem,
+              isNested: false,
+          } as NestedTranslationItem)
+        : getNestedTranslationItem(match);
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -147,7 +156,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translationItem = getTranslationItem(param.value)?.translationItem;
+            const translationItem = getTranslationItem(
+                param.value,
+            )?.translationItem;
 
             if (!translationItem) {
                 return null;
@@ -183,9 +194,9 @@ export const hoverProvider: HoverProvider = (
             .filter(([key]) => key !== "default")
             .map(([key, translation]) => {
                 return [
-                    ...(!translationItem.isNested ? [
-                        `\`${key}\`: ${translation.value}`
-                    ] : []),
+                    ...(!translationItem.isNested
+                        ? [`\`${key}\`: ${translation.value}`]
+                        : []),
                     `[${relativePath(translation.path)}](${vscode.Uri.file(
                         translation.path,
                     ).with({
@@ -206,22 +217,36 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
 
-            const translationItem = getTranslationItem(param.value)?.translationItem;
+            const translationItem = getTranslationItem(
+                param.value,
+            )?.translationItem;
 
             if (translationItem) {
                 return null;
             }
 
+            const pathToFile = getTranslationPathByName(
+                param.value,
+                getLang(item as AutocompleteParsingResult.MethodCall),
+            );
+
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "translation",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "translation";
+
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                "translation",
+                code,
             );
         },
     );
