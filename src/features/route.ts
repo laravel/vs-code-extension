@@ -33,6 +33,14 @@ const toFind: FeatureTag = [
         method: ["route"],
         argumentIndex: 1,
     },
+    {
+        class: ["Illuminate\\Routing\\Router", ...facade("Route")],
+        method: "is",
+    },
+    {
+        class: ["Illuminate\\Http\\Request", ...facade("Request")],
+        method: "routeIs",
+    },
 ];
 
 const isCorrectIndexForMethod = (
@@ -135,7 +143,10 @@ export const diagnosticProvider = (
             }
 
             return notFound(
-                "Route",
+                // @ts-ignore
+                item.className === "Livewire\\Volt\\Volt"
+                    ? "Component"
+                    : "Route",
                 param.value,
                 detectedRange(param),
                 "route",
@@ -160,7 +171,15 @@ export const completionProvider = {
             return [];
         }
 
-        if (result.isParamIndex(1)) {
+        if (
+            result.isFunc([
+                "route",
+                "signedRoute",
+                "to_route",
+                "temporarySignedRoute",
+            ]) &&
+            result.isParamIndex(1)
+        ) {
             // Route parameters autocomplete
             return getRoutes()
                 .items.filter((route) => route.name === result.param(0).value)

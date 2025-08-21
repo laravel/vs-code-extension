@@ -60,11 +60,11 @@ export async function activate(context: vscode.ExtensionContext) {
         { Blade: BladeCompletion },
         {
             completionComponentProvider: bladeComponentCompletion,
-            completionAttributeProvider: bladeComponentAttributeCompletion
+            completionAttributeProvider: bladeComponentAttributeCompletion,
         },
         {
             completionComponentProvider: livewireComponentCompletion,
-            completionAttributeProvider: livewireComponentAttributeCompletion
+            completionAttributeProvider: livewireComponentAttributeCompletion,
         },
         { CodeActionProvider },
         { updateDiagnostics },

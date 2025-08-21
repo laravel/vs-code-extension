@@ -2,6 +2,28 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.0.12 - 2025-08-19
+
+### What's Changed
+
+* Add support for custom View extensions by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/vs-code-extension/pull/429
+* Support for configs in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/427
+* Add support for root-level Inertia configs by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/425
+* Fix bug with unnecessary autocompletion blade components when name doesn't match by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/417
+* Support for linked parameter vscode.Diagnostic.code for diagnosticProvider by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/415
+* Add GH action for automatically formatting code by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/438
+* Fix for Blade::anonymousComponentPath with double colon by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/420
+* Support for routes autocompletion for Route::is and routeIs methods by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/411
+* Fix for translations with numeric keys by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/407
+* Fix a bug with overrides vendor blade components by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/361
+* Fix Route not found error in web.php when using Volt by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/349
+
+### New Contributors
+
+* [@ryangjchandler](https://github.com/ryangjchandler) made their first contribution in https://github.com/laravel/vs-code-extension/pull/429
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.11...v1.0.12
+
 ## v1.0.11 - 2025-06-11
 
 ### What's Changed
@@ -199,15 +221,15 @@ All notable changes to the Laravel extension will be documented in this file.
 - Better support for earlier versions of Laravel (fixes for config and translation loading)
 - If extension cannot load, give specific reason
 - Support for linking in path helpers:
-    - `base_path`
-    - `resource_path`
-    - `config_path`
-    - `app_path`
-    - `database_path`
-    - `lang_path`
-    - `public_path`
-    - `storage_path`
-    
+  - `base_path`
+  - `resource_path`
+  - `config_path`
+  - `app_path`
+  - `database_path`
+  - `lang_path`
+  - `public_path`
+  - `storage_path`
+  
 
 ## [0.1.7]
 

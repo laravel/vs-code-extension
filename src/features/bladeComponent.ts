@@ -63,13 +63,17 @@ export const completionAttributeProvider: vscode.CompletionItemProvider = {
         }
 
         const components = getBladeComponents().items;
-        const text = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
+        const text = doc.getText(
+            new vscode.Range(new vscode.Position(0, 0), pos),
+        );
 
         const regexes = [new RegExp(/<x-([^\s>]+)[^<]*:$/)];
 
         if (components.prefixes.length > 0) {
             regexes.push(
-                new RegExp(`<((${components.prefixes.join("|")})\\:[^\\s>]+)[^<]*:$`),
+                new RegExp(
+                    `<((${components.prefixes.join("|")})\\:[^\\s>]+)[^<]*:$`,
+                ),
             );
         }
 
@@ -99,7 +103,7 @@ export const completionAttributeProvider: vscode.CompletionItemProvider = {
         }
 
         return undefined;
-    }
+    },
 };
 
 export const completionComponentProvider: vscode.CompletionItemProvider = {
@@ -122,7 +126,7 @@ export const completionComponentProvider: vscode.CompletionItemProvider = {
                 pos.character,
             );
 
-            return linePrefix !== prefix;
+            return linePrefix === prefix;
         });
 
         if (!match) {
