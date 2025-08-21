@@ -2,11 +2,7 @@ import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getModelByName, getModels } from "@src/repositories/models";
 import { config } from "@src/support/config";
 import * as vscode from "vscode";
-import {
-    CompletionProvider,
-    Eloquent,
-    FeatureTag,
-} from "..";
+import { CompletionProvider, Eloquent, FeatureTag } from "..";
 
 export const completionModelProvider: vscode.CompletionItemProvider = {
     provideCompletionItems(): vscode.ProviderResult<vscode.CompletionItem[]> {
@@ -16,7 +12,10 @@ export const completionModelProvider: vscode.CompletionItemProvider = {
 
         return Object.entries(getModels().items).flatMap(([, value]) => {
             return value.name_cases.slice(0, 2).map((name) => {
-                return new vscode.CompletionItem(name, vscode.CompletionItemKind.Variable);
+                return new vscode.CompletionItem(
+                    name,
+                    vscode.CompletionItemKind.Variable,
+                );
             });
         });
     },
@@ -24,16 +23,18 @@ export const completionModelProvider: vscode.CompletionItemProvider = {
 
 export const completionAttributeProvider: CompletionProvider = {
     tags() {
-        return Object.values(getModels().items).flatMap(model => {
-            return [
-                {
-                    method: [...model.name_cases],
-                },
-                {
-                    name: [...model.name_cases]
-                }
-            ];
-        }).filter(item => item !== null) as FeatureTag;
+        return Object.values(getModels().items)
+            .flatMap((model) => {
+                return [
+                    {
+                        method: [...model.name_cases],
+                    },
+                    {
+                        name: [...model.name_cases],
+                    },
+                ];
+            })
+            .filter((item) => item !== null) as FeatureTag;
     },
 
     provideCompletionItems(
@@ -55,7 +56,9 @@ export const completionAttributeProvider: CompletionProvider = {
             return [];
         }
 
-        const createCompleteItem = (item: Eloquent.Attribute | Eloquent.Relation) => {
+        const createCompleteItem = (
+            item: Eloquent.Attribute | Eloquent.Relation,
+        ) => {
             let completeItem = new vscode.CompletionItem(
                 item.name,
                 vscode.CompletionItemKind.Property,
@@ -68,7 +71,8 @@ export const completionAttributeProvider: CompletionProvider = {
             return completeItem;
         };
 
-        return model.attributes.map(createCompleteItem)
+        return model.attributes
+            .map(createCompleteItem)
             .concat(model.relations.map(createCompleteItem));
     },
 };

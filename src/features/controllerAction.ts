@@ -13,15 +13,7 @@ import { LinkProvider } from "..";
 const toFind = [
     {
         class: contract("Routing\\Registrar"),
-        method: [
-            "get",
-            "post",
-            "patch",
-            "put",
-            "delete",
-            "options",
-            "match",            
-        ]
+        method: ["get", "post", "patch", "put", "delete", "options", "match"],
     },
     {
         class: facade("Route"),
@@ -38,7 +30,7 @@ const toFind = [
             "addRoute",
             "newRoute",
         ],
-    }
+    },
 ];
 
 const isCorrectIndexForMethod = (
