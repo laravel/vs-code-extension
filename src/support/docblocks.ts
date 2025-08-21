@@ -1,5 +1,6 @@
 import fs from "fs";
 import { Eloquent } from "..";
+import { config } from "./config";
 import { internalVendorPath } from "./project";
 import { indent } from "./util";
 
@@ -7,6 +8,7 @@ interface ClassBlock {
     namespace: string;
     className: string;
     blocks: string[];
+    extends: string | null;
 }
 
 const modelBuilderType = (className: string) =>
@@ -16,7 +18,7 @@ export const writeEloquentDocBlocks = (
     models: Eloquent.Models,
     builderMethods: Eloquent.BuilderMethod[],
 ) => {
-    if (!models) {
+    if (!models || !config("eloquent.generateDocBlocks", true)) {
         return;
     }
 
@@ -28,6 +30,7 @@ export const writeEloquentDocBlocks = (
             namespace: pathParts.join("\\"),
             className: cls || "",
             blocks: getBlocks(model, cls || "", builderMethods),
+            extends: model.extends || null,
         };
     });
 
@@ -113,7 +116,9 @@ const getBlocks = (
         .concat(
             [...model.scopes, "newModelQuery", "newQuery", "query"].map(
                 (method) => {
-                    return `@method static ${modelBuilderType(className)} ${method}()`;
+                    return `@method static ${modelBuilderType(
+                        className,
+                    )} ${method}()`;
                 },
             ),
         )
@@ -178,7 +183,9 @@ const classToDocBlock = (block: ClassBlock, namespace: string) => {
         ...block.blocks,
         " * @mixin \\Illuminate\\Database\\Query\\Builder",
         " */",
-        `class ${block.className} extends \\Illuminate\\Database\\Eloquent\\Model`,
+        `class ${block.className} extends ${
+            block.extends ?? "\\Illuminate\\Database\\Eloquent\\Model"
+        }`,
         `{`,
         indent("//"),
         `}`,
@@ -205,7 +212,9 @@ const getAttributeBlocks = (
 
     if (!["accessor", "attribute"].includes(attr.cast || "")) {
         blocks.push(
-            `@method static ${modelBuilderType(className)} where${attr.title_case}($value)`,
+            `@method static ${modelBuilderType(className)} where${
+                attr.title_case
+            }($value)`,
         );
     }
 

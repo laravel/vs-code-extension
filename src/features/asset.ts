@@ -4,10 +4,18 @@ import { getAssets } from "@src/repositories/asset";
 import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
+import { contract } from "@src/support/util";
 import * as vscode from "vscode";
 import { FeatureTag, LinkProvider } from "..";
 
-const toFind: FeatureTag = { class: null, method: "asset", argumentIndex: 0 };
+const toFind: FeatureTag = [
+    { class: null, method: "asset", argumentIndex: 0 },
+    {
+        class: contract("Routing\\UrlGenerator"),
+        method: "asset",
+        argumentIndex: 0,
+    },
+];
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(

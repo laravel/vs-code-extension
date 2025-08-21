@@ -29,6 +29,10 @@ export const toArray = <T>(value: T | T[]): T[] => {
     return Array.isArray(value) ? value : [value];
 };
 
+export const contract = (className: string): string => {
+    return `Illuminate\\Contracts\\${className}`;
+};
+
 export const facade = (className: string): string[] => {
     return [className, support(`Facades\\${className}`)];
 };
@@ -95,4 +99,50 @@ export const leadingDebounce = <T extends (...args: any[]) => any>(
 
         lastInvocation = Date.now();
     } as T;
+};
+
+export const waitForValue = <T>(
+    value: () => T,
+    interval = 100,
+    maxAttempts = 20,
+): Promise<T> =>
+    new Promise((resolve) => {
+        let attempts = 0;
+
+        const checkForValue = () => {
+            attempts++;
+
+            if (attempts > maxAttempts) {
+                return resolve(value());
+            }
+
+            if (value() === null) {
+                return setTimeout(checkForValue, 100);
+            }
+
+            resolve(value());
+        };
+
+        checkForValue();
+    });
+
+export const createIndexMapping = (
+    items: [string | string[], Record<string, number>][],
+) => {
+    const mapping: Record<string, Record<string, number>> = {};
+
+    items.forEach(([keys, value]) => {
+        keys = toArray(keys);
+
+        keys.forEach((key) => {
+            mapping[key] = value;
+        });
+    });
+
+    return {
+        mapping,
+        get(className: string | null, methodName: string | null) {
+            return mapping[className ?? ""][methodName ?? ""] ?? null;
+        },
+    };
 };

@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.0.1",
+    "version": "1.0.12",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -112,6 +112,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Show popups for errors."
+                },
+                "Laravel.env.viteQuickFix": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable quickfix for adding VITE_ variables from regular env variables."
+                },
+                "Laravel.eloquent.generateDocBlocks": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically generate Eloquent doc blocks for models as IDE helpers."
                 },
                 "Laravel.blade.autoSpaceTags": {
                     "type": "boolean",
@@ -394,6 +404,24 @@
                     "generated": true,
                     "description": "Enable completion for route."
                 },
+                "Laravel.storage.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for storage."
+                },
+                "Laravel.storage.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for storage."
+                },
+                "Laravel.storage.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable diagnostics for storage."
+                },
                 "Laravel.translation.diagnostics": {
                     "type": "boolean",
                     "default": true,
@@ -448,13 +476,14 @@
     "scripts": {
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
+        "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
         "test": "vscode-test",
         "compile": "npm run check-types && node esbuild.js",
         "check-types": "tsc --noEmit",
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run package",
+        "vscode:prepublish": "php generate-templates.php && php generate-config.php && ./precheck && npm run format",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
@@ -466,12 +495,13 @@
         "@typescript-eslint/parser": "^7.7.1",
         "@vscode/test-cli": "^0.0.9",
         "@vscode/test-electron": "^2.3.9",
-        "esbuild": "^0.21.5",
+        "esbuild": ">=0.25.0",
         "eslint": "^8.57.0",
+        "prettier": "^3.0.0",
         "typescript": "^5.4.5"
     },
     "dependencies": {
-        "axios": "^1.7.9",
+        "axios": "^1.8.2",
         "extract-zip": "^2.0.1",
         "find-up": "^7.0.0",
         "glob": "^11.0.0",

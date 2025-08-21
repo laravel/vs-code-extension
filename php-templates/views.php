@@ -37,7 +37,7 @@ $blade = new class {
             foreach ($autoloaded as $namespace => $paths) {
                 if (str_starts_with($ns, $namespace)) {
                     foreach ($paths as $p) {
-                        $test = \Illuminate\Support\Str::of($ns)->replace($namespace, '')->replace('\\', '/')->prepend($p . DIRECTORY_SEPARATOR)->toString();
+                        $test = str($ns)->replace($namespace, '')->replace('\\', '/')->prepend($p . DIRECTORY_SEPARATOR)->toString();
 
                         if (is_dir($test)) {
                             $path = $test;
@@ -64,7 +64,7 @@ $blade = new class {
                 $components[] = [
                     "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $realPath),
                     "isVendor" => str_contains($realPath, base_path("vendor")),
-                    "key" =>  \Illuminate\Support\Str::of($realPath)
+                    "key" =>  str($realPath)
                         ->replace(realpath($path), "")
                         ->replace(".php", "")
                         ->ltrim(DIRECTORY_SEPARATOR)
@@ -86,18 +86,21 @@ $blade = new class {
             return $paths;
         }
 
+        $finder = app("view")->getFinder();
+        $extensions = array_map(fn($extension) => ".{$extension}", $finder->getExtensions());
+
         $files = \Symfony\Component\Finder\Finder::create()
             ->files()
-            ->name("*.blade.php")
+            ->name(array_map(fn ($ext) => "*{$ext}", $extensions))
             ->in($path);
 
         foreach ($files as $file) {
             $paths[] = [
                 "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $file->getRealPath()),
                 "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
-                "key" => \Illuminate\Support\Str::of($file->getRealPath())
+                "key" => str($file->getRealPath())
                     ->replace(realpath($path), "")
-                    ->replace(".blade.php", "")
+                    ->replace($extensions, "")
                     ->ltrim(DIRECTORY_SEPARATOR)
                     ->replace(DIRECTORY_SEPARATOR, ".")
             ];

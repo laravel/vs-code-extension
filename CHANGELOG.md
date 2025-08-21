@@ -2,9 +2,90 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.0.12 - 2025-08-19
+
+### What's Changed
+
+* Add support for custom View extensions by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/vs-code-extension/pull/429
+* Support for configs in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/427
+* Add support for root-level Inertia configs by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/425
+* Fix bug with unnecessary autocompletion blade components when name doesn't match by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/417
+* Support for linked parameter vscode.Diagnostic.code for diagnosticProvider by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/415
+* Add GH action for automatically formatting code by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/438
+* Fix for Blade::anonymousComponentPath with double colon by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/420
+* Support for routes autocompletion for Route::is and routeIs methods by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/411
+* Fix for translations with numeric keys by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/407
+* Fix a bug with overrides vendor blade components by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/361
+* Fix Route not found error in web.php when using Volt by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/349
+
+### New Contributors
+
+* [@ryangjchandler](https://github.com/ryangjchandler) made their first contribution in https://github.com/laravel/vs-code-extension/pull/429
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.11...v1.0.12
+
+## v1.0.11 - 2025-06-11
+
+### What's Changed
+
+* Improve startup time by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/404
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.10...v1.0.11
+
 ## [Unreleased]
 
 - Nothing yet
+
+## [v1.0.10]
+
+- Memory improvements ([PR #402](https://github.com/laravel/vs-code-extension/pull/402))
+
+## [v1.0.9]
+
+- Fix False positive "Translation not found" with partial string in Laravel JSON translation ([#375](https://github.com/laravel/vs-code-extension/pull/375))
+- Fix Translation detection breaks when there are blank lines in a JSON file ([399](https://github.com/laravel/vs-code-extension/pull/399))
+- Fix Translation not found when contains non-standard character ([#401](https://github.com/laravel/vs-code-extension/pull/401))
+- Fix a bug with enums in config files ([#390](https://github.com/laravel/vs-code-extension/pull/390))
+- Fix SyntaxError: Unexpected end of JSON input ([#391](https://github.com/laravel/vs-code-extension/pull/391))
+
+## [v1.0.8]
+
+- Add the bootstrap/app.php pattern to the middleware repository ([#358](https://github.com/laravel/vs-code-extension/pull/358))
+- Add support for @pushIf, @pushOnce, and @use directives in Blade completion ([#378](https://github.com/laravel/vs-code-extension/pull/378))
+- Fix Middleware "handle" does not exist on invokable middleware files ([#381](https://github.com/laravel/vs-code-extension/pull/381))
+- Fix Cannot access offset of type array on array ([#341](https://github.com/laravel/vs-code-extension/pull/341))
+
+## [v1.0.6]
+
+- Support for Laravel 12 scope attributes ([#357](https://github.com/laravel/vs-code-extension/pull/357))
+
+## [v1.0.5]
+
+- Ability to quickly add `VITE_` env variables from existing ([#332](https://github.com/laravel/vs-code-extension/pull/332))
+- Add trans_choice helper ([#331](https://github.com/laravel/vs-code-extension/pull/331))
+- Support for locale parameter in translations ([PR #330](https://github.com/laravel/vs-code-extension/pull/330))
+- Better resolution for `$request->user()`, `auth()->user()`, and `Auth::user()` ([#333](https://github.com/laravel/vs-code-extension/pull/333))
+
+## [v1.0.4]
+
+- Improve file watcher performance ([#327](https://github.com/laravel/vs-code-extension/pull/327))
+- Autocompletion, linking, and diagnostics for Storage Disks ([#328](https://github.com/laravel/vs-code-extension/pull/328))
+- Fix relative path when path does not exist ([#322](https://github.com/laravel/vs-code-extension/pull/322))
+- Automatically check lowercase Inertia view paths ([#323](https://github.com/laravel/vs-code-extension/pull/323))
+
+## [v1.0.3]
+
+- Basic Folio support ([#319](https://github.com/laravel/vs-code-extension/pull/319))
+- Add link to Blade file for MailMessage::markdown/view ([#317](https://github.com/laravel/vs-code-extension/pull/317))
+- Fix TypeError: Cannot read properties of undefined (reading 'type') ([#296](https://github.com/laravel/vs-code-extension/pull/296))
+- Support for contracts ([#298](https://github.com/laravel/vs-code-extension/pull/298))
+- Option to disable model doc block generation + fix doc block extends ([#320](https://github.com/laravel/vs-code-extension/pull/320))
+
+## [v1.0.2]
+
+- Fix fetching Blade component properties when constructor is missing ([#307](https://github.com/laravel/vs-code-extension/pull/307))
+- Fix parsing of incomplete or incorrect language files ([#311](https://github.com/laravel/vs-code-extension/pull/311))
+- Support for vendor components ([#310](https://github.com/laravel/vs-code-extension/pull/310))
 
 ## [v1.0.1]
 
@@ -113,7 +194,7 @@ All notable changes to the Laravel extension will be documented in this file.
 ## [0.1.12]
 
 - Now fetching OS/arch specific binaries for Mac and Linux (Windows coming soon)
-- Fixed translation loading when there were _a lot_ of translations
+- Fixed translation loading when there were *a lot* of translations
 - Fixed an issue regarding full name resolution for scoped property access
 
 ## [0.1.11]
@@ -140,14 +221,15 @@ All notable changes to the Laravel extension will be documented in this file.
 - Better support for earlier versions of Laravel (fixes for config and translation loading)
 - If extension cannot load, give specific reason
 - Support for linking in path helpers:
-    - `base_path`
-    - `resource_path`
-    - `config_path`
-    - `app_path`
-    - `database_path`
-    - `lang_path`
-    - `public_path`
-    - `storage_path`
+  - `base_path`
+  - `resource_path`
+  - `config_path`
+  - `app_path`
+  - `database_path`
+  - `lang_path`
+  - `public_path`
+  - `storage_path`
+  
 
 ## [0.1.7]
 

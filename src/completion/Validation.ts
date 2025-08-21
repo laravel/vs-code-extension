@@ -1,12 +1,12 @@
 "use strict";
 
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider } from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Validation implements CompletionProvider {
+export class Validation implements CompletionProvider {
     private rules = {
         accepted: "accepted",
         active_url: "active_url",
@@ -98,6 +98,16 @@ export default class Validation implements CompletionProvider {
     tags() {
         return [
             {
+                class: contract("Validation\\Factory"),
+                method: ["make"],
+                argumentIndex: 1,
+            },
+            {
+                class: contract("Validation\\Validator"),
+                method: ["sometimes"],
+                argumentIndex: 1,
+            },
+            {
                 class: facade("Validator"),
                 method: ["validate", "sometimes"],
                 argumentIndex: 1,
@@ -126,7 +136,7 @@ export default class Validation implements CompletionProvider {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.isFunc("validate")) {
+        if (result.isFunc(["validate", "make"])) {
             return this.handleValidateMethod(document, position, result);
         }
 
@@ -164,7 +174,10 @@ export default class Validation implements CompletionProvider {
         position: vscode.Position,
         result: AutocompleteResult,
     ): vscode.CompletionItem[] | undefined {
-        if (result.isFacade("Validator")) {
+        if (
+            result.isFacade("Validator") ||
+            result.isContract(["Validation\\Factory", "Validation\\Validator"])
+        ) {
             return this.getRules(document, position);
         }
     }

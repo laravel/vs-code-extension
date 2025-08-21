@@ -5,7 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { facade, relativeMarkdownLink } from "@src/support/util";
+import { contract, facade, relativeMarkdownLink } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
@@ -17,6 +17,19 @@ import {
 } from "..";
 
 const toFind: FeatureTag = [
+    {
+        class: contract("Auth\\Access\\Gate"),
+        method: [
+            "has",
+            "allows",
+            "denies",
+            "check",
+            "any",
+            "authorize",
+            "inspect",
+        ],
+        argumentIndex: 0,
+    },
     {
         class: facade("Gate"),
         method: [
@@ -93,7 +106,7 @@ const analyzeParam = (
     }
 
     const policies = values
-        .map((value) => getPolicies().items[value.value])
+        .map((value) => getPolicies().items.policies[value.value])
         .flat();
 
     if (["has"].includes(item.methodName)) {
@@ -115,7 +128,7 @@ const analyzeParam = (
     const nextArg = item.arguments.children[1].children[0];
     let classArg: string | null = null;
 
-    if (nextArg.type === "array") {
+    if (nextArg?.type === "array") {
         classArg = nextArg.children[0]?.value?.className;
     } else {
         classArg = nextArg?.className;
@@ -288,26 +301,28 @@ export const completionProvider: CompletionProvider = {
             return [];
         }
 
-        return Object.entries(getPolicies().items).map(([key, value]) => {
-            let completeItem = new vscode.CompletionItem(
-                key,
-                vscode.CompletionItemKind.Value,
-            );
+        return Object.entries(getPolicies().items.policies).map(
+            ([key, value]) => {
+                let completeItem = new vscode.CompletionItem(
+                    key,
+                    vscode.CompletionItemKind.Value,
+                );
 
-            completeItem.range = document.getWordRangeAtPosition(
-                position,
-                wordMatchRegex,
-            );
+                completeItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
 
-            const policyClasses = value
-                .map((item) => item.policy)
-                .filter(String);
+                const policyClasses = value
+                    .map((item) => item.policy)
+                    .filter(String);
 
-            if (policyClasses.length > 0) {
-                completeItem.detail = policyClasses.join("\n\n");
-            }
+                if (policyClasses.length > 0) {
+                    completeItem.detail = policyClasses.join("\n\n");
+                }
 
-            return completeItem;
-        });
+                return completeItem;
+            },
+        );
     },
 };

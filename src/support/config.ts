@@ -10,7 +10,9 @@ type ConfigKey =
     | "tests.ssh.enabled"
     | "tests.suiteSuffix"
     | "showErrorPopups"
-    | "blade.autoSpaceTags";
+    | "blade.autoSpaceTags"
+    | "eloquent.generateDocBlocks"
+    | "env.viteQuickFix";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);

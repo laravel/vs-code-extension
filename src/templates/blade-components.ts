@@ -19,6 +19,7 @@ $components = new class {
             $this->getAnonymousNamespaced(),
             $this->getAnonymous(),
             $this->getAliases(),
+            $this->getVendorComponents(),
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
@@ -54,7 +55,7 @@ $components = new class {
         foreach ($files as $file) {
             $realPath = $file->getRealPath();
 
-            $key = \\Illuminate\\Support\\Str::of($realPath)
+            $key = str($realPath)
                 ->replace($pathRealPath, '')
                 ->ltrim('/\\\\')
                 ->replace('.' . $extension, '')
@@ -87,9 +88,10 @@ $components = new class {
                 ->map(fn($p) => \\Illuminate\\Support\\Str::kebab($p))
                 ->implode('.'),
         ))->map(function ($item) use ($appNamespace) {
-            $class = \\Illuminate\\Support\\Str::of($item['path'])
+            $class = str($item['path'])
                 ->after('View/Components/')
                 ->replace('.php', '')
+                ->replace('/', '\\\\')
                 ->prepend($appNamespace . 'View\\\\Components\\\\')
                 ->toString();
 
@@ -98,7 +100,7 @@ $components = new class {
             }
 
             $reflection = new \\ReflectionClass($class);
-            $parameters = collect($reflection->getConstructor()->getParameters())
+            $parameters = collect($reflection->getConstructor()?->getParameters() ?? [])
                 ->filter(fn($p) => $p->isPromoted())
                 ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $p->getDefaultValue() : null])
                 ->all();
@@ -178,15 +180,59 @@ $components = new class {
                 ...$this->findFiles(
                     $item['path'],
                     'blade.php',
-                    fn($key) => $key
-                        ->kebab()
-                        ->prepend(($item['prefix'] ?? ':') . ':')
-                        ->ltrim(':'),
+                    function (\\Illuminate\\Support\\Stringable $key) use ($item) {
+                        $prefix = $item['prefix'] ? $item['prefix'] . '::' : '';
+                        $key = $key->kebab();
+                        $keys = [];
+
+                        $keys[] = $key->prepend($prefix);
+
+                        if ($item['prefix'] === 'flux') {
+                            $keys[] = $key->prepend('flux:');
+                        }
+
+                        return $keys;
+                    },
                 )
             );
 
             if (!in_array($item['prefix'], $this->prefixes)) {
                 $this->prefixes[] = $item['prefix'];
+            }
+        }
+
+        return $components;
+    }
+
+    protected function getVendorComponents(): array
+    {
+        $components = [];
+
+        /** @var \\Illuminate\\View\\Factory $view */
+        $view = \\Illuminate\\Support\\Facades\\App::make('view');
+
+        /** @var \\Illuminate\\View\\FileViewFinder $finder */
+        $finder = $view->getFinder();
+
+        /** @var array<string, array<int, string>> $views */
+        $views = $finder->getHints();
+
+        foreach ($views as $key => $paths) {
+            foreach ($paths as $path) {
+                $path .= '/components';
+
+                if (!is_dir($path)) {
+                    continue;
+                }
+
+                array_push(
+                    $components,
+                    ...$this->findFiles(
+                        $path,
+                        'blade.php',
+                        fn (\\Illuminate\\Support\\Stringable $k) => $k->kebab()->prepend($key.'::'),
+                    )
+                );
             }
         }
 
@@ -208,7 +254,7 @@ $components = new class {
         if ($parts->slice(-2)->unique()->count() === 1) {
             $parts->pop();
 
-            return \\Illuminate\\Support\\Str::of($parts->implode('.'));
+            return str($parts->implode('.'));
         }
 
         return $str;
@@ -247,7 +293,7 @@ $components = new class {
             }
 
             foreach ($paths as $p) {
-                $dir = \\Illuminate\\Support\\Str::of($classNamespace)
+                $dir = str($classNamespace)
                     ->replace($ns, '')
                     ->replace('\\\\', '/')
                     ->prepend($p . DIRECTORY_SEPARATOR)

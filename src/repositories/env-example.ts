@@ -41,8 +41,8 @@ const load = () => {
     return items;
 };
 
-export const getEnvExample = repository<EnvItem>(
-    () =>
+export const getEnvExample = repository<EnvItem>({
+    load: () =>
         new Promise<EnvItem>((resolve, reject) => {
             try {
                 resolve(load());
@@ -50,6 +50,7 @@ export const getEnvExample = repository<EnvItem>(
                 reject(error);
             }
         }),
-    filename,
-    {},
-);
+    pattern: filename,
+    itemsDefault: {},
+    reloadOnComposerChanges: false,
+});

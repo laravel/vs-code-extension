@@ -12,6 +12,10 @@ $translator = new class
 
     public $emptyParams = [];
 
+    public $directoriesToWatch = [];
+
+    public $languages = [];
+
     public function all()
     {
         $final = [];
@@ -22,12 +26,20 @@ $translator = new class
                     $dotKey = $val["k"];
                     $final[$dotKey] ??= [];
 
+                    if (!in_array($val["la"], $this->languages)) {
+                      $this->languages[] = $val["la"];
+                    }
+
                     $final[$dotKey][$val["la"]] = $val["vs"];
                 }
             } else {
                 foreach ($value["vs"] as $v) {
                     $dotKey = "{$value["k"]}.{$v['k']}";
                     $final[$dotKey] ??= [];
+
+                    if (!in_array($$value["la"], $this->languages)) {
+                      $this->languages[] = $$value["la"];
+                    }
 
                     $final[$dotKey][$value["la"]] = $v['arr'];
                 }
@@ -82,6 +94,10 @@ $translator = new class
             return [];
         }
 
+        if (!LaravelVsCode::isVendor($realPath)) {
+            $this->directoriesToWatch[] = LaravelVsCode::relativePath($realPath);
+        }
+
         return array_map(
             fn($file) => $this->fromFile($file, $path, $namespace),
             \\Illuminate\\Support\\Facades\\File::allFiles($realPath),
@@ -113,11 +129,11 @@ $translator = new class
 
         $lines = explode(PHP_EOL, $contents);
         $encoded = array_map(
-            fn($k) => [json_encode($k), $k],
+            fn($k) => [json_encode($k, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $k],
             array_keys($json),
         );
         $result = [];
-        $searchRange = 2;
+        $searchRange = 5;
 
         foreach ($encoded as $index => $keys) {
             // Pretty likely to be on the line that is the index, go happy path first
@@ -126,7 +142,7 @@ $translator = new class
                 continue;
             }
 
-            // Search around the index, like to be within 2 lines
+            // Search around the index, likely to be within $searchRange lines
             $start = max(0, $index - $searchRange);
             $end = min($index + $searchRange, count($lines) - 1);
             $current = $start;
@@ -153,10 +169,11 @@ $translator = new class
         $arrayDepth = -1;
         $depthKeys = [];
 
-        foreach ($tokens as $token) {
+        foreach ($tokens as $index => $token) {
             if (!is_array($token)) {
                 if ($token === '[') {
                     $inArrayKey = true;
+                    $currentIndex = 0;
                     $arrayDepth++;
                 }
 
@@ -174,6 +191,15 @@ $translator = new class
             }
 
             if ($inArrayKey && $token[0] === T_CONSTANT_ENCAPSED_STRING) {
+                $nextToken = isset($tokens[$index + 1]) ? $tokens[$index + 1] : null;
+                $nextValue = isset($nextToken[1]) ? $nextToken[1] : $nextToken;
+
+                if ($nextValue === ',' || str_contains($nextValue, "\\n")) {
+                    $token[1] = $currentIndex;
+
+                    $currentIndex++;
+                }
+
                 $depthKeys[$arrayDepth] = trim($token[1], '"\\'');
 
                 \\Illuminate\\Support\\Arr::set($found, implode('.', $depthKeys), $token[2]);
@@ -189,11 +215,16 @@ $translator = new class
 
     protected function getDotted($key, $lang)
     {
-        return \\Illuminate\\Support\\Arr::dot(
-            \\Illuminate\\Support\\Arr::wrap(
-                __($key, [], $lang),
-            ),
-        );
+        try {
+            return \\Illuminate\\Support\\Arr::dot(
+                \\Illuminate\\Support\\Arr::wrap(
+                    __($key, [], $lang),
+                ),
+            );
+        } catch (\\Throwable $e) {
+            // Most likely, in this case, the lang file doesn't return an array
+            return [];
+        }
     }
 
     protected function getPathIndex($file)
@@ -277,6 +308,10 @@ $translator = new class
             [$json, $lines] = $this->linesFromJsonFile($file);
 
             foreach ($json as $key => $value) {
+                if (!array_key_exists($key, $lines) || is_array($value)) {
+                    continue;
+                }
+
                 yield [
                     "k" => $key,
                     "la" => $lang,
@@ -338,8 +373,10 @@ $translator = new class
 echo json_encode([
     'default' => \\Illuminate\\Support\\Facades\\App::currentLocale(),
     'translations' => $translator->all(),
+    'languages' => $translator->languages,
     'paths' => array_keys($translator->paths),
     'values' => array_keys($translator->values),
     'params' => array_map(fn($p) => json_decode($p, true), array_keys($translator->paramResults)),
-]);
+    'to_watch' => $translator->directoriesToWatch,
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 `;

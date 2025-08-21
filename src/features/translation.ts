@@ -1,6 +1,8 @@
-import { notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getTranslationItemByName,
+    getTranslationPathByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -8,27 +10,107 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { projectPath, relativePath } from "@src/support/project";
+import { contract, createIndexMapping, facade } from "@src/support/util";
+import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
 const toFind: FeatureTag = [
     {
-        class: facade("Lang"),
-        method: ["has", "hasForLocale", "get", "getForLocale", "choice"],
-        argumentIndex: [0, 1],
+        class: [contract("Translation\\Translator")],
+        method: ["get", "choice"],
     },
     {
-        method: ["__", "trans", "@lang"],
-        argumentIndex: [0, 1],
+        class: facade("Lang"),
+        method: ["has", "hasForLocale", "get", "choice"],
+    },
+    {
+        method: ["__", "trans", "trans_choice", "@lang"],
     },
 ];
 
-const getDefault = (translation: TranslationItem) => {
-    const langDefault = getTranslations().items.default;
+type ArgIndexMap = Record<string, Record<string, number>>;
 
-    return translation[langDefault] ?? translation[Object.keys(translation)[0]];
+const paramArgIndexes = createIndexMapping([
+    [
+        contract("Translation\\Translator"),
+        {
+            get: 1,
+            choice: 2,
+        },
+    ],
+    [
+        "",
+        {
+            __: 1,
+            trans: 1,
+            "@lang": 1,
+            trans_choice: 2,
+        },
+    ],
+    [
+        facade("Lang"),
+        {
+            get: 1,
+            choice: 2,
+        },
+    ],
+]);
+
+const localeArgIndexes = createIndexMapping([
+    [
+        contract("Translation\\Translator"),
+        {
+            get: 2,
+            choice: 3,
+        },
+    ],
+    [
+        "",
+        {
+            __: 2,
+            trans: 2,
+            "@lang": 2,
+            trans_choice: 3,
+        },
+    ],
+    [
+        facade("Lang"),
+        {
+            has: 1,
+            hasForLocale: 1,
+            get: 2,
+            choice: 3,
+        },
+    ],
+]);
+
+const getLang = (
+    item: AutocompleteParsingResult.MethodCall,
+): string | undefined => {
+    const localeArgIndex = localeArgIndexes.get(
+        item.className,
+        item.methodName,
+    );
+
+    const locale = (
+        item.arguments.children as AutocompleteParsingResult.Argument[]
+    ).find((arg, i) => arg.name === "locale" || i === localeArgIndex);
+
+    return locale?.children.length
+        ? (locale.children as AutocompleteParsingResult.StringValue[])[0].value
+        : undefined;
+};
+
+const getTranslationItemByLang = (
+    translation: TranslationItem,
+    lang?: string,
+) => {
+    return (
+        translation[lang ?? getTranslations().items.default] ??
+        translation[Object.keys(translation)[0]]
+    );
 };
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
@@ -36,19 +118,21 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
 
-            const translation =
-                getTranslations().items.translations[param.value];
+            const translation = getTranslationItemByName(param.value);
 
             if (!translation) {
                 return null;
             }
 
-            const def = getDefault(translation);
+            const def = getTranslationItemByLang(
+                translation,
+                getLang(item as AutocompleteParsingResult.MethodCall),
+            );
 
             return new vscode.DocumentLink(
                 detectedRange(param),
@@ -65,7 +149,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslations().items.translations[match];
+        const item = getTranslationItemByName(match);
 
         if (!item) {
             return null;
@@ -96,22 +180,34 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
 
-            const item = getTranslations().items.translations[param.value];
+            const translation = getTranslationItemByName(param.value);
 
-            if (item) {
+            if (translation) {
                 return null;
             }
+
+            const pathToFile = getTranslationPathByName(
+                param.value,
+                getLang(item as AutocompleteParsingResult.MethodCall),
+            );
+
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "translation",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "translation";
 
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                "translation",
+                code,
             );
         },
     );
@@ -129,13 +225,54 @@ export const completionProvider = {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext,
     ): vscode.CompletionItem[] {
-        if (result.isParamIndex(1)) {
+        const localeArgIndex = localeArgIndexes.get(
+            result.class(),
+            result.func(),
+        );
+        const paramArgIndex = paramArgIndexes.get(
+            result.class(),
+            result.func(),
+        );
+
+        if (result.isParamIndex(paramArgIndex ?? -1)) {
             return this.getParameterCompletionItems(result, document, position);
+        }
+
+        if (
+            result.isParamIndex(localeArgIndex ?? -1) ||
+            result.isArgumentNamed("locale")
+        ) {
+            return getTranslations().items.languages.map((lang) => {
+                let completionItem = new vscode.CompletionItem(
+                    lang,
+                    vscode.CompletionItemKind.Value,
+                );
+
+                completionItem.range = document.getWordRangeAtPosition(
+                    position,
+                    wordMatchRegex,
+                );
+
+                return completionItem;
+            });
+        }
+
+        if (!result.isParamIndex(0)) {
+            return [];
         }
 
         const totalTranslationItems = Object.entries(
             getTranslations().items.translations,
         ).length;
+
+        const precedingCharacter = document.getText(
+            new vscode.Range(
+                position.line,
+                position.character - 1,
+                position.line,
+                position.character,
+            ),
+        );
 
         return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
@@ -149,10 +286,17 @@ export const completionProvider = {
                     wordMatchRegex,
                 );
 
+                if (precedingCharacter === "'") {
+                    completionItem.insertText = key.replaceAll("'", "\\'");
+                } else if (precedingCharacter === '"') {
+                    completionItem.insertText = key.replaceAll('"', '\\"');
+                }
+
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,
                     // 200 is an arbitrary but probably safe number
-                    completionItem.detail = getDefault(translations).value;
+                    completionItem.detail =
+                        getTranslationItemByLang(translations).value;
                 }
 
                 return completionItem;
@@ -177,7 +321,7 @@ export const completionProvider = {
         return Object.entries(getTranslations().items.translations)
             .filter(([key, value]) => key === result.param(0).value)
             .map(([key, value]) => {
-                return getDefault(value)
+                return getTranslationItemByLang(value)
                     .params.filter((param) => {
                         return true;
                         // TODO: Fix this....

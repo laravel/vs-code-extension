@@ -13,12 +13,22 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
 import * as vscode from "vscode";
 
 const toFind: FeatureTag = [
+    {
+        class: contract("Routing\\ResponseFactory"),
+        method: "view",
+        argumentIndex: 0,
+    },
+    {
+        class: contract("View\\Factory"),
+        method: "make",
+        argumentIndex: 0,
+    },
     {
         class: facade("View"),
         method: [
@@ -35,6 +45,11 @@ const toFind: FeatureTag = [
         class: facade("Route"),
         method: ["view"],
         argumentIndex: 1,
+    },
+    {
+        class: "Illuminate\\Notifications\\Messages\\MailMessage",
+        method: ["markdown", "view"],
+        argumentIndex: 0,
     },
     {
         class: "Illuminate\\Mail\\Mailables\\Content",

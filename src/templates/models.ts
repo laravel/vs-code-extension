@@ -119,27 +119,44 @@ $models = new class($factory) {
         return collect();
     }
 
+    protected function getParentClass(\\ReflectionClass $reflection)
+    {
+        if (!$reflection->getParentClass()) {
+            return null;
+        }
+
+        $parent = $reflection->getParentClass()->getName();
+
+        if ($parent === \\Illuminate\\Database\\Eloquent\\Model::class) {
+            return null;
+        }
+
+        return \\Illuminate\\Support\\Str::start($parent, '\\\\');
+    }
+
     protected function getInfo($className)
     {
         if (($data = $this->fromArtisan($className)) === null) {
             return null;
         }
 
-        $reflection = (new \\ReflectionClass($className));
+        $reflection = new \\ReflectionClass($className);
+
+        $data["extends"] = $this->getParentClass($reflection);
 
         $existingProperties = $this->collectExistingProperties($reflection);
 
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
-                'title_case' => \\Illuminate\\Support\\Str::of($attrs['name'])->title()->replace('_', '')->toString(),
+                'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
             ->toArray();
 
         $data['scopes'] = collect($reflection->getMethods())
-            ->filter(fn($method) => $method->isPublic() && !$method->isStatic() && str_starts_with($method->name, 'scope'))
-            ->map(fn($method) => \\Illuminate\\Support\\Str::of($method->name)->replace('scope', '')->lcfirst()->toString())
+            ->filter(fn($method) =>!$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
+            ->map(fn($method) => str($method->name)->replace('scope', '')->lcfirst()->toString())
             ->values()
             ->toArray();
 
@@ -158,8 +175,8 @@ $builder = new class($docblocks) {
     {
         $reflection = new \\ReflectionClass(\\Illuminate\\Database\\Query\\Builder::class);
 
-        return collect($reflection->getMethods(\\ReflectionMethod::IS_PUBLIC))
-            ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__"))
+        return collect($reflection->getMethods(\\ReflectionMethod::IS_PUBLIC | \\ReflectionMethod::IS_PROTECTED))
+            ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__") || (!$method->isPublic() && empty($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class))))
             ->map(fn(\\ReflectionMethod $method) => $this->getMethodInfo($method))
             ->filter()
             ->values();
