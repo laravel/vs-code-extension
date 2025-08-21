@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
 
-export const helpers = ['dd', 'dump', 'collect', 'str'];
+export const helpers = ["dd", "dump", "collect", "str"];
 
 export const openSubmenuCommand = async () => {
     const choice = await vscode.window.showQuickPick(
         helpers.map((helper: string) => {
             return {
                 label: `with ${helper}(...)`,
-                command: `laravel.wrapHelpers.${helper}`
+                command: `laravel.wrapHelpers.${helper}`,
             };
         }),
         {
-            placeHolder: 'Choose a wrap'
-        }
+            placeHolder: "Choose a wrap",
+        },
     );
 
     if (choice) {
@@ -29,7 +29,7 @@ export const wrapSelectionCommand = (wrapper: string) => {
 
     const selection = editor.selection;
     let selectedText = editor.document.getText(selection);
-    const hasSemicolon = selectedText.at(-1) === ';';
+    const hasSemicolon = selectedText.at(-1) === ";";
 
     if (hasSemicolon) {
         selectedText = selectedText.slice(0, -1);
@@ -38,10 +38,10 @@ export const wrapSelectionCommand = (wrapper: string) => {
     let transformed = `${wrapper}(${selectedText})`;
 
     if (hasSemicolon) {
-        transformed += ';';
+        transformed += ";";
     }
 
-    editor.edit(editBuilder => {
+    editor.edit((editBuilder) => {
         editBuilder.replace(selection, transformed);
     });
 };
@@ -66,9 +66,12 @@ export const unwrapSelectionCommand = () => {
         return;
     }
 
-    const transformed = selectedText.replace(/[a-zA-Z0-9_]+\(([\s\S]+)\)(?!\))/, '$1');
+    const transformed = selectedText.replace(
+        /[a-zA-Z0-9_]+\(([\s\S]+)\)(?!\))/,
+        "$1",
+    );
 
-    editor.edit(editBuilder => {
+    editor.edit((editBuilder) => {
         editBuilder.replace(selection, transformed);
     });
 };
