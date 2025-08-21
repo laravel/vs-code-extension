@@ -5,7 +5,7 @@ $local = collect(\Illuminate\Support\Facades\File::allFiles(config_path()))
   ->map(fn (\Symfony\Component\Finder\SplFileInfo $file) => $file->getPathname())
   ->map(fn ($path) => [
       (string) str($path)
-        ->replace([config_path('/'), ".php"], "")
+        ->replace([config_path(DIRECTORY_SEPARATOR), ".php"], "")
         ->replace(DIRECTORY_SEPARATOR, "."),
       $path
     ]);
