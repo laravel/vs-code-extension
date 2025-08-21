@@ -9,7 +9,7 @@ import { RetryUtility } from "../utility/RetryUtility";
 import IHttpRequestHandler from "./IHttpRequestHandler";
 
 export default class HttpRequestHandler implements IHttpRequestHandler {
-    public constructor(private readonly _logger: ILogger) { }
+    public constructor(private readonly _logger: ILogger) {}
 
     public async get(
         url: string,
@@ -18,22 +18,32 @@ export default class HttpRequestHandler implements IHttpRequestHandler {
         retryDelayInMs: number,
         headers?: Record<string, string | number | boolean>,
         cancellationToken?: CancellationToken,
-        onDownloadProgressChange?: (downloadedBytes: number, totalBytes: number) => void
+        onDownloadProgressChange?: (
+            downloadedBytes: number,
+            totalBytes: number,
+        ) => void,
     ): Promise<Readable> {
-        const requestFn = () => this.getRequestHelper(
-            url,
-            timeoutInMs,
-            headers,
-            cancellationToken,
-            onDownloadProgressChange
-        );
+        const requestFn = () =>
+            this.getRequestHelper(
+                url,
+                timeoutInMs,
+                headers,
+                cancellationToken,
+                onDownloadProgressChange,
+            );
         const errorHandlerFn = (error: Error) => {
             const statusCode = (error as any)?.response?.status;
             if (statusCode != null && 400 <= statusCode && statusCode < 500) {
                 throw error;
             }
         };
-        return RetryUtility.exponentialRetryAsync(requestFn, `HttpRequestHandler.get`, retries, retryDelayInMs, errorHandlerFn);
+        return RetryUtility.exponentialRetryAsync(
+            requestFn,
+            `HttpRequestHandler.get`,
+            retries,
+            retryDelayInMs,
+            errorHandlerFn,
+        );
     }
 
     private async getRequestHelper(
@@ -41,19 +51,24 @@ export default class HttpRequestHandler implements IHttpRequestHandler {
         timeoutInMs: number,
         headers?: Record<string, string | number | boolean>,
         cancellationToken?: CancellationToken,
-        onDownloadProgressChange?: (downloadedBytes: number, totalBytes: number) => void
+        onDownloadProgressChange?: (
+            downloadedBytes: number,
+            totalBytes: number,
+        ) => void,
     ): Promise<Readable> {
         const options: AxiosRequestConfig = {
             timeout: timeoutInMs,
             responseType: `stream`,
             proxy: false, // Disabling axios proxy support allows VS Code proxy settings to take effect.
-            headers
+            headers,
         };
 
         if (cancellationToken != null) {
             const cancelToken = axios.CancelToken;
             const cancelTokenSource = cancelToken.source();
-            cancellationToken.onCancellationRequested(() => cancelTokenSource.cancel());
+            cancellationToken.onCancellationRequested(() =>
+                cancelTokenSource.cancel(),
+            );
             options.cancelToken = cancelTokenSource.token;
         }
 
@@ -61,12 +76,15 @@ export default class HttpRequestHandler implements IHttpRequestHandler {
         try {
             response = await axios.get(url, options);
             if (response === undefined) {
-                throw new Error(`Undefined response received when downloading from '${url}'`);
+                throw new Error(
+                    `Undefined response received when downloading from '${url}'`,
+                );
             }
-        }
-        catch (error) {
+        } catch (error) {
             if (error instanceof Error) {
-                this._logger.error(`${error.message}. Technical details: ${JSON.stringify(error)}`);
+                this._logger.error(
+                    `${error.message}. Technical details: ${JSON.stringify(error)}`,
+                );
             }
             throw error;
         }

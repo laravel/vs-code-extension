@@ -13,8 +13,8 @@ const toFind: FeatureTag = [
     {
         class: contract("Routing\\UrlGenerator"),
         method: "asset",
-        argumentIndex: 0
-    }
+        argumentIndex: 0,
+    },
 ];
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {

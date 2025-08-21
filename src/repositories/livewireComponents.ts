@@ -25,8 +25,16 @@ export interface LivewireComponents {
 const load = () => {
     getConfigs().whenLoaded(() => {
         livewirePaths = [
-            lcfirst(getConfigByName('livewire.class_namespace')?.value?.replace(/\\/g, '/') ?? 'app/Livewire'),
-            relativePath(getConfigByName('livewire.view_path')?.value ?? 'resources/views/livewire')
+            lcfirst(
+                getConfigByName("livewire.class_namespace")?.value?.replace(
+                    /\\/g,
+                    "/",
+                ) ?? "app/Livewire",
+            ),
+            relativePath(
+                getConfigByName("livewire.view_path")?.value ??
+                    "resources/views/livewire",
+            ),
         ];
     });
 
@@ -41,7 +49,7 @@ export const getLivewireComponents = repository<LivewireComponents>({
                 return null;
             }
 
-            return paths.map(path => path + "/{*,**/*}");
+            return paths.map((path) => path + "/{*,**/*}");
         }),
     itemsDefault: {
         components: {},
