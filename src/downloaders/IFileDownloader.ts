@@ -61,8 +61,11 @@ export interface IFileDownloader {
         filename: string,
         context: ExtensionContext,
         cancellationToken?: CancellationToken,
-        onDownloadProgressChange?: (downloadedBytes: number, totalBytes: number | undefined) => void,
-        settings?: FileDownloadSettings
+        onDownloadProgressChange?: (
+            downloadedBytes: number,
+            totalBytes: number | undefined,
+        ) => void,
+        settings?: FileDownloadSettings,
     ): Promise<Uri>;
     /**
      * Downloads a file from a GitHub release and gives back the file path, file name, and a checksum. Allows you to
@@ -90,8 +93,11 @@ export interface IFileDownloader {
         fileName: string,
         context: ExtensionContext,
         cancellationToken?: CancellationToken,
-        onDownloadProgressChange?: (downloadedBytes: number, totalBytes: number | undefined) => void,
-        settings?: FileDownloadSettings
+        onDownloadProgressChange?: (
+            downloadedBytes: number,
+            totalBytes: number | undefined,
+        ) => void,
+        settings?: FileDownloadSettings,
     ): Promise<Uri>;
     /**
      * Returns the paths of all files that exist in the consumer extensions' download folder
@@ -117,7 +123,10 @@ export interface IFileDownloader {
      * @param context The calling extension's context
      * @returns the path to the downloaded file (or folder if the download was unzipped)
      */
-    tryGetItem(filename: string, context: ExtensionContext): Promise<Uri | undefined>;
+    tryGetItem(
+        filename: string,
+        context: ExtensionContext,
+    ): Promise<Uri | undefined>;
     /**
      * Deletes the file specified by `filename`. The filename should match the name that the file was downloaded with.
      * Does not throw an error if the file doesn't exist, as the filesystem is already in the desired state.

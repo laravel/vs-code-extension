@@ -275,9 +275,8 @@ export class FileDownloader implements IFileDownloader {
         const downloadsStoragePath =
             FileDownloader.getDownloadsStoragePath(context);
         try {
-            const filePaths: string[] = await fs.promises.readdir(
-                downloadsStoragePath,
-            );
+            const filePaths: string[] =
+                await fs.promises.readdir(downloadsStoragePath);
             return filePaths.map((filePath) =>
                 Uri.file(path.join(downloadsStoragePath, filePath)),
             );

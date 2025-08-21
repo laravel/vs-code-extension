@@ -1,7 +1,8 @@
-import { notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslationItemByName,
+    getTranslationPathByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -9,7 +10,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { contract, createIndexMapping, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -179,22 +180,34 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
 
-            const item = getTranslationItemByName(param.value);
+            const translation = getTranslationItemByName(param.value);
 
-            if (item) {
+            if (translation) {
                 return null;
             }
+
+            const pathToFile = getTranslationPathByName(
+                param.value,
+                getLang(item as AutocompleteParsingResult.MethodCall),
+            );
+
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "translation",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "translation";
 
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                "translation",
+                code,
             );
         },
     );
