@@ -73,14 +73,6 @@ export const relativePath = (srcPath: string): string => {
     return srcPath;
 };
 
-const resolvePath = (basePath: string, relativePath: string): string => {
-    if (basePath.startsWith(".") && hasWorkspace()) {
-        basePath = path.resolve(getWorkspaceFolders()[0].uri.fsPath, basePath);
-    }
-
-    return path.join(basePath, relativePath);
-};
-
 export const hasWorkspace = (): boolean => {
     return (
         vscode.workspace.workspaceFolders instanceof Array &&
