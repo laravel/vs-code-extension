@@ -11,7 +11,6 @@ import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
-import { usesRelativePaths, resolveProjectPath } from "@src/support/php";
 
 const toFind: FeatureTag = [
     { method: ["route", "signedRoute", "to_route"] },
@@ -87,13 +86,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const filename = usesRelativePaths()
-                ? resolveProjectPath(route.filename)
-                : route.filename
-
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(filename).with({
+                vscode.Uri.file(route.filename).with({
                     fragment: `L${route.line ?? 0}`,
                 }),
             );
