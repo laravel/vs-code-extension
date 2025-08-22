@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.0.13",
+    "version": "1.0.12",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -486,7 +486,7 @@
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && ./precheck && npm run format",
+        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && ./precheck && npm run package",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
