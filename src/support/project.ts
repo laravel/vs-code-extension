@@ -30,7 +30,7 @@ const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
 
-const adjustBasePathForPhpEnvironment = (srcPath: string): string => {
+export const pathForPhpEnv = (srcPath: string): string => {
     if (isPhpEnv("ddev")) {
         return srcPath.replace(new RegExp("^/var/www/html/"), "");
     }
@@ -39,10 +39,7 @@ const adjustBasePathForPhpEnvironment = (srcPath: string): string => {
 };
 
 export const basePath = (srcPath = ""): string => {
-    return path.join(
-        config<string>("basePath", ""),
-        adjustBasePathForPhpEnvironment(srcPath),
-    );
+    return path.join(config<string>("basePath", ""), pathForPhpEnv(srcPath));
 };
 
 export const projectPath = (srcPath = ""): string => {
