@@ -1,10 +1,10 @@
 type PhpEnvironmentConfig = {
+    label: string;
+    description?: string;
     check?: string | string[];
     command?: string;
     test?: (output: string) => boolean;
     relativePath?: boolean;
-    label: string;
-    description?: string;
 };
 
 export type PhpEnvironment =
@@ -22,40 +22,40 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
         description: "Auto detect the local PHP environment.",
     },
     herd: {
-        check: "herd which-php",
         label: "Herd",
         description: "Auto detect PHP version Herd is using for the project.",
+        check: "herd which-php",
         command: '"{binaryPath}"',
         test: (output) => !output.includes("No usable PHP version found"),
     },
     valet: {
-        check: "valet which-php",
         label: "Valet",
         description: "Auto detect PHP version Valet is using for the project.",
+        check: "valet which-php",
         command: '"{binaryPath}"',
     },
     sail: {
-        check: "./vendor/bin/sail ps",
         label: "Sail",
+        check: "./vendor/bin/sail ps",
         command: "./vendor/bin/sail php",
         relativePath: true,
     },
     lando: {
-        check: "lando php -r 'echo PHP_BINARY;'",
         label: "Lando",
+        check: "lando php -r 'echo PHP_BINARY;'",
         command: "lando php",
         relativePath: true,
     },
     ddev: {
-        check: "ddev php -r 'echo PHP_BINARY;'",
         label: "DDEV",
+        check: "ddev php -r 'echo PHP_BINARY;'",
         command: "ddev php",
         relativePath: true,
     },
     local: {
-        check: "php -r 'echo PHP_BINARY;'",
         label: "Local",
         description: "Use PHP installed on the local machine.",
+        check: "php -r 'echo PHP_BINARY;'",
         command: '"{binaryPath}"',
     },
 };
