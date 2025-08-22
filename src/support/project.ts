@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
-import { getPhpEnv } from "./php";
+import { isPhpEnv } from "./php";
 
 let internalVendorExists: boolean | null = null;
 
@@ -31,7 +31,7 @@ const trimFirstSlash = (srcPath: string): string => {
 };
 
 const adjustBasePathForPhpEnvironment = (srcPath: string): string => {
-    if (getPhpEnv() === "ddev") {
+    if (isPhpEnv("ddev")) {
         return srcPath.replace(new RegExp("^/var/www/html/"), "");
     }
 

@@ -23,12 +23,3 @@ export const configAffected = (
     event: vscode.ConfigurationChangeEvent,
     ...keys: ConfigKey[]
 ): boolean => keys.some((key) => event.affectsConfiguration(configKey(key)));
-
-export type PhpEnvironment =
-    | "auto"
-    | "herd"
-    | "valet"
-    | "sail"
-    | "lando"
-    | "ddev"
-    | "local";

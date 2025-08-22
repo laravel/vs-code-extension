@@ -27,7 +27,11 @@ import {
 } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { setParserBinaryPath } from "./support/parser";
-import { clearDefaultPhpCommand, initVendorWatchers } from "./support/php";
+import {
+    clearDefaultPhpCommand,
+    initPhp,
+    initVendorWatchers,
+} from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 
@@ -68,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
+    initPhp();
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
