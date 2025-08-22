@@ -22,7 +22,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         toFind,
         getPaths,
         ({ param, item }) => {
-            const configItem = getConfigs().items.find(
+            const configItem = getConfigs().items.configs.find(
                 (c) => c.name === `filesystems.disks.${param.value}`,
             );
 
@@ -48,7 +48,7 @@ export const diagnosticProvider = (
         toFind,
         getConfigs,
         ({ param, item, index }) => {
-            const config = getConfigs().items.find(
+            const config = getConfigs().items.configs.find(
                 (c) => c.name === `filesystems.disks.${param.value}`,
             );
 
@@ -83,7 +83,7 @@ export const completionProvider: CompletionProvider = {
         }
 
         return getConfigs()
-            .items.filter((config) => {
+            .items.configs.filter((config) => {
                 return (
                     config.name.startsWith("filesystems.disks.") &&
                     config.name.split(".").length === 3

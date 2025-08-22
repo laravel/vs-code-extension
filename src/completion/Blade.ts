@@ -5,7 +5,7 @@ import { getCustomBladeDirectives } from "../repositories/customBladeDirectives"
 import { wordMatchRegex } from "./../support/patterns";
 import { indent } from "./../support/util";
 
-export default class Blade implements vscode.CompletionItemProvider {
+export class Blade implements vscode.CompletionItemProvider {
     provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -130,7 +130,11 @@ export default class Blade implements vscode.CompletionItemProvider {
             "@stack(...)": "@stack(${1})",
             "@push(...)": ["@push(${1})", indent("${2}"), "@endpush"],
             "@pushIf(...)": ["@pushIf(${1})", indent("${2}"), "@endPushIf"],
-            "@pushOnce(...)": ["@pushOnce(${1})", indent("${2}"), "@endPushOnce"],
+            "@pushOnce(...)": [
+                "@pushOnce(${1})",
+                indent("${2}"),
+                "@endPushOnce",
+            ],
             "@prepend(...)": ["@prepend(${1})", indent("${2}"), "@endprepend"],
             "@php": ["@php", indent("${1}"), "@endphp"],
             "@component(...)": ["@component(${1})", "${2}", "@endcomponent"],

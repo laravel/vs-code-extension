@@ -2,6 +2,7 @@ import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { BoundedFileCache } from "./cache";
 import { config } from "./config";
 import { registerWatcher } from "./fileWatcher";
 import { error, info } from "./logger";
@@ -29,10 +30,10 @@ const toTemplateVar = (str: string) => {
 
 let defaultPhpCommand: string | null = null;
 
-const discoverFiles = new Map<string, string>();
+const discoverFiles = new BoundedFileCache(50);
 
-let hasVendor = false;
-let hasBootstrap = false;
+let hasVendor: boolean | null = null;
+let hasBootstrap: boolean | null = null;
 
 export const initPhp = () => {
     hasVendor = projectPathExists("vendor/autoload.php");
@@ -55,12 +56,7 @@ export const initVendorWatchers = () => {
     );
 
     watcher.onDidDelete((file) => {
-        for (const [key, value] of discoverFiles) {
-            if (value === file.fsPath) {
-                discoverFiles.delete(key);
-                break;
-            }
-        }
+        discoverFiles.deleteByFilePath(file.fsPath);
     });
 
     [internalVendorPath(), projectPath("vendor")].forEach((path) => {
@@ -159,6 +155,10 @@ export const isPhpEnv = (env: PhpEnvironment): boolean => false; // getPhpEnv() 
 
 export const clearDefaultPhpCommand = () => {
     defaultPhpCommand = null;
+};
+
+export const clearPhpFileCache = () => {
+    discoverFiles.clear();
 };
 
 const getDefaultPhpCommand = (): string => {

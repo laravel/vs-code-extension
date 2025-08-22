@@ -9,14 +9,20 @@ import * as fs from "fs";
 import * as os from "os";
 import * as vscode from "vscode";
 import { FeatureTag, ValidDetectParamTypes } from "..";
+import { Cache } from "./cache";
 import { showErrorPopup } from "./popup";
 import { md5, tempPath, toArray } from "./util";
 
-const currentlyParsing = new Map<string, Promise<AutocompleteResult>>();
-const detected = new Map<
+const currentlyParsing = new Cache<string, Promise<AutocompleteResult>>(100);
+const detected = new Cache<
     string,
     Promise<AutocompleteParsingResult.ContextValue[]>
->();
+>(50);
+
+export const clearParserCaches = (): void => {
+    currentlyParsing.clear();
+    detected.clear();
+};
 
 type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
@@ -147,7 +153,7 @@ export const detect = async (
 
     const promise = runCommand(`detect "${cleanArg(code)}"`)
         .then((result: string) => {
-            return JSON.parse(result);
+            return result.length > 0 ? JSON.parse(result) : result;
         })
         .catch((err) => {
             showErrorPopup(err);
