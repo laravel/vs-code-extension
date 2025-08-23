@@ -167,13 +167,16 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getConfigPathByName(param.value);
+            const configPath = getConfigPathByName(param.value);
 
-            const code: NotFoundCode = pathToFile
+            const code: NotFoundCode = configPath
                 ? {
-                      value: "config",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
-                  }
+                    value: "config",
+                    target: vscode.Uri.file(configPath.path)
+                        .with(configPath.line ? {
+                            fragment: `L${configPath.line}`
+                        } : {}),
+                }
                 : "config";
 
             return notFound("Config", param.value, detectedRange(param), code);

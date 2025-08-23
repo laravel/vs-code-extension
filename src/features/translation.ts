@@ -191,16 +191,19 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getTranslationPathByName(
+            const translationPath = getTranslationPathByName(
                 param.value,
                 getLang(item as AutocompleteParsingResult.MethodCall),
             );
 
-            const code: NotFoundCode = pathToFile
+            const code: NotFoundCode = translationPath
                 ? {
-                      value: "translation",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
-                  }
+                    value: "translation",
+                    target: vscode.Uri.file(translationPath.path)
+                        .with(translationPath.line ? {
+                            fragment: `L${translationPath.line}`
+                        } : {}),
+                }
                 : "translation";
 
             return notFound(

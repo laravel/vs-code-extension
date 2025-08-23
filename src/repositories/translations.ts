@@ -35,6 +35,11 @@ interface TranslationGroupPhpResult {
     languages: string[];
 }
 
+interface TranslationPath {
+    path: string;
+    line?: number;
+};
+
 let dirsToWatch: string[] | null = null;
 
 const load = () => {
@@ -78,20 +83,54 @@ export const getTranslationItemByName = (
     return getTranslations().items.translations[match.replaceAll("\\", "")];
 };
 
+export const getParentTranslationItemByName = (
+    match: string,
+): TranslationItem | undefined => {
+    const name = match.match(/^(.*)\./)?.[0];
+
+    if (!name) {
+        return undefined;
+    }
+
+    const parentName = Object.keys(getTranslations().items.translations).find((key) =>
+        key.startsWith(name.replaceAll("\\", "")),
+    );
+
+    return parentName ? getTranslationItemByName(parentName) : undefined;
+};
+
 export const getTranslationPathByName = (
     match: string,
     lang: string | undefined,
-): string | undefined => {
+): TranslationPath | undefined => {
     lang = lang ?? getTranslations().items.default;
 
-    const fileName = match.replace(/^.*::/, "").replace(/^([^.]+)\..*$/, "$1");
+    // Firstly, we try to get the parent TranslationItem, because it has a path and a line
+    const parentItem = getParentTranslationItemByName(match);
 
-    return getTranslations().items.paths.find((path) => {
-        return (
-            !path.startsWith("vendor/") &&
-            path.endsWith(`${lang}/${fileName}.php`)
-        );
-    });
+    let path = parentItem?.[lang]?.path;
+
+    // If the path is not found (because, for example, translation file is empty), 
+    // we try to find the path by the file name
+    if (!path) {
+        const fileName = match.replace(/^.*::/, "").replace(/^([^.]+)\..*$/, "$1");
+
+        path = getTranslations().items.paths.find((path) => {
+            return (
+                !path.startsWith("vendor/") &&
+                path.endsWith(`${lang}/${fileName}.php`)
+            );
+        });
+
+        if (path) {
+            path = projectPath(path);
+        }
+    }
+
+    return path ? {
+        path: path,
+        line: parentItem?.[lang]?.line,
+    } : undefined;
 };
 
 export const getTranslations = repository<TranslationGroupResult>({
