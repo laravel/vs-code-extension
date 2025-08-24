@@ -198,12 +198,15 @@ export const diagnosticProvider = (
 
             const code: NotFoundCode = translationPath
                 ? {
-                    value: "translation",
-                    target: vscode.Uri.file(translationPath.path)
-                        .with(translationPath.line ? {
-                            fragment: `L${translationPath.line}`
-                        } : {}),
-                }
+                      value: "translation",
+                      target: vscode.Uri.file(translationPath.path).with(
+                          translationPath.line
+                              ? {
+                                    fragment: `L${translationPath.line}`,
+                                }
+                              : {},
+                      ),
+                  }
                 : "translation";
 
             return notFound(

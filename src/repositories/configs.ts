@@ -11,15 +11,13 @@ interface ConfigGroupResult {
 interface ConfigPath {
     path: string;
     line?: string | null;
-};
+}
 
 export const getConfigByName = (name: string): Config | undefined => {
     return getConfigs().items.configs.find((item) => item.name === name);
 };
 
-export const getParentConfigByName = (
-    match: string,
-): Config | undefined => {
+export const getParentConfigByName = (match: string): Config | undefined => {
     const name = match.match(/^(.*)\./)?.[0];
 
     if (!name) {
@@ -37,7 +35,7 @@ export const getConfigPathByName = (match: string): ConfigPath | undefined => {
 
     let path = parentItem?.file;
 
-    // If the path is not found (because, for example, config file is empty), 
+    // If the path is not found (because, for example, config file is empty),
     // we try to find the path by the file name
     if (!path) {
         const fileName = match.replace(/\.[^.]+$/, "");
@@ -45,10 +43,16 @@ export const getConfigPathByName = (match: string): ConfigPath | undefined => {
         // We have to check every possible subfolder, for example: foo.bar.baz.example
         // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
         const parts = fileName.split(".");
-        const subfolderPaths = parts.slice(1).map((_, i) =>
-            (parts.slice(0, i + 2).join("/") + "." + parts.slice(i + 2).join("."))
-                .replace(/^([^.]+)\..*$/, "$1")
-        ).reverse();
+        const subfolderPaths = parts
+            .slice(1)
+            .map((_, i) =>
+                (
+                    parts.slice(0, i + 2).join("/") +
+                    "." +
+                    parts.slice(i + 2).join(".")
+                ).replace(/^([^.]+)\..*$/, "$1"),
+            )
+            .reverse();
 
         for (const tryPath of [
             ...subfolderPaths,
@@ -56,7 +60,8 @@ export const getConfigPathByName = (match: string): ConfigPath | undefined => {
         ]) {
             path = getConfigs().items.paths.find((path) => {
                 return (
-                    !path.startsWith("vendor/") && path.endsWith(`${tryPath}.php`)
+                    !path.startsWith("vendor/") &&
+                    path.endsWith(`${tryPath}.php`)
                 );
             });
 
@@ -66,10 +71,12 @@ export const getConfigPathByName = (match: string): ConfigPath | undefined => {
         }
     }
 
-    return path ? {
-        path: projectPath(path),
-        line: parentItem?.line,
-    } : undefined;
+    return path
+        ? {
+              path: projectPath(path),
+              line: parentItem?.line,
+          }
+        : undefined;
 };
 
 export const getConfigs = repository<ConfigGroupResult>({

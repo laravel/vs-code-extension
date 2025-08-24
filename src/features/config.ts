@@ -171,12 +171,15 @@ export const diagnosticProvider = (
 
             const code: NotFoundCode = configPath
                 ? {
-                    value: "config",
-                    target: vscode.Uri.file(configPath.path)
-                        .with(configPath.line ? {
-                            fragment: `L${configPath.line}`
-                        } : {}),
-                }
+                      value: "config",
+                      target: vscode.Uri.file(configPath.path).with(
+                          configPath.line
+                              ? {
+                                    fragment: `L${configPath.line}`,
+                                }
+                              : {},
+                      ),
+                  }
                 : "config";
 
             return notFound("Config", param.value, detectedRange(param), code);

@@ -38,7 +38,7 @@ interface TranslationGroupPhpResult {
 interface TranslationPath {
     path: string;
     line?: number;
-};
+}
 
 let dirsToWatch: string[] | null = null;
 
@@ -92,8 +92,8 @@ export const getParentTranslationItemByName = (
         return undefined;
     }
 
-    const parentName = Object.keys(getTranslations().items.translations).find((key) =>
-        key.startsWith(name.replaceAll("\\", "")),
+    const parentName = Object.keys(getTranslations().items.translations).find(
+        (key) => key.startsWith(name.replaceAll("\\", "")),
     );
 
     return parentName ? getTranslationItemByName(parentName) : undefined;
@@ -110,10 +110,12 @@ export const getTranslationPathByName = (
 
     let path = parentItem?.[lang]?.path;
 
-    // If the path is not found (because, for example, translation file is empty), 
+    // If the path is not found (because, for example, translation file is empty),
     // we try to find the path by the file name
     if (!path) {
-        const fileName = match.replace(/^.*::/, "").replace(/^([^.]+)\..*$/, "$1");
+        const fileName = match
+            .replace(/^.*::/, "")
+            .replace(/^([^.]+)\..*$/, "$1");
 
         path = getTranslations().items.paths.find((path) => {
             return (
@@ -127,10 +129,12 @@ export const getTranslationPathByName = (
         }
     }
 
-    return path ? {
-        path: path,
-        line: parentItem?.[lang]?.line,
-    } : undefined;
+    return path
+        ? {
+              path: path,
+              line: parentItem?.[lang]?.line,
+          }
+        : undefined;
 };
 
 export const getTranslations = repository<TranslationGroupResult>({
