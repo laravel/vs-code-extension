@@ -1,7 +1,10 @@
 <?php
 
 if (!\Illuminate\Support\Facades\App::bound('auth')) {
-    echo json_encode([]);
+    echo json_encode([
+        'authenticatable' => null,
+        'policies' => (object) [],
+    ]);
 } else {
     collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
 
