@@ -2,6 +2,19 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.0.14 - 2025-08-25
+
+### What's Changed
+
+* Fix Auth bug when \Illuminate\Auth\AuthServiceProvider::class is disabled by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/445
+* bump required Php version by [@m-graham](https://github.com/m-graham) in https://github.com/laravel/vs-code-extension/pull/413
+
+### New Contributors
+
+* [@m-graham](https://github.com/m-graham) made their first contribution in https://github.com/laravel/vs-code-extension/pull/413
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.13...v1.0.14
+
 ## v1.0.13 - 2025-08-22
 
 ### What's Changed
