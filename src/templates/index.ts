@@ -5,6 +5,7 @@ import bladeDirectives from "./blade-directives";
 import bootstrapLaravel from "./bootstrap-laravel";
 import configs from "./configs";
 import inertia from "./inertia";
+import livewireComponents from "./livewire-components";
 import middleware from "./middleware";
 import models from "./models";
 import routes from "./routes";
@@ -14,6 +15,7 @@ import views from "./views";
 const templates = {
     app,
     auth,
+    livewireComponents,
     bladeComponents,
     bladeDirectives,
     bootstrapLaravel,
