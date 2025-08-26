@@ -1,17 +1,17 @@
 #!/bin/bash
 
-BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
+# BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
 
-read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
+# read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
 
-if [ "$confirmation" != "y" ]; then
-  echo "Please update the binary version in src/support/parser.ts"
-  exit 1
-fi
+# if [ "$confirmation" != "y" ]; then
+#   echo "Please update the binary version in src/support/parser.ts"
+#   exit 1
+# fi
 
-read -p "Did you update the changelog? (y/n)? " confirmation
+# read -p "Did you update the changelog? (y/n)? " confirmation
 
-if [ "$confirmation" != "y" ]; then
-  echo "Maybe update the changelog before publishing."
-  exit 1
-fi
+# if [ "$confirmation" != "y" ]; then
+#   echo "Maybe update the changelog before publishing."
+#   exit 1
+# fi

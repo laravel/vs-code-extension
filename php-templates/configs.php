@@ -1,10 +1,11 @@
 <?php
 
-$local = collect(glob(config_path("/*.php")))
-  ->merge(glob(config_path("**/*.php")))
+$local = collect(\Illuminate\Support\Facades\File::allFiles(config_path()))
+  ->filter(fn(\Symfony\Component\Finder\SplFileInfo $file) => $file->getExtension() === 'php')
+  ->map(fn (\Symfony\Component\Finder\SplFileInfo $file) => $file->getPathname())
   ->map(fn ($path) => [
       (string) str($path)
-        ->replace([config_path('/'), ".php"], "")
+        ->replace([config_path(DIRECTORY_SEPARATOR), ".php"], "")
         ->replace(DIRECTORY_SEPARATOR, "."),
       $path
     ]);
@@ -115,6 +116,10 @@ function vsCodeGetConfigValue($value, $key, $configPaths) {
           break;
         }
       }
+    }
+
+    if (is_object($value)) {
+      $value = get_class($value);
     }
 
     return [

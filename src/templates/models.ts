@@ -157,7 +157,7 @@ $models = new class($factory) {
             ->toArray();
 
         $data['scopes'] = collect($reflection->getMethods())
-            ->filter(fn($method) => $method->isPublic() && !$method->isStatic() && str_starts_with($method->name, 'scope'))
+            ->filter(fn($method) =>!$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
             ->map(fn($method) => str($method->name)->replace('scope', '')->lcfirst()->toString())
             ->values()
             ->toArray();
@@ -177,8 +177,8 @@ $builder = new class($docblocks) {
     {
         $reflection = new \\ReflectionClass(\\Illuminate\\Database\\Query\\Builder::class);
 
-        return collect($reflection->getMethods(\\ReflectionMethod::IS_PUBLIC))
-            ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__"))
+        return collect($reflection->getMethods(\\ReflectionMethod::IS_PUBLIC | \\ReflectionMethod::IS_PROTECTED))
+            ->filter(fn(ReflectionMethod $method) => !str_starts_with($method->getName(), "__") || (!$method->isPublic() && empty($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class))))
             ->map(fn(\\ReflectionMethod $method) => $this->getMethodInfo($method))
             ->filter()
             ->values();
