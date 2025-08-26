@@ -23,7 +23,7 @@ $components = new class {
         ))->groupBy('key')->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
             'paths' => $items->pluck('path')->values(),
-            'props' => $items->pluck('props')->values()->filter()->flatMap(fn($i) => $i),
+            'props' => $items->pluck('props')->unique()->values()->filter()->flatMap(fn($i) => $i),
         ]);
 
         return [
@@ -32,11 +32,209 @@ $components = new class {
         ];
     }
 
+    private function runConcurrently(\Illuminate\Support\Collection $items, \Closure $callback, int $concurrency = 8): array
+    {
+        if (app()->version() > 11 && \Composer\InstalledVersions::isInstalled('spatie/fork')) {
+            $tasks = $items
+                ->split($concurrency)
+                ->map(fn (\Illuminate\Support\Collection $chunk) => fn (): array => $callback($chunk))
+                ->toArray();
+
+            $results = \Illuminate\Support\Facades\Concurrency::driver('fork')->run($tasks);
+
+            return array_merge(...$results);
+        }
+
+        return $callback($items);
+    }
+
+    private function getComponentPropsFromDirective(string $path): array
+    {
+        if (!\Illuminate\Support\Facades\File::exists($path)) {
+            return [];
+        }
+
+        $contents = \Illuminate\Support\Facades\File::get($path);
+
+        $match = str($contents)->match('/\@props\(\[(.*?)\]\)/s');
+
+        if ($match->isEmpty()) {
+            return [];
+        }
+
+        $parser = (new \PhpParser\ParserFactory)->createForNewestSupportedVersion();
+
+        $propsAsString = $match->wrap('[', ']')->toString();
+
+        try {
+            $ast = $parser->parse("<?php return {$propsAsString};");
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        $traverser = new \PhpParser\NodeTraverser();
+        $visitor = new class extends \PhpParser\NodeVisitorAbstract {
+            public array $props = [];
+
+            private function getClassConstNodeValue(\PhpParser\Node\Expr\ClassConstFetch $node): string
+            {
+                return match (true) {
+                    $node->name instanceof \PhpParser\Node\Identifier => "{$node->class->toString()}::{$node->name->toString()}",
+                    default => $node->class->toString(),
+                };
+            }
+
+            private function getConstNodeValue(\PhpParser\Node\Expr\ConstFetch $node): string
+            {
+                return $node->name->toString();
+            }
+
+            private function getStringNodeValue(\PhpParser\Node\Scalar\String_ $node): string
+            {
+                return $node->value;
+            }
+
+            private function getIntNodeValue(\PhpParser\Node\Scalar\Int_ $node): int
+            {
+                return $node->value;
+            }
+
+            private function getFloatNodeValue(\PhpParser\Node\Scalar\Float_ $node): float
+            {
+                return $node->value;
+            }
+
+            private function getNodeValue(\PhpParser\Node $node): mixed
+            {
+                return match (true) {
+                    $node instanceof \PhpParser\Node\Expr\ConstFetch => $this->getConstNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\ClassConstFetch => $this->getClassConstNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\String_ => $this->getStringNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\Int_ => $this->getIntNodeValue($node),
+                    $node instanceof \PhpParser\Node\Scalar\Float_ => $this->getFloatNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\Array_ => $this->getArrayNodeValue($node),
+                    $node instanceof \PhpParser\Node\Expr\New_ => $this->getObjectNodeValue($node),
+                    default => null
+                };
+            }
+
+            private function getObjectNodeValue(\PhpParser\Node\Expr\New_ $node): array
+            {
+                if (! $node->class instanceof \PhpParser\Node\Stmt\Class_) {
+                    return [];
+                }
+
+                $array = [];
+
+                foreach ($node->class->getProperties() as $property) {
+                    foreach ($property->props as $item) {
+                        $array[$item->name->name] = $this->getNodeValue($item->default);
+                    }
+                }
+
+                return array_filter($array);
+            }
+
+            private function getArrayNodeValue(\PhpParser\Node\Expr\Array_ $node): array
+            {
+                $array = [];
+                $i = 0;
+
+                foreach ($node->items as $item) {
+                    $value = $this->getNodeValue($item->value);
+
+                    $array[$item->key?->value ?? $i++] = $value;
+                }
+
+                return array_filter($array);
+            }
+
+            public function enterNode(\PhpParser\Node $node) {
+                if (
+                    $node instanceof \PhpParser\Node\Stmt\Return_
+                    && $node->expr instanceof \PhpParser\Node\Expr\Array_
+                ) {
+                    foreach ($node->expr->items as $item) {
+                        $this->props[] = match (true) {
+                            $item->value instanceof \PhpParser\Node\Scalar\String_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key?->value ?? $item->value->value),
+                                'type' => $item->key ? 'string' : 'mixed',
+                                'hasDefault' => $item->key ? true : false,
+                                'default' => $item->key ? $this->getStringNodeValue($item->value) : null,
+                            ],
+                            $item->value instanceof \PhpParser\Node\Expr\ConstFetch => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => $item->value->name->toString() !== 'null' ? 'boolean' : 'mixed',
+                                'hasDefault' => true,
+                                'default' => $this->getConstNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Expr\ClassConstFetch => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => $item->value->class->toString(),
+                                'hasDefault' => true,
+                                'default' => $this->getClassConstNodeValue($item->value),
+                            ],                            
+                            $item->value instanceof \PhpParser\Node\Scalar\Int_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => 'integer',
+                                'hasDefault' => true,
+                                'default' => $this->getIntNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Scalar\Float_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => 'float',
+                                'hasDefault' => true,
+                                'default' => $this->getFloatNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Expr\Array_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => 'array',
+                                'hasDefault' => true,
+                                'default' => $this->getArrayNodeValue($item->value),
+                            ],
+                            $item->value instanceof \PhpParser\Node\Expr\New_ => [
+                                'name' => \Illuminate\Support\Str::kebab($item->key->value),
+                                'type' => $item->value->class->toString(),
+                                'hasDefault' => true,
+                                'default' => $this->getObjectNodeValue($item->value),
+                            ],
+                            default => null
+                        };
+                    }
+                }
+            }
+        };
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return array_filter($visitor->props);
+    }
+
+    private function mapComponentPropsFromDirective(array $files): array
+    {
+        if (! \Composer\InstalledVersions::isInstalled('nikic/php-parser')) {
+            return $files;
+        }
+
+        return $this->runConcurrently(
+            collect($files), 
+            fn (\Illuminate\Support\Collection $files): array => $files->map(function (array $item): array {
+                $props = $this->getComponentPropsFromDirective($item['path']);
+    
+                if ($props !== []) {
+                    $item['props'] = $props;
+                }
+    
+                return $item;                
+            })->all()
+        );
+    }
+
     protected function getStandardViews()
     {
         $path = resource_path('views/components');
 
-        return $this->findFiles($path, 'blade.php');
+        return $this->mapComponentPropsFromDirective($this->findFiles($path, 'blade.php'));
     }
 
     protected function findFiles($path, $extension, $keyCallback = null)
@@ -110,6 +308,9 @@ $components = new class {
                 ->map(fn($p) => [
                     'name' => \Illuminate\Support\Str::kebab($p->getName()),
                     'type' => (string) ($p->getType() ?? 'mixed'),
+                    // We need to add hasDefault, because null can be also a default value,
+                    // it can't be a flag of no default
+                    'hasDefault' => $p->hasDefaultValue(),
                     'default' => $p->getDefaultValue() ?? $parameters[$p->getName()] ?? null,
                 ]);
 
@@ -201,7 +402,7 @@ $components = new class {
             }
         }
 
-        return $components;
+        return $this->mapComponentPropsFromDirective($components);
     }
 
     protected function getVendorComponents(): array
@@ -236,7 +437,7 @@ $components = new class {
             }
         }
 
-        return $components;
+        return $this->mapComponentPropsFromDirective($components);
     }
 
     protected function handleIndexComponents($str)
