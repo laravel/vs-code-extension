@@ -53,6 +53,10 @@ export const projectPath = (srcPath = ""): string => {
         ) {
             return path.join(workspaceFolder.uri.fsPath, srcPath);
         }
+
+        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, srcPath))) {
+            return path.join(workspaceFolder.uri.fsPath, srcPath);
+        }
     }
 
     return "";
