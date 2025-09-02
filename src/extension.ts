@@ -6,7 +6,13 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
-import { openFileCommand } from "./commands";
+import {
+    openFileCommand,
+    runPint,
+    runPintOnCurrentFile,
+    runPintOnDirtyFiles,
+    runPintOnSave,
+} from "./commands";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -119,6 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }),
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
+            runPintOnSave(event);
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
@@ -188,6 +195,15 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand("laravel.open", openFileCommand),
+        vscode.commands.registerCommand("laravel.runPint", runPint),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnCurrentFile",
+            runPintOnCurrentFile,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnDirtyFiles",
+            runPintOnDirtyFiles,
+        ),
     );
 
     collectDebugInfo();

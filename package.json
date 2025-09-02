@@ -67,6 +67,23 @@
                 }
             }
         ],
+        "commands": [
+            {
+                "command": "laravel.runPint",
+                "title": "Run Pint",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.runPintOnDirtyFiles",
+                "title": "Run Pint on Dirty Files",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.runPintOnCurrentFile",
+                "title": "Run Pint on Current File",
+                "category": "Laravel"
+            }
+        ],
         "configuration": {
             "title": "Laravel",
             "properties": {
@@ -472,6 +489,11 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable completion for view."
+                },
+                "Laravel.pint.runOnSave": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically run Pint on the current file when saved."
                 }
             }
         }
