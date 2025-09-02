@@ -91,7 +91,10 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            return notFound("Env", param.value, detectedRange(param), "env");
+            return notFound("Env", param.value, detectedRange(param), {
+                value: "env",
+                target: vscode.Uri.file(projectPath(".env")),
+            });
         },
     );
 };
