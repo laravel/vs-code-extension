@@ -49,6 +49,21 @@ function shouldActivate(): boolean {
 export async function activate(context: vscode.ExtensionContext) {
     info("Activating Laravel Extension...");
 
+    initPhp();
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("laravel.open", openFileCommand),
+        vscode.commands.registerCommand("laravel.runPint", runPint),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnCurrentFile",
+            runPintOnCurrentFile,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnDirtyFiles",
+            runPintOnDirtyFiles,
+        ),
+    );
+
     if (!shouldActivate()) {
         info(
             'Not activating Laravel Extension because "shouldActivate" returned false',
@@ -95,7 +110,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
-    initPhp();
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
@@ -103,8 +117,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const TRIGGER_CHARACTERS = ["'", '"'];
 
     updateDiagnostics(vscode.window.activeTextEditor);
-
-    context.subscriptions.push();
 
     const delegatedRegistry = new Registry(
         ...completionProviders,
@@ -193,16 +205,6 @@ export async function activate(context: vscode.ExtensionContext) {
             {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
-        ),
-        vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand("laravel.runPint", runPint),
-        vscode.commands.registerCommand(
-            "laravel.runPintOnCurrentFile",
-            runPintOnCurrentFile,
-        ),
-        vscode.commands.registerCommand(
-            "laravel.runPintOnDirtyFiles",
-            runPintOnDirtyFiles,
         ),
     );
 
