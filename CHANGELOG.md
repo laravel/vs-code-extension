@@ -2,6 +2,14 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.1.0 - 2025-09-02
+
+### What's Changed
+
+* Pint commands + run Pint on save by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/448
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.14...v1.1.0
+
 ## v1.0.14 - 2025-08-25
 
 ### What's Changed
