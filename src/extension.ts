@@ -8,6 +8,7 @@ import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import {
     openFileCommand,
+    PintEditProvider,
     runPint,
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
@@ -61,6 +62,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             "laravel.runPintOnDirtyFiles",
             runPintOnDirtyFiles,
+        ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            { language: "php" },
+            new PintEditProvider(),
         ),
     );
 
