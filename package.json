@@ -42,32 +42,6 @@
         }
     ],
     "contributes": {
-        "commands": [
-            {
-                "command": "laravel.wrapHelpers",
-                "title": "Laravel: Wrap selection with helpers"
-            },
-            {
-                "command": "laravel.wrapHelpers.unwrap",
-                "title": "Laravel: Unwrap selection"
-            },
-            {
-                "command": "laravel.wrapHelpers.dd",
-                "title": "with dd(...)"
-            },
-            {
-                "command": "laravel.wrapHelpers.dump",
-                "title": "with dump(...)"
-            },
-            {
-                "command": "laravel.wrapHelpers.collect",
-                "title": "with collect(...)"
-            },
-            {
-                "command": "laravel.wrapHelpers.str",
-                "title": "with str(...)"
-            }
-        ],
         "keybindings": [
             {
                 "command": "laravel.wrapHelpers.dd",
@@ -186,7 +160,37 @@
                 "command": "laravel.runPintOnCurrentFile",
                 "title": "Run Pint on Current File",
                 "category": "Laravel"
-            }
+            },
+            {
+                "command": "laravel.wrapHelpers",
+                "title": "Laravel: Wrap selection with helpers",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapHelpers.unwrap",
+                "title": "Laravel: Unwrap selection",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapHelpers.dd",
+                "title": "with dd(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapHelpers.dump",
+                "title": "with dump(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapHelpers.collect",
+                "title": "with collect(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapHelpers.str",
+                "title": "with str(...)",
+                "category": "Laravel"
+            }            
         ],
         "configuration": {
             "title": "Laravel",
