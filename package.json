@@ -163,12 +163,12 @@
             },
             {
                 "command": "laravel.wrapHelpers",
-                "title": "Laravel: Wrap selection with helpers",
+                "title": "Wrap selection with helpers",
                 "category": "Laravel"
             },
             {
                 "command": "laravel.wrapHelpers.unwrap",
-                "title": "Laravel: Unwrap selection",
+                "title": "Unwrap selection",
                 "category": "Laravel"
             },
             {
