@@ -42,6 +42,39 @@
         }
     ],
     "contributes": {
+        "keybindings": [
+            {
+                "command": "laravel.refactorSelectedClass",
+                "key": "shift+alt+c",
+                "when": "editorHasSelection && resourceLangId == blade"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "laravel.refactorSelectedClass",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllClasses",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "laravel.refactorSelectedClass",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllClasses",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ]            
+        },
         "languages": [
             {
                 "id": "blade",
@@ -82,7 +115,17 @@
                 "command": "laravel.runPintOnCurrentFile",
                 "title": "Run Pint on Current File",
                 "category": "Laravel"
-            }
+            },
+            {
+                "command": "laravel.refactorSelectedClass",
+                "title": "Refactor selected class attribute",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorAllClasses",
+                "title": "Refactor all class attributes",
+                "category": "Laravel"
+            }            
         ],
         "configuration": {
             "title": "Laravel",
