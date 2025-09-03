@@ -118,12 +118,12 @@
             },
             {
                 "command": "laravel.refactorSelectedClass",
-                "title": "Laravel: Refactor selected class attribute",
+                "title": "Refactor selected class attribute",
                 "category": "Laravel"
             },
             {
                 "command": "laravel.refactorAllClasses",
-                "title": "Laravel: Refactor all class attributes",
+                "title": "Refactor all class attributes",
                 "category": "Laravel"
             }            
         ],
