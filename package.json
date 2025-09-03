@@ -42,16 +42,6 @@
         }
     ],
     "contributes": {
-        "commands": [
-            {
-                "command": "laravel.refactorSelectedClass",
-                "title": "Laravel: Refactor selected class attribute"
-            },
-            {
-                "command": "laravel.refactorAllClasses",
-                "title": "Laravel: Refactor all class attributes"
-            }
-        ],
         "keybindings": [
             {
                 "command": "laravel.refactorSelectedClass",
@@ -125,7 +115,17 @@
                 "command": "laravel.runPintOnCurrentFile",
                 "title": "Run Pint on Current File",
                 "category": "Laravel"
-            }
+            },
+            {
+                "command": "laravel.refactorSelectedClass",
+                "title": "Laravel: Refactor selected class attribute",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorAllClasses",
+                "title": "Laravel: Refactor all class attributes",
+                "category": "Laravel"
+            }            
         ],
         "configuration": {
             "title": "Laravel",
