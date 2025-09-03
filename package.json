@@ -57,7 +57,7 @@
         "submenus": [
             {
                 "id": "laravel.wrapHelpers.submenu",
-                "label": "Laravel: Wrap selection with helpers"
+                "label": "Wrap selection with helpers"
             }
         ],
         "menus": {
