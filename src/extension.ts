@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             "laravel.runPintOnDirtyFiles",
             runPintOnDirtyFiles,
-        )
+        ),
     );
 
     if (!shouldActivate()) {
