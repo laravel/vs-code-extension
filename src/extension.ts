@@ -6,7 +6,13 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
-import { openFileCommand } from "./commands";
+import {
+    openFileCommand,
+    runPint,
+    runPintOnCurrentFile,
+    runPintOnDirtyFiles,
+    runPintOnSave,
+} from "./commands";
 import {
     refactorAllClassesCommand,
     refactorSelectedClassCommand,
@@ -46,6 +52,29 @@ function shouldActivate(): boolean {
 
 export async function activate(context: vscode.ExtensionContext) {
     info("Activating Laravel Extension...");
+
+    initPhp();
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("laravel.open", openFileCommand),
+        vscode.commands.registerCommand("laravel.runPint", runPint),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnCurrentFile",
+            runPintOnCurrentFile,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.runPintOnDirtyFiles",
+            runPintOnDirtyFiles,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.refactorSelectedClass",
+            refactorSelectedClassCommand,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.refactorAllClasses",
+            refactorAllClassesCommand,
+        ),
+    );
 
     if (!shouldActivate()) {
         info(
@@ -93,7 +122,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
 
-    initPhp();
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
@@ -101,8 +129,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const TRIGGER_CHARACTERS = ["'", '"'];
 
     updateDiagnostics(vscode.window.activeTextEditor);
-
-    context.subscriptions.push();
 
     const delegatedRegistry = new Registry(
         ...completionProviders,
@@ -123,6 +149,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }),
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
+            runPintOnSave(event);
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
@@ -190,15 +217,6 @@ export async function activate(context: vscode.ExtensionContext) {
             {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
-        ),
-        vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand(
-            "laravel.refactorSelectedClass",
-            refactorSelectedClassCommand,
-        ),
-        vscode.commands.registerCommand(
-            "laravel.refactorAllClasses",
-            refactorAllClassesCommand,
         ),
     );
 
