@@ -63,6 +63,10 @@ export async function activate(context: vscode.ExtensionContext) {
             "laravel.runPintOnDirtyFiles",
             runPintOnDirtyFiles,
         ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            { language: "php" },
+            new PintEditProvider(),
+        ),
     );
 
     if (!shouldActivate()) {
@@ -143,10 +147,6 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
         }),
-        vscode.languages.registerDocumentFormattingEditProvider(
-            { language: "php" },
-            new PintEditProvider(),
-        ),
         // vscode.languages.registerDocumentHighlightProvider(
         //     documentSelector,
         //     new DocumentHighlight(),
