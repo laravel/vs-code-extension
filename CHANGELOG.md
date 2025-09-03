@@ -2,6 +2,67 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.1.1 - 2025-09-02
+
+### What's Changed
+
+* Pint for plain PHP projects by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/449
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.1.0...v1.1.1
+
+## v1.1.0 - 2025-09-02
+
+### What's Changed
+
+* Pint commands + run Pint on save by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/448
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.14...v1.1.0
+
+## v1.0.14 - 2025-08-25
+
+### What's Changed
+
+* Fix Auth bug when \Illuminate\Auth\AuthServiceProvider::class is disabled by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/445
+* bump required Php version by [@m-graham](https://github.com/m-graham) in https://github.com/laravel/vs-code-extension/pull/413
+
+### New Contributors
+
+* [@m-graham](https://github.com/m-graham) made their first contribution in https://github.com/laravel/vs-code-extension/pull/413
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.13...v1.0.14
+
+## v1.0.13 - 2025-08-22
+
+### What's Changed
+
+* Fix for getTranslationPathByName with nested translations by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/439
+* Fix for DIRECTORY_SEPARATOR for Windows environment by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/441
+* Add ddev support by [@damms005](https://github.com/damms005) in https://github.com/laravel/vs-code-extension/pull/398
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.12...v1.0.13
+
+## v1.0.12 - 2025-08-19
+
+### What's Changed
+
+* Add support for custom View extensions by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/vs-code-extension/pull/429
+* Support for configs in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/427
+* Add support for root-level Inertia configs by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/425
+* Fix bug with unnecessary autocompletion blade components when name doesn't match by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/417
+* Support for linked parameter vscode.Diagnostic.code for diagnosticProvider by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/415
+* Add GH action for automatically formatting code by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/438
+* Fix for Blade::anonymousComponentPath with double colon by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/420
+* Support for routes autocompletion for Route::is and routeIs methods by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/411
+* Fix for translations with numeric keys by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/407
+* Fix a bug with overrides vendor blade components by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/361
+* Fix Route not found error in web.php when using Volt by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/349
+
+### New Contributors
+
+* [@ryangjchandler](https://github.com/ryangjchandler) made their first contribution in https://github.com/laravel/vs-code-extension/pull/429
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.11...v1.0.12
+
 ## v1.0.11 - 2025-06-11
 
 ### What's Changed
@@ -199,15 +260,15 @@ All notable changes to the Laravel extension will be documented in this file.
 - Better support for earlier versions of Laravel (fixes for config and translation loading)
 - If extension cannot load, give specific reason
 - Support for linking in path helpers:
-    - `base_path`
-    - `resource_path`
-    - `config_path`
-    - `app_path`
-    - `database_path`
-    - `lang_path`
-    - `public_path`
-    - `storage_path`
-    
+  - `base_path`
+  - `resource_path`
+  - `config_path`
+  - `app_path`
+  - `database_path`
+  - `lang_path`
+  - `public_path`
+  - `storage_path`
+  
 
 ## [0.1.7]
 
