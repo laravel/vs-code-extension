@@ -8,6 +8,7 @@ import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import {
     openFileCommand,
+    PintEditProvider,
     runPint,
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
@@ -142,6 +143,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
         }),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            { language: "php" },
+            new PintEditProvider(),
+        ),
         // vscode.languages.registerDocumentHighlightProvider(
         //     documentSelector,
         //     new DocumentHighlight(),
