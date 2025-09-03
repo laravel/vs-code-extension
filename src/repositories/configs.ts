@@ -7,6 +7,10 @@ interface ConfigGroupResult {
     paths: string[];
 }
 
+export const getConfigByName = (name: string): Config | undefined => {
+    return getConfigs().items.configs.find((item) => item.name === name);
+};
+
 export const getConfigPathByName = (match: string): string | undefined => {
     const filePath = match.replace(/\.[^.]+$/, "");
 
