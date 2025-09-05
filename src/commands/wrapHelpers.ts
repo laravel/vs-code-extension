@@ -29,16 +29,18 @@ export const wrapSelectionCommand = (wrapper: string) => {
 
     const selection = editor.selection;
     let selectedText = editor.document.getText(selection);
-    const hasSemicolon = selectedText.at(-1) === ";";
 
-    if (hasSemicolon) {
+    const lastChar = selectedText.at(-1) ?? '';
+    const hasSeparator = [";", ","].includes(lastChar);
+
+    if (hasSeparator) {
         selectedText = selectedText.slice(0, -1);
     }
 
     let transformed = `${wrapper}(${selectedText})`;
 
-    if (hasSemicolon) {
-        transformed += ";";
+    if (hasSeparator) {
+        transformed += lastChar;
     }
 
     editor.edit((editBuilder) => {
