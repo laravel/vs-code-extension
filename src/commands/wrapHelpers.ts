@@ -30,7 +30,7 @@ export const wrapSelectionCommand = (wrapper: string) => {
     const selection = editor.selection;
     let selectedText = editor.document.getText(selection);
 
-    const lastChar = selectedText.at(-1) ?? '';
+    const lastChar = selectedText.at(-1) ?? "";
     const hasSeparator = [";", ","].includes(lastChar);
 
     if (hasSeparator) {
