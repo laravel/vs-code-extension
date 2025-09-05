@@ -13,6 +13,12 @@ import {
     runPintOnDirtyFiles,
     runPintOnSave,
 } from "./commands";
+import {
+    helpers,
+    openSubmenuCommand,
+    unwrapSelectionCommand,
+    wrapSelectionCommand,
+} from "./commands/wrapHelpers";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -206,6 +212,20 @@ export async function activate(context: vscode.ExtensionContext) {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
         ),
+        vscode.commands.registerCommand(
+            "laravel.wrapHelpers",
+            openSubmenuCommand,
+        ),
+        vscode.commands.registerCommand(
+            "laravel.wrapHelpers.unwrap",
+            unwrapSelectionCommand,
+        ),
+        ...helpers.map((helper: string) => {
+            return vscode.commands.registerCommand(
+                `laravel.wrapHelpers.${helper}`,
+                () => wrapSelectionCommand(helper),
+            );
+        }),
     );
 
     collectDebugInfo();
