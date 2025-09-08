@@ -77,4 +77,4 @@ gh release create "$new_version" --generate-notes
 npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
 
 echo "\n✅ Release $new_version completed successfully."
-echo "🔗 https://github.com/inertiajs/inertia/releases/tag/$new_version"
+echo "🔗 https://github.com/laravel/vs-code-extension/releases/tag/$new_version"
