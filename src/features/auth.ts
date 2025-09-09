@@ -66,10 +66,10 @@ const analyzeParam = (
 ):
     | { missingReason: "not_found" | "wrong_model" | "ignored" }
     | {
-          policies: AuthItem[];
-          values: AutocompleteParsingResult.StringValue[] | { value: string }[];
-          missingReason: null;
-      } => {
+        policies: AuthItem[];
+        values: AutocompleteParsingResult.StringValue[] | { value: string }[];
+        missingReason: null;
+    } => {
     if (item.type !== "methodCall" || !item.methodName || index !== 0) {
         return {
             missingReason: "ignored",
@@ -128,11 +128,12 @@ const analyzeParam = (
     // @ts-ignore
     const nextArg = item.arguments.children[1].children[0];
 
-    const classArg = nextArg?.type === "array" ? 
+    const classArg = nextArg?.type === "array" ?
         nextArg.children[0]?.value : nextArg;
 
-    const modelClass = classArg?.type === "variable" ? 
-        getModelByName(classArg.name)?.class : classArg?.className;
+    const modelClass = classArg?.type === "variable" ?
+        (classArg.className ?? getModelByName(classArg.varName)?.class)
+        : classArg?.className;
 
     if (!modelClass) {
         // If it's not a class we can even identify, just ignore it
