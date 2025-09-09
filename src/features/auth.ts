@@ -133,7 +133,7 @@ const analyzeParam = (
 
     const modelClass =
         classArg?.type === "variable"
-            ? (classArg.className ?? getModelByName(classArg.varName)?.class)
+            ? (classArg.className ?? getModelByName(classArg.name)?.class)
             : classArg?.className;
 
     if (!modelClass) {
