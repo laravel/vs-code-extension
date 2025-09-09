@@ -2,9 +2,15 @@ import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { config, PhpEnvironment } from "./config";
+import { BoundedFileCache } from "./cache";
+import { config } from "./config";
 import { registerWatcher } from "./fileWatcher";
 import { error, info } from "./logger";
+import {
+    PhpEnvironment,
+    phpEnvironments,
+    phpEnvironmentsThatUseRelativePaths,
+} from "./phpEnvironments";
 import { showErrorPopup } from "./popup";
 import {
     getWorkspaceFolders,
@@ -24,13 +30,17 @@ const toTemplateVar = (str: string) => {
 
 let defaultPhpCommand: string | null = null;
 
-const discoverFiles = new Map<string, string>();
+const discoverFiles = new BoundedFileCache(50);
 
-let hasVendor = projectPathExists("vendor/autoload.php");
-const hasBootstrap = projectPathExists("bootstrap/app.php");
+let hasVendor: boolean | null = null;
+let hasBootstrap: boolean | null = null;
+
+export const initPhp = () => {
+    hasVendor = projectPathExists("vendor/autoload.php");
+    hasBootstrap = projectPathExists("bootstrap/app.php");
+};
 
 let phpEnvKey: PhpEnvironment | null = null;
-const phpEnvsThatUseRelativePaths: PhpEnvironment[] = ["sail", "lando"];
 
 export const initVendorWatchers = () => {
     // fs.readdirSync(internalVendorPath()).forEach((file) => {
@@ -46,12 +56,7 @@ export const initVendorWatchers = () => {
     );
 
     watcher.onDidDelete((file) => {
-        for (const [key, value] of discoverFiles) {
-            if (value === file.fsPath) {
-                discoverFiles.delete(key);
-                break;
-            }
-        }
+        discoverFiles.deleteByFilePath(file.fsPath);
     });
 
     [internalVendorPath(), projectPath("vendor")].forEach((path) => {
@@ -89,43 +94,12 @@ export const initVendorWatchers = () => {
 const getPhpCommand = (): string => {
     const phpEnv = config<PhpEnvironment>("phpEnvironment", "auto");
 
-    const options = new Map<
-        PhpEnvironment,
-        {
-            check: string | string[];
-            command: string;
-            test?: (output: string) => boolean;
-        }
-    >();
-
-    options.set("herd", {
-        check: "herd which-php",
-        command: `"{binaryPath}"`,
-        test: (output) => !output.includes("No usable PHP version found"),
-    });
-
-    options.set("valet", {
-        check: "valet which-php",
-        command: `"{binaryPath}"`,
-    });
-
-    options.set("sail", {
-        check: "./vendor/bin/sail ps",
-        command: "./vendor/bin/sail php",
-    });
-
-    options.set("lando", {
-        check: "lando php -r 'echo PHP_BINARY;'",
-        command: "lando php",
-    });
-
-    options.set("local", {
-        check: "php -r 'echo PHP_BINARY;'",
-        command: `"{binaryPath}"`,
-    });
-
-    for (const [key, option] of options.entries()) {
+    for (const [key, option] of Object.entries(phpEnvironments)) {
         if (phpEnv !== "auto" && phpEnv !== key) {
+            continue;
+        }
+
+        if (!option.check || !option.command) {
             continue;
         }
 
@@ -153,7 +127,7 @@ const getPhpCommand = (): string => {
             if (result !== "" && (!option.test || option.test(result))) {
                 info(`Using ${key} PHP installation: ${result}`);
 
-                phpEnvKey = key;
+                phpEnvKey = key as PhpEnvironment;
 
                 return option.command.replace("{binaryPath}", result);
             }
@@ -169,8 +143,22 @@ const getPhpCommand = (): string => {
     return "php";
 };
 
+export const getPhpEnv = (): PhpEnvironment => {
+    if (phpEnvKey === null) {
+        defaultPhpCommand ??= getPhpCommand();
+    }
+
+    return phpEnvKey ?? "local";
+};
+
+export const isPhpEnv = (env: PhpEnvironment): boolean => false; // getPhpEnv() === env;
+
 export const clearDefaultPhpCommand = () => {
     defaultPhpCommand = null;
+};
+
+export const clearPhpFileCache = () => {
+    discoverFiles.clear();
 };
 
 const getDefaultPhpCommand = (): string => {
@@ -261,8 +249,8 @@ export const runInLaravel = <T>(
         });
 };
 
-const fixFilePath = (path: string) => {
-    if (phpEnvsThatUseRelativePaths.includes(phpEnvKey!)) {
+export const fixFilePath = (path: string) => {
+    if (phpEnvironmentsThatUseRelativePaths.includes(phpEnvKey!)) {
         return relativePath(path);
     }
 
