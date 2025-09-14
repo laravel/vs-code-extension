@@ -6,7 +6,7 @@ import { CompletionProvider } from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { wordMatchRegex } from "./../support/patterns";
 
-export default class Validation implements CompletionProvider {
+export class Validation implements CompletionProvider {
     private rules = {
         accepted: "accepted",
         active_url: "active_url",

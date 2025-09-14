@@ -1,0 +1,17 @@
+# Build outputs
+dist/
+out/
+node_modules/
+
+# Generated files
+*.vsix
+
+# Config files that should maintain their format
+syntaxes/
+php-templates/
+
+# Package files
+package-lock.json
+
+# Logs
+*.log
