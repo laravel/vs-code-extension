@@ -1,13 +1,17 @@
 import * as vscode from "vscode";
+import { commandName } from ".";
 
 type SubCommand = "dd" | "dump" | "collect" | "str" | "unwrap";
 
 export const helpers: SubCommand[] = ["dd", "dump", "collect", "str"];
 
-export const wrapWithHelperCommandName = "laravel.wrapWithHelper";
+export const wrapWithHelperCommands = {
+    wrap: commandName("laravel.wrapWithHelper"),
+    unwrap: commandName("laravel.wrapWithHelper.unwrap"),
+};
 
 export const wrapHelperCommandNameSubCommandName = (command: SubCommand) =>
-    `${wrapWithHelperCommandName}.${command}`;
+    `${wrapWithHelperCommands.wrap}.${command}`;
 
 export const openSubmenuCommand = async () => {
     const choice = await vscode.window.showQuickPick(
