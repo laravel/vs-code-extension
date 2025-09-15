@@ -8,6 +8,7 @@ import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import {
     openFileCommand,
+    PintEditProvider,
     runPint,
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
@@ -51,6 +52,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     initPhp();
 
+    const PHP_LANGUAGE = { scheme: "file", language: "php" };
+
     context.subscriptions.push(
         vscode.commands.registerCommand("laravel.open", openFileCommand),
         vscode.commands.registerCommand("laravel.runPint", runPint),
@@ -61,6 +64,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             "laravel.runPintOnDirtyFiles",
             runPintOnDirtyFiles,
+        ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            PHP_LANGUAGE,
+            new PintEditProvider(),
         ),
     );
 
@@ -108,7 +115,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "laravel-blade" },
     ];
 
-    const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
+    const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
 
     initVendorWatchers();
     watchForComposerChanges();
