@@ -78,6 +78,15 @@
                 {
                     "command": "laravel.wrapWithHelper.str",
                     "when": "false",
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
                     "group": "laravel"
                 }
             ],
@@ -105,6 +114,16 @@
                 },
                 {
                     "command": "laravel.wrapWithHelper.str"
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
                 }
             ]
         },
@@ -177,6 +196,15 @@
             {
                 "command": "laravel.wrapWithHelper.str",
                 "title": "with str(...)",
+            },
+            {
+                "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                "title": "Refactor selected HTML class attribute to Blade directive",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                "title": "Refactor all HTML class attributes to Blade directives",
                 "category": "Laravel"
             }
         ],

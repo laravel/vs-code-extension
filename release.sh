@@ -5,6 +5,19 @@ set -e
 echo "🚀 Laravel VS Code Extension Release"
 echo "=========================================="
 
+# Ensure we are on main and the working tree is clean
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH" != "main" ]; then
+  echo "Error: must be on main branch (current: $CURRENT_BRANCH)" >&2
+  exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Error: working tree is not clean. Commit or stash changes before releasing." >&2
+  git status --porcelain
+  exit 1
+fi
+
 BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
 
 read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
@@ -59,10 +72,9 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-release_url="https://github.com/laravel/vs-code-extension/releases/new?tag=$new_version"
+gh release create "$new_version" --generate-notes
 
-open "$release_url"
+npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
 
-echo
-echo "🔗 Direct link to release page:"
-echo "$release_url"
+echo "\n✅ Release $new_version completed successfully."
+echo "🔗 https://github.com/laravel/vs-code-extension/releases/tag/$new_version"

@@ -136,3 +136,11 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
 
     runPintOnFile(document.uri.fsPath, false);
 };
+
+export class PintEditProvider implements vscode.DocumentFormattingEditProvider {
+    provideDocumentFormattingEdits() {
+        runPintOnCurrentFile();
+
+        return [];
+    }
+}
