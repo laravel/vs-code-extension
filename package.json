@@ -42,8 +42,44 @@
         }
     ],
     "contributes": {
+        "submenus": [
+            {
+                "id": "laravel.wrapWithHelper.submenu",
+                "label": "Wrap selection with helpers"
+            }
+        ],
         "menus": {
             "commandPalette": [
+                {
+                    "command": "laravel.wrapWithHelper",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.unwrap",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dd",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dump",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.collect",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.str",
+                    "when": "false",
+                    "group": "laravel"
+                },
                 {
                     "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
                     "when": "editorHasSelection && resourceLangId == blade",
@@ -56,6 +92,30 @@
                 }
             ],
             "editor/context": [
+                {
+                    "submenu": "laravel.wrapWithHelper.submenu",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.unwrap",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                }
+            ],
+            "laravel.wrapWithHelper.submenu": [
+                {
+                    "command": "laravel.wrapWithHelper.dd"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dump"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.collect"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.str"
+                },
                 {
                     "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
                     "when": "editorHasSelection && resourceLangId == blade",
@@ -107,6 +167,36 @@
             {
                 "command": "laravel.runPintOnCurrentFile",
                 "title": "Run Pint on Current File",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper",
+                "title": "Wrap selection with helper",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.unwrap",
+                "title": "Unwrap selection",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.dd",
+                "title": "with dd(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.dump",
+                "title": "with dump(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.collect",
+                "title": "with collect(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.str",
+                "title": "with str(...)",
                 "category": "Laravel"
             },
             {

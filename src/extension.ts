@@ -15,6 +15,14 @@ import {
     runPintOnSave,
 } from "./commands";
 import {
+    helpers,
+    openSubmenuCommand,
+    unwrapSelectionCommand,
+    wrapHelperCommandNameSubCommandName,
+    wrapSelectionCommand,
+    wrapWithHelperCommandName,
+} from "./commands/wrapWithHelper";
+import {
     refactorAllHtmlClassesToBladeDirectives,
     refactorSelectedHtmlClassToBladeDirective,
 } from "./commands/refactorClass";
@@ -217,6 +225,20 @@ export async function activate(context: vscode.ExtensionContext) {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
         ),
+        vscode.commands.registerCommand(
+            wrapWithHelperCommandName,
+            openSubmenuCommand,
+        ),
+        vscode.commands.registerCommand(
+            wrapHelperCommandNameSubCommandName("unwrap"),
+            unwrapSelectionCommand,
+        ),
+        ...helpers.map((helper) => {
+            return vscode.commands.registerCommand(
+                wrapHelperCommandNameSubCommandName(helper),
+                () => wrapSelectionCommand(helper),
+            );
+        }),
         vscode.commands.registerCommand(
             "laravel.refactorSelectedHtmlClassToBladeDirective",
             refactorSelectedHtmlClassToBladeDirective,
