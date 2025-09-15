@@ -42,6 +42,32 @@
         }
     ],
     "contributes": {
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "blade",
@@ -81,6 +107,16 @@
             {
                 "command": "laravel.runPintOnCurrentFile",
                 "title": "Run Pint on Current File",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                "title": "Refactor selected HTML class attribute to Blade directive",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                "title": "Refactor all HTML class attributes to Blade directives",
                 "category": "Laravel"
             }
         ],
