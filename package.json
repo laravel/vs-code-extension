@@ -155,17 +155,17 @@
         ],
         "commands": [
             {
-                "command": "laravel.runPint",
+                "command": "laravel.pint.run",
                 "title": "Run Pint",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.runPintOnDirtyFiles",
+                "command": "laravel.pint.runOnDirtyFiles",
                 "title": "Run Pint on Dirty Files",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.runPintOnCurrentFile",
+                "command": "laravel.pint.runOnCurrentFile",
                 "title": "Run Pint on Current File",
                 "category": "Laravel"
             },
@@ -634,7 +634,7 @@
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && ./precheck && npm run package",
+        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && php generate-registered-commands.php && ./precheck && npm run package",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },

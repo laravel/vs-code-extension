@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { commandName } from ".";
 
 const transformClass = (classList: string) => {
     const classes = classList
@@ -8,6 +9,11 @@ const transformClass = (classList: string) => {
         .join(", ");
 
     return `@class([${classes}])`;
+};
+
+export const htmlClassToBladeDirectiveCommands = {
+    selected: commandName("laravel.refactorSelectedHtmlClassToBladeDirective"),
+    all: commandName("laravel.refactorAllHtmlClassesToBladeDirectives"),
 };
 
 export const refactorAllHtmlClassesToBladeDirectives = () => {

@@ -6,26 +6,28 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
+import { commandName, openFileCommand } from "./commands";
 import {
-    openFileCommand,
+    pintCommands,
     PintEditProvider,
     runPint,
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
     runPintOnSave,
-} from "./commands";
+} from "./commands/pint";
+import {
+    htmlClassToBladeDirectiveCommands,
+    refactorAllHtmlClassesToBladeDirectives,
+    refactorSelectedHtmlClassToBladeDirective,
+} from "./commands/refactorHtmlClassToBladeDirective";
 import {
     helpers,
     openSubmenuCommand,
     unwrapSelectionCommand,
     wrapHelperCommandNameSubCommandName,
     wrapSelectionCommand,
-    wrapWithHelperCommandName,
+    wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
-import {
-    refactorAllHtmlClassesToBladeDirectives,
-    refactorSelectedHtmlClassToBladeDirective,
-} from "./commands/refactorClass";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -67,14 +69,17 @@ export async function activate(context: vscode.ExtensionContext) {
     const PHP_LANGUAGE = { scheme: "file", language: "php" };
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand("laravel.runPint", runPint),
         vscode.commands.registerCommand(
-            "laravel.runPintOnCurrentFile",
+            commandName("laravel.open"),
+            openFileCommand,
+        ),
+        vscode.commands.registerCommand(pintCommands.all, runPint),
+        vscode.commands.registerCommand(
+            pintCommands.currentFile,
             runPintOnCurrentFile,
         ),
         vscode.commands.registerCommand(
-            "laravel.runPintOnDirtyFiles",
+            pintCommands.dirtyFiles,
             runPintOnDirtyFiles,
         ),
         vscode.languages.registerDocumentFormattingEditProvider(
@@ -226,11 +231,11 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand(
-            wrapWithHelperCommandName,
+            wrapWithHelperCommands.wrap,
             openSubmenuCommand,
         ),
         vscode.commands.registerCommand(
-            wrapHelperCommandNameSubCommandName("unwrap"),
+            wrapWithHelperCommands.unwrap,
             unwrapSelectionCommand,
         ),
         ...helpers.map((helper) => {
@@ -240,11 +245,11 @@ export async function activate(context: vscode.ExtensionContext) {
             );
         }),
         vscode.commands.registerCommand(
-            "laravel.refactorSelectedHtmlClassToBladeDirective",
+            htmlClassToBladeDirectiveCommands.selected,
             refactorSelectedHtmlClassToBladeDirective,
         ),
         vscode.commands.registerCommand(
-            "laravel.refactorAllHtmlClassesToBladeDirectives",
+            htmlClassToBladeDirectiveCommands.all,
             refactorAllHtmlClassesToBladeDirectives,
         ),
     );
