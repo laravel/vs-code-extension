@@ -78,6 +78,7 @@
                 {
                     "command": "laravel.wrapWithHelper.str",
                     "when": "false",
+                    "group": "laravel"
                 },
                 {
                     "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
@@ -196,6 +197,7 @@
             {
                 "command": "laravel.wrapWithHelper.str",
                 "title": "with str(...)",
+                "category": "Laravel"
             },
             {
                 "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
