@@ -11,3 +11,5 @@ file_put_contents(__DIR__ . '/src/commands/generatedRegisteredCommands.ts',
     "// Run 'php generate-registered-commands.php' to regenerate.\n\n" .
     "export type RegisteredCommand = \"" . implode('" | "', $commands) . "\";\n"
 );
+
+exec('npm run format');

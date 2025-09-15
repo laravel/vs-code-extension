@@ -119,3 +119,5 @@ file_put_contents(
     __DIR__ . '/package.json',
     json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
 );
+
+exec('npm run format');
