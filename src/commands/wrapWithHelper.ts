@@ -1,17 +1,22 @@
 import * as vscode from "vscode";
 
-export const helpers = ["dd", "dump", "collect", "str"];
+type SubCommand = "dd" | "dump" | "collect" | "str" | "unwrap";
+
+export const helpers: SubCommand[] = ["dd", "dump", "collect", "str"];
+
+export const wrapWithHelperCommandName = "laravel.wrapWithHelper";
+
+export const wrapHelperCommandNameSubCommandName = (command: SubCommand) =>
+    `${wrapWithHelperCommandName}.${command}`;
 
 export const openSubmenuCommand = async () => {
     const choice = await vscode.window.showQuickPick(
-        helpers.map((helper: string) => {
-            return {
-                label: `with ${helper}(...)`,
-                command: `laravel.wrapHelpers.${helper}`,
-            };
-        }),
+        helpers.map((helper) => ({
+            label: `${helper}(...)`,
+            command: wrapHelperCommandNameSubCommandName(helper),
+        })),
         {
-            placeHolder: "Choose a wrap",
+            placeHolder: "Wrap with...",
         },
     );
 
@@ -28,6 +33,7 @@ export const wrapSelectionCommand = (wrapper: string) => {
     }
 
     const selection = editor.selection;
+
     let selectedText = editor.document.getText(selection);
 
     const lastChar = selectedText.at(-1) ?? "";
@@ -57,14 +63,9 @@ export const unwrapSelectionCommand = () => {
 
     const selection = editor.selection;
     const selectedText = editor.document.getText(selection);
-
     const match = selectedText.match(/^([a-zA-Z0-9_]+)\(/);
 
-    if (!match) {
-        return;
-    }
-
-    if (!helpers.includes(match[1])) {
+    if (!match || !helpers.includes(match[1] as SubCommand)) {
         return;
     }
 

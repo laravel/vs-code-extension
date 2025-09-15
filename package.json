@@ -42,84 +42,72 @@
         }
     ],
     "contributes": {
-        "keybindings": [
-            {
-                "command": "laravel.wrapHelpers.dd",
-                "key": "shift+alt+d",
-                "when": "editorHasSelection"
-            },
-            {
-                "command": "laravel.wrapHelpers.unwrap",
-                "key": "shift+alt+u",
-                "when": "editorHasSelection"
-            }
-        ],
         "submenus": [
             {
-                "id": "laravel.wrapHelpers.submenu",
+                "id": "laravel.wrapWithHelper.submenu",
                 "label": "Wrap selection with helpers"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "laravel.wrapHelpers",
+                    "command": "laravel.wrapWithHelper",
                     "when": "editorHasSelection",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.unwrap",
+                    "command": "laravel.wrapWithHelper.unwrap",
                     "when": "editorHasSelection",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.dd",
+                    "command": "laravel.wrapWithHelper.dd",
                     "when": "false",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.dump",
+                    "command": "laravel.wrapWithHelper.dump",
                     "when": "false",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.collect",
+                    "command": "laravel.wrapWithHelper.collect",
                     "when": "false",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.str",
+                    "command": "laravel.wrapWithHelper.str",
                     "when": "false",
                     "group": "laravel"
                 }
-            ], 
+            ],
             "editor/context": [
                 {
-                    "submenu": "laravel.wrapHelpers.submenu",
+                    "submenu": "laravel.wrapWithHelper.submenu",
                     "when": "editorHasSelection",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.wrapHelpers.unwrap",
+                    "command": "laravel.wrapWithHelper.unwrap",
                     "when": "editorHasSelection",
                     "group": "laravel"
                 }
             ],
-            "laravel.wrapHelpers.submenu": [
+            "laravel.wrapWithHelper.submenu": [
                 {
-                    "command": "laravel.wrapHelpers.dd"
+                    "command": "laravel.wrapWithHelper.dd"
                 },
                 {
-                    "command": "laravel.wrapHelpers.dump"
+                    "command": "laravel.wrapWithHelper.dump"
                 },
                 {
-                    "command": "laravel.wrapHelpers.collect"
+                    "command": "laravel.wrapWithHelper.collect"
                 },
                 {
-                    "command": "laravel.wrapHelpers.str"
+                    "command": "laravel.wrapWithHelper.str"
                 }
-            ]            
-        }, 
+            ]
+        },
         "languages": [
             {
                 "id": "blade",
@@ -162,35 +150,35 @@
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers",
-                "title": "Wrap selection with helpers",
+                "command": "laravel.wrapWithHelper",
+                "title": "Wrap selection with helper",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers.unwrap",
+                "command": "laravel.wrapWithHelper.unwrap",
                 "title": "Unwrap selection",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers.dd",
+                "command": "laravel.wrapWithHelper.dd",
                 "title": "with dd(...)",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers.dump",
+                "command": "laravel.wrapWithHelper.dump",
                 "title": "with dump(...)",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers.collect",
+                "command": "laravel.wrapWithHelper.collect",
                 "title": "with collect(...)",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.wrapHelpers.str",
+                "command": "laravel.wrapWithHelper.str",
                 "title": "with str(...)",
                 "category": "Laravel"
-            }            
+            }
         ],
         "configuration": {
             "title": "Laravel",

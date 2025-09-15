@@ -17,8 +17,10 @@ import {
     helpers,
     openSubmenuCommand,
     unwrapSelectionCommand,
+    wrapHelperCommandNameSubCommandName,
     wrapSelectionCommand,
-} from "./commands/wrapHelpers";
+    wrapWithHelperCommandName,
+} from "./commands/wrapWithHelper";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -213,16 +215,16 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand(
-            "laravel.wrapHelpers",
+            wrapWithHelperCommandName,
             openSubmenuCommand,
         ),
         vscode.commands.registerCommand(
-            "laravel.wrapHelpers.unwrap",
+            wrapHelperCommandNameSubCommandName("unwrap"),
             unwrapSelectionCommand,
         ),
-        ...helpers.map((helper: string) => {
+        ...helpers.map((helper) => {
             return vscode.commands.registerCommand(
-                `laravel.wrapHelpers.${helper}`,
+                wrapHelperCommandNameSubCommandName(helper),
                 () => wrapSelectionCommand(helper),
             );
         }),
