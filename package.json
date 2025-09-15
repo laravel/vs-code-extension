@@ -42,38 +42,31 @@
         }
     ],
     "contributes": {
-        "keybindings": [
-            {
-                "command": "laravel.refactorSelectedClass",
-                "key": "shift+alt+c",
-                "when": "editorHasSelection && resourceLangId == blade"
-            }
-        ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "laravel.refactorSelectedClass",
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
                     "when": "editorHasSelection && resourceLangId == blade",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.refactorAllClasses",
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                     "when": "resourceLangId == blade",
                     "group": "laravel"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "laravel.refactorSelectedClass",
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
                     "when": "editorHasSelection && resourceLangId == blade",
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.refactorAllClasses",
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                     "when": "resourceLangId == blade",
                     "group": "laravel"
                 }
-            ]            
+            ]
         },
         "languages": [
             {
@@ -117,15 +110,15 @@
                 "category": "Laravel"
             },
             {
-                "command": "laravel.refactorSelectedClass",
-                "title": "Refactor selected class attribute",
+                "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                "title": "Refactor selected HTML class attribute to Blade directive",
                 "category": "Laravel"
             },
             {
-                "command": "laravel.refactorAllClasses",
-                "title": "Refactor all class attributes",
+                "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                "title": "Refactor all HTML class attributes to Blade directives",
                 "category": "Laravel"
-            }            
+            }
         ],
         "configuration": {
             "title": "Laravel",

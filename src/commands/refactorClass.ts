@@ -10,7 +10,7 @@ const transformClass = (classList: string) => {
     return `@class([${classes}])`;
 };
 
-export const refactorAllClassesCommand = () => {
+export const refactorAllHtmlClassesToBladeDirectives = () => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
@@ -37,7 +37,7 @@ export const refactorAllClassesCommand = () => {
     });
 };
 
-export const refactorSelectedClassCommand = () => {
+export const refactorSelectedHtmlClassToBladeDirective = () => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {

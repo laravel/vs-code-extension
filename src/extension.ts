@@ -14,8 +14,8 @@ import {
     runPintOnSave,
 } from "./commands";
 import {
-    refactorAllClassesCommand,
-    refactorSelectedClassCommand,
+    refactorAllHtmlClassesToBladeDirectives,
+    refactorSelectedHtmlClassToBladeDirective,
 } from "./commands/refactorClass";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
@@ -211,12 +211,12 @@ export async function activate(context: vscode.ExtensionContext) {
             },
         ),
         vscode.commands.registerCommand(
-            "laravel.refactorSelectedClass",
-            refactorSelectedClassCommand,
+            "laravel.refactorSelectedHtmlClassToBladeDirective",
+            refactorSelectedHtmlClassToBladeDirective,
         ),
         vscode.commands.registerCommand(
-            "laravel.refactorAllClasses",
-            refactorAllClassesCommand,
+            "laravel.refactorAllHtmlClassesToBladeDirectives",
+            refactorAllHtmlClassesToBladeDirectives,
         ),
     );
 
