@@ -114,13 +114,16 @@ const getBlocks = (
     return model.attributes
         .map((attr) => getAttributeBlocks(attr, className))
         .concat(
-            [...model.scopes, "newModelQuery", "newQuery", "query"].map(
-                (method) => {
-                    return `@method static ${modelBuilderType(
-                        className,
-                    )} ${method}()`;
-                },
-            ),
+            [
+                ...model.scopes.map((scope) => scope.name),
+                "newModelQuery",
+                "newQuery",
+                "query",
+            ].map((method) => {
+                return `@method static ${modelBuilderType(
+                    className,
+                )} ${method}()`;
+            }),
         )
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()

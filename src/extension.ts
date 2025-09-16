@@ -28,6 +28,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { ScopeHoverProvider } from "./features/model";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -209,6 +210,10 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
+        ),
+        vscode.languages.registerHoverProvider(
+            PHP_LANGUAGE,
+            new ScopeHoverProvider(),
         ),
         // ...testRunnerCommands,
         // testController,

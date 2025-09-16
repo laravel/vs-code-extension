@@ -22,6 +22,12 @@ const load = () => {
     });
 };
 
+export const getModelByClassname = (
+    className: string,
+): Eloquent.Model | undefined => {
+    return getModels().items[className];
+};
+
 export const getModels = repository<Eloquent.Models>({
     load,
     pattern: modelPaths
