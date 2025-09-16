@@ -110,6 +110,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { viteEnvCodeActionProvider },
         { hoverProviders },
         { linkProviders },
+        { completionAttributeProvider, completionModelProvider },
     ] = await Promise.all([
         import("./completion/Registry.js"),
         import("./completion/CompletionProvider.js"),
@@ -123,6 +124,7 @@ export async function activate(context: vscode.ExtensionContext) {
         import("./features/env.js"),
         import("./hover/HoverProvider.js"),
         import("./link/LinkProvider.js"),
+        import("./features/model.js"),
     ]);
 
     console.log("Laravel VS Code Started...");
@@ -178,6 +180,16 @@ export async function activate(context: vscode.ExtensionContext) {
         //     documentSelector,
         //     new BladeFormattingEditProvider(),
         // ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
+            new Registry(completionAttributeProvider),
+            ">",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
+            completionModelProvider,
+            "$",
+        ),
         vscode.languages.registerCompletionItemProvider(
             LANGUAGES,
             delegatedRegistry,
