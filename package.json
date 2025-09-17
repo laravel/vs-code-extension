@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -105,6 +105,16 @@
                     "command": "laravel.wrapWithHelper.unwrap",
                     "when": "editorHasSelection",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
                 }
             ],
             "laravel.wrapWithHelper.submenu": [
@@ -119,16 +129,6 @@
                 },
                 {
                     "command": "laravel.wrapWithHelper.str"
-                },
-                {
-                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
-                    "when": "editorHasSelection && resourceLangId == blade",
-                    "group": "laravel"
-                },
-                {
-                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
-                    "when": "resourceLangId == blade",
-                    "group": "laravel"
                 }
             ]
         },

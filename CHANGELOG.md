@@ -2,6 +2,14 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.2.1 - 2025-09-16
+
+### What's Changed
+
+* Fix - move refactor class commands from laravel.wrapWithHelper.submenu to editor/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/460
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.0...v1.2.1
+
 ## v1.2.0 - 2025-09-15
 
 ### What's Changed
