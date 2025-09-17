@@ -92,6 +92,7 @@
                 },
                 {
                     "command": "laravel.generateNamespace",
+                    "when": "resourceLangId == php",
                     "group": "laravel"
                 }
             ],

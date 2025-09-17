@@ -1,10 +1,20 @@
 import * as vscode from "vscode";
 
+interface Namespace {
+    namespace: string;
+    path: string;
+}
+
+interface Option {
+    condition: () => boolean | RegExpMatchArray | RegExpExecArray | null;
+    replaceNamespace: (match?: string) => string;
+}
+
 export const generateNamespaceCommand = async () => {
     const editor = vscode.window.activeTextEditor;
 
     if (!editor) {
-        vscode.window.showErrorMessage("Brak aktywnego pliku w edytorze!");
+        vscode.window.showErrorMessage("No active file in the editor");
 
         return;
     }
@@ -13,7 +23,8 @@ export const generateNamespaceCommand = async () => {
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
 
     if (!workspaceFolder) {
-        vscode.window.showErrorMessage("Plik nie należy do żadnego workspace!");
+        vscode.window.showErrorMessage("Cannot detect active workspace");
+
         return;
     }
 
@@ -22,14 +33,104 @@ export const generateNamespaceCommand = async () => {
         "composer.json",
     );
 
+    let json;
+
     try {
         const data = await vscode.workspace.fs.readFile(composerPath);
-        const json = JSON.parse(Buffer.from(data).toString("utf8"));
 
-        vscode.window.showInformationMessage(
-            `Nazwa pakietu: ${json.name || "brak"}`,
-        );
+        json = JSON.parse(Buffer.from(data).toString("utf8"));
     } catch (err) {
-        vscode.window.showErrorMessage("Nie udało się odczytać composer.json");
+        vscode.window.showErrorMessage("Failed to read composer.json");
+
+        return;
     }
+
+    const autoload = json["autoload"]?.["psr-4"] ?? {};
+    const autoloadDev = json["autoload-dev"]?.["psr-4"] ?? {};
+
+    const autoloads: Record<string, string> = {
+        ...autoload,
+        ...autoloadDev,
+    };
+
+    const namespaces: Namespace[] = Object.entries(autoloads)
+        .map(([namespace, path]) => ({ namespace, path }))
+        // We need to sort by length, because we need to check longer paths first, for example:
+        //
+        // "psr-4": {
+        //    "App\\": "app/",
+        //    "App\\AnotherNamespace\\": "app/anotherPath/",
+        //
+        // Otherwise, the system will first find the shorter one, which also matches
+        .sort((a, b) => b.path.length - a.path.length);
+
+    const findNamespace = namespaces.find((namespace) => {
+        return fileUri.path.startsWith(
+            `${workspaceFolder.uri.path}/${namespace.path}`,
+        );
+    });
+
+    if (!findNamespace) {
+        vscode.window.showErrorMessage("Failed to find a matching namespace");
+
+        return;
+    }
+
+    const newNamespace = (
+        findNamespace.namespace +
+        fileUri.path
+            .replace(`${workspaceFolder.uri.path}/${findNamespace.path}`, "")
+            .replace(/\/?[^\/]+$/, "")
+            .replace(/\//g, "\\")
+    ).replace(/\\$/, "");
+
+    const doc = editor.document;
+    const text = doc.getText();
+
+    const options: Option[] = [
+        // Case when the file is empty
+        {
+            condition: () => text.length === 0,
+            replaceNamespace: () => `<?php\n\nnamespace ${newNamespace};`,
+        },
+        // Case when the file already has a namespace
+        {
+            condition: () => text.match(/^namespace\s+(?:[A-Za-z0-9_\\]+);$/m),
+            replaceNamespace: () => `namespace ${newNamespace};`,
+        },
+        // Case when the file already has a code, but without a namespace
+        {
+            condition: () =>
+                text.match(/^<\?php(?:\s*declare\s*\(.*?\)\s*;)*/m),
+            replaceNamespace: (match) =>
+                `${match}\n\nnamespace ${newNamespace};`,
+        },
+    ];
+
+    options.some((option) => {
+        const condition = option.condition();
+
+        if (!condition) {
+            return false;
+        }
+
+        const range =
+            Array.isArray(condition) && condition?.index !== undefined
+                ? new vscode.Range(
+                    doc.positionAt(condition.index),
+                    doc.positionAt(condition.index + condition[0].length),
+                )
+                : doc.positionAt(0);
+
+        editor.edit((editBuilder) => {
+            editBuilder.replace(
+                range,
+                option.replaceNamespace(
+                    Array.isArray(condition) ? condition?.[0] : undefined,
+                ),
+            );
+        });
+
+        return true;
+    });
 };
