@@ -55,6 +55,7 @@ export const generateNamespaceCommand = async () => {
         // "psr-4": {
         //    "App\\": "app/",
         //    "App\\AnotherNamespace\\": "app/anotherPath/",
+        // }
         //
         // Otherwise, the system will first find the shorter one, which also matches
         .sort((a, b) => b.path.length - a.path.length);
