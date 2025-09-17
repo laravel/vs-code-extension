@@ -12,17 +12,20 @@ const isInHoverRange = (
         return false;
     }
 
+    const nodeRange = new vscode.Range(
+        new vscode.Position(method.start.line, method.start.column),
+        new vscode.Position(method.end.line, method.end.column),
+    );
+
     // vs-code-php-parser-cli returns us the position of the entire node, for example:
     //
-    // Example::popular()->active();
+    // Example::popular()
+    //    ->traitScope()
+    //    ->active();
     //
-    // but we need only the position of the method name, for example: active(),
-    // so we cannot check the position by the exact equations, but this should be enough
-    return (
-        method.end.line === range.end.line &&
-        method.start.column <= range.start.character &&
-        method.end.column >= range.end.character
-    );
+    // so we don't have to check equality of the start and end positions.
+    // It's enough to check if the node range contains the scope range
+    return nodeRange.contains(range);
 };
 
 export class ScopeHoverProvider implements vscode.HoverProvider {
@@ -47,21 +50,15 @@ export class ScopeHoverProvider implements vscode.HoverProvider {
                 .filter((result) => result.type === "methodCall")
                 .find(
                     (result) =>
-                        isInHoverRange(range, result) &&
-                        result.methodName === scopeName,
+                        result.methodName === scopeName &&
+                        isInHoverRange(range, result),
                 );
 
             if (!result || !result.className) {
                 return null;
             }
 
-            const model = getModelByClassname(result.className);
-
-            if (!model || !model.uri) {
-                return null;
-            }
-
-            const scope = model.scopes.find(
+            const scope = getModelByClassname(result.className)?.scopes?.find(
                 (scope) => scope.name === scopeName,
             );
 
