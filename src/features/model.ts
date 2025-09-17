@@ -54,7 +54,7 @@ export class ScopeHoverProvider implements vscode.HoverProvider {
                         isInHoverRange(range, result),
                 );
 
-            if (!result || !result.className) {
+            if (!result?.className) {
                 return null;
             }
 
@@ -62,7 +62,7 @@ export class ScopeHoverProvider implements vscode.HoverProvider {
                 (scope) => scope.name === scopeName,
             );
 
-            if (!scope || !scope.uri) {
+            if (!scope?.uri) {
                 return null;
             }
 
