@@ -5,11 +5,6 @@ interface Namespace {
     path: string;
 }
 
-interface Option {
-    condition: () => boolean | RegExpMatchArray | RegExpExecArray | null;
-    replaceNamespace: (match?: string) => string;
-}
-
 export const generateNamespaceCommand = async () => {
     const editor = vscode.window.activeTextEditor;
 
@@ -64,11 +59,11 @@ export const generateNamespaceCommand = async () => {
         // Otherwise, the system will first find the shorter one, which also matches
         .sort((a, b) => b.path.length - a.path.length);
 
-    const findNamespace = namespaces.find((namespace) => {
-        return fileUri.path.startsWith(
+    const findNamespace = namespaces.find((namespace) =>
+        fileUri.path.startsWith(
             `${workspaceFolder.uri.path}/${namespace.path}`,
-        );
-    });
+        ),
+    );
 
     if (!findNamespace) {
         vscode.window.showErrorMessage("Failed to find a matching namespace");
@@ -87,50 +82,37 @@ export const generateNamespaceCommand = async () => {
     const doc = editor.document;
     const text = doc.getText();
 
-    const options: Option[] = [
-        // Case when the file is empty
-        {
-            condition: () => text.length === 0,
-            replaceNamespace: () => `<?php\n\nnamespace ${newNamespace};`,
-        },
-        // Case when the file already has a namespace
-        {
-            condition: () => text.match(/^namespace\s+(?:[A-Za-z0-9_\\]+);$/m),
-            replaceNamespace: () => `namespace ${newNamespace};`,
-        },
-        // Case when the file already has a code, but without a namespace
-        {
-            condition: () =>
-                text.match(/^<\?php(?:\s*declare\s*\(.*?\)\s*;)*/m),
-            replaceNamespace: (match) =>
-                `${match}\n\nnamespace ${newNamespace};`,
-        },
-    ];
+    let replaceNamespace = undefined;
+    let match = undefined;
 
-    options.some((option) => {
-        const condition = option.condition();
+    // Case when the file is empty
+    if (text.length === 0) {
+        replaceNamespace = `<?php\n\nnamespace ${newNamespace};`;
+    }
+    // Case when the file already has a namespace
+    else if ((match = text.match(/^namespace\s+(?:[A-Za-z0-9_\\]+);$/m))) {
+        replaceNamespace = `namespace ${newNamespace};`;
+    }
+    // Case when the file already has a php open tag, but without a namespace
+    else if ((match = text.match(/^<\?php(?:\s*declare\s*\(.*?\)\s*;)*/m))) {
+        replaceNamespace = `${match?.[0]}\n\nnamespace ${newNamespace};`;
+    }
 
-        if (!condition) {
-            return false;
-        }
+    if (!replaceNamespace) {
+        vscode.window.showErrorMessage("Failed to find a matching case");
 
-        const range =
-            Array.isArray(condition) && condition?.index !== undefined
-                ? new vscode.Range(
-                    doc.positionAt(condition.index),
-                    doc.positionAt(condition.index + condition[0].length),
-                )
-                : doc.positionAt(0);
+        return;
+    }
 
-        editor.edit((editBuilder) => {
-            editBuilder.replace(
-                range,
-                option.replaceNamespace(
-                    Array.isArray(condition) ? condition?.[0] : undefined,
-                ),
-            );
-        });
+    const range =
+        match?.index !== undefined
+            ? new vscode.Range(
+                doc.positionAt(match.index),
+                doc.positionAt(match.index + match[0].length),
+            )
+            : doc.positionAt(0);
 
-        return true;
+    editor.edit((editBuilder) => {
+        editBuilder.replace(range, replaceNamespace);
     });
 };
