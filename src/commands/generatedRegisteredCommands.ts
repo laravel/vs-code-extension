@@ -13,4 +13,5 @@ export type RegisteredCommand =
     | "laravel.wrapWithHelper.str"
     | "laravel.refactorSelectedHtmlClassToBladeDirective"
     | "laravel.refactorAllHtmlClassesToBladeDirectives"
+    | "laravel.generateNamespace"
     | "laravel.open";

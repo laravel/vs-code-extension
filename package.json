@@ -89,6 +89,10 @@
                     "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                     "when": "resourceLangId == blade",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.generateNamespace",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -207,6 +211,11 @@
             {
                 "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                 "title": "Refactor all HTML class attributes to Blade directives",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.generateNamespace",
+                "title": "Generate namespace",
                 "category": "Laravel"
             }
         ],
