@@ -3,6 +3,11 @@ import { projectPath } from "@src/support/project";
 import { waitForValue } from "@src/support/util";
 import { repository } from ".";
 
+export interface NestedTranslationItem {
+    translationItem: TranslationItem | undefined;
+    isNested: boolean;
+}
+
 export interface TranslationItem {
     [key: string]: {
         value: string;
