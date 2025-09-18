@@ -10,8 +10,13 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath, relativePath } from "@src/support/project";
-import { contract, createIndexMapping, facade } from "@src/support/util";
+import { relativePath } from "@src/support/project";
+import {
+    contract,
+    createIndexMapping,
+    facade,
+    withLineFragment,
+} from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
@@ -191,15 +196,17 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getTranslationPathByName(
+            const translationPath = getTranslationPathByName(
                 param.value,
                 getLang(item as AutocompleteParsingResult.MethodCall),
             );
 
-            const code: NotFoundCode = pathToFile
+            const code: NotFoundCode = translationPath
                 ? {
                       value: "translation",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
+                      target: vscode.Uri.file(translationPath.path).with(
+                          withLineFragment(translationPath.line),
+                      ),
                   }
                 : "translation";
 

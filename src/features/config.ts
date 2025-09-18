@@ -6,7 +6,7 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { contract, facade } from "@src/support/util";
+import { contract, facade, withLineFragment } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
@@ -167,12 +167,14 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getConfigPathByName(param.value);
+            const configPath = getConfigPathByName(param.value);
 
-            const code: NotFoundCode = pathToFile
+            const code: NotFoundCode = configPath
                 ? {
                       value: "config",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
+                      target: vscode.Uri.file(configPath.path).with(
+                          withLineFragment(configPath.line),
+                      ),
                   }
                 : "config";
 
