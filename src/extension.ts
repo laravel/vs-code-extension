@@ -7,6 +7,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import { generateNamespaceCommand } from "./commands/generateNamespace";
 import {
     pintCommands,
     PintEditProvider,
@@ -85,6 +86,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerDocumentFormattingEditProvider(
             PHP_LANGUAGE,
             new PintEditProvider(),
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.namespace.generate"),
+            generateNamespaceCommand,
         ),
     );
 
