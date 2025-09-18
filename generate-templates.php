@@ -17,4 +17,6 @@ foreach ($templates as $template) {
     file_put_contents(__DIR__ . '/src/templates/' . pathinfo($template, PATHINFO_FILENAME) . '.ts', $content);
 }
 
-exec('npm run format');
+if (!isset($building)) {
+    exec('npm run format');
+}
