@@ -155,8 +155,12 @@ $models = new class($factory) {
             ->toArray();
 
         $data['scopes'] = collect($reflection->getMethods())
-            ->filter(fn($method) =>!$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
-            ->map(fn($method) => str($method->name)->replace('scope', '')->lcfirst()->toString())
+            ->filter(fn(\\ReflectionMethod $method) =>!$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
+            ->map(fn(\\ReflectionMethod $method) => [
+                "name" => str($method->name)->replace('scope', '')->lcfirst()->toString(),
+                "uri" => $method->getFileName(),
+                "start_line" => $method->getStartLine()
+            ])
             ->values()
             ->toArray();
 
