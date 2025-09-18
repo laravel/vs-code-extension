@@ -91,7 +91,7 @@
                     "group": "laravel"
                 },
                 {
-                    "command": "laravel.generateNamespace",
+                    "command": "laravel.namespace.generate",
                     "when": "resourceLangId == php",
                     "group": "laravel"
                 }
@@ -215,7 +215,7 @@
                 "category": "Laravel"
             },
             {
-                "command": "laravel.generateNamespace",
+                "command": "laravel.namespace.generate",
                 "title": "Generate namespace",
                 "category": "Laravel"
             }

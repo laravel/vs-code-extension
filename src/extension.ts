@@ -88,7 +88,7 @@ export async function activate(context: vscode.ExtensionContext) {
             new PintEditProvider(),
         ),
         vscode.commands.registerCommand(
-            commandName("laravel.generateNamespace"),
+            commandName("laravel.namespace.generate"),
             generateNamespaceCommand,
         ),
     );
