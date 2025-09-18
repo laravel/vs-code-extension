@@ -120,4 +120,6 @@ file_put_contents(
     json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
 );
 
-exec('npm run format');
+if (!isset($building)) {
+    exec('npm run format');
+}

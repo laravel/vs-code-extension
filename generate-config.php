@@ -52,4 +52,6 @@ file_put_contents(
     "export type GeneratedConfigKey = '" . implode("' | '", $keys) . "';" . PHP_EOL
 );
 
-exec('npm run format');
+if (!isset($building)) {
+    exec('npm run format');
+}
