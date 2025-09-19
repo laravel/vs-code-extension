@@ -221,8 +221,8 @@ export const runInLaravel = <T>(
         .then((result: string) => {
             const regex = new RegExp(
                 toTemplateVar("start_output") +
-                    "(.*)" +
-                    toTemplateVar("end_output"),
+                "(.*)" +
+                toTemplateVar("end_output"),
                 "gs",
             );
 
@@ -321,11 +321,10 @@ export const artisan = (
     command: string,
     workspaceFolder?: string | undefined,
 ): Promise<string> => {
-    const fullCommand = projectPath("artisan") + " " + command;
+    // Support for multi-root workspaces
+    const fullCommand = projectPath("artisan", workspaceFolder) + " " + command;
 
-    if (!workspaceFolder) {
-        workspaceFolder = getWorkspaceFolders()[0]?.uri?.fsPath;
-    }
+    workspaceFolder ??= getWorkspaceFolders()[0]?.uri?.fsPath;
 
     return new Promise<string>((resolve, error) => {
         cp.exec(

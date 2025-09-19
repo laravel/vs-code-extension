@@ -26,7 +26,7 @@ interface Command {
 
 enum OptionType {
     Select,
-    Input
+    Input,
 }
 
 enum ArgumentType {
@@ -75,16 +75,6 @@ type SubCommand =
 const forceOption: Option = {
     name: "--force",
     description: "Create the class even if the cast already exists",
-};
-
-const invokableOption: Option = {
-    name: "--invokable",
-    description: "Generate a single method, invokable class",
-};
-
-const inlineOption: Option = {
-    name: "--inline",
-    description: "Create a component that renders an inline view",
 };
 
 const testOptions: Option[] = [
@@ -140,7 +130,13 @@ export const commands: Command[] = [
                 description: "The name of the class",
             },
         ],
-        options: [forceOption, invokableOption],
+        options: [
+            forceOption,
+            {
+                name: "--invokable",
+                description: "Generate a single method, invokable class",
+            },
+        ],
     },
     {
         name: "command",
@@ -164,7 +160,10 @@ export const commands: Command[] = [
         ],
         options: [
             forceOption,
-            inlineOption,
+            {
+                name: "--inline",
+                description: "Create a component that renders an inline view",
+,
             {
                 name: "--view",
                 description: "Create an anonymous component with only a view",
@@ -183,7 +182,10 @@ export const commands: Command[] = [
         ],
         options: [
             forceOption,
-            invokableOption,
+            {
+                name: "--invokable",
+                description: "Generate a single method, invokable class",
+            },
             {
                 name: "--api",
                 description:
@@ -191,6 +193,7 @@ export const commands: Command[] = [
             },
             {
                 name: "--model",
+                type: OptionType.Select,
                 callback: () => getModelClassnames(),
                 description:
                     "Generate a resource controller for the given model",
@@ -281,6 +284,7 @@ export const commands: Command[] = [
         options: [
             {
                 name: "--model",
+                type: OptionType.Select,
                 callback: () => getModelClassnames(),
                 description: "The name of the model",
             },
@@ -353,7 +357,13 @@ export const commands: Command[] = [
                 description: "The name of the Livewire component",
             },
         ],
-        options: [forceOption, inlineOption, ...testOptions],
+        options: [
+            forceOption, {
+                name: "--inline",
+                description: "Create a component that renders an inline view",
+            },
+            ...testOptions
+        ],
     },
     {
         name: "mail",
@@ -407,7 +417,7 @@ export const commands: Command[] = [
                 name: "--table",
                 type: OptionType.Input,
                 description: "The table to migrate",
-            }
+            },
         ],
     },
     {
@@ -423,7 +433,8 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--all",
-                description: "Generate a migration, seeder, factory, policy, resource controller, and form request classes for the model",
+                description:
+                    "Generate a migration, seeder, factory, policy, resource controller, and form request classes for the model",
             },
             {
                 name: "--controller",
@@ -439,7 +450,8 @@ export const commands: Command[] = [
             },
             {
                 name: "--morph-pivot",
-                description: "Indicates if the generated model should be a custom polymorphic intermediate table model",
+                description:
+                    "Indicates if the generated model should be a custom polymorphic intermediate table model",
             },
             {
                 name: "--policy",
@@ -451,23 +463,27 @@ export const commands: Command[] = [
             },
             {
                 name: "--pivot",
-                description: "Indicates if the generated model should be a custom intermediate table model",
+                description:
+                    "Indicates if the generated model should be a custom intermediate table model",
             },
             {
                 name: "--resource",
-                description: "Indicates if the generated controller should be a resource controller",
+                description:
+                    "Indicates if the generated controller should be a resource controller",
             },
             {
                 name: "--api",
-                description: "Indicates if the generated controller should be an API resource controller",
+                description:
+                    "Indicates if the generated controller should be an API resource controller",
             },
             {
                 name: "--requests",
-                description: "Create new form request classes and use them in the resource controller",
+                description:
+                    "Create new form request classes and use them in the resource controller",
             },
-            ...testOptions
+            ...testOptions,
         ],
-    }
+    },
 ];
 
 const getModelClassnames = (): Record<string, string> =>
@@ -526,6 +542,7 @@ const getValueForArgumentType = async (
         case ArgumentType.Path:
             // OS path separators
             return path.normalize(value.replace("\\", "/"));
+
         default:
             return value;
     }
