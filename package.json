@@ -120,8 +120,33 @@
             ],
             "explorer/context": [
                 {
+                    "command": "laravel.artisan.make.cast",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Cast(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.channel",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Broadcasting(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.command",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Console\\/Command(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.component",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/View(s?)\\/Component(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
                     "command": "laravel.artisan.make.controller",
                     "when": "explorerResourceIsFolder && resourcePath =~ /\\/Controller(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.enum",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/(Enum|ValueObject)(s?)(\\/|$)/i",
                     "group": "navigation"
                 }
             ],
@@ -227,8 +252,33 @@
                 "category": "Laravel"
             },
             {
+                "command": "laravel.artisan.make.cast",
+                "title": "New Cast...",
+                "category": "Laravel"
+            },   
+            {
+                "command": "laravel.artisan.make.channel",
+                "title": "New Channel...",
+                "category": "Laravel"
+            },       
+            {
+                "command": "laravel.artisan.make.command",
+                "title": "New Console Command...",
+                "category": "Laravel"
+            },    
+            {
+                "command": "laravel.artisan.make.component",
+                "title": "New View Component...",
+                "category": "Laravel"
+            },                                       
+            {
                 "command": "laravel.artisan.make.controller",
                 "title": "New Controller...",
+                "category": "Laravel"
+            },                                       
+            {
+                "command": "laravel.artisan.make.enum",
+                "title": "New Enum...",
                 "category": "Laravel"
             }
         ],

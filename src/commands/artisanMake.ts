@@ -1,3 +1,4 @@
+import { getModels } from "@src/repositories/models";
 import { artisan } from "@src/support/php";
 import path from "path";
 import * as vscode from "vscode";
@@ -23,7 +24,9 @@ interface Command {
 }
 
 enum ArgumentType {
-    Namespace = "namespace",
+    NamespaceOrPath,
+    Namespace,
+    Path,
 }
 
 enum EndSelection {
@@ -31,9 +34,97 @@ enum EndSelection {
     Value = "end-selection",
 }
 
-type SubCommand = "controller" | "model";
+type SubCommand =
+    | "cast"
+    | "channel"
+    | "command"
+    | "component"
+    | "controller"
+    | "model"
+    | "enum";
+
+const forceOption: Option = {
+    name: "--force",
+    description: "Create the class even if the cast already exists",
+};
+
+const testOptions: Option[] = [
+    {
+        name: "--test",
+        description: "Generate an accompanying Test test for the Controller",
+    },
+    {
+        name: "--pest",
+        description: "Generate an accompanying Pest test for the Controller",
+    },
+    {
+        name: "--phpunit",
+        description: "Generate an accompanying PHPUnit test for the Controller",
+    },
+];
 
 export const commands: Command[] = [
+    {
+        name: "cast",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the cast class",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--inbound",
+                description: "Generate an inbound cast class",
+            },
+        ],
+    },
+    {
+        name: "channel",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the channel",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "command",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the command",
+            },
+        ],
+        options: [forceOption, ...testOptions],
+    },
+    {
+        name: "component",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.NamespaceOrPath,
+                description: "The name of the component",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--inline",
+                description: "Create a component that renders an inline view",
+            },
+            {
+                name: "--view",
+                description: "Create an anonymous component with only a view",
+            },
+            ...testOptions,
+        ],
+    },
     {
         name: "controller",
         arguments: [
@@ -41,9 +132,10 @@ export const commands: Command[] = [
                 name: "name",
                 type: ArgumentType.Namespace,
                 description: "The name of the controller",
-            }
+            },
         ],
         options: [
+            forceOption,
             {
                 name: "--api",
                 description:
@@ -54,8 +146,61 @@ export const commands: Command[] = [
                 description:
                     "Generate a single method, invokable controller class",
             },
+            {
+                name: "--model",
+                callback: () =>
+                    Object.fromEntries(
+                        Object.entries(getModels().items).map(([_, model]) => [
+                            model.class,
+                            // We need escape backslashes because finally it will be a part of CLI command
+                            model.class.replace(/(?<!\\)\\(?!\\)/g, "\\\\"),
+                        ]),
+                    ),
+                description:
+                    "Generate a resource controller for the given model",
+            },
+            {
+                name: "--resource",
+                description: "Generate a resource controller class",
+            },
+            {
+                name: "--requests",
+                description:
+                    "Generate FormRequest classes for store and update",
+            },
+            {
+                name: "--singleton",
+                description: "Generate a singleton resource controller class",
+            },
+            {
+                name: "--creatable",
+                description:
+                    "Indicate that a singleton resource should be creatable",
+            },
+            ...testOptions,
         ],
     },
+    {
+        name: "enum",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the enum",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--string",
+                description: "Generate a string backed enum."
+            },
+            {
+                name: "--int",
+                description: "Generate an integer backed enum."
+            }
+        ],
+    }
 ];
 
 const getValueForArgumentType = async (
@@ -65,8 +210,29 @@ const getValueForArgumentType = async (
     uri: vscode.Uri,
 ): Promise<string> => {
     switch (argumentType) {
+        case ArgumentType.NamespaceOrPath:
+            try {
+                return await getValueForArgumentType(
+                    value,
+                    ArgumentType.Namespace,
+                    workspaceFolder,
+                    uri,
+                );
+            } catch (error) {
+                if (error instanceof NamespaceNotFoundError) {
+                    return await getValueForArgumentType(
+                        value,
+                        ArgumentType.Path,
+                        workspaceFolder,
+                        uri,
+                    );
+                }
+
+                throw error;
+            }
+
         case ArgumentType.Namespace:
-            // User can input a relative path, for example: NewFolder\NewFile 
+            // User can input a relative path, for example: NewFolder\NewFile
             // or NewFolder/NewFile, so we need to convert it to a new Uri
             const newUri = vscode.Uri.joinPath(uri, value);
 
@@ -74,10 +240,12 @@ const getValueForArgumentType = async (
 
             const namespace = await getNamespace(workspaceFolder, newUri);
 
-            return (`${namespace}\\${fileName}`)
-                .replace(/\//g, "\\")
-                // We need escape backslashes because finally it will be a part of CLI command
-                .replace(/(?<!\\)\\(?!\\)/g, "\\\\");
+            return (
+                `${namespace}\\${fileName}`
+                    .replace(/\//g, "\\")
+                    // We need escape backslashes because finally it will be a part of CLI command
+                    .replace(/(?<!\\)\\(?!\\)/g, "\\\\")
+            );
         default:
             return value;
     }
@@ -86,7 +254,7 @@ const getValueForArgumentType = async (
 const getUserArguments = async (
     commandArguments: Argument[],
     workspaceFolder: vscode.WorkspaceFolder,
-    uri: vscode.Uri
+    uri: vscode.Uri,
 ): Promise<Record<string, string> | undefined> => {
     const userArguments: Record<string, string> = {};
 
@@ -175,7 +343,29 @@ const getUserOptions = async (
             break;
         }
 
-        userOptions[choice.command] = choice.command;
+        let value = choice.command;
+
+        const option = commandOptions.find(
+            (option) => option.name === choice.command,
+        );
+
+        if (option?.callback) {
+            const callbackChoice = await vscode.window.showQuickPick(
+                Object.entries(option.callback()).map(([key, value]) => ({
+                    label: key,
+                    command: value,
+                })),
+            );
+
+            // Once again if the user cancels the selection by pressing ESC
+            if (callbackChoice === undefined) {
+                continue;
+            }
+
+            value = callbackChoice.command;
+        }
+
+        userOptions[choice.command] = value;
 
         pickOptions.splice(pickOptions.indexOf(choice), 1);
 
@@ -236,21 +426,29 @@ export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
 
     const error = output.match(/ERROR\s+(.*)/);
 
-    if (error) {
+    if (error?.[1]) {
         vscode.window.showErrorMessage(error[1]);
 
         return;
     }
 
-    const filePath = output.match(/\[(.*?)\]/)?.[1];
+    const paths = output.match(/\[(.*?)\]/g);
 
-    if (!filePath) {
-        vscode.window.showErrorMessage("Failed to get the path of the new file");
+    if (!paths) {
+        vscode.window.showErrorMessage(
+            "Failed to get the path of the new file",
+        );
 
         return;
     }
 
-    const fullPath = path.join(workspaceFolder.uri.fsPath, filePath);
+    // If artisan command creates multiple files, the last one is the one we want, I hope so :P
+    //
+    // INFO  Test [tests/Feature/Http/Controllers/NewControllerTest.php] created successfully.
+    // INFO  Controller [app/Http/Controllers/NewController.php] created successfully.
+    const lastPath = paths[paths.length - 1].slice(1, -1);
+
+    const fullPath = path.join(workspaceFolder.uri.fsPath, lastPath);
 
     openFileCommand(vscode.Uri.file(fullPath), 1, 1);
 };
