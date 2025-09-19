@@ -67,10 +67,12 @@ type SubCommand =
     | "request"
     | "resource"
     | "rule"
+    | "scope"
     | "seeder"
     | "service"
     | "test"
-    | "trait";
+    | "trait"
+    | "view";
 
 const forceOption: Option = {
     name: "--force",
@@ -163,7 +165,7 @@ export const commands: Command[] = [
             {
                 name: "--inline",
                 description: "Create a component that renders an inline view",
-,
+            },
             {
                 name: "--view",
                 description: "Create an anonymous component with only a view",
@@ -484,6 +486,179 @@ export const commands: Command[] = [
             ...testOptions,
         ],
     },
+    {
+        name: "notification",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the notification",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--markdown",
+                description: "Create a new Markdown template for the notification"
+            },
+            ...testOptions
+        ],
+    },
+    {
+        name: "observer",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the observer",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--model",
+                type: OptionType.Select,
+                callback: () => getModelClassnames(),
+                description: "The model that the observer applies to",
+            }
+        ],
+    },
+    {
+        name: "policy",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the policy",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--model",
+                type: OptionType.Select,
+                callback: () => getModelClassnames(),
+                description: "The model that the policy applies to",
+            },
+            {
+                name: "--guard",
+                type: OptionType.Input,
+                description: "The guard that the policy relies on",
+            }
+        ],
+    },
+    {
+        name: "provider",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the service provider",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "request",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the request",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "resource",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the resource",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--collection",
+                description: "Create a resource collection"
+            }
+        ],
+    },
+    {
+        name: "scope",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the scope",
+            },
+        ],
+        options: [
+            forceOption,
+        ],
+    },
+    {
+        name: "seeder",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Path,
+                description: "The name of the seeder",
+            },
+        ],
+    },
+    {
+        name: "test",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.NamespaceOrPath,
+                description: "The name of the test",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--unit",
+                description: "Create a unit test",
+            },
+            {
+                name: "--pest",
+                description: "Create a Pest test",
+            },
+            {
+                name: "--phpunit",
+                description: "Create a PHPUnit test",
+            },
+        ],
+    },
+    {
+        name: "trait",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the trait",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "view",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Path,
+                description: "The name of the view",
+            },
+        ],
+        options: [
+            forceOption,
+            ...testOptions
+        ],
+    }
 ];
 
 const getModelClassnames = (): Record<string, string> =>
@@ -537,15 +712,36 @@ const getValueForArgumentType = async (
                     .replace(/\//g, "\\")
                     // We need escape backslashes because finally it will be a part of CLI command
                     .replace(/(?<!\\)\\(?!\\)/g, "\\\\")
+                    .trim()
             );
 
         case ArgumentType.Path:
             // OS path separators
-            return path.normalize(value.replace("\\", "/"));
+            return path.normalize(value.replace("\\", "/")).trim();
 
         default:
-            return value;
+            return value.trim();
     }
+};
+
+const validateInput = (input: string, field: string): boolean => {
+    if (input === "") {
+        vscode.window.showWarningMessage(
+            `${field} is required`,
+        );
+
+        return false;
+    }
+
+    if (/\s/.test(input)) {
+        vscode.window.showWarningMessage(
+            `${field} cannot contain spaces`,
+        );
+
+        return false;
+    }
+
+    return true;
 };
 
 const getUserArguments = async (
@@ -568,10 +764,8 @@ const getUserArguments = async (
                 return;
             }
 
-            if (input === "") {
-                vscode.window.showWarningMessage(
-                    `Argument ${argument.name} is required`,
-                );
+            if (!validateInput(input, `Argument ${argument.name}`)) {
+                input = undefined;
             }
         }
 
@@ -675,10 +869,8 @@ const getUserOptions = async (
                     break;
                 }
 
-                if (input === "") {
-                    vscode.window.showWarningMessage(
-                        `Value for ${option.name} is required`,
-                    );
+                if (!validateInput(input, `Value for ${option.name}`)) {
+                    input = undefined;
                 }
             }
 
