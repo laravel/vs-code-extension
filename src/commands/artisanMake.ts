@@ -984,8 +984,6 @@ export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
 
     if (error?.[1]) {
         vscode.window.showErrorMessage(error[1]);
-
-        return;
     }
 
     const outputPath = getPathFromOutput(
