@@ -221,8 +221,8 @@ export const runInLaravel = <T>(
         .then((result: string) => {
             const regex = new RegExp(
                 toTemplateVar("start_output") +
-                "(.*)" +
-                toTemplateVar("end_output"),
+                    "(.*)" +
+                    toTemplateVar("end_output"),
                 "gs",
             );
 

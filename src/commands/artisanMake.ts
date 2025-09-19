@@ -360,11 +360,12 @@ export const commands: Command[] = [
             },
         ],
         options: [
-            forceOption, {
+            forceOption,
+            {
                 name: "--inline",
                 description: "Create a component that renders an inline view",
             },
-            ...testOptions
+            ...testOptions,
         ],
     },
     {
@@ -499,9 +500,10 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--markdown",
-                description: "Create a new Markdown template for the notification"
+                description:
+                    "Create a new Markdown template for the notification",
             },
-            ...testOptions
+            ...testOptions,
         ],
     },
     {
@@ -520,7 +522,7 @@ export const commands: Command[] = [
                 type: OptionType.Select,
                 callback: () => getModelClassnames(),
                 description: "The model that the observer applies to",
-            }
+            },
         ],
     },
     {
@@ -544,7 +546,7 @@ export const commands: Command[] = [
                 name: "--guard",
                 type: OptionType.Input,
                 description: "The guard that the policy relies on",
-            }
+            },
         ],
     },
     {
@@ -582,8 +584,8 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--collection",
-                description: "Create a resource collection"
-            }
+                description: "Create a resource collection",
+            },
         ],
     },
     {
@@ -595,9 +597,7 @@ export const commands: Command[] = [
                 description: "The name of the scope",
             },
         ],
-        options: [
-            forceOption,
-        ],
+        options: [forceOption],
     },
     {
         name: "seeder",
@@ -654,11 +654,8 @@ export const commands: Command[] = [
                 description: "The name of the view",
             },
         ],
-        options: [
-            forceOption,
-            ...testOptions
-        ],
-    }
+        options: [forceOption, ...testOptions],
+    },
 ];
 
 const getModelClassnames = (): Record<string, string> =>
@@ -726,17 +723,13 @@ const getValueForArgumentType = async (
 
 const validateInput = (input: string, field: string): boolean => {
     if (input === "") {
-        vscode.window.showWarningMessage(
-            `${field} is required`,
-        );
+        vscode.window.showWarningMessage(`${field} is required`);
 
         return false;
     }
 
     if (/\s/.test(input)) {
-        vscode.window.showWarningMessage(
-            `${field} cannot contain spaces`,
-        );
+        vscode.window.showWarningMessage(`${field} cannot contain spaces`);
 
         return false;
     }
