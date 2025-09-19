@@ -7,6 +7,11 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import {
+    artisanMakeCommand,
+    artisanMakeCommandNameSubCommandName,
+    commands as artisanMakeCommands,
+} from "./commands/artisanMake";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import {
     pintCommands,
@@ -257,6 +262,12 @@ export async function activate(context: vscode.ExtensionContext) {
             htmlClassToBladeDirectiveCommands.all,
             refactorAllHtmlClassesToBladeDirectives,
         ),
+        ...artisanMakeCommands.map((command) => {
+            return vscode.commands.registerCommand(
+                artisanMakeCommandNameSubCommandName(command.name),
+                (uri: vscode.Uri) => artisanMakeCommand(command, uri),
+            );
+        }),
     );
 
     collectDebugInfo();

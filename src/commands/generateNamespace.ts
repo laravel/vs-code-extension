@@ -34,6 +34,50 @@ const getPsr4Autoloads = async (
     };
 };
 
+export class NamespaceNotFoundError extends Error {}
+
+export const getNamespace = async (
+    workspaceFolder: vscode.WorkspaceFolder,
+    fileUri: vscode.Uri,
+): Promise<string> => {
+    const composerPath = vscode.Uri.joinPath(
+        workspaceFolder.uri,
+        "composer.json",
+    );
+
+    const autoloads = await getPsr4Autoloads(composerPath);
+
+    const namespaces: Namespace[] = Object.entries(autoloads)
+        .map(([namespace, path]) => ({ namespace, path }))
+        // We need to sort by length, because we need to check longer paths first, for example:
+        //
+        // "psr-4": {
+        //    "App\\": "app/",
+        //    "App\\AnotherNamespace\\": "app/anotherPath/",
+        // }
+        //
+        // Otherwise, the system will first find the shorter one, which also matches
+        .sort((a, b) => b.path.length - a.path.length);
+
+    const findNamespace = namespaces.find((namespace) =>
+        fileUri.path.startsWith(
+            `${workspaceFolder.uri.path}/${namespace.path}`,
+        ),
+    );
+
+    if (!findNamespace) {
+        throw new NamespaceNotFoundError();
+    }
+
+    return (
+        findNamespace.namespace +
+        fileUri.path
+            .replace(`${workspaceFolder.uri.path}/${findNamespace.path}`, "")
+            .replace(/\/?[^\/]+$/, "")
+            .replace(/\//g, "\\")
+    ).replace(/\\$/, "");
+};
+
 const getNamespaceReplacement = (
     newNamespace: string,
     content: string,
@@ -88,44 +132,21 @@ export const generateNamespaceCommand = async () => {
         return;
     }
 
-    const composerPath = vscode.Uri.joinPath(
-        workspaceFolder.uri,
-        "composer.json",
-    );
+    let newNamespace = undefined;
 
-    const autoloads = await getPsr4Autoloads(composerPath);
+    try {
+        newNamespace = await getNamespace(workspaceFolder, fileUri);
+    } catch (error) {
+        if (error instanceof NamespaceNotFoundError) {
+            vscode.window.showErrorMessage(
+                "Failed to find a matching namespace",
+            );
 
-    const namespaces: Namespace[] = Object.entries(autoloads)
-        .map(([namespace, path]) => ({ namespace, path }))
-        // We need to sort by length, because we need to check longer paths first, for example:
-        //
-        // "psr-4": {
-        //    "App\\": "app/",
-        //    "App\\AnotherNamespace\\": "app/anotherPath/",
-        // }
-        //
-        // Otherwise, the system will first find the shorter one, which also matches
-        .sort((a, b) => b.path.length - a.path.length);
+            return;
+        }
 
-    const findNamespace = namespaces.find((namespace) =>
-        fileUri.path.startsWith(
-            `${workspaceFolder.uri.path}/${namespace.path}`,
-        ),
-    );
-
-    if (!findNamespace) {
-        vscode.window.showErrorMessage("Failed to find a matching namespace");
-
-        return;
+        throw error;
     }
-
-    const newNamespace = (
-        findNamespace.namespace +
-        fileUri.path
-            .replace(`${workspaceFolder.uri.path}/${findNamespace.path}`, "")
-            .replace(/\/?[^\/]+$/, "")
-            .replace(/\//g, "\\")
-    ).replace(/\\$/, "");
 
     const doc = editor.document;
     const text = doc.getText();

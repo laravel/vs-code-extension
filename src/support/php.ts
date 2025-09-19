@@ -317,14 +317,21 @@ export const runPhp = (
     });
 };
 
-export const artisan = (command: string): Promise<string> => {
+export const artisan = (
+    command: string,
+    workspaceFolder?: string | undefined,
+): Promise<string> => {
     const fullCommand = projectPath("artisan") + " " + command;
+
+    if (!workspaceFolder) {
+        workspaceFolder = getWorkspaceFolders()[0]?.uri?.fsPath;
+    }
 
     return new Promise<string>((resolve, error) => {
         cp.exec(
             fullCommand,
             {
-                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+                cwd: workspaceFolder,
             },
             (err, stdout, stderr) => {
                 if (err === null) {

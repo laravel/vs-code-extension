@@ -118,6 +118,13 @@
                     "group": "laravel"
                 }
             ],
+            "explorer/context": [
+                {
+                    "command": "laravel.artisan.make.controller",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Controller(s?)(\\/|$)/i",
+                    "group": "navigation"
+                }
+            ],
             "laravel.wrapWithHelper.submenu": [
                 {
                     "command": "laravel.wrapWithHelper.dd"
@@ -217,6 +224,11 @@
             {
                 "command": "laravel.namespace.generate",
                 "title": "Generate namespace",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.controller",
+                "title": "New Controller...",
                 "category": "Laravel"
             }
         ],
