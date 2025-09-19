@@ -13,6 +13,7 @@ interface Argument {
 
 interface Option {
     name: string;
+    type?: OptionType | undefined;
     callback?: () => Record<string, string>;
     description?: string;
 }
@@ -21,6 +22,11 @@ interface Command {
     name: SubCommand;
     arguments: [Argument, ...Argument[]];
     options?: Option[];
+}
+
+enum OptionType {
+    Select,
+    Input
 }
 
 enum ArgumentType {
@@ -37,29 +43,62 @@ enum EndSelection {
 type SubCommand =
     | "cast"
     | "channel"
+    | "class"
     | "command"
     | "component"
     | "controller"
     | "model"
-    | "enum";
+    | "enum"
+    | "event"
+    | "exception"
+    | "factory"
+    | "interface"
+    | "job"
+    | "job-middleware"
+    | "listener"
+    | "livewire"
+    | "mail"
+    | "middleware"
+    | "migration"
+    | "notification"
+    | "observer"
+    | "policy"
+    | "provider"
+    | "request"
+    | "resource"
+    | "rule"
+    | "seeder"
+    | "service"
+    | "test"
+    | "trait";
 
 const forceOption: Option = {
     name: "--force",
     description: "Create the class even if the cast already exists",
 };
 
+const invokableOption: Option = {
+    name: "--invokable",
+    description: "Generate a single method, invokable class",
+};
+
+const inlineOption: Option = {
+    name: "--inline",
+    description: "Create a component that renders an inline view",
+};
+
 const testOptions: Option[] = [
     {
         name: "--test",
-        description: "Generate an accompanying Test test for the Controller",
+        description: "Generate an accompanying Test test for the class",
     },
     {
         name: "--pest",
-        description: "Generate an accompanying Pest test for the Controller",
+        description: "Generate an accompanying Pest test for the class",
     },
     {
         name: "--phpunit",
-        description: "Generate an accompanying PHPUnit test for the Controller",
+        description: "Generate an accompanying PHPUnit test for the class",
     },
 ];
 
@@ -93,6 +132,17 @@ export const commands: Command[] = [
         options: [forceOption],
     },
     {
+        name: "class",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the class",
+            },
+        ],
+        options: [forceOption, invokableOption],
+    },
+    {
         name: "command",
         arguments: [
             {
@@ -114,10 +164,7 @@ export const commands: Command[] = [
         ],
         options: [
             forceOption,
-            {
-                name: "--inline",
-                description: "Create a component that renders an inline view",
-            },
+            inlineOption,
             {
                 name: "--view",
                 description: "Create an anonymous component with only a view",
@@ -136,26 +183,15 @@ export const commands: Command[] = [
         ],
         options: [
             forceOption,
+            invokableOption,
             {
                 name: "--api",
                 description:
                     "Exclude the create and edit methods from the controller",
             },
             {
-                name: "--invokable",
-                description:
-                    "Generate a single method, invokable controller class",
-            },
-            {
                 name: "--model",
-                callback: () =>
-                    Object.fromEntries(
-                        Object.entries(getModels().items).map(([_, model]) => [
-                            model.class,
-                            // We need escape backslashes because finally it will be a part of CLI command
-                            model.class.replace(/(?<!\\)\\(?!\\)/g, "\\\\"),
-                        ]),
-                    ),
+                callback: () => getModelClassnames(),
                 description:
                     "Generate a resource controller for the given model",
             },
@@ -193,15 +229,255 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--string",
-                description: "Generate a string backed enum."
+                description: "Generate a string backed enum.",
             },
             {
                 name: "--int",
-                description: "Generate an integer backed enum."
+                description: "Generate an integer backed enum.",
+            },
+        ],
+    },
+    {
+        name: "event",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the event",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "exception",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the exception",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--render",
+                description: "Create the exception with an empty render method",
+            },
+            {
+                name: "--report",
+                description: "Create the exception with an empty report method",
+            },
+        ],
+    },
+    {
+        name: "factory",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the factory",
+            },
+        ],
+        options: [
+            {
+                name: "--model",
+                callback: () => getModelClassnames(),
+                description: "The name of the model",
+            },
+        ],
+    },
+    {
+        name: "interface",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the interface",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "job",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the job",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--sync",
+                description: "Indicates that job should be synchronous",
+            },
+            ...testOptions,
+        ],
+    },
+    {
+        name: "job-middleware",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the job middleware",
+            },
+        ],
+        options: [forceOption, ...testOptions],
+    },
+    {
+        name: "listener",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the listener",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--queued",
+                description: "Indicates that listener should be queued",
+            },
+            ...testOptions,
+        ],
+    },
+    {
+        name: "livewire",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Path,
+                description: "The name of the Livewire component",
+            },
+        ],
+        options: [forceOption, inlineOption, ...testOptions],
+    },
+    {
+        name: "mail",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the mail",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--markdown",
+                description: "Create a new Markdown template for the mailable",
+            },
+            {
+                name: "--view",
+                description: "Create a new Blade template for the mailable",
+            },
+            ...testOptions,
+        ],
+    },
+    {
+        name: "middleware",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the middleware",
+            },
+        ],
+        options: [forceOption],
+    },
+    {
+        name: "migration",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Path,
+                description: "The name of the migration",
+            },
+        ],
+        options: [
+            {
+                name: "--create",
+                type: OptionType.Input,
+                description: "The table to be created",
+            },
+            {
+                name: "--table",
+                type: OptionType.Input,
+                description: "The table to migrate",
             }
+        ],
+    },
+    {
+        name: "model",
+        arguments: [
+            {
+                name: "name",
+                type: ArgumentType.Namespace,
+                description: "The name of the model",
+            },
+        ],
+        options: [
+            forceOption,
+            {
+                name: "--all",
+                description: "Generate a migration, seeder, factory, policy, resource controller, and form request classes for the model",
+            },
+            {
+                name: "--controller",
+                description: "Create a new controller for the model",
+            },
+            {
+                name: "--factory",
+                description: "Create a new factory for the model",
+            },
+            {
+                name: "--migration",
+                description: "Create a new migration file for the model",
+            },
+            {
+                name: "--morph-pivot",
+                description: "Indicates if the generated model should be a custom polymorphic intermediate table model",
+            },
+            {
+                name: "--policy",
+                description: "Create a new policy for the model",
+            },
+            {
+                name: "--seed",
+                description: "Create a new seeder for the model",
+            },
+            {
+                name: "--pivot",
+                description: "Indicates if the generated model should be a custom intermediate table model",
+            },
+            {
+                name: "--resource",
+                description: "Indicates if the generated controller should be a resource controller",
+            },
+            {
+                name: "--api",
+                description: "Indicates if the generated controller should be an API resource controller",
+            },
+            {
+                name: "--requests",
+                description: "Create new form request classes and use them in the resource controller",
+            },
+            ...testOptions
         ],
     }
 ];
+
+const getModelClassnames = (): Record<string, string> =>
+    Object.fromEntries(
+        Object.entries(getModels().items).map(([_, model]) => [
+            model.class,
+            // We need escape backslashes because finally it will be a part of CLI command
+            model.class.replace(/(?<!\\)\\(?!\\)/g, "\\\\"),
+        ]),
+    );
 
 const getValueForArgumentType = async (
     value: string,
@@ -246,6 +522,10 @@ const getValueForArgumentType = async (
                     // We need escape backslashes because finally it will be a part of CLI command
                     .replace(/(?<!\\)\\(?!\\)/g, "\\\\")
             );
+
+        case ArgumentType.Path:
+            // OS path separators
+            return path.normalize(value.replace("\\", "/"));
         default:
             return value;
     }
@@ -316,7 +596,7 @@ const getUserOptions = async (
     }
 
     let pickOptions = commandOptions.map((option) => ({
-        label: `${option.name} (${option.description})`,
+        label: `${option.name} ${option.description}`,
         command: option.name,
     }));
 
@@ -343,13 +623,13 @@ const getUserOptions = async (
             break;
         }
 
-        let value = choice.command;
+        let value = undefined;
 
         const option = commandOptions.find(
             (option) => option.name === choice.command,
         );
 
-        if (option?.callback) {
+        if (option?.type === OptionType.Select && option?.callback) {
             const callbackChoice = await vscode.window.showQuickPick(
                 Object.entries(option.callback()).map(([key, value]) => ({
                     label: key,
@@ -365,7 +645,35 @@ const getUserOptions = async (
             value = callbackChoice.command;
         }
 
-        userOptions[choice.command] = value;
+        if (option?.type === OptionType.Input) {
+            let input = undefined;
+
+            while (!input) {
+                input = await vscode.window.showInputBox({
+                    prompt: option.description,
+                });
+
+                // Exit when the user press ESC
+                if (input === undefined) {
+                    break;
+                }
+
+                if (input === "") {
+                    vscode.window.showWarningMessage(
+                        `Value for ${option.name} is required`,
+                    );
+                }
+            }
+
+            // Once again if the user cancels the selection by pressing ESC
+            if (input === undefined) {
+                continue;
+            }
+
+            value = input;
+        }
+
+        userOptions[choice.command] = value ?? choice.command;
 
         pickOptions.splice(pickOptions.indexOf(choice), 1);
 
@@ -387,6 +695,44 @@ const getOptionsAsString = (userOptions: Record<string, string | undefined>) =>
             return key;
         })
         .join(" ");
+
+const getPathFromOutput = (
+    output: string,
+    command: SubCommand,
+    workspaceFolder: vscode.WorkspaceFolder,
+    uri: vscode.Uri,
+): string | undefined => {
+    let paths;
+
+    // Unfortunately, Livewire has own output format for make:livewire
+    if (command === "livewire") {
+        paths = output.match(/CLASS:\s+(.*)/);
+
+        if (paths?.[1]) {
+            return paths?.[1];
+        }
+    }
+
+    paths = output.match(/\[(.*?)\]/g)?.map((path) => path.slice(1, -1));
+
+    if (!paths) {
+        return;
+    }
+
+    // If artisan command creates multiple files, we have to find the right one, for example:
+    //
+    // INFO  Test [tests/Feature/Http/Controllers/NewControllerTest.php] created successfully.
+    // INFO  Controller [app/Http/Controllers/NewController.php] created successfully.
+    const outputPath = paths
+        .map((_path) => path.join(workspaceFolder.uri.fsPath, _path))
+        .find((_path) => _path.startsWith(uri.fsPath.replaceAll("\\", "/")));
+
+    if (!outputPath) {
+        return;
+    }
+
+    return outputPath;
+};
 
 export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
     `laravel.artisan.make.${command}`;
@@ -432,9 +778,14 @@ export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
         return;
     }
 
-    const paths = output.match(/\[(.*?)\]/g);
+    const outputPath = getPathFromOutput(
+        output,
+        command.name,
+        workspaceFolder,
+        uri,
+    );
 
-    if (!paths) {
+    if (!outputPath) {
         vscode.window.showErrorMessage(
             "Failed to get the path of the new file",
         );
@@ -442,13 +793,5 @@ export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
         return;
     }
 
-    // If artisan command creates multiple files, the last one is the one we want, I hope so :P
-    //
-    // INFO  Test [tests/Feature/Http/Controllers/NewControllerTest.php] created successfully.
-    // INFO  Controller [app/Http/Controllers/NewController.php] created successfully.
-    const lastPath = paths[paths.length - 1].slice(1, -1);
-
-    const fullPath = path.join(workspaceFolder.uri.fsPath, lastPath);
-
-    openFileCommand(vscode.Uri.file(fullPath), 1, 1);
+    openFileCommand(vscode.Uri.file(outputPath), 1, 1);
 };

@@ -128,7 +128,12 @@
                     "command": "laravel.artisan.make.channel",
                     "when": "explorerResourceIsFolder && resourcePath =~ /\\/Broadcasting(s?)(\\/|$)/i",
                     "group": "navigation"
-                },
+                }, 
+                {
+                    "command": "laravel.artisan.make.class",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/(app|src)(\\/|$)/i",
+                    "group": "navigation"
+                },                          
                 {
                     "command": "laravel.artisan.make.command",
                     "when": "explorerResourceIsFolder && resourcePath =~ /\\/Console\\/Command(s?)(\\/|$)/i",
@@ -148,7 +153,67 @@
                     "command": "laravel.artisan.make.enum",
                     "when": "explorerResourceIsFolder && resourcePath =~ /\\/(Enum|ValueObject)(s?)(\\/|$)/i",
                     "group": "navigation"
-                }
+                },
+                {
+                    "command": "laravel.artisan.make.event",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Event(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.exception",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Exception(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.factory",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Database\\/Factor(y|ies)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.interface",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/(app|src)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.job",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Job(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.job-middleware",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Job(s?)\\/Middleware(s?)(\\/|$)/i",
+                    "group": "navigation"                    
+                },
+                {
+                    "command": "laravel.artisan.make.listener",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Listener(s?)(\\/|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.livewire",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Livewire\\/Component(s?)(\\/|$)/i",
+                    "group": "navigation"                    
+                },
+                {
+                    "command": "laravel.artisan.make.mail",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Mail(s?)(\\/|$)/i",
+                    "group": "navigation"                    
+                },
+                {
+                    "command": "laravel.artisan.make.middleware",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Http\\/Middleware(s?)(\\/|$)/i",
+                    "group": "navigation"                    
+                },
+                {
+                    "command": "laravel.artisan.make.migration",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Database\\/Migration(s?)(\\/|$)/i",
+                    "group": "navigation"                    
+                },
+                {
+                    "command": "laravel.artisan.make.model",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /\\/Model(s?)(\\/|$)/i",
+                    "group": "navigation"
+                }                
             ],
             "laravel.wrapWithHelper.submenu": [
                 {
@@ -260,7 +325,12 @@
                 "command": "laravel.artisan.make.channel",
                 "title": "New Channel...",
                 "category": "Laravel"
-            },       
+            },   
+            {
+                "command": "laravel.artisan.make.class",
+                "title": "New Class...",
+                "category": "Laravel"
+            },
             {
                 "command": "laravel.artisan.make.command",
                 "title": "New Console Command...",
@@ -279,6 +349,81 @@
             {
                 "command": "laravel.artisan.make.enum",
                 "title": "New Enum...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.event",
+                "title": "New Event...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.exception",
+                "title": "New Exception...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.factory",
+                "title": "New Factory...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.interface",
+                "title": "New Interface...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.job",
+                "title": "New Job...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.job-middleware",
+                "title": "New Job Middleware...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.listener",
+                "title": "New Event Listener...",
+                "category": "Laravel"
+            }, 
+            {
+                "command": "laravel.artisan.make.livewire",
+                "title": "New Livewire Component...",
+                "category": "Laravel"                
+            },                                      
+            {
+                "command": "laravel.artisan.make.mail",
+                "title": "New Mail...",
+                "category": "Laravel"
+            },                                       
+            {
+                "command": "laravel.artisan.make.middleware",
+                "title": "New Middleware...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.migration",
+                "title": "New Migration...",
+                "category": "Laravel"                
+            },
+            {
+                "command": "laravel.artisan.make.model",
+                "title": "New Model...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.notification",
+                "title": "New Notification...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.policy",
+                "title": "New Policy...",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.provider",
+                "title": "New Service Provider...",
                 "category": "Laravel"
             }
         ],
