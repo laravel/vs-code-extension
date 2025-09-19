@@ -1051,7 +1051,7 @@
                         }
                     },
                     "contentName": "text.html",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1087,7 +1087,7 @@
                         }
                     },
                     "contentName": "text.xml",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1123,7 +1123,7 @@
                         }
                     },
                     "contentName": "source.sql",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1159,7 +1159,7 @@
                         }
                     },
                     "contentName": "source.js",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1195,7 +1195,7 @@
                         }
                     },
                     "contentName": "source.json",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1231,7 +1231,7 @@
                         }
                     },
                     "contentName": "source.css",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1267,7 +1267,7 @@
                         }
                     },
                     "contentName": "string.regexp.heredoc.php",
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1346,7 +1346,7 @@
                             "name": "invalid.illegal.trailing-whitespace.php"
                         }
                     },
-                    "end": "^(\\3)\\b",
+                    "end": "^\\s*(\\3)\\b",
                     "endCaptures": {
                         "1": {
                             "name": "keyword.operator.heredoc.php"
@@ -1379,7 +1379,7 @@
                         }
                     },
                     "contentName": "text.html",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1412,7 +1412,7 @@
                         }
                     },
                     "contentName": "text.xml",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1445,7 +1445,7 @@
                         }
                     },
                     "contentName": "source.sql",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1478,7 +1478,7 @@
                         }
                     },
                     "contentName": "source.js",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1511,7 +1511,7 @@
                         }
                     },
                     "contentName": "source.json",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1544,7 +1544,7 @@
                         }
                     },
                     "contentName": "source.css",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1577,7 +1577,7 @@
                         }
                     },
                     "contentName": "string.regexp.nowdoc.php",
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.section.embedded.end.php"
@@ -1653,7 +1653,7 @@
                             "name": "invalid.illegal.trailing-whitespace.php"
                         }
                     },
-                    "end": "^(\\2)\\b",
+                    "end": "^\\s*(\\2)\\b",
                     "endCaptures": {
                         "1": {
                             "name": "keyword.operator.nowdoc.php"
