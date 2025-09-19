@@ -710,7 +710,7 @@ const getValueForArgumentType = async (
             return (
                 `${namespace}\\${fileName}`
                     .replace(/\//g, "\\")
-                    // We need escape backslashes because finally it will be a part of CLI command
+                    // We need to escape backslashes because finally it will be a part of CLI command
                     .replace(/(?<!\\)\\(?!\\)/g, "\\\\")
                     .trim()
             );
@@ -884,6 +884,7 @@ const getUserOptions = async (
 
         userOptions[choice.command] = value ?? choice.command;
 
+        // Remove the option from the list
         pickOptions.splice(pickOptions.indexOf(choice), 1);
 
         if (!pickOptions.length) {
