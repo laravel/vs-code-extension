@@ -136,12 +136,12 @@
                 },
                 {
                     "command": "laravel.artisan.make.command",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Console\\/Command(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Console(\\/|\\\\)Command(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.component",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)\\/Component(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -166,7 +166,7 @@
                 },
                 {
                     "command": "laravel.artisan.make.factory",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database\\/Factor(y|ies)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Factor(y|ies)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -181,7 +181,7 @@
                 },
                 {
                     "command": "laravel.artisan.make.job-middleware",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)\\/Middleware(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -191,7 +191,7 @@
                 },
                 {
                     "command": "laravel.artisan.make.livewire",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Livewire\\/Component(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Livewire(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -201,12 +201,12 @@
                 },
                 {
                     "command": "laravel.artisan.make.middleware",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http\\/Middleware(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.migration",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database\\/Migration(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Migration(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -236,12 +236,12 @@
                 },
                 {
                     "command": "laravel.artisan.make.request",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http\\/Request(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Request(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.resource",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http\\/Resource(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Resource(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -256,7 +256,7 @@
                 },
                 {
                     "command": "laravel.artisan.make.seeder",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database\\/Seed(er?)(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Seed(er?)(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {

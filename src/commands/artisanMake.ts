@@ -1,5 +1,6 @@
 import { getModels } from "@src/repositories/models";
 import { artisan } from "@src/support/php";
+import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
 import { openFileCommand } from ".";
@@ -658,14 +659,27 @@ export const commands: Command[] = [
     },
 ];
 
-const getModelClassnames = (): Record<string, string> =>
-    Object.fromEntries(
+const getModelClassnames = (): Record<string, string> => {
+    return Object.fromEntries(
         Object.entries(getModels().items).map(([_, model]) => [
             model.class,
-            // We need escape backslashes because finally it will be a part of CLI command
-            model.class.replace(/(?<!\\)\\(?!\\)/g, "\\\\"),
+            escapeNamespace(model.class),
         ]),
     );
+};
+
+const escapeNamespace = (namespace: string): string => {
+    if (
+        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+            os.platform().includes(unixPlatforms),
+        )
+    ) {
+        // We need to escape backslashes because finally it will be a part of CLI command
+        return namespace.replace(/(?<!\\)\\(?!\\)/g, "\\\\");
+    }
+
+    return namespace;
+};
 
 const getValueForArgumentType = async (
     value: string,
@@ -704,12 +718,8 @@ const getValueForArgumentType = async (
 
             const namespace = await getNamespace(workspaceFolder, newUri);
 
-            return (
-                `${namespace}\\${fileName}`
-                    .replace(/\//g, "\\")
-                    // We need to escape backslashes because finally it will be a part of CLI command
-                    .replace(/(?<!\\)\\(?!\\)/g, "\\\\")
-                    .trim()
+            return escapeNamespace(
+                `${namespace}\\${fileName}`.replace(/\//g, "\\").trim(),
             );
 
         case ArgumentType.Path:
@@ -927,8 +937,14 @@ const getPathFromOutput = (
     // INFO  Test [tests/Feature/Http/Controllers/NewControllerTest.php] created successfully.
     // INFO  Controller [app/Http/Controllers/NewController.php] created successfully.
     const outputPath = paths
+        // Windows always returns absolute paths, Linux returns relative. We have to normalize the paths
+        .map((_path) =>
+            path.isAbsolute(_path)
+                ? path.relative(workspaceFolder.uri.fsPath, _path)
+                : _path,
+        )
         .map((_path) => path.join(workspaceFolder.uri.fsPath, _path))
-        .find((_path) => _path.startsWith(uri.fsPath.replaceAll("\\", "/")));
+        .find((_path) => _path.startsWith(uri.fsPath));
 
     if (!outputPath) {
         return;
