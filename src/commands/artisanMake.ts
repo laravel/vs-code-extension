@@ -868,7 +868,7 @@ const getUserOptions = async (
         );
 
         if (option?.type === OptionType.Select && option?.options) {
-            const callbackChoice = await vscode.window.showQuickPick(
+            const optionsChoice = await vscode.window.showQuickPick(
                 Object.entries(option.options()).map(([key, value]) => ({
                     label: key,
                     command: value,
@@ -876,11 +876,11 @@ const getUserOptions = async (
             );
 
             // Once again if the user cancels the selection by pressing ESC
-            if (callbackChoice === undefined) {
+            if (optionsChoice === undefined) {
                 continue;
             }
 
-            value = callbackChoice.command;
+            value = optionsChoice.command;
         }
 
         if (option?.type === OptionType.Input) {
