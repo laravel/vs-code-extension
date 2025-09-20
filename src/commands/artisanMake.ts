@@ -176,7 +176,8 @@ export const commands: Command[] = [
                 name: "--path",
                 type: OptionType.Input,
                 defaultCallback: "components",
-                description: "The location where the component view should be created",
+                description:
+                    "The location where the component view should be created",
             },
             {
                 name: "--inline",
@@ -410,13 +411,15 @@ export const commands: Command[] = [
                 name: "--markdown",
                 description: "Create a new Markdown template for the mailable",
                 type: OptionType.Input,
-                defaultCallback: (name: string): string => kebab(name.replaceAll("\\\\", "/")),
+                defaultCallback: (name: string): string =>
+                    kebab(name.replaceAll("\\\\", "/")),
             },
             {
                 name: "--view",
                 description: "Create a new Blade template for the mailable",
                 type: OptionType.Input,
-                defaultCallback: (name: string): string => kebab(name.replaceAll("\\\\", "/")),
+                defaultCallback: (name: string): string =>
+                    kebab(name.replaceAll("\\\\", "/")),
             },
             ...testOptions,
         ],
