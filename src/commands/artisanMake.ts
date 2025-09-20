@@ -1,6 +1,7 @@
 import { getModels } from "@src/repositories/models";
 import { artisan } from "@src/support/php";
 import { getWorkspaceFolders } from "@src/support/project";
+import { kebab } from "@src/support/str";
 import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
@@ -17,6 +18,7 @@ interface Option {
     name: string;
     type?: OptionType | undefined;
     callback?: () => Record<string, string>;
+    defaultCallback?: ((...args: string[]) => string) | string;
     description?: string;
 }
 
@@ -169,6 +171,12 @@ export const commands: Command[] = [
         ],
         options: [
             forceOption,
+            {
+                name: "--path",
+                type: OptionType.Input,
+                defaultCallback: "components",
+                description: "The location where the component view should be created",
+            },
             {
                 name: "--inline",
                 description: "Create a component that renders an inline view",
@@ -400,10 +408,14 @@ export const commands: Command[] = [
             {
                 name: "--markdown",
                 description: "Create a new Markdown template for the mailable",
+                type: OptionType.Input,
+                defaultCallback: (name: string): string => kebab(name.replaceAll("\\\\", "/")),
             },
             {
                 name: "--view",
                 description: "Create a new Blade template for the mailable",
+                type: OptionType.Input,
+                defaultCallback: (name: string): string => kebab(name.replaceAll("\\\\", "/")),
             },
             ...testOptions,
         ],
@@ -802,6 +814,7 @@ const getArgumentsAsString = (userArguments: Record<string, string>) =>
 
 const getUserOptions = async (
     commandOptions: Option[] | undefined,
+    userArguments: Record<string, string>,
 ): Promise<Record<string, string | undefined> | undefined> => {
     const userOptions: Record<string, string | undefined> = {};
 
@@ -863,8 +876,21 @@ const getUserOptions = async (
             let input = undefined;
 
             while (!input) {
+                let defaultCallback = undefined;
+
+                if (typeof option.defaultCallback === "string") {
+                    defaultCallback = option.defaultCallback;
+                }
+
+                if (typeof option.defaultCallback === "function") {
+                    defaultCallback = option.defaultCallback(
+                        ...Object.values(userArguments).map((value) => value),
+                    );
+                }
+
                 input = await vscode.window.showInputBox({
                     prompt: option.description,
+                    value: defaultCallback ?? "",
                 });
 
                 // Exit when the user press ESC
@@ -1001,7 +1027,7 @@ export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
         return;
     }
 
-    const userOptions = await getUserOptions(command.options);
+    const userOptions = await getUserOptions(command.options, userArguments);
 
     if (!userOptions) {
         return;
