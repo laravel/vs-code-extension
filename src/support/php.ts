@@ -317,14 +317,26 @@ export const runPhp = (
     });
 };
 
-export const artisan = (command: string): Promise<string> => {
-    const fullCommand = projectPath("artisan") + " " + command;
+export const artisan = (
+    command: string,
+    workspaceFolder?: string | undefined,
+): Promise<string> => {
+    // Without php at the beginning, under Windows it doesn't work
+    const fullCommand =
+        getDefaultPhpCommand() +
+        " " +
+        projectPath("artisan", workspaceFolder) +
+        " " +
+        command;
+
+    // Support for multi-root workspaces
+    workspaceFolder ??= getWorkspaceFolders()[0]?.uri?.fsPath;
 
     return new Promise<string>((resolve, error) => {
         cp.exec(
             fullCommand,
             {
-                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+                cwd: workspaceFolder,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
