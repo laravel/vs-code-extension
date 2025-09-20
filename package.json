@@ -98,7 +98,7 @@
                 {
                     "command": "laravel.artisan.make",
                     "group": "laravel"
-                },                
+                },
                 {
                     "command": "laravel.artisan.make.cast",
                     "when": "false",
@@ -253,7 +253,7 @@
                     "command": "laravel.artisan.make.view",
                     "when": "false",
                     "group": "laravel"
-                }                
+                }
             ],
             "editor/context": [
                 {
@@ -539,7 +539,7 @@
                 "command": "laravel.artisan.make",
                 "title": "Create new file",
                 "category": "Laravel"
-            },            
+            },
             {
                 "command": "laravel.artisan.make.cast",
                 "title": "New Cast...",
