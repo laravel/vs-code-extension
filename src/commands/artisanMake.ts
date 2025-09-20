@@ -981,7 +981,7 @@ export const artisanMakeOpenSubmenuCommand = async () => {
 };
 
 export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
-    uri ??= vscode.Uri.parse(getWorkspaceFolders()[0]?.uri?.fsPath);
+    uri ??= vscode.Uri.joinPath(getWorkspaceFolders()[0]?.uri);
 
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
