@@ -1,10 +1,11 @@
 import { getModels } from "@src/repositories/models";
 import { artisan } from "@src/support/php";
+import { getWorkspaceFolders } from "@src/support/project";
 import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
 import { openFileCommand } from ".";
-import { getNamespace, NamespaceNotFoundError } from "./generateNamespace";
+import { getNamespace } from "./generateNamespace";
 
 interface Argument {
     name: string;
@@ -31,7 +32,6 @@ enum OptionType {
 }
 
 enum ArgumentType {
-    NamespaceOrPath,
     Namespace,
     Path,
 }
@@ -157,7 +157,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.NamespaceOrPath,
+                type: ArgumentType.Namespace,
                 description: "The name of the component",
             },
         ],
@@ -615,7 +615,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.NamespaceOrPath,
+                type: ArgumentType.Namespace,
                 description: "The name of the test",
             },
         ],
@@ -688,27 +688,6 @@ const getValueForArgumentType = async (
     uri: vscode.Uri,
 ): Promise<string> => {
     switch (argumentType) {
-        case ArgumentType.NamespaceOrPath:
-            try {
-                return await getValueForArgumentType(
-                    value,
-                    ArgumentType.Namespace,
-                    workspaceFolder,
-                    uri,
-                );
-            } catch (error) {
-                if (error instanceof NamespaceNotFoundError) {
-                    return await getValueForArgumentType(
-                        value,
-                        ArgumentType.Path,
-                        workspaceFolder,
-                        uri,
-                    );
-                }
-
-                throw error;
-            }
-
         case ArgumentType.Namespace:
             // User can input a relative path, for example: NewFolder\NewFile
             // or NewFolder/NewFile, so we need to convert it to a new Uri
@@ -716,10 +695,12 @@ const getValueForArgumentType = async (
 
             const fileName = path.parse(newUri.fsPath).name;
 
-            const namespace = await getNamespace(workspaceFolder, newUri);
+            let namespace = await getNamespace(workspaceFolder, newUri);
+
+            namespace = namespace ? namespace += "\\" : "";
 
             return escapeNamespace(
-                `${namespace}\\${fileName}`.replace(/\//g, "\\").trim(),
+                `${namespace}${fileName}`.replace(/\//g, "\\").trim(),
             );
 
         case ArgumentType.Path:
@@ -772,24 +753,12 @@ const getUserArguments = async (
             }
         }
 
-        try {
-            userArguments[argument.name] = await getValueForArgumentType(
-                input,
-                argument.type,
-                workspaceFolder,
-                uri,
-            );
-        } catch (error) {
-            if (error instanceof NamespaceNotFoundError) {
-                vscode.window.showErrorMessage(
-                    "Failed to find a matching namespace",
-                );
-
-                return;
-            }
-
-            throw error;
-        }
+        userArguments[argument.name] = await getValueForArgumentType(
+            input,
+            argument.type,
+            workspaceFolder,
+            uri,
+        );
     }
 
     return userArguments;
@@ -957,6 +926,8 @@ export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
     `laravel.artisan.make.${command}`;
 
 export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
+    uri ??= vscode.Uri.parse(getWorkspaceFolders()[0]?.uri?.fsPath);
+
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
     if (!workspaceFolder) {

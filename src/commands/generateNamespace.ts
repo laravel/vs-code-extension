@@ -34,12 +34,10 @@ const getPsr4Autoloads = async (
     };
 };
 
-export class NamespaceNotFoundError extends Error {}
-
 export const getNamespace = async (
     workspaceFolder: vscode.WorkspaceFolder,
     fileUri: vscode.Uri,
-): Promise<string> => {
+): Promise<string | undefined> => {
     const composerPath = vscode.Uri.joinPath(
         workspaceFolder.uri,
         "composer.json",
@@ -66,7 +64,7 @@ export const getNamespace = async (
     );
 
     if (!findNamespace) {
-        throw new NamespaceNotFoundError();
+        return;
     }
 
     return (
@@ -132,20 +130,14 @@ export const generateNamespaceCommand = async () => {
         return;
     }
 
-    let newNamespace = undefined;
+    const newNamespace = await getNamespace(workspaceFolder, fileUri);
 
-    try {
-        newNamespace = await getNamespace(workspaceFolder, fileUri);
-    } catch (error) {
-        if (error instanceof NamespaceNotFoundError) {
-            vscode.window.showErrorMessage(
-                "Failed to find a matching namespace",
-            );
+    if (!newNamespace) {
+        vscode.window.showErrorMessage(
+            "Failed to find a matching namespace",
+        );
 
-            return;
-        }
-
-        throw error;
+        return;
     }
 
     const doc = editor.document;
@@ -165,9 +157,9 @@ export const generateNamespaceCommand = async () => {
     const range =
         match?.index !== undefined
             ? new vscode.Range(
-                  doc.positionAt(match.index),
-                  doc.positionAt(match.index + match[0].length),
-              )
+                doc.positionAt(match.index),
+                doc.positionAt(match.index + match[0].length),
+            )
             : doc.positionAt(0);
 
     editor.edit((editBuilder) => {
