@@ -812,9 +812,7 @@ const getUserArguments = async (
 };
 
 const getArgumentsAsString = (userArguments: Record<string, string>) =>
-    Object.entries(userArguments)
-        .map(([_, value]) => value)
-        .join(" ");
+    Object.values(userArguments).join(" ");
 
 const getUserOptions = async (
     commandOptions: Option[] | undefined,
@@ -887,9 +885,7 @@ const getUserOptions = async (
                 }
 
                 if (typeof option.default === "function") {
-                    _default = option.default(
-                        ...Object.values(userArguments).map((value) => value),
-                    );
+                    _default = option.default(...Object.values(userArguments));
                 }
 
                 input = await vscode.window.showInputBox({
