@@ -959,7 +959,7 @@ export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
 export const artisanMakeOpenSubmenuCommand = async () => {
     const choice = await vscode.window.showQuickPick(
         commands
-            .filter((command) => command.submenu === true)
+            .filter((command) => command.submenu)
             .map((command) => {
                 const name =
                     command.name.charAt(0).toUpperCase() +
