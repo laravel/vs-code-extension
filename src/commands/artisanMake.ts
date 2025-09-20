@@ -35,6 +35,7 @@ enum OptionType {
 }
 
 enum ArgumentType {
+    NamespaceOrPath,
     Namespace,
     Path,
 }
@@ -165,7 +166,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: ArgumentType.NamespaceOrPath,
                 description: "The name of the component",
             },
         ],
@@ -731,6 +732,7 @@ const getValueForArgumentType = async (
     uri: vscode.Uri,
 ): Promise<string> => {
     switch (argumentType) {
+        case ArgumentType.NamespaceOrPath:
         case ArgumentType.Namespace:
             // User can input a relative path, for example: NewFolder\NewFile
             // or NewFolder/NewFile, so we need to convert it to a new Uri
@@ -739,6 +741,15 @@ const getValueForArgumentType = async (
             const fileName = path.parse(newUri.fsPath).name;
 
             let namespace = await getNamespace(workspaceFolder, newUri);
+
+            if (!namespace && argumentType === ArgumentType.NamespaceOrPath) {
+                return getValueForArgumentType(
+                    value,
+                    ArgumentType.Path,
+                    workspaceFolder,
+                    uri,
+                );
+            }
 
             namespace = namespace ? (namespace += "\\") : "";
 
