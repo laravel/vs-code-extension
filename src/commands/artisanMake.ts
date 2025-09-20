@@ -29,16 +29,9 @@ interface Command {
     options?: Option[];
 }
 
-enum OptionType {
-    Select,
-    Input,
-}
+type OptionType = "select" | "input";
 
-enum ArgumentType {
-    NamespaceOrPath,
-    Namespace,
-    Path,
-}
+type ArgumentType = "namespaceOrPath" | "namespace" | "path";
 
 type SubCommand =
     | "cast"
@@ -103,7 +96,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the cast class",
             },
         ],
@@ -121,7 +114,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the channel",
             },
         ],
@@ -133,7 +126,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the class",
             },
         ],
@@ -151,7 +144,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the command",
             },
         ],
@@ -163,7 +156,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.NamespaceOrPath,
+                type: "namespaceOrPath",
                 description: "The name of the component",
             },
         ],
@@ -171,7 +164,7 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--path",
-                type: OptionType.Input,
+                type: "input",
                 default: "components",
                 description:
                     "The location where the component view should be created",
@@ -193,7 +186,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the controller",
             },
         ],
@@ -210,7 +203,7 @@ export const commands: Command[] = [
             },
             {
                 name: "--model",
-                type: OptionType.Select,
+                type: "select",
                 options: () => getModelClassnames(),
                 description:
                     "Generate a resource controller for the given model",
@@ -242,7 +235,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the enum",
             },
         ],
@@ -264,7 +257,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the event",
             },
         ],
@@ -276,7 +269,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the exception",
             },
         ],
@@ -298,14 +291,14 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the factory",
             },
         ],
         options: [
             {
                 name: "--model",
-                type: OptionType.Select,
+                type: "select",
                 options: () => getModelClassnames(),
                 description: "The name of the model",
             },
@@ -317,7 +310,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the interface",
             },
         ],
@@ -329,7 +322,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the job",
             },
         ],
@@ -348,7 +341,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the job middleware",
             },
         ],
@@ -360,7 +353,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the listener",
             },
         ],
@@ -379,7 +372,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Path,
+                type: "path",
                 description: "The name of the Livewire component",
             },
         ],
@@ -398,7 +391,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the mail",
             },
         ],
@@ -407,14 +400,14 @@ export const commands: Command[] = [
             {
                 name: "--markdown",
                 description: "Create a new Markdown template for the mailable",
-                type: OptionType.Input,
+                type: "input",
                 default: (name: string): string =>
                     kebab(name.replaceAll("\\\\", "/")),
             },
             {
                 name: "--view",
                 description: "Create a new Blade template for the mailable",
-                type: OptionType.Input,
+                type: "input",
                 default: (name: string): string =>
                     kebab(name.replaceAll("\\\\", "/")),
             },
@@ -427,7 +420,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the middleware",
             },
         ],
@@ -439,19 +432,19 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Path,
+                type: "path",
                 description: "The name of the migration",
             },
         ],
         options: [
             {
                 name: "--create",
-                type: OptionType.Input,
+                type: "input",
                 description: "The table to be created",
             },
             {
                 name: "--table",
-                type: OptionType.Input,
+                type: "input",
                 description: "The table to migrate",
             },
         ],
@@ -462,7 +455,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the model",
             },
         ],
@@ -527,7 +520,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the notification",
             },
         ],
@@ -547,7 +540,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the observer",
             },
         ],
@@ -555,7 +548,7 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--model",
-                type: OptionType.Select,
+                type: "select",
                 options: () => getModelClassnames(),
                 description: "The model that the observer applies to",
             },
@@ -567,7 +560,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the policy",
             },
         ],
@@ -575,13 +568,13 @@ export const commands: Command[] = [
             forceOption,
             {
                 name: "--model",
-                type: OptionType.Select,
+                type: "select",
                 options: () => getModelClassnames(),
                 description: "The model that the policy applies to",
             },
             {
                 name: "--guard",
-                type: OptionType.Input,
+                type: "input",
                 description: "The guard that the policy relies on",
             },
         ],
@@ -592,7 +585,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the service provider",
             },
         ],
@@ -604,7 +597,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the request",
             },
         ],
@@ -616,7 +609,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the resource",
             },
         ],
@@ -634,7 +627,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the scope",
             },
         ],
@@ -646,7 +639,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Path,
+                type: "path",
                 description: "The name of the seeder",
             },
         ],
@@ -657,7 +650,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the test",
             },
         ],
@@ -683,7 +676,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Namespace,
+                type: "namespace",
                 description: "The name of the trait",
             },
         ],
@@ -695,7 +688,7 @@ export const commands: Command[] = [
         arguments: [
             {
                 name: "name",
-                type: ArgumentType.Path,
+                type: "path",
                 description: "The name of the view",
             },
         ],
@@ -732,8 +725,8 @@ const getValueForArgumentType = async (
     uri: vscode.Uri,
 ): Promise<string> => {
     switch (argumentType) {
-        case ArgumentType.NamespaceOrPath:
-        case ArgumentType.Namespace:
+        case "namespaceOrPath":
+        case "namespace":
             // User can input a relative path, for example: NewFolder\NewFile
             // or NewFolder/NewFile, so we need to convert it to a new Uri
             const newUri = vscode.Uri.joinPath(uri, value);
@@ -742,10 +735,10 @@ const getValueForArgumentType = async (
 
             let namespace = await getNamespace(workspaceFolder, newUri);
 
-            if (!namespace && argumentType === ArgumentType.NamespaceOrPath) {
+            if (!namespace && argumentType === "namespaceOrPath") {
                 return getValueForArgumentType(
                     value,
-                    ArgumentType.Path,
+                    "path",
                     workspaceFolder,
                     uri,
                 );
@@ -757,7 +750,7 @@ const getValueForArgumentType = async (
                 `${namespace}${fileName}`.replace(/\//g, "\\").trim(),
             );
 
-        case ArgumentType.Path:
+        case "path":
             // OS path separators
             return path.normalize(value.replace("\\", "/")).trim();
 
@@ -867,7 +860,7 @@ const getUserOptions = async (
             (option) => option.name === choice.command,
         );
 
-        if (option?.type === OptionType.Select && option?.options) {
+        if (option?.type === "select" && option?.options) {
             const optionsChoice = await vscode.window.showQuickPick(
                 Object.entries(option.options()).map(([key, value]) => ({
                     label: key,
@@ -883,7 +876,7 @@ const getUserOptions = async (
             value = optionsChoice.command;
         }
 
-        if (option?.type === OptionType.Input) {
+        if (option?.type === "input") {
             let input = undefined;
 
             while (!input) {
