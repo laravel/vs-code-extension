@@ -40,11 +40,6 @@ enum ArgumentType {
     Path,
 }
 
-enum EndSelection {
-    Name = "End Selection",
-    Value = "end-selection",
-}
-
 type SubCommand =
     | "cast"
     | "channel"
@@ -78,6 +73,8 @@ type SubCommand =
     | "test"
     | "trait"
     | "view";
+
+const EndSelection = "End Selection";
 
 const forceOption: Option = {
     name: "--force",
@@ -845,8 +842,8 @@ const getUserOptions = async (
         const choice = await vscode.window.showQuickPick(
             [
                 {
-                    label: EndSelection.Name,
-                    command: EndSelection.Value,
+                    label: EndSelection,
+                    command: EndSelection,
                 },
                 ...pickOptions,
             ],
@@ -860,7 +857,7 @@ const getUserOptions = async (
             return;
         }
 
-        if (choice.command === EndSelection.Value) {
+        if (choice.command === EndSelection) {
             break;
         }
 
