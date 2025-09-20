@@ -948,7 +948,7 @@ const getPathFromOutput = (
         paths = output.match(/CLASS:\s+(.*)/);
 
         if (paths?.[1]) {
-            return paths?.[1];
+            return path.join(workspaceFolder.uri.fsPath, paths?.[1]);
         }
     }
 
