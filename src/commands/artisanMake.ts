@@ -17,8 +17,8 @@ interface Argument {
 interface Option {
     name: string;
     type?: OptionType | undefined;
-    callback?: () => Record<string, string>;
-    defaultCallback?: ((...args: string[]) => string) | string;
+    options?: () => Record<string, string>;
+    default?: ((...args: string[]) => string) | string;
     description?: string;
 }
 
@@ -175,7 +175,7 @@ export const commands: Command[] = [
             {
                 name: "--path",
                 type: OptionType.Input,
-                defaultCallback: "components",
+                default: "components",
                 description:
                     "The location where the component view should be created",
             },
@@ -214,7 +214,7 @@ export const commands: Command[] = [
             {
                 name: "--model",
                 type: OptionType.Select,
-                callback: () => getModelClassnames(),
+                options: () => getModelClassnames(),
                 description:
                     "Generate a resource controller for the given model",
             },
@@ -309,7 +309,7 @@ export const commands: Command[] = [
             {
                 name: "--model",
                 type: OptionType.Select,
-                callback: () => getModelClassnames(),
+                options: () => getModelClassnames(),
                 description: "The name of the model",
             },
         ],
@@ -411,14 +411,14 @@ export const commands: Command[] = [
                 name: "--markdown",
                 description: "Create a new Markdown template for the mailable",
                 type: OptionType.Input,
-                defaultCallback: (name: string): string =>
+                default: (name: string): string =>
                     kebab(name.replaceAll("\\\\", "/")),
             },
             {
                 name: "--view",
                 description: "Create a new Blade template for the mailable",
                 type: OptionType.Input,
-                defaultCallback: (name: string): string =>
+                default: (name: string): string =>
                     kebab(name.replaceAll("\\\\", "/")),
             },
             ...testOptions,
@@ -559,7 +559,7 @@ export const commands: Command[] = [
             {
                 name: "--model",
                 type: OptionType.Select,
-                callback: () => getModelClassnames(),
+                options: () => getModelClassnames(),
                 description: "The model that the observer applies to",
             },
         ],
@@ -579,7 +579,7 @@ export const commands: Command[] = [
             {
                 name: "--model",
                 type: OptionType.Select,
-                callback: () => getModelClassnames(),
+                options: () => getModelClassnames(),
                 description: "The model that the policy applies to",
             },
             {
@@ -870,9 +870,9 @@ const getUserOptions = async (
             (option) => option.name === choice.command,
         );
 
-        if (option?.type === OptionType.Select && option?.callback) {
+        if (option?.type === OptionType.Select && option?.options) {
             const callbackChoice = await vscode.window.showQuickPick(
-                Object.entries(option.callback()).map(([key, value]) => ({
+                Object.entries(option.options()).map(([key, value]) => ({
                     label: key,
                     command: value,
                 })),
@@ -890,21 +890,21 @@ const getUserOptions = async (
             let input = undefined;
 
             while (!input) {
-                let defaultCallback = undefined;
+                let _default = undefined;
 
-                if (typeof option.defaultCallback === "string") {
-                    defaultCallback = option.defaultCallback;
+                if (typeof option.default === "string") {
+                    _default = option.default;
                 }
 
-                if (typeof option.defaultCallback === "function") {
-                    defaultCallback = option.defaultCallback(
+                if (typeof option.default === "function") {
+                    _default = option.default(
                         ...Object.values(userArguments).map((value) => value),
                     );
                 }
 
                 input = await vscode.window.showInputBox({
                     prompt: option.description,
-                    value: defaultCallback ?? "",
+                    value: _default ?? "",
                 });
 
                 // Exit when the user press ESC
