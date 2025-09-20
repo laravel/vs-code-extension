@@ -133,9 +133,7 @@ export const generateNamespaceCommand = async () => {
     const newNamespace = await getNamespace(workspaceFolder, fileUri);
 
     if (!newNamespace) {
-        vscode.window.showErrorMessage(
-            "Failed to find a matching namespace",
-        );
+        vscode.window.showErrorMessage("Failed to find a matching namespace");
 
         return;
     }
@@ -157,9 +155,9 @@ export const generateNamespaceCommand = async () => {
     const range =
         match?.index !== undefined
             ? new vscode.Range(
-                doc.positionAt(match.index),
-                doc.positionAt(match.index + match[0].length),
-            )
+                  doc.positionAt(match.index),
+                  doc.positionAt(match.index + match[0].length),
+              )
             : doc.positionAt(0);
 
     editor.edit((editBuilder) => {

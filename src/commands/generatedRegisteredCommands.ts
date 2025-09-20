@@ -14,6 +14,7 @@ export type RegisteredCommand =
     | "laravel.refactorSelectedHtmlClassToBladeDirective"
     | "laravel.refactorAllHtmlClassesToBladeDirectives"
     | "laravel.namespace.generate"
+    | "laravel.artisan.make"
     | "laravel.artisan.make.cast"
     | "laravel.artisan.make.channel"
     | "laravel.artisan.make.class"

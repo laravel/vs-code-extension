@@ -22,6 +22,7 @@ interface Option {
 
 interface Command {
     name: SubCommand;
+    submenu?: boolean;
     arguments: [Argument, ...Argument[]];
     options?: Option[];
 }
@@ -98,6 +99,7 @@ const testOptions: Option[] = [
 export const commands: Command[] = [
     {
         name: "cast",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -115,6 +117,7 @@ export const commands: Command[] = [
     },
     {
         name: "channel",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -126,6 +129,7 @@ export const commands: Command[] = [
     },
     {
         name: "class",
+        submenu: false,
         arguments: [
             {
                 name: "name",
@@ -143,6 +147,7 @@ export const commands: Command[] = [
     },
     {
         name: "command",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -154,6 +159,7 @@ export const commands: Command[] = [
     },
     {
         name: "component",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -176,6 +182,7 @@ export const commands: Command[] = [
     },
     {
         name: "controller",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -224,6 +231,7 @@ export const commands: Command[] = [
     },
     {
         name: "enum",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -245,6 +253,7 @@ export const commands: Command[] = [
     },
     {
         name: "event",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -256,6 +265,7 @@ export const commands: Command[] = [
     },
     {
         name: "exception",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -277,6 +287,7 @@ export const commands: Command[] = [
     },
     {
         name: "factory",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -295,6 +306,7 @@ export const commands: Command[] = [
     },
     {
         name: "interface",
+        submenu: false,
         arguments: [
             {
                 name: "name",
@@ -306,6 +318,7 @@ export const commands: Command[] = [
     },
     {
         name: "job",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -324,6 +337,7 @@ export const commands: Command[] = [
     },
     {
         name: "job-middleware",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -335,6 +349,7 @@ export const commands: Command[] = [
     },
     {
         name: "listener",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -353,6 +368,7 @@ export const commands: Command[] = [
     },
     {
         name: "livewire",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -371,6 +387,7 @@ export const commands: Command[] = [
     },
     {
         name: "mail",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -393,6 +410,7 @@ export const commands: Command[] = [
     },
     {
         name: "middleware",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -404,6 +422,7 @@ export const commands: Command[] = [
     },
     {
         name: "migration",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -426,6 +445,7 @@ export const commands: Command[] = [
     },
     {
         name: "model",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -490,6 +510,7 @@ export const commands: Command[] = [
     },
     {
         name: "notification",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -509,6 +530,7 @@ export const commands: Command[] = [
     },
     {
         name: "observer",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -528,6 +550,7 @@ export const commands: Command[] = [
     },
     {
         name: "policy",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -552,6 +575,7 @@ export const commands: Command[] = [
     },
     {
         name: "provider",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -563,6 +587,7 @@ export const commands: Command[] = [
     },
     {
         name: "request",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -574,6 +599,7 @@ export const commands: Command[] = [
     },
     {
         name: "resource",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -591,6 +617,7 @@ export const commands: Command[] = [
     },
     {
         name: "scope",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -602,6 +629,7 @@ export const commands: Command[] = [
     },
     {
         name: "seeder",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -612,6 +640,7 @@ export const commands: Command[] = [
     },
     {
         name: "test",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -637,6 +666,7 @@ export const commands: Command[] = [
     },
     {
         name: "trait",
+        submenu: false,
         arguments: [
             {
                 name: "name",
@@ -648,6 +678,7 @@ export const commands: Command[] = [
     },
     {
         name: "view",
+        submenu: true,
         arguments: [
             {
                 name: "name",
@@ -697,7 +728,7 @@ const getValueForArgumentType = async (
 
             let namespace = await getNamespace(workspaceFolder, newUri);
 
-            namespace = namespace ? namespace += "\\" : "";
+            namespace = namespace ? (namespace += "\\") : "";
 
             return escapeNamespace(
                 `${namespace}${fileName}`.replace(/\//g, "\\").trim(),
@@ -924,6 +955,30 @@ const getPathFromOutput = (
 
 export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
     `laravel.artisan.make.${command}`;
+
+export const artisanMakeOpenSubmenuCommand = async () => {
+    const choice = await vscode.window.showQuickPick(
+        commands
+            .filter((command) => command.submenu === true)
+            .map((command) => {
+                const name =
+                    command.name.charAt(0).toUpperCase() +
+                    command.name.slice(1);
+
+                return {
+                    label: `New ${name}...`,
+                    command: artisanMakeCommandNameSubCommandName(command.name),
+                };
+            }),
+        {
+            placeHolder: "Select file type...",
+        },
+    );
+
+    if (choice) {
+        vscode.commands.executeCommand(choice.command);
+    }
+};
 
 export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
     uri ??= vscode.Uri.parse(getWorkspaceFolders()[0]?.uri?.fsPath);

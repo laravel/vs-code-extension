@@ -94,7 +94,166 @@
                     "command": "laravel.namespace.generate",
                     "when": "resourceLangId == php",
                     "group": "laravel"
-                }
+                },
+                {
+                    "command": "laravel.artisan.make",
+                    "group": "laravel"
+                },                
+                {
+                    "command": "laravel.artisan.make.cast",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.channel",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.class",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.command",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.component",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.controller",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.enum",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.event",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.exception",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.factory",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.interface",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.job",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.job-middleware",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.listener",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.livewire",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.mail",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.middleware",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.migration",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.model",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.notification",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.observer",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.policy",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.provider",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.request",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.resource",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.rule",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.scope",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.seeder",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.test",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.trait",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.view",
+                    "when": "false",
+                    "group": "laravel"
+                }                
             ],
             "editor/context": [
                 {
@@ -376,6 +535,11 @@
                 "title": "Generate namespace",
                 "category": "Laravel"
             },
+            {
+                "command": "laravel.artisan.make",
+                "title": "Create new file",
+                "category": "Laravel"
+            },            
             {
                 "command": "laravel.artisan.make.cast",
                 "title": "New Cast...",

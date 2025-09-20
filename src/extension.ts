@@ -11,6 +11,7 @@ import {
     artisanMakeCommand,
     artisanMakeCommandNameSubCommandName,
     commands as artisanMakeCommands,
+    artisanMakeOpenSubmenuCommand,
 } from "./commands/artisanMake";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import {
@@ -261,6 +262,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             htmlClassToBladeDirectiveCommands.all,
             refactorAllHtmlClassesToBladeDirectives,
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.artisan.make"),
+            artisanMakeOpenSubmenuCommand,
         ),
         ...artisanMakeCommands.map((command) => {
             return vscode.commands.registerCommand(
