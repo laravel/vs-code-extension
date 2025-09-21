@@ -734,7 +734,7 @@ const getValueForArgumentType = async (
             const fileName = path.parse(newUri.fsPath).name;
 
             // Always try to get the full namespace because it supports
-            // multi-root workspaces projects
+            // projects with modular architecture
             let namespace = await getNamespace(workspaceFolder, newUri);
 
             if (!namespace && argumentType === "namespaceOrPath") {
