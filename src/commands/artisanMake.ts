@@ -733,6 +733,8 @@ const getValueForArgumentType = async (
 
             const fileName = path.parse(newUri.fsPath).name;
 
+            // Always try to get the full namespace because it supports
+            // multi-root workspaces projects
             let namespace = await getNamespace(workspaceFolder, newUri);
 
             if (!namespace && argumentType === "namespaceOrPath") {
@@ -744,11 +746,9 @@ const getValueForArgumentType = async (
                 );
             }
 
-            namespace = namespace ? (namespace += "\\") : "";
+            namespace = namespace ? (namespace += `\\${fileName}`) : value;
 
-            return escapeNamespace(
-                `${namespace}${fileName}`.replace(/\//g, "\\").trim(),
-            );
+            return escapeNamespace(namespace.replace(/\//g, "\\").trim());
 
         case "path":
             // OS path separators
