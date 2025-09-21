@@ -1007,7 +1007,7 @@ const getWorkspaceFolder = (
         }
     }
 
-    // Case when the user uses VSCode command palette (click on "Laravel: Create new file command")
+    // Case when the user uses VSCode command palette (click on "Laravel: Create new file")
     // when no file is open in the editor
     return getWorkspaceFolders()?.[0];
 };
