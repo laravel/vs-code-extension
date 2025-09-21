@@ -979,6 +979,39 @@ const getPathFromOutput = (
     return outputPath;
 };
 
+const getWorkspaceFolder = (
+    uri: vscode.Uri | undefined,
+): vscode.WorkspaceFolder | undefined => {
+    let workspaceFolder = undefined;
+
+    // Case when the user uses VSCode explorer/context (click on a folder in explorer)
+    if (uri) {
+        workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+
+        if (workspaceFolder) {
+            return workspaceFolder;
+        }
+    }
+
+    // Case when the user uses VSCode command palette (click on "Laravel: Create new file command")
+    // when some file is open in the editor
+    const editor = vscode.window.activeTextEditor;
+
+    if (editor) {
+        const fileUri = editor.document.uri;
+
+        workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+
+        if (workspaceFolder) {
+            return workspaceFolder;
+        }
+    }
+
+    // Case when the user uses VSCode command palette (click on "Laravel: Create new file command")
+    // when no file is open in the editor
+    return getWorkspaceFolders()?.[0];
+};
+
 export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
     `laravel.artisan.make.${command}`;
 
@@ -1006,16 +1039,19 @@ export const artisanMakeOpenSubmenuCommand = async () => {
     }
 };
 
-export const artisanMakeCommand = async (command: Command, uri: vscode.Uri) => {
-    uri ??= vscode.Uri.joinPath(getWorkspaceFolders()[0]?.uri);
-
-    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+export const artisanMakeCommand = async (
+    command: Command,
+    uri?: vscode.Uri | undefined,
+) => {
+    const workspaceFolder = getWorkspaceFolder(uri);
 
     if (!workspaceFolder) {
         vscode.window.showErrorMessage("Cannot detect active workspace");
 
         return;
     }
+
+    uri ??= vscode.Uri.joinPath(workspaceFolder.uri);
 
     const userArguments = await getUserArguments(
         command.arguments,
