@@ -748,11 +748,11 @@ const getValueForArgumentType = async (
 
             namespace = namespace ? (namespace += `\\${fileName}`) : value;
 
-            return escapeNamespace(namespace.replace(/\//g, "\\").trim());
+            return escapeNamespace(namespace.replaceAll("/", "\\").trim());
 
         case "path":
             // OS path separators
-            return path.normalize(value.replace("\\", "/")).trim();
+            return path.normalize(value.replaceAll("\\", "/")).trim();
 
         default:
             return value.trim();
