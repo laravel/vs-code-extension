@@ -21,15 +21,21 @@ export class FileNotFoundError extends Error {
 
 export class RetriesExceededError extends Error {
     public constructor(error: Error, operationName: string) {
-        super(`Maximum number of retries exceeded. The operation '${operationName}' failed with error: ${error.message}. Technical details: ${JSON.stringify(error)}`);
+        super(
+            `Maximum number of retries exceeded. The operation '${operationName}' failed with error: ${error.message}. Technical details: ${JSON.stringify(error)}`,
+        );
         Object.setPrototypeOf(this, new.target.prototype);
         this.name = `${RetriesExceededError.name} for operation '${operationName}'`;
     }
 }
 
 export class ErrorUtils {
-    public static isErrnoException(object: unknown): object is NodeJS.ErrnoException {
-        return Object.prototype.hasOwnProperty.call(object, `code`)
-            || Object.prototype.hasOwnProperty.call(object, `errno`);
+    public static isErrnoException(
+        object: unknown,
+    ): object is NodeJS.ErrnoException {
+        return (
+            Object.prototype.hasOwnProperty.call(object, `code`) ||
+            Object.prototype.hasOwnProperty.call(object, `errno`)
+        );
     }
 }

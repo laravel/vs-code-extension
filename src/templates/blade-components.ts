@@ -381,10 +381,19 @@ $components = new class {
                 ...$this->findFiles(
                     $item['path'],
                     'blade.php',
-                    fn($key) => $key
-                        ->kebab()
-                        ->prepend(($item['prefix'] ?? ':') . ':')
-                        ->ltrim(':'),
+                    function (\\Illuminate\\Support\\Stringable $key) use ($item) {
+                        $prefix = $item['prefix'] ? $item['prefix'] . '::' : '';
+                        $key = $key->kebab();
+                        $keys = [];
+
+                        $keys[] = $key->prepend($prefix);
+
+                        if ($item['prefix'] === 'flux') {
+                            $keys[] = $key->prepend('flux:');
+                        }
+
+                        return $keys;
+                    },
                 )
             );
 
