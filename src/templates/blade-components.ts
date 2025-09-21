@@ -34,7 +34,7 @@ $components = new class {
 
     private function runConcurrently(\\Illuminate\\Support\\Collection $items, \\Closure $callback, int $concurrency = 8): array
     {
-        if (app()->version() > 11 && \\Composer\\InstalledVersions::isInstalled('spatie/fork')) {
+        if (app()->version() > 11 && function_exists('pcntl_fork') && \\Composer\\InstalledVersions::isInstalled('spatie/fork')) {
             $tasks = $items
                 ->split($concurrency)
                 ->map(fn (\\Illuminate\\Support\\Collection $chunk) => fn (): array => $callback($chunk))
