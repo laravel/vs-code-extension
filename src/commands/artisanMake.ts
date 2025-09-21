@@ -993,7 +993,7 @@ const getWorkspaceFolder = (
         }
     }
 
-    // Case when the user uses VSCode command palette (click on "Laravel: Create new file command")
+    // Case when the user uses VSCode command palette (click on "Laravel: Create new file")
     // when some file is open in the editor
     const editor = vscode.window.activeTextEditor;
 
