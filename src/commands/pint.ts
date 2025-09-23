@@ -40,7 +40,7 @@ const runPintCommand = (
         const php = getCommand();
 
         // Without php at the beginning, it won't work on Windows
-        const command = `${php} "${pintPath}" ${args}`.trim();
+        const command = `"${php}" "${pintPath}" ${args}`.trim();
 
         cp.exec(
             command,
