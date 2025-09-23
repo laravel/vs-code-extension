@@ -1,7 +1,7 @@
 import { getModels } from "@src/repositories/models";
 import { artisan } from "@src/support/php";
 import { getWorkspaceFolders } from "@src/support/project";
-import { kebab } from "@src/support/str";
+import { kebab, ucfirst } from "@src/support/str";
 import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
@@ -1020,9 +1020,7 @@ export const artisanMakeOpenSubmenuCommand = async () => {
         commands
             .filter((command) => command.submenu)
             .map((command) => {
-                const name =
-                    command.name.charAt(0).toUpperCase() +
-                    command.name.slice(1);
+                const name = ucfirst(command.name);
 
                 return {
                     label: `New ${name}...`,
