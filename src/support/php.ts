@@ -325,13 +325,11 @@ export const artisan = (
     command: string,
     workspaceFolder?: string | undefined,
 ): Promise<string> => {
+    const phpPath = getCommand();
+    const artisanPath = projectPath("artisan", workspaceFolder);
+
     // Without php at the beginning, it doesn't work on Windows
-    const fullCommand =
-        getCommand() +
-        " " +
-        projectPath("artisan", workspaceFolder) +
-        " " +
-        command;
+    const fullCommand = `"${phpPath}" "${artisanPath}" ${command}`.trim();
 
     // Support for multi-root workspaces
     workspaceFolder ??= getWorkspaceFolders()[0]?.uri?.fsPath;
