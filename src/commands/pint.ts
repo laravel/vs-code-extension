@@ -1,4 +1,4 @@
-import { fixFilePath } from "@src/support/php";
+import { fixFilePath, getCommand } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -37,7 +37,10 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        const php = getCommand();
+
+        // Without php at the beginning, it won't work on Windows
+        const command = `${php} "${pintPath}" ${args}`.trim();
 
         cp.exec(
             command,
