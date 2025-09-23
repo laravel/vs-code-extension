@@ -325,9 +325,9 @@ export const artisan = (
     command: string,
     workspaceFolder?: string | undefined,
 ): Promise<string> => {
-    // Without php at the beginning, under Windows it doesn't work
+    // Without php at the beginning, it doesn't work on Windows
     const fullCommand =
-        getDefaultPhpCommand() +
+        getCommand() +
         " " +
         projectPath("artisan", workspaceFolder) +
         " " +
