@@ -926,13 +926,7 @@ const getUserOptions = async (
 
 const getOptionsAsString = (userOptions: Record<string, string | undefined>) =>
     Object.entries(userOptions)
-        .map(([key, value]) => {
-            if (key !== value) {
-                return `${key}=${value}`;
-            }
-
-            return key;
-        })
+        .map(([key, value]) => (key !== value ? `${key}=${value}` : key))
         .join(" ");
 
 const getPathFromOutput = (
