@@ -394,14 +394,26 @@ const commands: Command[] = [
                 description: "Create a new Markdown template for the mailable",
                 type: "input",
                 default: (name: string): string =>
-                    kebab(name.replaceAll("\\\\", "/")),
+                    kebab(
+                        name
+                            .replaceAll("\\\\", "/")
+                            .split("/")
+                            .slice(-2)
+                            .join("/"),
+                    ),
             },
             {
                 name: "--view",
                 description: "Create a new Blade template for the mailable",
                 type: "input",
                 default: (name: string): string =>
-                    kebab(name.replaceAll("\\\\", "/")),
+                    kebab(
+                        name
+                            .replaceAll("\\\\", "/")
+                            .split("/")
+                            .slice(-2)
+                            .join("/"),
+                    ),
             },
             ...testOptions,
         ],
