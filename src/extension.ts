@@ -10,7 +10,6 @@ import { commandName, openFileCommand } from "./commands";
 import {
     artisanMakeCommand,
     artisanMakeCommandNameSubCommandName,
-    commands as artisanMakeCommands,
     artisanMakeOpenSubmenuCommand,
 } from "./commands/artisanMake";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
@@ -35,6 +34,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { getArtisanMakeCommands } from "./repositories/artisanMake";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -267,7 +267,7 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.artisan.make"),
             artisanMakeOpenSubmenuCommand,
         ),
-        ...artisanMakeCommands.map((command) => {
+        ...getArtisanMakeCommands().map((command) => {
             return vscode.commands.registerCommand(
                 artisanMakeCommandNameSubCommandName(command.name),
                 (uri: vscode.Uri) => artisanMakeCommand(command, uri),
