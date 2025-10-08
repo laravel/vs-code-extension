@@ -42,16 +42,8 @@ export const basePath = (srcPath = ""): string => {
     return path.join(config<string>("basePath", ""), pathForPhpEnv(srcPath));
 };
 
-export const projectPath = (
-    srcPath = "",
-    workspaceFolder?: string | undefined,
-): string => {
+export const projectPath = (srcPath = ""): string => {
     srcPath = basePath(srcPath);
-
-    // Support for multi-root workspaces
-    if (workspaceFolder) {
-        return path.join(workspaceFolder, srcPath);
-    }
 
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (
