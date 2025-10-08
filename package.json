@@ -548,7 +548,7 @@
             },
             {
                 "command": "laravel.artisan.make",
-                "title": "Create new file",
+                "title": "New file",
                 "category": "Laravel"
             },
             {
