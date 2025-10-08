@@ -5,7 +5,7 @@ import {
     getArtisanMakeCommands,
     Option,
     SubCommand,
-} from "@src/repositories/artisanMake";
+} from "@src/repositories/artisanMakeCommands";
 import { artisan } from "@src/support/php";
 import { getWorkspaceFolders } from "@src/support/project";
 import { ucfirst } from "@src/support/str";

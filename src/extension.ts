@@ -34,7 +34,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
-import { getArtisanMakeCommands } from "./repositories/artisanMake";
+import { getArtisanMakeCommands } from "./repositories/artisanMakeCommands";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
