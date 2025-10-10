@@ -74,7 +74,7 @@ declare namespace Eloquent {
 
     interface Scope {
         name: string;
-        uri: string | false;
+        path: string | null;
         start_line: number | false;
     }
 
