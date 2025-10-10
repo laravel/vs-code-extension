@@ -155,10 +155,10 @@ $models = new class($factory) {
             ->toArray();
 
         $data['scopes'] = collect($reflection->getMethods())
-            ->filter(fn(\\ReflectionMethod $method) =>!$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
+            ->filter(fn(\\ReflectionMethod $method) => !$method->isStatic() && ($method->getAttributes(\\Illuminate\\Database\\Eloquent\\Attributes\\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
             ->map(fn(\\ReflectionMethod $method) => [
                 "name" => str($method->name)->replace('scope', '')->lcfirst()->toString(),
-                "uri" => $method->getFileName(),
+                "path" => $method->getFileName() ? LaravelVsCode::relativePath($method->getFileName()) : null,  
                 "start_line" => $method->getStartLine()
             ])
             ->values()
