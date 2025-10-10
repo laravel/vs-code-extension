@@ -17,7 +17,7 @@ export class HoverActions {
         let string = "";
 
         this.commands.forEach((command) => {
-            string += `<small>[${command.title}](command:${command.command}?${encodeURIComponent(JSON.stringify(command.arguments))})</small>`;
+            string += `[${command.title}](command:${command.command}?${encodeURIComponent(JSON.stringify(command.arguments))})`;
             string += `<span style="display: none;">&nbsp;&nbsp;&nbsp;</span>`;
         });
 
