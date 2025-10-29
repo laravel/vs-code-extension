@@ -7,7 +7,7 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getViews, ViewItem } from "@src/repositories/views";
+import { getViewByName, getViews, ViewItem } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -114,14 +114,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const filenames = [param.value];
-
-            if (isLivewireMethod(item)) {
-                filenames.push(`⚡${param.value}`);
-            }
-
-            const path = getViews().items.find((view) =>
-                filenames.includes(view.key),
+            const path = getViewByName(
+                param.value,
+                isLivewireMethod(item),
             )?.path;
 
             if (!path) {
@@ -141,15 +136,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match, arg) => {
-        const filenames = [match];
-
-        if (isLivewireMethod(arg.item)) {
-            filenames.push(`⚡${match}`);
-        }
-
-        const view = getViews().items.find((view) =>
-            filenames.includes(view.key),
-        );
+        const view = getViewByName(match, isLivewireMethod(arg.item));
 
         if (!view) {
             return null;
@@ -180,15 +167,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const filenames = [param.value];
-
-            if (isLivewireMethod(item)) {
-                filenames.push(`⚡${param.value}`);
-            }
-
-            const view = getViews().items.find((view) =>
-                filenames.includes(view.key),
-            );
+            const view = getViewByName(param.value, isLivewireMethod(item));
 
             if (view) {
                 return null;

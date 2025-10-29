@@ -1,4 +1,4 @@
-import { getViews } from "@src/repositories/views";
+import { getViewByName, getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
@@ -8,7 +8,6 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
 
     lines.forEach((line, index) => {
         const match = line.match(/<\/?livewire:([^\s>]+)/);
@@ -17,10 +16,8 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             const componentName = match[1];
             // Standard component
             const viewName = `livewire.${componentName}`;
-            // Index component
-            const view = views.find(
-                (v) => v.key.replace("⚡", "") === viewName,
-            );
+
+            const view = getViewByName(viewName, true);
 
             if (view) {
                 links.push(
@@ -65,10 +62,28 @@ export const completionProvider: vscode.CompletionItemProvider = {
 
         return getViews()
             .items.filter((view) => view.key.startsWith(pathPrefix))
+            .map((view) => {
+                const parts = view.key.split(".");
+                const filename = parts.at(-1);
+                const directory = parts.at(-2);
+
+                if (
+                    filename === directory?.replace("⚡", "") &&
+                    !view.path.endsWith(".blade.php") &&
+                    view.path.endsWith(".php")
+                ) {
+                    const mfcView = { ...view };
+                    mfcView.key = view.key.replace(`.${directory}`, "");
+
+                    return mfcView;
+                }
+
+                return view;
+            })
             .map(
                 (view) =>
                     new vscode.CompletionItem(
-                        view.key.replace(pathPrefix, "").replace("⚡", ""),
+                        view.key.replace(pathPrefix, "").replaceAll("⚡", ""),
                     ),
             );
     },

@@ -26,6 +26,32 @@ const load = () => {
     });
 };
 
+export const getViewByName = (name: string, isLivewire: boolean) => {
+    const filenames = [name];
+
+    if (isLivewire) {
+        const parts = name.split(".");
+        const filename = parts[parts.length - 1];
+
+        if (filename) {
+            parts[parts.length - 1] = `⚡${filename}`;
+        }
+
+        const nameWithEmoji = parts.join(".");
+
+        // Support for emoji and mfc components
+        filenames.push(
+            nameWithEmoji,
+            `${name}.${filename}`,
+            `${nameWithEmoji}.${filename}`,
+        );
+    }
+
+    return getViews().items.find((view) => {
+        return filenames.includes(view.key);
+    });
+};
+
 export const getViews = repository<ViewItem[]>({
     load,
     pattern: inAppDirs("{,**/}{view,views}/{*,**/*}"),
