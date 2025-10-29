@@ -1,4 +1,3 @@
-import { getConfigs } from "@src/repositories/configs";
 import {
     getLivewireViewItems,
     getViewItemByKey,
