@@ -7,7 +7,12 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getViewItemByKey, getViews, ViewItem } from "@src/repositories/views";
+import {
+    getLivewireViewItems,
+    getViewItemByKey,
+    getViews,
+    ViewItem,
+} from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -277,10 +282,13 @@ export const completionProvider = {
         }
 
         if (result.isFacade("Route")) {
-            if (
-                ["view", "livewire"].includes(result.func()) &&
-                result.isParamIndex(1)
-            ) {
+            if (result.func() === "livewire" && result.isParamIndex(1)) {
+                return getLivewireViewItems().map((view) =>
+                    getCompletionItem(view, document, position),
+                );
+            }
+
+            if (result.func() === "view" && result.isParamIndex(1)) {
                 return views.map((view) =>
                     getCompletionItem(view, document, position),
                 );

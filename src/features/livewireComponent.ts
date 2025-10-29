@@ -1,4 +1,8 @@
-import { getViewItemByKey, getViews } from "@src/repositories/views";
+import {
+    getLivewireViewItems,
+    getViewItemByKey,
+    getViews,
+} from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
@@ -60,46 +64,11 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return (
-            getViews()
-                .items.filter((view) => view.key.startsWith(pathPrefix))
-                // Mfc components have .php file and .blade.php. We don't want to show
-                // both the files in the completion
-                .filter((view) => {
-                    const hasMfcView = getViews().items.some(
-                        (mfcView) =>
-                            mfcView.key === view.key && mfcView !== view,
-                    );
-
-                    return !(hasMfcView && view.path.endsWith(".blade.php"));
-                })
-                // Mfc components link to the component file using the directory name
-                .map((view) => {
-                    const parts = view.key.split(".");
-                    const filename = parts.at(-1);
-                    const directory = parts.at(-2);
-
-                    if (
-                        filename === directory?.replace("⚡", "") &&
-                        !view.path.endsWith(".blade.php") &&
-                        view.path.endsWith(".php")
-                    ) {
-                        const mfcView = { ...view };
-                        mfcView.key = view.key.replace(`.${directory}`, "");
-
-                        return mfcView;
-                    }
-
-                    return view;
-                })
-                .map(
-                    (view) =>
-                        new vscode.CompletionItem(
-                            view.key
-                                .replace(pathPrefix, "")
-                                .replaceAll("⚡", ""),
-                        ),
-                )
+        return getLivewireViewItems(pathPrefix).map(
+            (view) =>
+                new vscode.CompletionItem(
+                    view.key.replace(pathPrefix, "").replaceAll("⚡", ""),
+                ),
         );
     },
 };

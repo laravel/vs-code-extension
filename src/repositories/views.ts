@@ -66,6 +66,51 @@ export const getViewItemByKey = (key: string, isLivewire: boolean) => {
     });
 };
 
+export const getLivewireViewItems = (pathPrefix?: string | undefined) => {
+    return (
+        getViews()
+            .items.filter((view) =>
+                pathPrefix ? view.key.startsWith(pathPrefix) : true,
+            )
+            // Mfc components have .php file and .blade.php. We don't want to show
+            // both the files in the completion
+            .filter((view) => {
+                const hasMfcView = getViews().items.some(
+                    (mfcView) => mfcView.key === view.key && mfcView !== view,
+                );
+
+                return !(hasMfcView && view.path.endsWith(".blade.php"));
+            })
+            // Mfc components link to the component file using the directory name
+            .map((view) => {
+                let [prefix, viewKey] = view.key.split("::");
+
+                if (!viewKey) {
+                    viewKey = prefix;
+                    prefix = "";
+                }
+
+                const parts = viewKey.split(".");
+                const filename = parts.at(-1);
+                const directory = parts.at(-2);
+
+                if (
+                    directory &&
+                    filename === directory.replace("⚡", "") &&
+                    !view.path.endsWith(".blade.php") &&
+                    view.path.endsWith(".php")
+                ) {
+                    const mfcView = { ...view };
+                    mfcView.key = view.key.replace(`.${filename}`, "");
+
+                    return mfcView;
+                }
+
+                return view;
+            })
+    );
+};
+
 export const getViews = repository<ViewItem[]>({
     load,
     pattern: inAppDirs("{,**/}{view,views}/{*,**/*}"),
