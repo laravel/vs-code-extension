@@ -66,14 +66,20 @@ export const getViewItemByKey = (key: string, isLivewire: boolean) => {
     });
 };
 
-export const getLivewireViewItems = (pathPrefix?: string | undefined) => {
+export const getLivewireViewItems = (
+    componentNamespaces?: string[] | undefined,
+) => {
     return (
         getViews()
             .items.filter((view) =>
-                pathPrefix ? view.key.startsWith(pathPrefix) : true,
+                componentNamespaces
+                    ? componentNamespaces.some((componentNamespace) =>
+                          view.key.startsWith(componentNamespace),
+                      )
+                    : true,
             )
             // Mfc components have .php file and .blade.php. We don't want to show
-            // both the files in the completion
+            // both files in the completion
             .filter((view) => {
                 const hasMfcView = getViews().items.some(
                     (mfcView) => mfcView.key === view.key && mfcView !== view,
