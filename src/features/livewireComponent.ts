@@ -21,11 +21,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             const [, viewKey] = componentName.split("::");
 
-            const viewName = viewKey
-                ? componentName
-                : `livewire.${componentName}`;
+            const key = viewKey ? componentName : `livewire.${componentName}`;
 
-            const view = getViewItemByKey(viewName, true);
+            const view = getViewItemByKey(key, true);
 
             if (view) {
                 links.push(
@@ -58,14 +56,6 @@ export const completionProvider: vscode.CompletionItemProvider = {
 
         const componentPrefix = "<livewire:";
         const pathPrefix = "livewire.";
-
-        const componentNamespaces = getConfigs()
-            .items.configs.filter((config) =>
-                config.name.startsWith("livewire.component_namespaces"),
-            )
-            .map((config) => config.name.split(".").pop() + "::")
-            .concat(pathPrefix);
-
         const line = doc.lineAt(pos.line).text;
         const linePrefix = line.substring(
             pos.character - componentPrefix.length,
@@ -76,7 +66,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getLivewireViewItems(componentNamespaces).map(
+        return getLivewireViewItems().map(
             (view) =>
                 new vscode.CompletionItem(
                     view.key.replace(pathPrefix, "").replaceAll("⚡", ""),

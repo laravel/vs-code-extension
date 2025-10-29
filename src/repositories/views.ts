@@ -1,6 +1,7 @@
 import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
+import { getConfigs } from "./configs";
 
 export interface ViewItem {
     key: string;
@@ -66,17 +67,20 @@ export const getViewItemByKey = (key: string, isLivewire: boolean) => {
     });
 };
 
-export const getLivewireViewItems = (
-    componentNamespaces?: string[] | undefined,
-) => {
+export const getLivewireViewItems = () => {
+    const componentNamespaces = getConfigs()
+        .items.configs.filter((config) =>
+            config.name.startsWith("livewire.component_namespaces"),
+        )
+        .map((config) => config.name.split(".").pop() + "::")
+        .concat("livewire.");
+
     return (
         getViews()
             .items.filter((view) =>
-                componentNamespaces
-                    ? componentNamespaces.some((componentNamespace) =>
-                          view.key.startsWith(componentNamespace),
-                      )
-                    : true,
+                componentNamespaces.some((componentNamespace) =>
+                    view.key.startsWith(componentNamespace),
+                ),
             )
             // Mfc components have .php file and .blade.php. We don't want to show
             // both files in the completion
