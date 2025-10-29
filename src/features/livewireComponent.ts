@@ -23,7 +23,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             const key = viewKey ? componentName : `livewire.${componentName}`;
 
-            const view = getViewItemByKey(key, true);
+            const view = getViewItemByKey(key);
 
             if (view) {
                 links.push(

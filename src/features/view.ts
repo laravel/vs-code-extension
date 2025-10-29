@@ -119,10 +119,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const path = getViewItemByKey(
-                param.value,
-                isLivewireMethod(item),
-            )?.path;
+            const path = getViewItemByKey(param.value)?.path;
 
             if (!path) {
                 return null;
@@ -141,7 +138,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match, arg) => {
-        const view = getViewItemByKey(match, isLivewireMethod(arg.item));
+        const view = getViewItemByKey(match);
 
         if (!view) {
             return null;
@@ -172,7 +169,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViewItemByKey(param.value, isLivewireMethod(item));
+            const view = getViewItemByKey(param.value);
 
             if (view) {
                 return null;
