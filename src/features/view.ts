@@ -128,7 +128,7 @@ export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match, arg) => {
+    return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match) => {
         const view = getViewItemByKey(match);
 
         if (!view) {
