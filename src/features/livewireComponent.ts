@@ -18,7 +18,9 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             // Standard component
             const viewName = `livewire.${componentName}`;
             // Index component
-            const view = views.find((v) => v.key === viewName);
+            const view = views.find(
+                (v) => v.key.replace("⚡", "") === viewName,
+            );
 
             if (view) {
                 links.push(
@@ -65,7 +67,9 @@ export const completionProvider: vscode.CompletionItemProvider = {
             .items.filter((view) => view.key.startsWith(pathPrefix))
             .map(
                 (view) =>
-                    new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
+                    new vscode.CompletionItem(
+                        view.key.replace(pathPrefix, "").replace("⚡", ""),
+                    ),
             );
     },
 };
