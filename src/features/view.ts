@@ -7,7 +7,7 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getViewByName, getViews, ViewItem } from "@src/repositories/views";
+import { getViewByKey, getViews, ViewItem } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -114,7 +114,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const path = getViewByName(
+            const path = getViewByKey(
                 param.value,
                 isLivewireMethod(item),
             )?.path;
@@ -136,7 +136,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match, arg) => {
-        const view = getViewByName(match, isLivewireMethod(arg.item));
+        const view = getViewByKey(match, isLivewireMethod(arg.item));
 
         if (!view) {
             return null;
@@ -167,7 +167,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViewByName(param.value, isLivewireMethod(item));
+            const view = getViewByKey(param.value, isLivewireMethod(item));
 
             if (view) {
                 return null;

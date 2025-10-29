@@ -26,11 +26,11 @@ const load = () => {
     });
 };
 
-export const getViewByName = (name: string, isLivewire: boolean) => {
-    const filenames = [name];
+export const getViewByKey = (key: string, isLivewire: boolean) => {
+    const filenames = [key];
 
     if (isLivewire) {
-        const parts = name.split(".");
+        const parts = key.split(".");
         const filename = parts[parts.length - 1];
 
         if (filename) {
@@ -42,7 +42,7 @@ export const getViewByName = (name: string, isLivewire: boolean) => {
         // Support for emoji and mfc components
         filenames.push(
             nameWithEmoji,
-            `${name}.${filename}`,
+            `${key}.${filename}`,
             `${nameWithEmoji}.${filename}`,
         );
     }
