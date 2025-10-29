@@ -26,24 +26,38 @@ const load = () => {
     });
 };
 
-export const getViewByKey = (key: string, isLivewire: boolean) => {
+export const getViewItemByKey = (key: string, isLivewire: boolean) => {
+    key = key.replaceAll("⚡", "");
+
     const filenames = [key];
 
     if (isLivewire) {
-        const parts = key.split(".");
+        let [prefix, viewKey] = key.split("::");
+
+        if (!viewKey) {
+            viewKey = prefix;
+            prefix = "";
+        }
+
+        const parts = viewKey.split(".");
         const filename = parts[parts.length - 1];
 
         if (filename) {
             parts[parts.length - 1] = `⚡${filename}`;
         }
 
-        const nameWithEmoji = parts.join(".");
+        let keyWithEmoji = parts.join(".");
 
-        // Support for emoji and mfc components
+        if (prefix) {
+            keyWithEmoji = `${prefix}::${keyWithEmoji}`;
+        }
+
         filenames.push(
-            nameWithEmoji,
+            // Support for emoji
+            keyWithEmoji,
+            // Support for mfc and mfc with emoji
             `${key}.${filename}`,
-            `${nameWithEmoji}.${filename}`,
+            `${keyWithEmoji}.${filename}`,
         );
     }
 

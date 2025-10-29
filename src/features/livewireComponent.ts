@@ -1,4 +1,4 @@
-import { getViewByKey, getViews } from "@src/repositories/views";
+import { getViewItemByKey, getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
@@ -17,7 +17,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             // Standard component
             const viewName = `livewire.${componentName}`;
 
-            const view = getViewByKey(viewName, true);
+            const view = getViewItemByKey(viewName, true);
 
             if (view) {
                 links.push(
