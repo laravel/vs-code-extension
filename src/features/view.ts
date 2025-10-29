@@ -43,7 +43,7 @@ const toFind: FeatureTag = [
     },
     {
         class: facade("Route"),
-        method: ["view"],
+        method: ["view", "livewire"],
         argumentIndex: 1,
     },
     {
@@ -71,6 +71,15 @@ const toFind: FeatureTag = [
         argumentIndex: 0,
     },
 ];
+
+const isLivewireMethod = (item: AutocompleteParsingResult.ContextValue) => {
+    return (
+        // @ts-ignore
+        item.className === "Illuminate\\Support\\Facades\\Route" &&
+        // @ts-ignore
+        item.methodName === "livewire"
+    );
+};
 
 const isCorrectIndexForMethod = (
     item: AutocompleteParsingResult.ContextValue,
@@ -105,8 +114,14 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const path = getViews().items.find(
-                (view) => view.key === param.value,
+            const filenames = [param.value];
+
+            if (isLivewireMethod(item)) {
+                filenames.push(`⚡${param.value}`);
+            }
+
+            const path = getViews().items.find((view) =>
+                filenames.includes(view.key),
             )?.path;
 
             if (!path) {
@@ -125,16 +140,24 @@ export const hoverProvider: HoverProvider = (
     doc: vscode.TextDocument,
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
-    return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match) => {
-        const item = getViews().items.find((view) => view.key === match);
+    return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match, arg) => {
+        const filenames = [match];
 
-        if (!item) {
+        if (isLivewireMethod(arg.item)) {
+            filenames.push(`⚡${match}`);
+        }
+
+        const view = getViews().items.find((view) =>
+            filenames.includes(view.key),
+        );
+
+        if (!view) {
             return null;
         }
 
         return new vscode.Hover(
             new vscode.MarkdownString(
-                `[${item.path}](${vscode.Uri.file(projectPath(item.path))})`,
+                `[${view.path}](${vscode.Uri.file(projectPath(view.path))})`,
             ),
         );
     });
@@ -157,8 +180,14 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViews().items.find(
-                (view) => view.key === param.value,
+            const filenames = [param.value];
+
+            if (isLivewireMethod(item)) {
+                filenames.push(`⚡${param.value}`);
+            }
+
+            const view = getViews().items.find((view) =>
+                filenames.includes(view.key),
             );
 
             if (view) {
@@ -269,7 +298,10 @@ export const completionProvider = {
         }
 
         if (result.isFacade("Route")) {
-            if (result.func() === "view" && result.isParamIndex(1)) {
+            if (
+                ["view", "livewire"].includes(result.func()) &&
+                result.isParamIndex(1)
+            ) {
                 return views.map((view) =>
                     getCompletionItem(view, document, position),
                 );
