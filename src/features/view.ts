@@ -77,15 +77,6 @@ const toFind: FeatureTag = [
     },
 ];
 
-const isLivewireMethod = (item: AutocompleteParsingResult.ContextValue) => {
-    return (
-        // @ts-ignore
-        item.className === "Illuminate\\Support\\Facades\\Route" &&
-        // @ts-ignore
-        item.methodName === "livewire"
-    );
-};
-
 const isCorrectIndexForMethod = (
     item: AutocompleteParsingResult.ContextValue,
     index: number,
