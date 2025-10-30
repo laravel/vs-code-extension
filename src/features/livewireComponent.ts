@@ -18,7 +18,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         if (match && match.index !== undefined) {
             const componentName = match[1];
 
-            const view = getViewItemByKey(componentName);
+            // Livewire 3 needs "livewire." prefix, but Livewire 4 doesn't
+            const view = [componentName, `livewire.${componentName}`]
+                .map((key) => getViewItemByKey(key))
+                .find((value) => value !== undefined);
 
             if (view) {
                 links.push(

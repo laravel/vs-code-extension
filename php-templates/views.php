@@ -133,7 +133,8 @@ $blade = new class {
         /** @var array<int, string> */
         $componentLocations = array_map(
             fn (string $path) => LaravelVsCode::relativePath($path),
-            config("livewire.component_locations", [])
+            // Backward compatibility for Livewire 3
+            config("livewire.component_locations", [config("livewire.view_path", resource_path('views/livewire'))]),
         );
 
         foreach ($componentLocations as $componentLocation) {
