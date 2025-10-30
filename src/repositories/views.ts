@@ -62,13 +62,15 @@ export const getViewItemByKey = (key: string) => {
         `${keyWithEmoji}.${filename}`,
     );
 
-    return getViews().items.find((view) => {
-        if (view.isLivewire) {
-            return filenames.includes(view.key);
-        }
+    return getViews()
+        .items.filter((view) => view.path.endsWith(".blade.php"))
+        .find((view) => {
+            if (view.isLivewire) {
+                return filenames.includes(view.key);
+            }
 
-        return view.key === key;
-    });
+            return view.key === key;
+        });
 };
 
 export const getLivewireViewItems = () => {
