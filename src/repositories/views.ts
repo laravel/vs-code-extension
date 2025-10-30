@@ -6,6 +6,7 @@ export interface ViewItem {
     key: string;
     path: string;
     isLivewire: boolean;
+    isMfc: boolean;
     isVendor: boolean;
 }
 
@@ -15,14 +16,16 @@ const load = () => {
             key: string;
             path: string;
             isLivewire: boolean;
+            isMfc: boolean;
             isVendor: boolean;
         }[]
     >(template("views")).then((results) => {
-        return results.map(({ key, path, isVendor, isLivewire }) => {
+        return results.map(({ key, path, isVendor, isLivewire, isMfc }) => {
             return {
                 key,
                 path,
                 isLivewire,
+                isMfc,
                 isVendor,
             };
         });
@@ -79,32 +82,20 @@ export const getLivewireViewItems = () => {
             .items.filter((view) => view.isLivewire)
             // Mfc components have .php file and .blade.php. We don't want to show
             // both files in the completion
-            .filter((view) => {
-                const hasMfcView = getViews().items.some(
-                    (mfcView) => mfcView.key === view.key && mfcView !== view,
-                );
-
-                return !(hasMfcView && view.path.endsWith(".blade.php"));
-            })
+            .filter((view) => !(view.isMfc && view.path.endsWith(".blade.php")))
             // Mfc components link to the component file using the directory name
             .map((view) => {
-                let [prefix, viewKey] = view.key.split("::");
+                if (view.isMfc) {
+                    let [prefix, viewKey] = view.key.split("::");
 
-                if (!viewKey) {
-                    viewKey = prefix;
-                    prefix = "";
-                }
+                    if (!viewKey) {
+                        viewKey = prefix;
+                        prefix = "";
+                    }
 
-                const parts = viewKey.split(".");
-                const filename = parts.at(-1);
-                const directory = parts.at(-2);
+                    const parts = viewKey.split(".");
+                    const filename = parts.at(-1);
 
-                if (
-                    directory &&
-                    filename === directory.replace("⚡", "") &&
-                    !view.path.endsWith(".blade.php") &&
-                    view.path.endsWith(".php")
-                ) {
                     const mfcView = { ...view };
                     mfcView.key = view.key.replace(`.${filename}`, "");
 

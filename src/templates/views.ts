@@ -1,5 +1,6 @@
 // This file was generated from php-templates/views.php, do not edit directly
 export default `
+use Illuminate\\Support\\Facades\\File;
 use Illuminate\\Support\\Stringable;
 
 $blade = new class {
@@ -25,9 +26,10 @@ $blade = new class {
                 $key = $data["key"] instanceof Stringable ? $data["key"]->toString() : $data["key"];
 
                 $data["isLivewire"] = $this->isLivewire($path, $key);
+                $data["isMfc"] = $data["isLivewire"] && $this->isMfc($path);
 
                 return $data;
-            })            
+            })
             ->values()
             ->partition(fn($v) => !$v["isVendor"]);
 
@@ -79,10 +81,12 @@ $blade = new class {
                     ->replace(DIRECTORY_SEPARATOR, ".")
                     ->kebab()
                     ->prepend($key . "::");
+                $isLivewire = $this->isLivewire($path, $key->toString());
 
                 $components[] = [
                     "path" => $path,
-                    "isLivewire" => $this->isLivewire($path, $key->toString()),
+                    "isLivewire" => $isLivewire,
+                    "isMfc" => $isLivewire && $this->isMfc($path),
                     "isVendor" => str_contains($realPath, base_path("vendor")),
                     "key" =>  $key,
                 ];
@@ -90,6 +94,27 @@ $blade = new class {
         }
 
         return $components;
+    }
+
+    protected function isMfc(string $path): bool
+    {
+        $directoryPath = base_path(dirname($path));
+
+        $folderName = str(basename($directoryPath))
+            ->replace("⚡", "")
+            ->toString();
+        $fileName = str(basename($path))
+            ->replace("⚡", "")
+            ->before(".")
+            ->toString();
+
+        if ($folderName !== $fileName) {
+            return false;
+        }
+
+        $componentPath = $directoryPath . '/' . $fileName . '.php';
+
+        return File::exists($componentPath);
     }
 
     protected function isLivewire(string $path, string $key): bool
