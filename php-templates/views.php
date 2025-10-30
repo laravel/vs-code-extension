@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Stringable;
+
 $blade = new class {
     public function getAllViews()
     {
@@ -17,6 +19,15 @@ $blade = new class {
 
         [$local, $vendor] = $paths
             ->merge($hints)
+            ->map(function (array $data) {
+                /** @var array{path: string, key: Stringable|string} $data */
+                $path = $data["path"];
+                $key = $data["key"] instanceof Stringable ? $data["key"]->toString() : $data["key"];
+
+                $data["isLivewire"] = $this->isLivewire($path, $key);
+
+                return $data;
+            })            
             ->values()
             ->partition(fn($v) => !$v["isVendor"]);
 
@@ -60,22 +71,53 @@ $blade = new class {
 
             foreach ($files as $file) {
                 $realPath = $file->getRealPath();
+                $path = str_replace(base_path(DIRECTORY_SEPARATOR), '', $realPath);
+                $key = str($realPath)
+                    ->replace(realpath($path), "")
+                    ->replace(".php", "")
+                    ->ltrim(DIRECTORY_SEPARATOR)
+                    ->replace(DIRECTORY_SEPARATOR, ".")
+                    ->kebab()
+                    ->prepend($key . "::");
 
                 $components[] = [
-                    "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $realPath),
+                    "path" => $path,
+                    "isLivewire" => $this->isLivewire($path, $key->toString()),
                     "isVendor" => str_contains($realPath, base_path("vendor")),
-                    "key" =>  str($realPath)
-                        ->replace(realpath($path), "")
-                        ->replace(".php", "")
-                        ->ltrim(DIRECTORY_SEPARATOR)
-                        ->replace(DIRECTORY_SEPARATOR, ".")
-                        ->kebab()
-                        ->prepend($key . "::"),
+                    "key" =>  $key,
                 ];
             }
         }
 
         return $components;
+    }
+
+    protected function isLivewire(string $path, string $key): bool
+    {
+        if (str_contains($key, "::")) {
+            /** @var array<int, string> */
+            $componentNamespaces = array_keys(config("livewire.component_namespaces", []));
+
+            [$prefix,] = explode("::", $key);
+
+            if (in_array($prefix, $componentNamespaces)) {
+                return true;
+            }
+        }
+
+        /** @var array<int, string> */
+        $componentLocations = array_map(
+            fn (string $path) => LaravelVsCode::relativePath($path),
+            config("livewire.component_locations", [])
+        );
+
+        foreach ($componentLocations as $componentLocation) {
+            if (str_starts_with($path, $componentLocation)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function findViews($path)

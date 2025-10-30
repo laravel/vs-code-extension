@@ -1,11 +1,11 @@
 import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
-import { getConfigs } from "./configs";
 
 export interface ViewItem {
     key: string;
     path: string;
+    isLivewire: boolean;
     isVendor: boolean;
 }
 
@@ -14,13 +14,15 @@ const load = () => {
         {
             key: string;
             path: string;
+            isLivewire: boolean;
             isVendor: boolean;
         }[]
     >(template("views")).then((results) => {
-        return results.map(({ key, path, isVendor }) => {
+        return results.map(({ key, path, isVendor, isLivewire }) => {
             return {
                 key,
                 path,
+                isLivewire,
                 isVendor,
             };
         });
@@ -61,25 +63,18 @@ export const getViewItemByKey = (key: string) => {
     );
 
     return getViews().items.find((view) => {
-        return filenames.includes(view.key);
+        if (view.isLivewire) {
+            return filenames.includes(view.key);
+        }
+
+        return view.key === key;
     });
 };
 
 export const getLivewireViewItems = () => {
-    const componentNamespaces = getConfigs()
-        .items.configs.filter((config) =>
-            config.name.startsWith("livewire.component_namespaces"),
-        )
-        .map((config) => config.name.split(".").pop() + "::")
-        .concat("livewire.");
-
     return (
         getViews()
-            .items.filter((view) =>
-                componentNamespaces.some((componentNamespace) =>
-                    view.key.startsWith(componentNamespace),
-                ),
-            )
+            .items.filter((view) => view.isLivewire)
             // Mfc components have .php file and .blade.php. We don't want to show
             // both files in the completion
             .filter((view) => {

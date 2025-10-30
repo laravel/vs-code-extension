@@ -18,11 +18,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         if (match && match.index !== undefined) {
             const componentName = match[1];
 
-            const [, viewKey] = componentName.split("::");
-
-            const key = viewKey ? componentName : `livewire.${componentName}`;
-
-            const view = getViewItemByKey(key);
+            const view = getViewItemByKey(componentName);
 
             if (view) {
                 links.push(
@@ -65,11 +61,13 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getLivewireViewItems().map(
-            (view) =>
-                new vscode.CompletionItem(
+        return [
+            // If we remove pathPrefix, we have to remove duplicates
+            ...new Set(
+                getLivewireViewItems().map((view) =>
                     view.key.replace(pathPrefix, "").replaceAll("⚡", ""),
                 ),
-        );
+            ),
+        ].map((key) => new vscode.CompletionItem(key));
     },
 };

@@ -271,12 +271,9 @@ export const completionProvider = {
 
         if (result.isFacade("Route")) {
             if (result.func() === "livewire" && result.isParamIndex(1)) {
-                return getLivewireViewItems().map((view) => {
-                    const newView = { ...view };
-                    newView.key = newView.key.replace("livewire.", "");
-
-                    return getCompletionItem(newView, document, position);
-                });
+                return getLivewireViewItems().map((view) =>
+                    getCompletionItem(view, document, position),
+                );
             }
 
             if (result.func() === "view" && result.isParamIndex(1)) {
