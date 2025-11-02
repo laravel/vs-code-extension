@@ -6,6 +6,8 @@ type ConfigKey =
     | "basePath"
     | "phpEnvironment"
     | "phpCommand"
+    | "dockerService"
+    | "dockerBase"
     | "tests.docker.enabled"
     | "tests.ssh.enabled"
     | "tests.suiteSuffix"

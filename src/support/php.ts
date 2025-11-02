@@ -1,6 +1,7 @@
 import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
+import { sep as pathsep } from "path";
 import * as vscode from "vscode";
 import { BoundedFileCache } from "./cache";
 import { config } from "./config";
@@ -109,6 +110,15 @@ const getPhpCommand = (): string => {
                 : [option.check];
             let check = checks.shift();
             let result = "";
+
+            if (key === "docker") {
+                const dockerService = config<string>("dockerService", "php");
+                check = check?.replace("{dockerService}", dockerService);
+                option.command = option.command.replace(
+                    "{dockerService}",
+                    dockerService,
+                );
+            }
 
             while (check) {
                 info(`Checking ${key} PHP installation: ${check}`);
@@ -251,7 +261,7 @@ export const runInLaravel = <T>(
 
 export const fixFilePath = (path: string) => {
     if (phpEnvironmentsThatUseRelativePaths.includes(phpEnvKey!)) {
-        return relativePath(path);
+        return relativePath(path).replaceAll(pathsep, "/");
     }
 
     return path;

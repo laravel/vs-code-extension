@@ -14,6 +14,7 @@ export type PhpEnvironment =
     | "sail"
     | "lando"
     | "ddev"
+    | "docker"
     | "local";
 
 export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
@@ -50,6 +51,12 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
         label: "DDEV",
         check: "ddev php -r 'echo PHP_BINARY;'",
         command: "ddev php",
+        relativePath: true,
+    },
+    docker: {
+        label: "Docker",
+        check: "docker compose exec {dockerService} which php",
+        command: 'docker compose exec {dockerService} "{binaryPath}"',
         relativePath: true,
     },
     local: {

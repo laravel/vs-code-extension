@@ -232,6 +232,7 @@
                         "sail",
                         "lando",
                         "ddev",
+                        "docker",
                         "local"
                     ],
                     "enumItemLabels": [
@@ -241,6 +242,7 @@
                         "Sail",
                         "Lando",
                         "DDEV",
+                        "Docker",
                         "Local"
                     ],
                     "markdownEnumDescriptions": [
@@ -250,6 +252,7 @@
                         "Sail",
                         "Lando",
                         "DDEV",
+                        "Docker",
                         "Use PHP installed on the local machine."
                     ],
                     "default": "auto",
@@ -258,6 +261,16 @@
                 "Laravel.phpCommand": {
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
+                },
+                "Laravel.dockerService": {
+                    "type": "string",
+                    "default": "php",
+                    "description": "Name of the Docker service container holding PHP executable and Laravel app source code."
+                },
+                "Laravel.dockerBase": {
+                    "type": "string",
+                    "default": "/app",
+                    "description": "Base path of the Laravel app source code inside Docker container."
                 },
                 "Laravel.basePath": {
                     "type": "string",
