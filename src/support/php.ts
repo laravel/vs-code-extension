@@ -92,7 +92,7 @@ export const initVendorWatchers = () => {
     registerWatcher(autoloadWatcher);
 };
 
-const getPhpCommand = (): string => {
+export const getPhpCommand = (): string => {
     const phpEnv = config<PhpEnvironment>("phpEnvironment", "auto");
 
     for (const [key, option] of Object.entries(phpEnvironments)) {
