@@ -171,7 +171,7 @@ export const clearPhpFileCache = () => {
     discoverFiles.clear();
 };
 
-const getDefaultPhpCommand = (): string => {
+export const getDefaultPhpCommand = (): string => {
     defaultPhpCommand ??= getPhpCommand();
 
     return defaultPhpCommand;

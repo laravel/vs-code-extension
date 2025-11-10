@@ -1,4 +1,4 @@
-import { fixFilePath, getPhpCommand, getPhpEnv } from "@src/support/php";
+import { fixFilePath, getDefaultPhpCommand, getPhpEnv } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -44,9 +44,9 @@ const runPintCommand = (
 
         if (getPhpEnv() !== "local") {
             const pintInEnv = pathForPhpEnv("vendor/bin/pint");
-            command = `${getPhpCommand()} "${pintInEnv}" ${args}`.trim();
+            command = `${getDefaultPhpCommand()} "${pintInEnv}" ${args}`.trim();
         } else if (os.platform() === "win32") {
-            command = `${getPhpCommand()} "${pintPath}" ${args}`.trim();
+            command = `${getDefaultPhpCommand()} "${pintPath}" ${args}`.trim();
         }
 
         cp.exec(
