@@ -15,6 +15,7 @@ import {
     pathForPhpEnv,
     projectPathExists,
 } from "../support/project";
+import os from "os";
 
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
@@ -42,9 +43,10 @@ const runPintCommand = (
         let command = `"${pintPath}" ${args}`.trim();
 
         if (getPhpEnv() !== "local") {
-            const phpcmd = getPhpCommand();
             const pintInEnv = pathForPhpEnv("vendor/bin/pint");
-            command = `${phpcmd} "${pintInEnv}" ${args}`.trim();
+            command = `${getPhpCommand()} "${pintInEnv}" ${args}`.trim();
+        } else if (os.platform() === "win32") {
+            command = `${getPhpCommand()} "${pintPath}" ${args}`.trim();
         }
 
         cp.exec(
