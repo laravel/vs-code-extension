@@ -284,7 +284,7 @@
             "explorer/context": [
                 {
                     "submenu": "laravel.artisanMake.submenu",
-                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src|database|resources)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 }
             ],
@@ -313,7 +313,7 @@
                     "command": "laravel.artisan.make.component",
                     "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
-                },                
+                },
                 {
                     "command": "laravel.artisan.make.controller",
                     "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Controller(s?)(\\/|\\\\|$)/i",
@@ -443,7 +443,7 @@
                     "command": "laravel.artisan.make.view",
                     "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
-                }                
+                }
             ],
             "laravel.wrapWithHelper.submenu": [
                 {
