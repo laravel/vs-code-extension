@@ -62,7 +62,7 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
     local: {
         label: "Local",
         description: "Use PHP installed on the local machine.",
-        check: "php -r 'echo PHP_BINARY;'",
+        check: 'php -r "echo PHP_BINARY;"',
         command: '"{binaryPath}"',
     },
 };
