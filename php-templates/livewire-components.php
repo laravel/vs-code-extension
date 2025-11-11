@@ -213,7 +213,7 @@ $components = new class
 
         $mountMethods = array_filter(
             $methods,
-            fn (\ReflectionMethod $method): bool => \Illuminate\Support\Str::startsWith($method->getName(), 'mount')
+            fn (\ReflectionMethod $method): bool => \Illuminate\Support\Str::startsWith($method->getName(), 'mount') && $method->isPublic()
         );
 
         foreach ($mountMethods as $method) {
