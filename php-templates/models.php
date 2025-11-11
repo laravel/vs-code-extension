@@ -134,6 +134,43 @@ $models = new class($factory) {
         return \Illuminate\Support\Str::start($parent, '\\');
     }
 
+    protected function defaultToString(mixed $value): string {
+        return match (true) {
+            is_null($value) => 'null',
+            is_numeric($value) => $value,
+            is_bool($value) => $value ? 'true' : 'false',
+            is_array($value) => '[...]',
+            is_object($value) && enum_exists(get_class($value)) => '\\' . get_class($value) . '::' . $value->name,
+            default => "'{$value}'",
+        };
+    }
+
+    protected function typeToString(?ReflectionType $type): string {
+        if ($type instanceof ReflectionNamedType) {
+            $name = $type->getName();
+
+            if (!$type->isBuiltin()) {
+                $name = '\\' . ltrim($name, '\\');
+            }
+
+            return ($type->allowsNull() ? '?' : '') . $name;
+        }
+
+        if ($type instanceof ReflectionUnionType) {
+            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
+
+            return implode('|', $types);
+        }
+
+        if ($type instanceof ReflectionIntersectionType) {
+            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
+
+            return implode('&', $types);
+        }
+
+        return 'mixed';
+    }
+
     protected function getInfo($className)
     {
         if (($data = $this->fromArtisan($className)) === null) {
@@ -155,8 +192,17 @@ $models = new class($factory) {
             ->toArray();
 
         $data['scopes'] = collect($reflection->getMethods())
-            ->filter(fn($method) =>!$method->isStatic() && ($method->getAttributes(\Illuminate\Database\Eloquent\Attributes\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
-            ->map(fn($method) => str($method->name)->replace('scope', '')->lcfirst()->toString())
+            ->filter(fn(\ReflectionMethod $method) => !$method->isStatic() && ($method->getAttributes(\Illuminate\Database\Eloquent\Attributes\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
+            ->map(fn(\ReflectionMethod $method) => [
+                "name" => str($method->name)->replace('scope', '')->lcfirst()->toString(),
+                "parameters" => collect($method->getParameters())->map(fn(\ReflectionParameter $param) => [
+                    "name" => $param->getName(),
+                    "type" => $this->typeToString($param->getType()),
+                    "hasDefault" => $param->isDefaultValueAvailable(),
+                    "default" => $param->isDefaultValueAvailable() ? $this->defaultToString($param->getDefaultValue()) : null,
+                    "isOptional" => $param->isOptional()
+                ]),
+            ])
             ->values()
             ->toArray();
 
