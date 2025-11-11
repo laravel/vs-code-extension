@@ -1,6 +1,7 @@
 // This file was generated from php-templates/livewire-components.php, do not edit directly
 export default `
-$components = new class {
+$components = new class
+{
     public function all(): array
     {
         $components = collect(array_merge(
@@ -8,12 +9,13 @@ $components = new class {
             $this->getStandardViews()
         ))->groupBy('key')->map(fn (\\Illuminate\\Support\\Collection $items) => [
             'isVendor' => $items->first()['isVendor'],
+            'isMfc' => $items->first()['isMfc'] ?? false,
             'paths' => $items->pluck('path')->values(),
             'props' => $items->pluck('props')->values()->filter()->flatMap(fn ($i) => $i),
         ]);
 
         return [
-            'components' => $components
+            'components' => $components,
         ];
     }
 
@@ -28,7 +30,7 @@ $components = new class {
 
         $files = \\Symfony\\Component\\Finder\\Finder::create()
             ->files()
-            ->name("*." . $extension)
+            ->name('*.'.$extension)
             ->in($path);
         $components = [];
         $pathRealPath = realpath($path);
@@ -39,14 +41,14 @@ $components = new class {
             $key = str($realPath)
                 ->replace($pathRealPath, '')
                 ->ltrim('/\\\\')
-                ->replace('.' . $extension, '')
+                ->replace('.'.$extension, '')
                 ->replace(['/', '\\\\'], '.')
                 ->pipe(fn (string $str): string => $str);
 
             $components[] = [
-                "path" => LaravelVsCode::relativePath($realPath),
-                "isVendor" => LaravelVsCode::isVendor($realPath),
-                "key" => $keyCallback ? $keyCallback($key) : $key,
+                'path' => LaravelVsCode::relativePath($realPath),
+                'isVendor' => LaravelVsCode::isVendor($realPath),
+                'key' => $keyCallback ? $keyCallback($key) : $key,
             ];
         }
 
@@ -70,7 +72,8 @@ $components = new class {
         $items = $this->findFiles(
             $path,
             'php',
-            fn (\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
+            fn (\\Illuminate\\Support\\Stringable $key): string => $key->replace('⚡', '')
+                ->explode('.')
                 ->map(fn (string $p): string => \\Illuminate\\Support\\Str::kebab($p))
                 ->implode('.'),
         );
@@ -108,59 +111,80 @@ $components = new class {
         /** @var string|null $viewPath */
         $path = config('livewire.view_path');
 
-        if (! $path) {
-            return [];
-        }
+        /** @var array<int, string> $componentLocations */
+        $componentLocations = config('livewire.component_locations', [config('livewire.view_path', resource_path('views/livewire'))]);
 
-        $items = $this->findFiles(
-            $path,
-            'blade.php',
-            fn (\\Illuminate\\Support\\Stringable $key): string => $key->explode('.')
-                ->map(fn(string $p): string => \\Illuminate\\Support\\Str::kebab($p))
-                ->implode('.'),
-        );
+        /** @var array<string, string> $componentNamespaces */
+        $componentNamespaces = config('livewire.component_namespaces', []);
+
+        $paths = array_merge($componentLocations, $componentNamespaces);
+
+        $items = collect([]);
+
+        foreach ($paths as $prefix => $path) {
+            $items = $items->merge($this->findFiles(
+                $path,
+                'php', // Mfc components are in .php files
+                function (\\Illuminate\\Support\\Stringable $key) use ($prefix): string {
+                    $componentKey = $key->beforeLast('.blade')
+                        ->replace('⚡', '')
+                        ->explode('.')
+                        ->map(fn (string $p): string => \\Illuminate\\Support\\Str::kebab($p))
+                        ->implode('.');
+
+                    if (is_string($prefix)) {
+                        $componentKey = "{$prefix}::{$componentKey}";
+                    }
+
+                    return $componentKey;
+                }
+            ));
+        }
 
         $previousClass = null;
 
-        return collect($items)
-            ->map(function ($item) use (&$previousClass) {
-                // This is ugly, I know, but I don't have better idea how to get
-                // anonymous classes from Volt components
-                ob_start();
+        return $items->map(function ($item) use (&$previousClass) {
+            $item['isMfc'] = $this->isMfc($item['path']);
 
-                try {
-                    require_once $item['path'];
-                } catch (\\Throwable $e) {
-                    return $item;
-                }
+            // This is ugly, I know, but I don't have better idea how to get
+            // anonymous classes from Volt components
+            ob_start();
 
-                ob_clean();
+            try {
+                require_once $item['path'];
+            } catch (\\Throwable $e) {
+                return $item;
+            }
 
-                $declaredClasses = get_declared_classes();
-                $class = end($declaredClasses);
+            ob_clean();
 
-                if ($previousClass === $class) {
-                    return $item;
-                }
+            $declaredClasses = get_declared_classes();
+            $class = end($declaredClasses);
 
-                $previousClass = $class;
+            if ($previousClass === $class) {
+                return $item;
+            }
 
-                if (! \\Illuminate\\Support\\Str::contains($class, '@anonymous')) {
-                    return $item;
-                }
+            $previousClass = $class;
 
-                $reflection = new \\ReflectionClass($class);
+            if (! \\Illuminate\\Support\\Str::contains($class, '@anonymous')) {
+                return $item;
+            }
 
-                if (! $reflection->isSubclassOf('Livewire\\Volt\\Component')) {
-                    return $item;
-                }
+            $reflection = new \\ReflectionClass($class);
 
-                return [
-                    ...$item,
-                    'props' => $this->getComponentProps($reflection),
-                ];
-            })
-            ->all();
+            if (
+                (class_exists('Livewire\\Volt\\Component') && ! $reflection->isSubclassOf('Livewire\\Volt\\Component'))
+                || (class_exists('Livewire\\Component') && ! $reflection->isSubclassOf('Livewire\\Component'))
+            ) {
+                return $item;
+            }
+
+            return [
+                ...$item,
+                'props' => $this->getComponentProps($reflection),
+            ];
+        })->all();
     }
 
     /**
@@ -177,8 +201,7 @@ $components = new class {
 
         $mountMethods = array_filter(
             $methods,
-            fn (\\ReflectionMethod $method): bool =>
-                \\Illuminate\\Support\\Str::startsWith($method->getName(), 'mount')
+            fn (\\ReflectionMethod $method): bool => \\Illuminate\\Support\\Str::startsWith($method->getName(), 'mount')
         );
 
         foreach ($mountMethods as $method) {
@@ -190,8 +213,8 @@ $components = new class {
                     'type' => (string) ($p->getType() ?? 'mixed'),
                     // We need to add hasDefault, because null can be also a default value,
                     // it can't be a flag of no default
-                    'hasDefault' => $p->isDefaultValueAvailable(), 
-                    'default' => $p->isOptional() ? $p->getDefaultValue() : null
+                    'hasDefault' => $p->isDefaultValueAvailable(),
+                    'default' => $p->isOptional() ? $p->getDefaultValue() : null,
                 ])
                 ->all();
 
@@ -201,14 +224,13 @@ $components = new class {
         // Then we need to get the public properties
 
         $properties = collect($reflection->getProperties())
-            ->filter(fn (\\ReflectionProperty $p): bool =>
-                $p->isPublic() && $p->getDeclaringClass()->getName() === $reflection->getName()
+            ->filter(fn (\\ReflectionProperty $p): bool => $p->isPublic() && $p->getDeclaringClass()->getName() === $reflection->getName()
             )
             ->map(fn (\\ReflectionProperty $p): array => [
                 'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                 'type' => (string) ($p->getType() ?? 'mixed'),
-                'hasDefault' => $p->hasDefaultValue(), 
-                'default' => $p->getDefaultValue()
+                'hasDefault' => $p->hasDefaultValue(),
+                'default' => $p->getDefaultValue(),
             ])
             ->all();
 
@@ -216,6 +238,27 @@ $components = new class {
             ->merge($properties)
             ->unique('name') // Mount parameters always overwrite public properties
             ->all();
+    }
+
+    protected function isMfc(string $path): bool
+    {
+        $directoryPath = base_path(dirname($path));
+
+        $folderName = str(basename($directoryPath))
+            ->replace('⚡', '')
+            ->toString();
+        $fileName = str(basename($path))
+            ->replace('⚡', '')
+            ->before('.')
+            ->toString();
+
+        if ($folderName !== $fileName) {
+            return false;
+        }
+
+        $componentPath = $directoryPath.'/'.$fileName.'.php';
+
+        return \\Illuminate\\Support\\Facades\\File::exists($componentPath);
     }
 };
 
