@@ -148,7 +148,7 @@ $components = new class
                 $isMfc = $this->isMfc($item['path']);
 
                 if ($isMfc) {
-                    $item['key'] = \Illuminate\Support\Str::beforeLast('.', $item['key']);
+                    $item['key'] = \Illuminate\Support\Str::beforeLast($item['key'], '.');
                 }
 
                 return [
