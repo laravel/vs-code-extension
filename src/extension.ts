@@ -6,7 +6,29 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
-import { openFileCommand } from "./commands";
+import { commandName, openFileCommand } from "./commands";
+import { generateNamespaceCommand } from "./commands/generateNamespace";
+import {
+    pintCommands,
+    PintEditProvider,
+    runPint,
+    runPintOnCurrentFile,
+    runPintOnDirtyFiles,
+    runPintOnSave,
+} from "./commands/pint";
+import {
+    htmlClassToBladeDirectiveCommands,
+    refactorAllHtmlClassesToBladeDirectives,
+    refactorSelectedHtmlClassToBladeDirective,
+} from "./commands/refactorHtmlClassToBladeDirective";
+import {
+    helpers,
+    openSubmenuCommand,
+    unwrapSelectionCommand,
+    wrapHelperCommandNameSubCommandName,
+    wrapSelectionCommand,
+    wrapWithHelperCommands,
+} from "./commands/wrapWithHelper";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -42,6 +64,34 @@ function shouldActivate(): boolean {
 
 export async function activate(context: vscode.ExtensionContext) {
     info("Activating Laravel Extension...");
+
+    initPhp();
+
+    const PHP_LANGUAGE = { scheme: "file", language: "php" };
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            commandName("laravel.open"),
+            openFileCommand,
+        ),
+        vscode.commands.registerCommand(pintCommands.all, runPint),
+        vscode.commands.registerCommand(
+            pintCommands.currentFile,
+            runPintOnCurrentFile,
+        ),
+        vscode.commands.registerCommand(
+            pintCommands.dirtyFiles,
+            runPintOnDirtyFiles,
+        ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            PHP_LANGUAGE,
+            new PintEditProvider(),
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.namespace.generate"),
+            generateNamespaceCommand,
+        ),
+    );
 
     if (!shouldActivate()) {
         info(
@@ -87,9 +137,8 @@ export async function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "laravel-blade" },
     ];
 
-    const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
+    const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
 
-    initPhp();
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
@@ -97,8 +146,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const TRIGGER_CHARACTERS = ["'", '"'];
 
     updateDiagnostics(vscode.window.activeTextEditor);
-
-    context.subscriptions.push();
 
     const delegatedRegistry = new Registry(
         ...completionProviders,
@@ -119,6 +166,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }),
         vscode.workspace.onDidSaveTextDocument((event) => {
             updateDiagnostics(vscode.window.activeTextEditor);
+            runPintOnSave(event);
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
@@ -187,7 +235,28 @@ export async function activate(context: vscode.ExtensionContext) {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
         ),
-        vscode.commands.registerCommand("laravel.open", openFileCommand),
+        vscode.commands.registerCommand(
+            wrapWithHelperCommands.wrap,
+            openSubmenuCommand,
+        ),
+        vscode.commands.registerCommand(
+            wrapWithHelperCommands.unwrap,
+            unwrapSelectionCommand,
+        ),
+        ...helpers.map((helper) => {
+            return vscode.commands.registerCommand(
+                wrapHelperCommandNameSubCommandName(helper),
+                () => wrapSelectionCommand(helper),
+            );
+        }),
+        vscode.commands.registerCommand(
+            htmlClassToBladeDirectiveCommands.selected,
+            refactorSelectedHtmlClassToBladeDirective,
+        ),
+        vscode.commands.registerCommand(
+            htmlClassToBladeDirectiveCommands.all,
+            refactorAllHtmlClassesToBladeDirectives,
+        ),
     );
 
     collectDebugInfo();
