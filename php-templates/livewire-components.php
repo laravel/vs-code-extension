@@ -143,48 +143,60 @@ $components = new class
 
         $previousClass = null;
 
-        return $items->map(function ($item) use (&$previousClass) {
-            $item['isMfc'] = $this->isMfc($item['path']);
+        return $items
+            ->map(function ($item) {
+                $isMfc = $this->isMfc($item['path']);
 
-            // This is ugly, I know, but I don't have better idea how to get
-            // anonymous classes from Volt components
-            ob_start();
+                if ($isMfc) {
+                    $item['key'] = \Illuminate\Support\Str::beforeLast($item['key'], '.');
+                }
 
-            try {
-                require_once $item['path'];
-            } catch (\Throwable $e) {
-                return $item;
-            }
+                return [
+                    ...$item,
+                    'isMfc' => $isMfc,
+                ];
+            })
+            ->map(function ($item) use (&$previousClass) {
+                // This is ugly, I know, but I don't have better idea how to get
+                // anonymous classes from Volt/Livewire 4 components
+                ob_start();
 
-            ob_clean();
+                try {
+                    require_once $item['path'];
+                } catch (\Throwable $e) {
+                    return $item;
+                }
 
-            $declaredClasses = get_declared_classes();
-            $class = end($declaredClasses);
+                ob_clean();
 
-            if ($previousClass === $class) {
-                return $item;
-            }
+                $declaredClasses = get_declared_classes();
+                $class = end($declaredClasses);
 
-            $previousClass = $class;
+                if ($previousClass === $class) {
+                    return $item;
+                }
 
-            if (! \Illuminate\Support\Str::contains($class, '@anonymous')) {
-                return $item;
-            }
+                $previousClass = $class;
 
-            $reflection = new \ReflectionClass($class);
+                if (! \Illuminate\Support\Str::contains($class, '@anonymous')) {
+                    return $item;
+                }
 
-            if (
-                (class_exists('Livewire\Volt\Component') && ! $reflection->isSubclassOf('Livewire\Volt\Component'))
-                || (class_exists('Livewire\Component') && ! $reflection->isSubclassOf('Livewire\Component'))
-            ) {
-                return $item;
-            }
+                $reflection = new \ReflectionClass($class);
 
-            return [
-                ...$item,
-                'props' => $this->getComponentProps($reflection),
-            ];
-        })->all();
+                if (
+                    (class_exists('Livewire\Volt\Component') && ! $reflection->isSubclassOf('Livewire\Volt\Component'))
+                    || (class_exists('Livewire\Component') && ! $reflection->isSubclassOf('Livewire\Component'))
+                ) {
+                    return $item;
+                }
+
+                return [
+                    ...$item,
+                    'props' => $this->getComponentProps($reflection),
+                ];
+            })
+            ->all();
     }
 
     /**
