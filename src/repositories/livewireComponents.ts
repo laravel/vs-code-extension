@@ -1,5 +1,4 @@
 import { runInLaravel, template } from "@src/support/php";
-import { relativePath } from "@src/support/project";
 import { lcfirst } from "@src/support/str";
 import { waitForValue } from "@src/support/util";
 import { repository } from ".";
@@ -12,6 +11,7 @@ export interface LivewireComponents {
         [key: string]: {
             paths: string[];
             isVendor: boolean;
+            isMfc: boolean;
             props: {
                 name: string;
                 type: string;
@@ -31,10 +31,7 @@ const load = () => {
                     "/",
                 ) ?? "app/Livewire",
             ),
-            relativePath(
-                getConfigByName("livewire.view_path")?.value ??
-                    "resources/views/livewire",
-            ),
+            "resources/views",
         ];
     });
 
