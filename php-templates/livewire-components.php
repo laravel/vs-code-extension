@@ -158,7 +158,7 @@ $components = new class
             })
             ->map(function ($item) use (&$previousClass) {
                 // This is ugly, I know, but I don't have better idea how to get
-                // anonymous classes from Volt components
+                // anonymous classes from Volt/Livewire 4 components
                 ob_start();
 
                 try {
