@@ -141,6 +141,7 @@ $models = new class($factory) {
             is_bool($value) => $value ? 'true' : 'false',
             is_array($value) => '[...]',
             is_object($value) && enum_exists(get_class($value)) => '\\' . get_class($value) . '::' . $value->name,
+            is_object($value) => '\\' . get_class($value),
             default => "'{$value}'",
         };
     }
