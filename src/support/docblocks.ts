@@ -239,6 +239,7 @@ const castMapping: TypeMapping = {
     mixed: ["attribute", "accessor", "encrypted"],
     object: ["encrypted:object"],
     string: ["hashed"],
+    float: [/^decimal:\d+$/],
     "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
     "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
