@@ -14,4 +14,5 @@ export type RegisteredCommand =
     | "laravel.refactorSelectedHtmlClassToBladeDirective"
     | "laravel.refactorAllHtmlClassesToBladeDirectives"
     | "laravel.namespace.generate"
+    | "laravel.internal.runPhpTemplate"
     | "laravel.open";

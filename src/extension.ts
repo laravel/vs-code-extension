@@ -29,6 +29,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { runPhpTemplate } from "./commands/runPhpTemplate";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -258,6 +259,17 @@ export async function activate(context: vscode.ExtensionContext) {
             refactorAllHtmlClassesToBladeDirectives,
         ),
     );
+
+    if (context.extensionMode === vscode.ExtensionMode.Development) {
+        vscode.commands.executeCommand("setContext", "laravel.inDevMode", true);
+
+        context.subscriptions.push(
+            vscode.commands.registerCommand(
+                commandName("laravel.internal.runPhpTemplate"),
+                runPhpTemplate,
+            ),
+        );
+    }
 
     collectDebugInfo();
 

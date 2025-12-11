@@ -11,7 +11,7 @@ import routes from "./routes";
 import translations from "./translations";
 import views from "./views";
 
-const templates = {
+export const templates = {
     app,
     auth,
     bladeComponents,

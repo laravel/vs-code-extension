@@ -94,6 +94,11 @@
                     "command": "laravel.namespace.generate",
                     "when": "resourceLangId == php",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.internal.runPhpTemplate",
+                    "when": "laravel.inDevMode",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -217,6 +222,11 @@
             {
                 "command": "laravel.namespace.generate",
                 "title": "Generate namespace",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.internal.runPhpTemplate",
+                "title": "Run PHP Template",
                 "category": "Laravel"
             }
         ],
