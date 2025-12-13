@@ -150,6 +150,7 @@ $models = new class($factory) {
             ->zip($this->getNameCases($name->plural()))
             ->flatten()
             ->unique()
+            ->values()            
             ->toArray();
 
         $existingProperties = $this->collectExistingProperties($reflection);
