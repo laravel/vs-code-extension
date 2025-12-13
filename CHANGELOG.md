@@ -2,6 +2,69 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.2.1 - 2025-09-16
+
+### What's Changed
+
+* Fix - move refactor class commands from laravel.wrapWithHelper.submenu to editor/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/460
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.0...v1.2.1
+
+## v1.2.0 - 2025-09-15
+
+### What's Changed
+
+* Correct repository link in release script by [@duncanmcclean](https://github.com/duncanmcclean) in https://github.com/laravel/vs-code-extension/pull/453
+* Add Pint formatter to the available list by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/451
+* Add commands that refactor class attributes in blade files by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/432
+* Add a command that wraps selected text with a helper by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/431
+* Increase consistency for registered commands by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/459
+
+### New Contributors
+
+* [@duncanmcclean](https://github.com/duncanmcclean) made their first contribution in https://github.com/laravel/vs-code-extension/pull/453
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.1.1...v1.2.0
+
+## v1.1.1 - 2025-09-02
+
+### What's Changed
+
+* Pint for plain PHP projects by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/449
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.1.0...v1.1.1
+
+## v1.1.0 - 2025-09-02
+
+### What's Changed
+
+* Pint commands + run Pint on save by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/448
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.14...v1.1.0
+
+## v1.0.14 - 2025-08-25
+
+### What's Changed
+
+* Fix Auth bug when \Illuminate\Auth\AuthServiceProvider::class is disabled by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/445
+* bump required Php version by [@m-graham](https://github.com/m-graham) in https://github.com/laravel/vs-code-extension/pull/413
+
+### New Contributors
+
+* [@m-graham](https://github.com/m-graham) made their first contribution in https://github.com/laravel/vs-code-extension/pull/413
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.13...v1.0.14
+
+## v1.0.13 - 2025-08-22
+
+### What's Changed
+
+* Fix for getTranslationPathByName with nested translations by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/439
+* Fix for DIRECTORY_SEPARATOR for Windows environment by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/441
+* Add ddev support by [@damms005](https://github.com/damms005) in https://github.com/laravel/vs-code-extension/pull/398
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.12...v1.0.13
+
 ## v1.0.12 - 2025-08-19
 
 ### What's Changed
