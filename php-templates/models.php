@@ -146,11 +146,11 @@ $models = new class($factory) {
 
         $name = str($className)->afterLast('\\');
 
-        $data['name_cases'] = array_merge(...array_map(
-            null,
-            $this->getNameCases($name),
-            $this->getNameCases($name->plural())
-        ));
+        $data['name_cases'] = collect($this->getNameCases($name))
+            ->zip($this->getNameCases($name->plural()))
+            ->flatten()
+            ->unique()
+            ->toArray();
 
         $existingProperties = $this->collectExistingProperties($reflection);
 
