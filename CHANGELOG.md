@@ -2,6 +2,18 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.2.3 - 2025-12-19
+
+### What's Changed
+
+* Fix "app/Modelsdirectory does not exist" error by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/511
+
+### New Contributors
+
+* [@TitasGailius](https://github.com/TitasGailius) made their first contribution in https://github.com/laravel/vs-code-extension/pull/511
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.2...v1.2.3
+
 ## v1.2.2 - 2025-12-18
 
 ### What's Changed
