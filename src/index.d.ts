@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import AutocompleteResult from "./parser/AutocompleteResult";
 
 type CodeActionProviderFunction = (
+    code: string,
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
