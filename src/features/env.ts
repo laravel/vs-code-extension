@@ -195,12 +195,13 @@ export const viteEnvCodeActionProvider: vscode.CodeActionProvider = {
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
+    code: string,
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ): Promise<vscode.CodeAction[]> => {
-    if (diagnostic.code !== "env") {
+    if (code !== "env") {
         return [];
     }
 

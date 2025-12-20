@@ -23,11 +23,20 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     ): vscode.ProviderResult<vscode.CodeAction[]> {
         return Promise.all(
             context.diagnostics
-                .map((diagnostic) =>
-                    providers.map((provider) =>
-                        provider(diagnostic, document, range, token),
-                    ),
-                )
+                .map((diagnostic) => {
+                    const code =
+                        typeof diagnostic.code === "object"
+                            ? diagnostic.code?.value
+                            : diagnostic.code;
+
+                    if (typeof code !== "string") {
+                        return [];
+                    }
+
+                    return providers.map((provider) =>
+                        provider(code, diagnostic, document, range, token),
+                    );
+                })
                 .flat(),
         ).then((actions) => actions.flat());
     }
