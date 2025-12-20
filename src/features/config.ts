@@ -1,8 +1,10 @@
+import { openFile } from "@src/commands";
 import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
+import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
@@ -10,6 +12,7 @@ import { contract, facade, withLineFragment } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
+    CodeActionProviderFunction,
     CompletionProvider,
     FeatureTag,
     HoverProvider,
@@ -181,6 +184,120 @@ export const diagnosticProvider = (
             return notFound("Config", param.value, detectedRange(param), code);
         },
     );
+};
+
+export const codeActionProvider: CodeActionProviderFunction = async (
+    code: string,
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (code !== "config") {
+        return [];
+    }
+
+    const missingVar = document.getText(diagnostic.range);
+
+    if (!missingVar) {
+        return [];
+    }
+
+    const actions = await Promise.all([addToFile(diagnostic, missingVar)]);
+
+    return actions.filter((action) => action !== null);
+};
+
+const addToFile = async (
+    diagnostic: vscode.Diagnostic,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    return getCodeAction(
+        "Add variable to the configuration file",
+        missingVar,
+        diagnostic,
+    );
+};
+
+const getCodeAction = async (
+    title: string,
+    missingVar: string,
+    diagnostic: vscode.Diagnostic,
+    value?: string,
+) => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const config = getConfigs().items.configs.find(
+        (c) => c.name === missingVar,
+    );
+
+    if (config) {
+        return null;
+    }
+
+    const configPath = getConfigPathByName(missingVar);
+
+    if (!configPath) {
+        return null;
+    }
+
+    const configContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(configPath.path),
+    );
+
+    let lineNumber = configPath.line ? Number(configPath.line) - 1 : undefined;
+
+    if (!lineNumber) {
+        // Default to the end of the file
+        const lines = configContents.toString().split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith("];")) {
+                lineNumber = i;
+            }
+        }
+    }
+
+    if (!lineNumber) {
+        return null;
+    }
+
+    const key = missingVar.split(".").pop();
+
+    const fileName = configPath.path.split("/").pop()?.replace(".php", "");
+
+    if (!fileName) {
+        return null;
+    }
+
+    // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
+    // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
+    const parents =
+        missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
+            .length - 1;
+
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * parents);
+
+    const finalValue = `${indent}'${key}' => '',\n`;
+
+    edit.insert(
+        vscode.Uri.file(configPath.path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(title, vscode.CodeActionKind.QuickFix);
+
+    action.edit = edit;
+    action.command = openFile(
+        configPath.path,
+        lineNumber,
+        finalValue.length - 3,
+    );
+    action.diagnostics = [diagnostic];
+    action.isPreferred = value === undefined;
+
+    return action;
 };
 
 export const completionProvider: CompletionProvider = {

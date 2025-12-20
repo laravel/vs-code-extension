@@ -101,7 +101,7 @@ export const getParentTranslationItemByName = (
 
 export const getTranslationPathByName = (
     match: string,
-    lang: string | undefined,
+    lang?: string | undefined,
 ): TranslationPath | undefined => {
     lang = lang ?? getTranslations().items.default;
 

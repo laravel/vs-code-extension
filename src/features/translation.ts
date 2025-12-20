@@ -1,3 +1,4 @@
+import { openFile } from "@src/commands";
 import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
@@ -8,6 +9,7 @@ import {
 } from "@src/repositories/translations";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
+import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { relativePath } from "@src/support/project";
@@ -19,7 +21,12 @@ import {
 } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
-import { FeatureTag, HoverProvider, LinkProvider } from "..";
+import {
+    CodeActionProviderFunction,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
 const toFind: FeatureTag = [
     {
@@ -196,10 +203,9 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const translationPath = getTranslationPathByName(
-                param.value,
-                getLang(item as AutocompleteParsingResult.MethodCall),
-            );
+            const lang = getLang(item as AutocompleteParsingResult.MethodCall);
+
+            const translationPath = getTranslationPathByName(param.value, lang);
 
             const code: NotFoundCode = translationPath
                 ? {
@@ -210,14 +216,127 @@ export const diagnosticProvider = (
                   }
                 : "translation";
 
-            return notFound(
-                "Translation",
-                param.value,
-                detectedRange(param),
-                code,
-            );
+            let message = "Translation";
+
+            if (lang) {
+                message += ` for locale: "${lang}"`;
+            }
+
+            return notFound(message, param.value, detectedRange(param), code);
         },
     );
+};
+
+export const codeActionProvider: CodeActionProviderFunction = async (
+    code: string,
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (code !== "translation") {
+        return [];
+    }
+
+    const missingVar = document.getText(diagnostic.range);
+
+    if (!missingVar) {
+        return [];
+    }
+
+    const actions = await Promise.all([addToFile(diagnostic, missingVar)]);
+
+    return actions.filter((action) => action !== null);
+};
+
+const addToFile = async (
+    diagnostic: vscode.Diagnostic,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    return getCodeAction(
+        "Add variable to the translation file",
+        missingVar,
+        diagnostic,
+    );
+};
+
+const getCodeAction = async (
+    title: string,
+    missingVar: string,
+    diagnostic: vscode.Diagnostic,
+    value?: string,
+) => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const translation = getTranslationItemByName(missingVar);
+
+    if (translation) {
+        return null;
+    }
+
+    /**
+     * This is ugly, but we don't have a way to get the language from method parameters,
+     * maybe {@link vscode.Diagnostic.relatedInformation} can help
+     **/
+    const match = diagnostic.message.match(/for locale:\s+\"([^"]+)\"/);
+
+    const lang = match?.[1];
+
+    const translationPath = getTranslationPathByName(missingVar, lang);
+
+    if (!translationPath) {
+        return null;
+    }
+
+    const translationContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(translationPath.path),
+    );
+
+    let lineNumber = translationPath.line
+        ? translationPath.line - 1
+        : undefined;
+
+    if (!lineNumber) {
+        // Default to the end of the file
+        const lines = translationContents.toString().split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith("];")) {
+                lineNumber = i;
+            }
+        }
+    }
+
+    if (!lineNumber) {
+        return null;
+    }
+
+    const key = missingVar.split(".").pop();
+
+    const parents = missingVar.split(".").length - 1;
+
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * parents);
+
+    const finalValue = `${indent}'${key}' => '',\n`;
+
+    edit.insert(
+        vscode.Uri.file(translationPath.path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(title, vscode.CodeActionKind.QuickFix);
+
+    action.edit = edit;
+    action.command = openFile(
+        translationPath.path,
+        lineNumber,
+        finalValue.length - 3,
+    );
+    action.diagnostics = [diagnostic];
+    action.isPreferred = value === undefined;
+
+    return action;
 };
 
 export const completionProvider = {

@@ -25,7 +25,7 @@ export const getParentConfigByName = (match: string): Config | undefined => {
     }
 
     return getConfigs().items.configs.find((config) =>
-        config.name.startsWith(name),
+        new RegExp(`^${name}[^.]*$`).test(config.name),
     );
 };
 
