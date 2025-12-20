@@ -1,5 +1,5 @@
 import { openFile } from "@src/commands";
-import { notFound, NotFoundCode } from "@src/diagnostic";
+import { DiagnosticWithContext, notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslationItemByName,
@@ -216,20 +216,20 @@ export const diagnosticProvider = (
                   }
                 : "translation";
 
-            let message = "Translation";
-
-            if (lang) {
-                message += ` for locale: "${lang}"`;
-            }
-
-            return notFound(message, param.value, detectedRange(param), code);
+            return notFound(
+                "Translation",
+                param.value,
+                detectedRange(param),
+                code,
+                item,
+            );
         },
     );
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
     code: string,
-    diagnostic: vscode.Diagnostic,
+    diagnostic: DiagnosticWithContext,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
@@ -250,7 +250,7 @@ export const codeActionProvider: CodeActionProviderFunction = async (
 };
 
 const addToFile = async (
-    diagnostic: vscode.Diagnostic,
+    diagnostic: DiagnosticWithContext,
     missingVar: string,
 ): Promise<vscode.CodeAction | null> => {
     return getCodeAction(
@@ -263,7 +263,7 @@ const addToFile = async (
 const getCodeAction = async (
     title: string,
     missingVar: string,
-    diagnostic: vscode.Diagnostic,
+    diagnostic: DiagnosticWithContext,
     value?: string,
 ) => {
     const edit = new vscode.WorkspaceEdit();
@@ -274,13 +274,9 @@ const getCodeAction = async (
         return null;
     }
 
-    /**
-     * This is ugly, but we don't have a way to get the language from method parameters,
-     * maybe {@link vscode.Diagnostic.relatedInformation} can help
-     **/
-    const match = diagnostic.message.match(/for locale:\s+\"([^"]+)\"/);
-
-    const lang = match?.[1];
+    const lang = getLang(
+        diagnostic.context as AutocompleteParsingResult.MethodCall,
+    );
 
     const translationPath = getTranslationPathByName(missingVar, lang);
 
