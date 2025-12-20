@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.0.13",
+    "version": "1.2.3",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -42,6 +42,97 @@
         }
     ],
     "contributes": {
+        "submenus": [
+            {
+                "id": "laravel.wrapWithHelper.submenu",
+                "label": "Wrap selection with helpers"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "laravel.wrapWithHelper",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.unwrap",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dd",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dump",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.collect",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.str",
+                    "when": "false",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.namespace.generate",
+                    "when": "resourceLangId == php",
+                    "group": "laravel"
+                }
+            ],
+            "editor/context": [
+                {
+                    "submenu": "laravel.wrapWithHelper.submenu",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.unwrap",
+                    "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
+                    "group": "laravel"
+                }
+            ],
+            "laravel.wrapWithHelper.submenu": [
+                {
+                    "command": "laravel.wrapWithHelper.dd"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.dump"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.collect"
+                },
+                {
+                    "command": "laravel.wrapWithHelper.str"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "blade",
@@ -65,6 +156,68 @@
                     "source.css": "css",
                     "source.js": "javascript"
                 }
+            }
+        ],
+        "commands": [
+            {
+                "command": "laravel.pint.run",
+                "title": "Run Pint",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.pint.runOnDirtyFiles",
+                "title": "Run Pint on Dirty Files",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.pint.runOnCurrentFile",
+                "title": "Run Pint on Current File",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper",
+                "title": "Wrap selection with helper",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.unwrap",
+                "title": "Unwrap selection",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.dd",
+                "title": "with dd(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.dump",
+                "title": "with dump(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.collect",
+                "title": "with collect(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.wrapWithHelper.str",
+                "title": "with str(...)",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                "title": "Refactor selected HTML class attribute to Blade directive",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                "title": "Refactor all HTML class attributes to Blade directives",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.namespace.generate",
+                "title": "Generate namespace",
+                "category": "Laravel"
             }
         ],
         "configuration": {
@@ -130,6 +283,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Automatically add spacing around Blade echo and comment tags."
+                },
+                "Laravel.pint.runOnSave": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically run Pint on the current file when saved."
                 },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
@@ -486,7 +644,7 @@
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && ./precheck && npm run package",
+        "vscode:prepublish": "php build.php && ./precheck && npm run package",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },

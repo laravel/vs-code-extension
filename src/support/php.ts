@@ -249,7 +249,7 @@ export const runInLaravel = <T>(
         });
 };
 
-const fixFilePath = (path: string) => {
+export const fixFilePath = (path: string) => {
     if (phpEnvironmentsThatUseRelativePaths.includes(phpEnvKey!)) {
         return relativePath(path);
     }

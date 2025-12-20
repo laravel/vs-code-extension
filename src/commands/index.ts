@@ -1,4 +1,7 @@
 import * as vscode from "vscode";
+import { RegisteredCommand } from "./generatedRegisteredCommands";
+
+export const commandName = (name: RegisteredCommand) => name;
 
 export const openFile = (
     uri: vscode.Uri | string,
@@ -10,7 +13,7 @@ export const openFile = (
     }
 
     return {
-        command: "laravel.open",
+        command: commandName("laravel.open"),
         title: "Open file",
         arguments: [uri, lineNumber, position],
     };
