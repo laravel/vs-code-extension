@@ -18,7 +18,7 @@ export const getConfigByName = (name: string): Config | undefined => {
 };
 
 export const getParentConfigByName = (match: string): Config | undefined => {
-    const name = match.match(/^(.*)\./)?.[0];
+    const name = match.match(/^(.+\..+)\./)?.[0];
 
     if (!name) {
         return undefined;

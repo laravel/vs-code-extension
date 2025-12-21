@@ -241,6 +241,23 @@ const getCodeAction = async (
         return null;
     }
 
+    const fileName = configPath.path.split("/").pop()?.replace(".php", "");
+
+    if (!fileName) {
+        return null;
+    }
+
+    // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
+    // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
+    const nestedKeys =
+        missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
+            .length - 1;
+
+    // Case when a user tries to add a new config key to an existing key that is not an array
+    if (!configPath.line && nestedKeys > 1) {
+        return null;
+    }
+
     const configContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(configPath.path),
     );
@@ -264,19 +281,7 @@ const getCodeAction = async (
 
     const key = missingVar.split(".").pop();
 
-    const fileName = configPath.path.split("/").pop()?.replace(".php", "");
-
-    if (!fileName) {
-        return null;
-    }
-
-    // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
-    // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
-    const parents =
-        missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
-            .length - 1;
-
-    const indent = " ".repeat((getIndentNumber("php") ?? 4) * parents);
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * nestedKeys);
 
     const finalValue = `${indent}'${key}' => '',\n`;
 

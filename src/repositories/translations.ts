@@ -86,7 +86,7 @@ export const getTranslationItemByName = (
 export const getParentTranslationItemByName = (
     match: string,
 ): TranslationItem | undefined => {
-    const name = match.match(/^(.*)\./)?.[0];
+    const name = match.match(/^(.+\..+)\./)?.[0];
 
     if (!name) {
         return undefined;
