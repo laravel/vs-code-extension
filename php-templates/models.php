@@ -184,7 +184,7 @@ $models = new class($factory) {
         ];
 
         if ($parameter->isDefaultValueAvailable()) {
-            $result['default'] = $this->defaultToString($parameter->getDefaultValue());
+            $result['default'] = $this->defaultValueToString($parameter->getDefaultValue());
         }
 
         return $result;
@@ -195,11 +195,11 @@ $models = new class($factory) {
         if ($type instanceof ReflectionNamedType) {
             $name = $type->getName();
 
-            if (!$type->isBuiltin()) {
+            if (! $type->isBuiltin()) {
                 $name = '\\' . ltrim($name, '\\');
             }
 
-            if ($name !== 'null' && $type->allowsNull()) {
+            if ($type->allowsNull() && ! in_array($name, ['null', 'mixed', 'void'])) {
                 return '?'.$name;
             }
 
@@ -207,21 +207,17 @@ $models = new class($factory) {
         }
 
         if ($type instanceof ReflectionUnionType) {
-            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
-
-            return implode('|', $types);
+            return implode('|', array_map($this->typeToString(...), $type->getTypes()));
         }
 
         if ($type instanceof ReflectionIntersectionType) {
-            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
-
-            return implode('&', $types);
+            return implode('&', array_map($this->typeToString(...), $type->getTypes()));
         }
 
         return 'mixed';
     }
 
-    protected function defaultToString(mixed $value): string
+    protected function defaultValueToString(mixed $value): string
     {
         return match (true) {
             is_null($value) => 'null',
