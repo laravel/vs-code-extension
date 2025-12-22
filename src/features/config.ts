@@ -205,19 +205,6 @@ const addToFile = async (
     diagnostic: vscode.Diagnostic,
     missingVar: string,
 ): Promise<vscode.CodeAction | null> => {
-    return getCodeAction(
-        "Add variable to the configuration file",
-        missingVar,
-        diagnostic,
-    );
-};
-
-const getCodeAction = async (
-    title: string,
-    missingVar: string,
-    diagnostic: vscode.Diagnostic,
-    value?: string,
-) => {
     const edit = new vscode.WorkspaceEdit();
 
     const config = getConfigs().items.configs.find(
@@ -284,7 +271,10 @@ const getCodeAction = async (
         finalValue,
     );
 
-    const action = new vscode.CodeAction(title, vscode.CodeActionKind.QuickFix);
+    const action = new vscode.CodeAction(
+        "Add config to the file",
+        vscode.CodeActionKind.QuickFix,
+    );
 
     action.edit = edit;
     action.command = openFile(
@@ -293,7 +283,6 @@ const getCodeAction = async (
         finalValue.length - 3,
     );
     action.diagnostics = [diagnostic];
-    action.isPreferred = value === undefined;
 
     return action;
 };
