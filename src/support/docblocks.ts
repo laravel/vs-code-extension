@@ -175,13 +175,16 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
 };
 
 const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
-    const parameters = scope.parameters.slice(1).map((param) => {
-        return [
-            param.type,
-            param.isVariadic ? ` ...$${param.name}` : ` $${param.name}`,
-            param.default ? ` = ${param.default}` : "",
-        ].join("");
-    }).join(', ');
+    const parameters = scope.parameters
+        .slice(1)
+        .map((param) => {
+            return [
+                param.type,
+                param.isVariadic ? ` ...$${param.name}` : ` $${param.name}`,
+                param.default ? ` = ${param.default}` : "",
+            ].join("");
+        })
+        .join(", ");
 
     return `@method static ${modelBuilderType(
         className,
