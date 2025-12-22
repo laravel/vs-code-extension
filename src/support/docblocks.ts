@@ -181,7 +181,7 @@ const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
             param.isVariadic ? ` ...$${param.name}` : ` $${param.name}`,
             param.default ? ` = ${param.default}` : "",
         ].join("");
-    });
+    }).join(', ');
 
     return `@method static ${modelBuilderType(
         className,
