@@ -171,13 +171,12 @@ export const diagnosticProvider = (
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
-    code: string,
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ): Promise<vscode.CodeAction[]> => {
-    if (code !== "view") {
+    if (diagnostic.code !== "view") {
         return [];
     }
 

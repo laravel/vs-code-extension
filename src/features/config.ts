@@ -1,5 +1,5 @@
 import { openFile } from "@src/commands";
-import { notFound, NotFoundCode } from "@src/diagnostic";
+import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
@@ -170,30 +170,23 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const configPath = getConfigPathByName(param.value);
-
-            const code: NotFoundCode = configPath
-                ? {
-                      value: "config",
-                      target: vscode.Uri.file(configPath.path).with(
-                          withLineFragment(configPath.line),
-                      ),
-                  }
-                : "config";
-
-            return notFound("Config", param.value, detectedRange(param), code);
+            return notFound(
+                "Config",
+                param.value,
+                detectedRange(param),
+                "config",
+            );
         },
     );
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
-    code: string,
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ): Promise<vscode.CodeAction[]> => {
-    if (code !== "config") {
+    if (diagnostic.code !== "config") {
         return [];
     }
 

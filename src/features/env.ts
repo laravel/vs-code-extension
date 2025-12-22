@@ -91,10 +91,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            return notFound("Env", param.value, detectedRange(param), {
-                value: "env",
-                target: vscode.Uri.file(projectPath(".env")),
-            });
+            return notFound("Env", param.value, detectedRange(param), "env");
         },
     );
 };
@@ -195,13 +192,12 @@ export const viteEnvCodeActionProvider: vscode.CodeActionProvider = {
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
-    code: string,
     diagnostic: vscode.Diagnostic,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ): Promise<vscode.CodeAction[]> => {
-    if (code !== "env") {
+    if (diagnostic.code !== "env") {
         return [];
     }
 

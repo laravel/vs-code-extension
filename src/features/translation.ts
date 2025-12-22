@@ -1,5 +1,5 @@
 import { openFile } from "@src/commands";
-import { DiagnosticWithContext, notFound, NotFoundCode } from "@src/diagnostic";
+import { DiagnosticWithContext, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
     getTranslationItemByName,
@@ -203,24 +203,11 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const lang = getLang(item as AutocompleteParsingResult.MethodCall);
-
-            const translationPath = getTranslationPathByName(param.value, lang);
-
-            const code: NotFoundCode = translationPath
-                ? {
-                      value: "translation",
-                      target: vscode.Uri.file(translationPath.path).with(
-                          withLineFragment(translationPath.line),
-                      ),
-                  }
-                : "translation";
-
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                code,
+                "translation",
                 item,
             );
         },
@@ -228,13 +215,12 @@ export const diagnosticProvider = (
 };
 
 export const codeActionProvider: CodeActionProviderFunction = async (
-    code: string,
     diagnostic: DiagnosticWithContext,
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     token: vscode.CancellationToken,
 ): Promise<vscode.CodeAction[]> => {
-    if (code !== "translation") {
+    if (diagnostic.code !== "translation") {
         return [];
     }
 
