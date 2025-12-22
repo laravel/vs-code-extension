@@ -138,48 +138,6 @@ $models = new class($factory) {
         return \Illuminate\Support\Str::start($parent, '\\');
     }
 
-    protected function defaultToString(mixed $value): string {
-        return match (true) {
-            is_null($value) => 'null',
-            is_numeric($value) => $value,
-            is_bool($value) => $value ? 'true' : 'false',
-            is_array($value) => '[...]',
-            is_object($value) && enum_exists(get_class($value)) => '\\' . get_class($value) . '::' . $value->name,
-            is_object($value) => '\\' . get_class($value),
-            default => "'{$value}'",
-        };
-    }
-
-    protected function typeToString(?ReflectionType $type): string {
-        if ($type instanceof ReflectionNamedType) {
-            $name = $type->getName();
-
-            if (!$type->isBuiltin()) {
-                $name = '\\' . ltrim($name, '\\');
-            }
-
-            if ($name !== 'null' && $type->allowsNull()) {
-                return '?'.$name;
-            }
-
-            return $name;
-        }
-
-        if ($type instanceof ReflectionUnionType) {
-            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
-
-            return implode('|', $types);
-        }
-
-        if ($type instanceof ReflectionIntersectionType) {
-            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
-
-            return implode('&', $types);
-        }
-
-        return 'mixed';
-    }
-
     protected function getInfo($className)
     {
         if (($data = $this->fromArtisan($className)) === null) {
@@ -230,6 +188,50 @@ $models = new class($factory) {
         }
 
         return $result;
+    }
+
+    protected function typeToString(?ReflectionType $type): string
+    {
+        if ($type instanceof ReflectionNamedType) {
+            $name = $type->getName();
+
+            if (!$type->isBuiltin()) {
+                $name = '\\' . ltrim($name, '\\');
+            }
+
+            if ($name !== 'null' && $type->allowsNull()) {
+                return '?'.$name;
+            }
+
+            return $name;
+        }
+
+        if ($type instanceof ReflectionUnionType) {
+            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
+
+            return implode('|', $types);
+        }
+
+        if ($type instanceof ReflectionIntersectionType) {
+            $types = array_map(fn(ReflectionNamedType|ReflectionIntersectionType $t) => $this->typeToString($t), $type->getTypes());
+
+            return implode('&', $types);
+        }
+
+        return 'mixed';
+    }
+
+    protected function defaultToString(mixed $value): string
+    {
+        return match (true) {
+            is_null($value) => 'null',
+            is_numeric($value) => $value,
+            is_bool($value) => $value ? 'true' : 'false',
+            is_array($value) => '[...]',
+            is_object($value) && enum_exists(get_class($value)) => '\\' . get_class($value) . '::' . $value->name,
+            is_object($value) => '\\' . get_class($value),
+            default => "'{$value}'",
+        };
     }
 };
 
