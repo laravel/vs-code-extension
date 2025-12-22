@@ -181,6 +181,7 @@ $models = new class($factory) {
             "type" => $this->typeToString($parameter->getType()),
             "hasDefault" => $parameter->isDefaultValueAvailable(),
             "isVariadic" => $parameter->isVariadic(),
+            "isPassedByReference" => $parameter->isPassedByReference(),
         ];
 
         if ($parameter->isDefaultValueAvailable()) {
@@ -195,7 +196,7 @@ $models = new class($factory) {
         if ($type instanceof ReflectionNamedType) {
             $name = $type->getName();
 
-            if (! $type->isBuiltin()) {
+            if (! $type->isBuiltin() && ! in_array($name, ['self', 'parent'])) {
                 $name = '\\\\' . ltrim($name, '\\\\');
             }
 

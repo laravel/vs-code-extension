@@ -127,5 +127,6 @@ declare namespace Eloquent {
         default?: string | null;
         isOptional: boolean;
         isVariadic: boolean;
+        isPassedByReference: boolean;
     }
 }

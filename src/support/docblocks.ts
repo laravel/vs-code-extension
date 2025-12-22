@@ -180,7 +180,9 @@ const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
         .map((param) => {
             return [
                 param.type,
-                param.isVariadic ? ` ...$${param.name}` : ` $${param.name}`,
+                param.isVariadic ? " ..." : " ",
+                param.isPassedByReference ? "&" : "",
+                `$${param.name}`,
                 param.default ? ` = ${param.default}` : "",
             ].join("");
         })
