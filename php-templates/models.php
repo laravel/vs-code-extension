@@ -158,7 +158,11 @@ $models = new class($factory) {
                 $name = '\\' . ltrim($name, '\\');
             }
 
-            return ($type->allowsNull() ? '?' : '') . $name;
+            if ($name !== 'null' && $type->allowsNull()) {
+                return '?'.$name;
+            }
+
+            return $name;
         }
 
         if ($type instanceof ReflectionUnionType) {
@@ -200,13 +204,7 @@ $models = new class($factory) {
             ->filter(fn(\ReflectionMethod $method) => !$method->isStatic() && ($method->getAttributes(\Illuminate\Database\Eloquent\Attributes\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
             ->map(fn(\ReflectionMethod $method) => [
                 "name" => str($method->name)->replace('scope', '')->lcfirst()->toString(),
-                "parameters" => collect($method->getParameters())->map(fn(\ReflectionParameter $param) => [
-                    "name" => $param->getName(),
-                    "type" => $this->typeToString($param->getType()),
-                    "hasDefault" => $param->isDefaultValueAvailable(),
-                    "default" => $param->isDefaultValueAvailable() ? $this->defaultToString($param->getDefaultValue()) : null,
-                    "isOptional" => $param->isOptional()
-                ]),
+                "parameters" => collect($method->getParameters())->map($this->getScopeParameterInfo(...)),
             ])
             ->values()
             ->toArray();
@@ -216,6 +214,22 @@ $models = new class($factory) {
         return [
             $className => $data,
         ];
+    }
+
+    protected function getScopeParameterInfo(\ReflectionParameter $parameter): array
+    {
+        $result = [
+            "name" => $parameter->getName(),
+            "type" => $this->typeToString($parameter->getType()),
+            "hasDefault" => $parameter->isDefaultValueAvailable(),
+            "isVariadic" => $parameter->isVariadic(),
+        ];
+
+        if ($parameter->isDefaultValueAvailable()) {
+            $result['default'] = $this->defaultToString($parameter->getDefaultValue());
+        }
+
+        return $result;
     }
 };
 

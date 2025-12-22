@@ -120,36 +120,7 @@ const getBlocks = (
                 )} ${method}()`;
             }),
         )
-        .concat(
-            model.scopes.map((scope) => {
-                const parameters = scope.parameters
-                    .slice(1)
-                    .map((param) => {
-                        let paramAsString = "";
-
-                        if (param.type !== null) {
-                            paramAsString += `${param.type} `;
-                        }
-
-                        if (param.isOptional && !param.hasDefault) {
-                            paramAsString += "...";
-                        }
-
-                        paramAsString += `$${param.name}`;
-
-                        if (param.hasDefault) {
-                            paramAsString += ` = ${param.default}`;
-                        }
-
-                        return paramAsString;
-                    })
-                    .join(", ");
-
-                return `@method static ${modelBuilderType(
-                    className,
-                )} ${scope.name}(${parameters})`;
-            }),
-        )
+        .concat(model.scopes.map((scope) => getScopeBlock(className, scope)))
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
         .map((block) => ` * ${block}`)
@@ -201,6 +172,20 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     }
 
     return [`@property-read \\${relation.related} $${relation.name}`];
+};
+
+const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
+    const parameters = scope.parameters.slice(1).map((param) => {
+        return [
+            param.type,
+            param.isVariadic ? ` ...$${param.name}` : ` $${param.name}`,
+            param.default ? ` = ${param.default}` : "",
+        ].join("");
+    });
+
+    return `@method static ${modelBuilderType(
+        className,
+    )} ${scope.name}(${parameters})`;
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
