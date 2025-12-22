@@ -229,12 +229,12 @@ const addToFile = async (
 
     // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
     // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
-    const nestedKeys =
+    const countNestedKeys =
         missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
             .length - 1;
 
     // Case when a user tries to add a new config key to an existing key that is not an array
-    if (!configPath.line && nestedKeys > 1) {
+    if (!configPath.line && countNestedKeys > 1) {
         return null;
     }
 
@@ -242,26 +242,24 @@ const addToFile = async (
         vscode.Uri.file(configPath.path),
     );
 
-    let lineNumber = configPath.line ? Number(configPath.line) - 1 : undefined;
+    const lineNumberFromConfig = configPath.line
+        ? Number(configPath.line) - 1
+        : undefined;
 
-    if (!lineNumber) {
-        // Default to the end of the file
-        const lines = configContents.toString().split("\n");
+    const lineNumber =
+        lineNumberFromConfig ??
+        configContents
+            .toString()
+            .split("\n")
+            .findIndex((line) => line.startsWith("];"));
 
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i].startsWith("];")) {
-                lineNumber = i;
-            }
-        }
-    }
-
-    if (!lineNumber) {
+    if (lineNumber === -1) {
         return null;
     }
 
     const key = missingVar.split(".").pop();
 
-    const indent = " ".repeat((getIndentNumber("php") ?? 4) * nestedKeys);
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * countNestedKeys);
 
     const finalValue = `${indent}'${key}' => '',\n`;
 

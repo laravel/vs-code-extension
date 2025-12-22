@@ -250,14 +250,13 @@ const addToJsonFile = async (
         return null;
     }
 
-    const translationPath = getTranslations().items.paths.find((path) => {
-        const lang =
-            getLang(
-                diagnostic.context as AutocompleteParsingResult.MethodCall,
-            ) ?? getTranslations().items.default;
+    const lang =
+        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
+        getTranslations().items.default;
 
-        return !path.startsWith("vendor/") && path.endsWith(`${lang}.json`);
-    });
+    const translationPath = getTranslations().items.paths.find(
+        (path) => !path.startsWith("vendor/") && path.endsWith(`${lang}.json`),
+    );
 
     if (!translationPath) {
         return null;
@@ -269,15 +268,9 @@ const addToJsonFile = async (
 
     const lines = translationContents.toString().split("\n");
 
-    let lineNumber = undefined;
+    const lineNumber = lines.findIndex((line) => line.startsWith("}"));
 
-    for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith("}")) {
-            lineNumber = i;
-        }
-    }
-
-    if (!lineNumber) {
+    if (lineNumber === -1) {
         return null;
     }
 
@@ -334,10 +327,10 @@ const addToPhpFile = async (
         return null;
     }
 
-    const nestedKeys = missingVar.split(".").length - 1;
+    const countNestedKeys = missingVar.split(".").length - 1;
 
     // Case when a user tries to add a new translation key to an existing key that is not an array
-    if (!translationPath.line && nestedKeys > 1) {
+    if (!translationPath.line && countNestedKeys > 1) {
         return null;
     }
 
@@ -345,28 +338,24 @@ const addToPhpFile = async (
         vscode.Uri.file(translationPath.path),
     );
 
-    let lineNumber = translationPath.line
+    const lineNumberFromConfig = translationPath.line
         ? translationPath.line - 1
         : undefined;
 
-    if (!lineNumber) {
-        // Default to the end of the file
-        const lines = translationContents.toString().split("\n");
+    const lineNumber =
+        lineNumberFromConfig ??
+        translationContents
+            .toString()
+            .split("\n")
+            .findIndex((line) => line.startsWith("];"));
 
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i].startsWith("];")) {
-                lineNumber = i;
-            }
-        }
-    }
-
-    if (!lineNumber) {
+    if (lineNumber === -1) {
         return null;
     }
 
     const key = missingVar.split(".").pop();
 
-    const indent = " ".repeat((getIndentNumber("php") ?? 4) * nestedKeys);
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * countNestedKeys);
 
     const finalValue = `${indent}'${key}' => '',\n`;
 
