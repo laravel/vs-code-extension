@@ -247,7 +247,7 @@ $models = new class($factory) {
             is_numeric($value) => $value,
             is_bool($value) => $value ? 'true' : 'false',
             is_array($value) => '[]',
-            is_object($value) => 'new \\\\'.get_class($value).'(...)',
+            is_object($value) => 'new \\\\'.get_class($value),
             default => "'{$value}'",
         };
     }
