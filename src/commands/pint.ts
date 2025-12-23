@@ -1,4 +1,4 @@
-import { fixFilePath } from "@src/support/php";
+import { fixFilePath, getPhpCommand, getPhpEnv } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -12,6 +12,7 @@ import { showErrorPopup } from "../support/popup";
 import {
     getWorkspaceFolders,
     projectPath,
+    pathForPhpEnv,
     projectPathExists,
 } from "../support/project";
 
@@ -27,7 +28,8 @@ const runPintCommand = (
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         // Check if pint exists in vendor/bin
-        const pintPath = projectPath("vendor/bin/pint");
+        const pintBin = "vendor/bin/pint";
+        const pintPath = projectPath(pintBin);
 
         if (!projectPathExists("vendor/bin/pint")) {
             const errorMessage =
@@ -37,7 +39,13 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        let command = `"${pintPath}" ${args}`.trim();
+
+        if (getPhpEnv() !== "local") {
+            const phpcmd = getPhpCommand();
+            const pintInEnv = pathForPhpEnv("vendor/bin/pint");
+            command = `${phpcmd} "${pintInEnv}" ${args}`.trim();
+        }
 
         cp.exec(
             command,

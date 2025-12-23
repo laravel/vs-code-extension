@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
-import { isPhpEnv } from "./php";
+import { getPhpEnv, isPhpEnv } from "./php";
 
 let internalVendorExists: boolean | null = null;
 
@@ -33,6 +33,14 @@ const trimFirstSlash = (srcPath: string): string => {
 export const pathForPhpEnv = (srcPath: string): string => {
     if (isPhpEnv("ddev")) {
         return srcPath.replace(new RegExp("^/var/www/html/"), "");
+    }
+
+    if (srcPath.match(/^\//) && getPhpEnv() === "docker") {
+        const dockerBase = config<string>("dockerBase", "/app").replace(
+            /\/$/,
+            "",
+        );
+        return projectPath(srcPath.replace(new RegExp(`^${dockerBase}/?`), ""));
     }
 
     return srcPath;
