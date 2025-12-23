@@ -191,17 +191,17 @@ $models = new class($factory) {
         return $result;
     }
 
-    protected function typeToString(?ReflectionType $type): string
+    protected function typeToString(?\\ReflectionType $type): string
     {
         return match (true) {
-            $type instanceof ReflectionNamedType => $this->namedTypeToString($type),
-            $type instanceof ReflectionUnionType => $this->unionTypeToString($type),
-            $type instanceof ReflectionIntersectionType => $this->intersectionTypeToString($type),
+            $type instanceof \\ReflectionNamedType => $this->namedTypeToString($type),
+            $type instanceof \\ReflectionUnionType => $this->unionTypeToString($type),
+            $type instanceof \\ReflectionIntersectionType => $this->intersectionTypeToString($type),
             default => 'mixed',
         };
     }
 
-    protected function namedTypeToString(ReflectionNamedType $type): string
+    protected function namedTypeToString(\\ReflectionNamedType $type): string
     {
         $name = $type->getName();
 
@@ -216,12 +216,12 @@ $models = new class($factory) {
         return $name;
     }
 
-    protected function unionTypeToString(ReflectionUnionType $type): string
+    protected function unionTypeToString(\\ReflectionUnionType $type): string
     {
-        return implode('|', array_map(function (ReflectionType $type) {
+        return implode('|', array_map(function (\\ReflectionType $type) {
             $result = $this->typeToString($type);
 
-            if ($type instanceof ReflectionIntersectionType) {
+            if ($type instanceof \\ReflectionIntersectionType) {
                 return "({$result})";
             }
 
@@ -229,12 +229,12 @@ $models = new class($factory) {
         }, $type->getTypes()));
     }
 
-    protected function intersectionTypeToString(ReflectionIntersectionType $type): string
+    protected function intersectionTypeToString(\\ReflectionIntersectionType $type): string
     {
         return implode('&', array_map($this->typeToString(...), $type->getTypes()));
     }
 
-    protected function defaultValueToString(ReflectionParameter $param): string
+    protected function defaultValueToString(\\ReflectionParameter $param): string
     {
         if ($param->isDefaultValueConstant()) {
             return '\\\\'.$param->getDefaultValueConstantName();
