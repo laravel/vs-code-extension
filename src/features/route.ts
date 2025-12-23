@@ -96,7 +96,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(pathForPhpEnv(route.filename)).with({
+                vscode.Uri.file(projectPath(route.filename)).with({
                     fragment: `L${route.line ?? 0}`,
                 }),
             );
