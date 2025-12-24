@@ -1,3 +1,4 @@
+import { getPintConfig } from "@src/repositories/pint";
 import { fixFilePath } from "@src/support/php";
 import {
     statusBarError,
@@ -71,11 +72,42 @@ export const runPint = () => {
     runPintCommand();
 };
 
+const isFileExcluded = (filePath: string): boolean => {
+    const pintConfig = getPintConfig().items;
+
+    if (pintConfig?.exclude.some((path) => filePath.includes(path))) {
+        return true;
+    }
+
+    const fileName = filePath.split("/").pop() ?? "";
+
+    if (
+        pintConfig?.notName.some((pattern) => {
+            const cleaned = pattern.replace("*", "");
+
+            return fileName.includes(cleaned);
+        })
+    ) {
+        return true;
+    }
+
+    if (pintConfig?.notPath.some((path) => filePath.endsWith(path))) {
+        return true;
+    }
+
+    return false;
+};
+
 export const runPintOnCurrentFile = () => {
     const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 
     if (!filePath) {
         statusBarError("No file selected");
+        return;
+    }
+
+    if (isFileExcluded(filePath)) {
+        statusBarError("File is excluded from Pint");
         return;
     }
 
