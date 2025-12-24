@@ -1,4 +1,4 @@
-import { fixFilePath } from "@src/support/php";
+import { fixFilePath, getDefaultPhpCommand, getPhpEnv } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -12,8 +12,10 @@ import { showErrorPopup } from "../support/popup";
 import {
     getWorkspaceFolders,
     projectPath,
+    pathForPhpEnv,
     projectPathExists,
 } from "../support/project";
+import os from "os";
 
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
@@ -27,7 +29,8 @@ const runPintCommand = (
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         // Check if pint exists in vendor/bin
-        const pintPath = projectPath("vendor/bin/pint");
+        const pintBin = "vendor/bin/pint";
+        const pintPath = projectPath(pintBin);
 
         if (!projectPathExists("vendor/bin/pint")) {
             const errorMessage =
@@ -37,7 +40,14 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        let command = `"${pintPath}" ${args}`.trim();
+
+        if (getPhpEnv() !== "local") {
+            const pintInEnv = pathForPhpEnv("vendor/bin/pint");
+            command = `${getDefaultPhpCommand()} "${pintInEnv}" ${args}`.trim();
+        } else if (os.platform() === "win32") {
+            command = `${getDefaultPhpCommand()} "${pintPath}" ${args}`.trim();
+        }
 
         cp.exec(
             command,
