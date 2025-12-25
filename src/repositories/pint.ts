@@ -4,19 +4,19 @@ import * as path from "path";
 import { repository } from ".";
 
 interface PintConfig {
-    exclude: string[];
-    notName: string[];
-    notPath: string[];
+    exclude?: string[];
+    notName?: string[];
+    notPath?: string[];
 }
 
-export const getPintConfig = repository<PintConfig | undefined>({
+export const getPintConfig = repository<PintConfig>({
     load: () =>
         new Promise((resolve, reject) => {
             try {
                 const workspaceFolder = getWorkspaceFolders()[0];
 
                 if (!workspaceFolder) {
-                    resolve(undefined);
+                    resolve({});
 
                     return;
                 }
@@ -27,7 +27,7 @@ export const getPintConfig = repository<PintConfig | undefined>({
                 );
 
                 if (!fs.existsSync(pintConfigPath)) {
-                    resolve(undefined);
+                    resolve({});
 
                     return;
                 }
@@ -36,16 +36,12 @@ export const getPintConfig = repository<PintConfig | undefined>({
                     fs.readFileSync(pintConfigPath, "utf8"),
                 );
 
-                resolve({
-                    exclude: pintConfig.exclude ?? [],
-                    notName: pintConfig.notName ?? [],
-                    notPath: pintConfig.notPath ?? [],
-                });
+                resolve(pintConfig);
             } catch (exception) {
                 reject(exception);
             }
         }),
     pattern: "pint.json",
-    itemsDefault: undefined,
+    itemsDefault: {},
     reloadOnComposerChanges: false,
 });

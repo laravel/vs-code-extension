@@ -74,28 +74,16 @@ export const runPint = () => {
 
 const isFileExcluded = (filePath: string): boolean => {
     const pintConfig = getPintConfig().items;
-
-    if (pintConfig?.exclude.some((path) => filePath.includes(path))) {
-        return true;
-    }
-
     const fileName = filePath.split("/").pop() ?? "";
 
-    if (
-        pintConfig?.notName.some((pattern) => {
-            const cleaned = pattern.replace("*", "");
-
-            return fileName.includes(cleaned);
-        })
-    ) {
-        return true;
-    }
-
-    if (pintConfig?.notPath.some((path) => filePath.endsWith(path))) {
-        return true;
-    }
-
-    return false;
+    return (
+        pintConfig.exclude?.some((path) => filePath.includes(path)) ||
+        pintConfig.notName?.some((pattern) =>
+            new RegExp(pattern.replace("*", ".*")).test(fileName),
+        ) ||
+        pintConfig.notPath?.some((path) => filePath.endsWith(path)) ||
+        false
+    );
 };
 
 export const runPintOnCurrentFile = () => {
