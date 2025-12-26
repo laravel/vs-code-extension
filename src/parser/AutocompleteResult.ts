@@ -131,7 +131,8 @@ export default class AutocompleteResult {
     }
 
     public getEnclosingClass(): AutocompleteParsingResult.ClassDefinition | null {
-        let context: AutocompleteParsingResult.ContextValue | null = this.result;
+        let context: AutocompleteParsingResult.ContextValue | null =
+            this.result;
 
         while (context !== null) {
             if (context.type === "classDefinition") {
@@ -144,7 +145,8 @@ export default class AutocompleteResult {
     }
 
     public getEnclosingMethodDefinition(): AutocompleteParsingResult.MethodDefinition | null {
-        let context: AutocompleteParsingResult.ContextValue | null = this.result;
+        let context: AutocompleteParsingResult.ContextValue | null =
+            this.result;
 
         while (context !== null) {
             if (context.type === "methodDefinition") {

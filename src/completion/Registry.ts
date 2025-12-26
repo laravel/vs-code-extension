@@ -96,7 +96,9 @@ export class Registry implements vscode.CompletionItemProvider {
             return argumentIndex === parseResult.paramIndex();
         };
 
-        const isMethodDefinition = (methodDefinition: string | string[] | undefined) => {
+        const isMethodDefinition = (
+            methodDefinition: string | string[] | undefined,
+        ) => {
             if (typeof methodDefinition === "undefined") {
                 return true;
             }

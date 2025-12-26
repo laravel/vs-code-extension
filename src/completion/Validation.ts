@@ -144,8 +144,10 @@ export class Validation implements CompletionProvider {
             return this.validatorValidation(document, position, result) || [];
         }
 
-        if (result.isInsideMethodDefinition("rules") &&
-            result.classExtends("Illuminate\\Foundation\\Http\\FormRequest")) {
+        if (
+            result.isInsideMethodDefinition("rules") &&
+            result.classExtends("Illuminate\\Foundation\\Http\\FormRequest")
+        ) {
             return this.handleFormRequestRules(document, position, result);
         }
 
