@@ -2,6 +2,17 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.3.0 - 2025-12-26
+
+### What's Changed
+
+* Fix models.php template indentation by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/515
+* Use relative paths for route links by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/514
+* Support for the Pint exclude config by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/518
+* Add scope parameters to the repository and docblock generator by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/487
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.3...v1.3.0
+
 ## v1.2.3 - 2025-12-19
 
 ### What's Changed
