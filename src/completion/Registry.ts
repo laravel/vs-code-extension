@@ -96,6 +96,22 @@ export class Registry implements vscode.CompletionItemProvider {
             return argumentIndex === parseResult.paramIndex();
         };
 
+        const isMethodDefinition = (methodDefinition: string | string[] | undefined) => {
+            if (typeof methodDefinition === "undefined") {
+                return true;
+            }
+
+            return parseResult.isInsideMethodDefinition(methodDefinition);
+        };
+
+        const hasClassExtends = (classExtends: string | undefined) => {
+            if (typeof classExtends === "undefined") {
+                return true;
+            }
+
+            return parseResult.classExtends(classExtends);
+        };
+
         const isNamedArg = (argumentName: FeatureTagParam["argumentName"]) => {
             // TODO: Make this work
             return true;
@@ -118,7 +134,9 @@ export class Registry implements vscode.CompletionItemProvider {
                         hasClass(tag.class) &&
                         hasFunc(tag.method) &&
                         isArgumentIndex(tag.argumentIndex) &&
-                        isNamedArg(tag.argumentName),
+                        isNamedArg(tag.argumentName) &&
+                        isMethodDefinition(tag.methodDefinition) &&
+                        hasClassExtends(tag.classExtends),
                 );
             }) || null
         );

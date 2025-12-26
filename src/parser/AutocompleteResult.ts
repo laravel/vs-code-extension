@@ -129,4 +129,52 @@ export default class AutocompleteResult {
         // @ts-ignore
         return this.result.arguments?.children.length ?? 0;
     }
+
+    public getEnclosingClass(): AutocompleteParsingResult.ClassDefinition | null {
+        let context: AutocompleteParsingResult.ContextValue | null = this.result;
+
+        while (context !== null) {
+            if (context.type === "classDefinition") {
+                return context as AutocompleteParsingResult.ClassDefinition;
+            }
+            context = context.parent;
+        }
+
+        return null;
+    }
+
+    public getEnclosingMethodDefinition(): AutocompleteParsingResult.MethodDefinition | null {
+        let context: AutocompleteParsingResult.ContextValue | null = this.result;
+
+        while (context !== null) {
+            if (context.type === "methodDefinition") {
+                return context as AutocompleteParsingResult.MethodDefinition;
+            }
+            context = context.parent;
+        }
+
+        return null;
+    }
+
+    public isInsideMethodDefinition(methodName: string | string[]): boolean {
+        const definition = this.getEnclosingMethodDefinition();
+        if (!definition || !definition.methodName) {
+            return false;
+        }
+
+        if (Array.isArray(methodName)) {
+            return methodName.includes(definition.methodName);
+        }
+
+        return definition.methodName === methodName;
+    }
+
+    public classExtends(className: string): boolean {
+        const enclosing = this.getEnclosingClass();
+        if (!enclosing || !enclosing.extends) {
+            return false;
+        }
+
+        return enclosing.extends === className;
+    }
 }
