@@ -7,7 +7,12 @@ import {
     LinkProvider,
 } from "@src/index";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getViews, ViewItem } from "@src/repositories/views";
+import {
+    getLivewireViewItems,
+    getViewItemByKey,
+    getViews,
+    ViewItem,
+} from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -43,7 +48,7 @@ const toFind: FeatureTag = [
     },
     {
         class: facade("Route"),
-        method: ["view"],
+        method: ["view", "livewire"],
         argumentIndex: 1,
     },
     {
@@ -105,9 +110,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const path = getViews().items.find(
-                (view) => view.key === param.value,
-            )?.path;
+            const path = getViewItemByKey(param.value)?.path;
 
             if (!path) {
                 return null;
@@ -126,15 +129,15 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match) => {
-        const item = getViews().items.find((view) => view.key === match);
+        const view = getViewItemByKey(match);
 
-        if (!item) {
+        if (!view) {
             return null;
         }
 
         return new vscode.Hover(
             new vscode.MarkdownString(
-                `[${item.path}](${vscode.Uri.file(projectPath(item.path))})`,
+                `[${view.path}](${vscode.Uri.file(projectPath(view.path))})`,
             ),
         );
     });
@@ -157,9 +160,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViews().items.find(
-                (view) => view.key === param.value,
-            );
+            const view = getViewItemByKey(param.value);
 
             if (view) {
                 return null;
@@ -269,6 +270,12 @@ export const completionProvider = {
         }
 
         if (result.isFacade("Route")) {
+            if (result.func() === "livewire" && result.isParamIndex(1)) {
+                return getLivewireViewItems().map((view) =>
+                    getCompletionItem(view, document, position),
+                );
+            }
+
             if (result.func() === "view" && result.isParamIndex(1)) {
                 return views.map((view) =>
                     getCompletionItem(view, document, position),

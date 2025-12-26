@@ -1,4 +1,7 @@
-import { getViews } from "@src/repositories/views";
+import {
+    getLivewireViewItems,
+    getViewItemByKey,
+} from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
@@ -8,17 +11,17 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
 
     lines.forEach((line, index) => {
         const match = line.match(/<\/?livewire:([^\s>]+)/);
 
         if (match && match.index !== undefined) {
             const componentName = match[1];
-            // Standard component
-            const viewName = `livewire.${componentName}`;
-            // Index component
-            const view = views.find((v) => v.key === viewName);
+
+            // Livewire 3 needs "livewire." prefix, but Livewire 4 doesn't
+            const view = [componentName, `livewire.${componentName}`]
+                .map((key) => getViewItemByKey(key))
+                .find((value) => value !== undefined);
 
             if (view) {
                 links.push(
@@ -61,11 +64,13 @@ export const completionProvider: vscode.CompletionItemProvider = {
             return undefined;
         }
 
-        return getViews()
-            .items.filter((view) => view.key.startsWith(pathPrefix))
-            .map(
-                (view) =>
-                    new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
-            );
+        return [
+            // If we remove pathPrefix, we have to remove duplicates
+            ...new Set(
+                getLivewireViewItems().map((view) =>
+                    view.key.replace(pathPrefix, "").replaceAll("⚡", ""),
+                ),
+            ),
+        ].map((key) => new vscode.CompletionItem(key));
     },
 };
