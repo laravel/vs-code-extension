@@ -1,15 +1,18 @@
-import { notFound, NotFoundCode } from "@src/diagnostic";
+import { openFile } from "@src/commands";
+import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
+import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { contract, facade } from "@src/support/util";
+import { contract, facade, withLineFragment } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
+    CodeActionProviderFunction,
     CompletionProvider,
     FeatureTag,
     HoverProvider,
@@ -167,18 +170,119 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getConfigPathByName(param.value);
-
-            const code: NotFoundCode = pathToFile
-                ? {
-                      value: "config",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
-                  }
-                : "config";
-
-            return notFound("Config", param.value, detectedRange(param), code);
+            return notFound(
+                "Config",
+                param.value,
+                detectedRange(param),
+                "config",
+            );
         },
     );
+};
+
+export const codeActionProvider: CodeActionProviderFunction = async (
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (diagnostic.code !== "config") {
+        return [];
+    }
+
+    const missingVar = document.getText(diagnostic.range);
+
+    if (!missingVar) {
+        return [];
+    }
+
+    const actions = await Promise.all([addToFile(diagnostic, missingVar)]);
+
+    return actions.filter((action) => action !== null);
+};
+
+const addToFile = async (
+    diagnostic: vscode.Diagnostic,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const config = getConfigs().items.configs.find(
+        (c) => c.name === missingVar,
+    );
+
+    if (config) {
+        return null;
+    }
+
+    const configPath = getConfigPathByName(missingVar);
+
+    if (!configPath) {
+        return null;
+    }
+
+    const fileName = configPath.path.split("/").pop()?.replace(".php", "");
+
+    if (!fileName) {
+        return null;
+    }
+
+    // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
+    // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
+    const countNestedKeys =
+        missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
+            .length - 1;
+
+    // Case when a user tries to add a new config key to an existing key that is not an array
+    if (!configPath.line && countNestedKeys > 1) {
+        return null;
+    }
+
+    const configContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(configPath.path),
+    );
+
+    const lineNumberFromConfig = configPath.line
+        ? Number(configPath.line) - 1
+        : undefined;
+
+    const lineNumber =
+        lineNumberFromConfig ??
+        configContents
+            .toString()
+            .split("\n")
+            .findIndex((line) => line.startsWith("];"));
+
+    if (lineNumber === -1) {
+        return null;
+    }
+
+    const key = missingVar.split(".").pop();
+
+    const indent = " ".repeat((getIndentNumber("php") ?? 4) * countNestedKeys);
+
+    const finalValue = `${indent}'${key}' => '',\n`;
+
+    edit.insert(
+        vscode.Uri.file(configPath.path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(
+        "Add config to the file",
+        vscode.CodeActionKind.QuickFix,
+    );
+
+    action.edit = edit;
+    action.command = openFile(
+        configPath.path,
+        lineNumber,
+        finalValue.length - 3,
+    );
+    action.diagnostics = [diagnostic];
+
+    return action;
 };
 
 export const completionProvider: CompletionProvider = {
