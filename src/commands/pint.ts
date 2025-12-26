@@ -94,11 +94,6 @@ export const runPintOnCurrentFile = () => {
         return;
     }
 
-    if (isFileExcluded(filePath)) {
-        statusBarError("File is excluded from Pint");
-        return;
-    }
-
     statusBarWorking("Running Pint on current file...");
     runPintCommand(`"${fixFilePath(filePath)}"`);
 };
@@ -129,6 +124,10 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
             getWorkspaceFolders()[0]?.uri?.fsPath || "",
         )
     ) {
+        return;
+    }
+
+    if (isFileExcluded(document.uri.fsPath)) {
         return;
     }
 
