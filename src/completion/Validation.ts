@@ -11,7 +11,7 @@ export class Validation implements CompletionProvider {
         accepted: "accepted",
         active_url: "active_url",
         after_or_equal: "after_or_equal:${0:date}",
-        after: "after:date",
+        after: "after:${0:date}",
         alpha_dash: "alpha_dash",
         alpha_num: "alpha_num",
         alpha: "alpha",
