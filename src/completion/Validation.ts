@@ -2,7 +2,7 @@
 
 import { contract, facade } from "@src/support/util";
 import * as vscode from "vscode";
-import { CompletionProvider } from "..";
+import { CompletionProvider, FeatureTag } from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { wordMatchRegex } from "./../support/patterns";
 
@@ -11,7 +11,7 @@ export class Validation implements CompletionProvider {
         accepted: "accepted",
         active_url: "active_url",
         after_or_equal: "after_or_equal:${0:date}",
-        after: "after:date",
+        after: "after:${0:date}",
         alpha_dash: "alpha_dash",
         alpha_num: "alpha_num",
         alpha: "alpha",
@@ -95,7 +95,7 @@ export class Validation implements CompletionProvider {
         uuid: "uuid",
     };
 
-    tags() {
+    tags(): FeatureTag {
         return [
             {
                 class: contract("Validation\\Factory"),
@@ -144,9 +144,27 @@ export class Validation implements CompletionProvider {
             return this.validatorValidation(document, position, result) || [];
         }
 
-        // TODO: Deal with FormRequest@rules method
+        if (
+            result.isInsideMethodDefinition("rules") &&
+            result.classExtends("Illuminate\\Foundation\\Http\\FormRequest")
+        ) {
+            return this.handleFormRequestRules(document, position, result);
+        }
 
         return [];
+    }
+
+    private handleFormRequestRules(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        result: AutocompleteResult,
+    ): vscode.CompletionItem[] {
+        if (result.fillingInArrayKey()) {
+            // We only fill in values for the rules method, abort
+            return [];
+        }
+
+        return this.getRules(document, position);
     }
 
     private handleValidateMethod(
