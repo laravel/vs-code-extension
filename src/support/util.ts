@@ -146,3 +146,24 @@ export const createIndexMapping = (
         },
     };
 };
+
+export const defaultToString = (value: any): string => {
+    switch (typeof value) {
+        case "object":
+            if (value === null) {
+                return "null";
+            }
+
+            const json: string = JSON.stringify(value, null, 2);
+
+            if (json.length > 1000) {
+                return "object";
+            }
+
+            return json;
+        case "function":
+            return "function";
+        default:
+            return value.toString();
+    }
+};
