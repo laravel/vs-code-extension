@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -89,6 +89,11 @@
                     "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                     "when": "resourceLangId == blade",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.namespace.generate",
+                    "when": "resourceLangId == php",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -100,6 +105,16 @@
                 {
                     "command": "laravel.wrapWithHelper.unwrap",
                     "when": "editorHasSelection",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
+                    "when": "editorHasSelection && resourceLangId == blade",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
+                    "when": "resourceLangId == blade",
                     "group": "laravel"
                 }
             ],
@@ -115,16 +130,6 @@
                 },
                 {
                     "command": "laravel.wrapWithHelper.str"
-                },
-                {
-                    "command": "laravel.refactorSelectedHtmlClassToBladeDirective",
-                    "when": "editorHasSelection && resourceLangId == blade",
-                    "group": "laravel"
-                },
-                {
-                    "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
-                    "when": "resourceLangId == blade",
-                    "group": "laravel"
                 }
             ]
         },
@@ -208,6 +213,11 @@
                 "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                 "title": "Refactor all HTML class attributes to Blade directives",
                 "category": "Laravel"
+            },
+            {
+                "command": "laravel.namespace.generate",
+                "title": "Generate namespace",
+                "category": "Laravel"
             }
         ],
         "configuration": {
@@ -273,6 +283,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Automatically add spacing around Blade echo and comment tags."
+                },
+                "Laravel.pint.runOnSave": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically run Pint on the current file when saved."
                 },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
@@ -615,11 +630,6 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable completion for view."
-                },
-                "Laravel.pint.runOnSave": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Automatically run Pint on the current file when saved."
                 }
             }
         }
@@ -634,7 +644,7 @@
         "watch": "npm-run-all -p watch:*",
         "watch:esbuild": "node esbuild.js --watch",
         "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-        "vscode:prepublish": "php generate-templates.php && php generate-config.php && php generate-php-envs.php && php generate-registered-commands.php && ./precheck && npm run package",
+        "vscode:prepublish": "php build.php && ./precheck && npm run package",
         "package": "npm run check-types && node esbuild.js --production",
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },

@@ -122,4 +122,18 @@ declare namespace Eloquent {
         event: string;
         observer: string[];
     }
+
+    interface Scope {
+        name: string;
+        parameters: ScopeParameter[];
+    }
+
+    interface ScopeParameter {
+        name: string;
+        type: string;
+        default?: string | null;
+        isOptional: boolean;
+        isVariadic: boolean;
+        isPassedByReference: boolean;
+    }
 }

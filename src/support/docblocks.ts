@@ -114,17 +114,13 @@ const getBlocks = (
     return model.attributes
         .map((attr) => getAttributeBlocks(attr, className))
         .concat(
-            [
-                ...model.scopes.map((scope) => scope.name),
-                "newModelQuery",
-                "newQuery",
-                "query",
-            ].map((method) => {
+            ["newModelQuery", "newQuery", "query"].map((method) => {
                 return `@method static ${modelBuilderType(
                     className,
                 )} ${method}()`;
             }),
         )
+        .concat(model.scopes.map((scope) => getScopeBlock(className, scope)))
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
         .map((block) => ` * ${block}`)
@@ -176,6 +172,25 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     }
 
     return [`@property-read \\${relation.related} $${relation.name}`];
+};
+
+const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
+    const parameters = scope.parameters
+        .slice(1)
+        .map((param) => {
+            return [
+                param.type,
+                param.isVariadic ? " ..." : " ",
+                param.isPassedByReference ? "&" : "",
+                `$${param.name}`,
+                param.default ? ` = ${param.default}` : "",
+            ].join("");
+        })
+        .join(", ");
+
+    return `@method static ${modelBuilderType(
+        className,
+    )} ${scope.name}(${parameters})`;
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
@@ -242,6 +257,7 @@ const castMapping: TypeMapping = {
     mixed: ["attribute", "accessor", "encrypted"],
     object: ["encrypted:object"],
     string: ["hashed"],
+    float: [/^decimal:\d+$/],
     "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
     "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],

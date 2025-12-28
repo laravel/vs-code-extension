@@ -12,4 +12,6 @@ file_put_contents(__DIR__ . '/src/commands/generatedRegisteredCommands.ts',
     "export type RegisteredCommand = \"" . implode('" | "', $commands) . "\";\n"
 );
 
-exec('npm run format');
+if (!isset($building)) {
+    exec('npm run format');
+}
