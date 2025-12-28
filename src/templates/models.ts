@@ -54,11 +54,11 @@ $models = new class($factory) {
 
     public function all()
     {
-            if (\\Illuminate\\Support\\Facades\\File::isDirectory(base_path('app/Models'))) {
-                collect(\\Illuminate\\Support\\Facades\\File::allFiles(base_path('app/Models')))
-                    ->filter(fn(\\Symfony\\Component\\Finder\\SplFileInfo $file) => $file->getExtension() === 'php')
-                    ->each(fn($file) => include_once($file));
-            }
+        if (\\Illuminate\\Support\\Facades\\File::isDirectory(base_path('app/Models'))) {
+            collect(\\Illuminate\\Support\\Facades\\File::allFiles(base_path('app/Models')))
+                ->filter(fn(\\Symfony\\Component\\Finder\\SplFileInfo $file) => $file->getExtension() === 'php')
+                ->each(fn($file) => include_once($file));
+        }
 
         return collect(get_declared_classes())
             ->filter(fn($class) => is_subclass_of($class, \\Illuminate\\Database\\Eloquent\\Model::class))
@@ -148,11 +148,21 @@ $models = new class($factory) {
 
         $data["extends"] = $this->getParentClass($reflection);
 
+        $name = str($className)->afterLast('\\\\');
+
+        $data['name_cases'] = collect($this->getNameCases($name))
+            ->zip($this->getNameCases($name->plural()))
+            ->flatten()
+            ->unique()
+            ->values()            
+            ->toArray();
+
         $existingProperties = $this->collectExistingProperties($reflection);
 
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
                 'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
+                'name_cases' => $this->getNameCases(str($attrs['name'])),  
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
@@ -174,6 +184,20 @@ $models = new class($factory) {
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function getNameCases(\\Illuminate\\Support\\Stringable $name): array
+    {
+        return collect([
+            $name->camel()->toString(),
+            $name->toString(),
+            $name->snake()->toString(),
+            $name->studly()->toString(),
+            $name->studly()->lower()->toString(),
+        ])->unique()->values()->toArray();
+    }
+    
     protected function getScopeParameterInfo(\\ReflectionParameter $parameter): array
     {
         $result = [
