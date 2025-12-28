@@ -6,13 +6,29 @@ import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
+import { commandName, openFileCommand } from "./commands";
+import { generateNamespaceCommand } from "./commands/generateNamespace";
 import {
-    openFileCommand,
+    pintCommands,
+    PintEditProvider,
     runPint,
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
     runPintOnSave,
-} from "./commands";
+} from "./commands/pint";
+import {
+    htmlClassToBladeDirectiveCommands,
+    refactorAllHtmlClassesToBladeDirectives,
+    refactorSelectedHtmlClassToBladeDirective,
+} from "./commands/refactorHtmlClassToBladeDirective";
+import {
+    helpers,
+    openSubmenuCommand,
+    unwrapSelectionCommand,
+    wrapHelperCommandNameSubCommandName,
+    wrapSelectionCommand,
+    wrapWithHelperCommands,
+} from "./commands/wrapWithHelper";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -51,16 +67,29 @@ export async function activate(context: vscode.ExtensionContext) {
 
     initPhp();
 
+    const PHP_LANGUAGE = { scheme: "file", language: "php" };
+
     context.subscriptions.push(
-        vscode.commands.registerCommand("laravel.open", openFileCommand),
-        vscode.commands.registerCommand("laravel.runPint", runPint),
         vscode.commands.registerCommand(
-            "laravel.runPintOnCurrentFile",
+            commandName("laravel.open"),
+            openFileCommand,
+        ),
+        vscode.commands.registerCommand(pintCommands.all, runPint),
+        vscode.commands.registerCommand(
+            pintCommands.currentFile,
             runPintOnCurrentFile,
         ),
         vscode.commands.registerCommand(
-            "laravel.runPintOnDirtyFiles",
+            pintCommands.dirtyFiles,
             runPintOnDirtyFiles,
+        ),
+        vscode.languages.registerDocumentFormattingEditProvider(
+            PHP_LANGUAGE,
+            new PintEditProvider(),
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.namespace.generate"),
+            generateNamespaceCommand,
         ),
     );
 
@@ -108,7 +137,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { scheme: "file", language: "laravel-blade" },
     ];
 
-    const LANGUAGES = [{ scheme: "file", language: "php" }, ...BLADE_LANGUAGES];
+    const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
 
     initVendorWatchers();
     watchForComposerChanges();
@@ -205,6 +234,28 @@ export async function activate(context: vscode.ExtensionContext) {
             {
                 providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
             },
+        ),
+        vscode.commands.registerCommand(
+            wrapWithHelperCommands.wrap,
+            openSubmenuCommand,
+        ),
+        vscode.commands.registerCommand(
+            wrapWithHelperCommands.unwrap,
+            unwrapSelectionCommand,
+        ),
+        ...helpers.map((helper) => {
+            return vscode.commands.registerCommand(
+                wrapHelperCommandNameSubCommandName(helper),
+                () => wrapSelectionCommand(helper),
+            );
+        }),
+        vscode.commands.registerCommand(
+            htmlClassToBladeDirectiveCommands.selected,
+            refactorSelectedHtmlClassToBladeDirective,
+        ),
+        vscode.commands.registerCommand(
+            htmlClassToBladeDirectiveCommands.all,
+            refactorAllHtmlClassesToBladeDirectives,
         ),
     );
 
