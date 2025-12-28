@@ -37,8 +37,8 @@ $translator = new class
                     $dotKey = "{$value["k"]}.{$v['k']}";
                     $final[$dotKey] ??= [];
 
-                    if (!in_array($$value["la"], $this->languages)) {
-                      $this->languages[] = $$value["la"];
+                    if (!in_array($value["la"], $this->languages)) {
+                      $this->languages[] = $value["la"];
                     }
 
                     $final[$dotKey][$value["la"]] = $v['arr'];

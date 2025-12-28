@@ -6,7 +6,11 @@ if (!\\Illuminate\\Support\\Facades\\App::bound('auth')) {
         'policies' => (object) [],
     ]);
 } else {
-    collect(glob(base_path('**/Models/*.php')))->each(fn($file) => include_once($file));
+    if (\\Illuminate\\Support\\Facades\\File::isDirectory(base_path('app/Models'))) {
+        collect(\\Illuminate\\Support\\Facades\\File::allFiles(base_path('app/Models')))
+            ->filter(fn(\\Symfony\\Component\\Finder\\SplFileInfo $file) => $file->getExtension() === 'php')
+            ->each(fn($file) => include_once($file));
+    }
 
     $modelPolicies = collect(get_declared_classes())
         ->filter(fn($class) => is_subclass_of($class, \\Illuminate\\Database\\Eloquent\\Model::class))
