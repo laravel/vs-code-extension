@@ -93,7 +93,7 @@ export default class AutocompleteResult {
     }
 
     public isInsideMethodDefinition(methodName: string) {
-        let check = false;
+        let result = false;
 
         this.loop((context) => {
             if (context.type !== 'methodDefinition') {
@@ -101,7 +101,7 @@ export default class AutocompleteResult {
             }
 
             if (context.methodName === methodName) {
-                check = true;
+                result = true;
 
                 return false;
             }
@@ -109,7 +109,7 @@ export default class AutocompleteResult {
             return true;
         });
 
-        return check;
+        return result;
     }
 
     public func() {
