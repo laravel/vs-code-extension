@@ -1,7 +1,7 @@
 import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
+import { getConfigs, getPreviousConfigByName } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { getIndentNumber } from "@src/support/indent";
@@ -215,13 +215,15 @@ const addToFile = async (
         return null;
     }
 
-    const configPath = getConfigPathByName(missingVar);
+    const previousConfig = getPreviousConfigByName(missingVar);
 
-    if (!configPath) {
+    if (!previousConfig || !previousConfig.file) {
         return null;
     }
 
-    const fileName = configPath.path.split("/").pop()?.replace(".php", "");
+    const path = projectPath(previousConfig.file);
+
+    const fileName = path.split("/").pop()?.replace(".php", "");
 
     if (!fileName) {
         return null;
@@ -234,16 +236,16 @@ const addToFile = async (
             .length - 1;
 
     // Case when a user tries to add a new config key to an existing key that is not an array
-    if (!configPath.line && countNestedKeys > 1) {
+    if (!previousConfig.line && countNestedKeys > 1) {
         return null;
     }
 
     const configContents = await vscode.workspace.fs.readFile(
-        vscode.Uri.file(configPath.path),
+        vscode.Uri.file(path),
     );
 
-    const lineNumberFromConfig = configPath.line
-        ? Number(configPath.line) - 1
+    const lineNumberFromConfig = previousConfig.line
+        ? Number(previousConfig.line) - 1
         : undefined;
 
     const lineNumber =
@@ -264,7 +266,7 @@ const addToFile = async (
     const finalValue = `${indent}'${key}' => '',\n`;
 
     edit.insert(
-        vscode.Uri.file(configPath.path),
+        vscode.Uri.file(path),
         new vscode.Position(lineNumber, 0),
         finalValue,
     );
@@ -275,11 +277,7 @@ const addToFile = async (
     );
 
     action.edit = edit;
-    action.command = openFile(
-        configPath.path,
-        lineNumber,
-        finalValue.length - 3,
-    );
+    action.command = openFile(path, lineNumber, finalValue.length - 3);
     action.diagnostics = [diagnostic];
 
     return action;

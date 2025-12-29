@@ -2,8 +2,8 @@ import { openFile } from "@src/commands";
 import { DiagnosticWithContext, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getPreviousTranslationItemByName,
     getTranslationItemByName,
-    getTranslationPathByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -318,29 +318,37 @@ const addToPhpFile = async (
         return null;
     }
 
-    const translationPath = getTranslationPathByName(
-        missingVar,
-        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall),
-    );
+    const previousTranslationItem =
+        getPreviousTranslationItemByName(missingVar);
 
-    if (!translationPath) {
+    const lang =
+        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
+        getTranslations().items.default;
+
+    if (!previousTranslationItem) {
         return null;
     }
+
+    const path = previousTranslationItem?.[lang]?.path;
+
+    if (!path) {
+        return null;
+    }
+
+    const line = previousTranslationItem?.[lang]?.line;
 
     const countNestedKeys = missingVar.split(".").length - 1;
 
     // Case when a user tries to add a new translation key to an existing key that is not an array
-    if (!translationPath.line && countNestedKeys > 1) {
+    if (!line && countNestedKeys > 1) {
         return null;
     }
 
     const translationContents = await vscode.workspace.fs.readFile(
-        vscode.Uri.file(translationPath.path),
+        vscode.Uri.file(path),
     );
 
-    const lineNumberFromConfig = translationPath.line
-        ? translationPath.line - 1
-        : undefined;
+    const lineNumberFromConfig = line ? line - 1 : undefined;
 
     const lineNumber =
         lineNumberFromConfig ??
@@ -360,7 +368,7 @@ const addToPhpFile = async (
     const finalValue = `${indent}'${key}' => '',\n`;
 
     edit.insert(
-        vscode.Uri.file(translationPath.path),
+        vscode.Uri.file(path),
         new vscode.Position(lineNumber, 0),
         finalValue,
     );
@@ -371,11 +379,7 @@ const addToPhpFile = async (
     );
 
     action.edit = edit;
-    action.command = openFile(
-        translationPath.path,
-        lineNumber,
-        finalValue.length - 3,
-    );
+    action.command = openFile(path, lineNumber, finalValue.length - 3);
     action.diagnostics = [diagnostic];
 
     return action;
