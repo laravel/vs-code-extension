@@ -123,10 +123,11 @@ export class Validation implements CompletionProvider {
                 argumentIndex: 0,
             },
             {
-                classExtends: [
-                    "Illuminate\\Foundation\\Http\\FormRequest",
-                    "Livewire\\Form",
-                ],
+                classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
+                methodDefinition: "rules",
+            },
+            {
+                classExtends: "Livewire\\Form",
                 methodDefinition: "rules",
             },
         ];

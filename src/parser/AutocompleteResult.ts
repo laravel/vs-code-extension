@@ -34,11 +34,10 @@ export default class AutocompleteResult {
 
     public fillingInArrayKey(): boolean {
         if (this.result.type === "array") {
-            // I'm not sure if this is enough to determine 
-            // if we're filling in a rules array key but I don't
-            // have better idea at this moment :/
-            return this.result.parent?.type !== "array_item" 
-                && this.result.autocompletingKey;
+            return (
+                this.result.parent?.type !== "array_item" &&
+                this.result.autocompletingKey
+            );
         }
 
         return this.param()?.autocompletingKey ?? false;
@@ -73,16 +72,16 @@ export default class AutocompleteResult {
         );
     }
 
-    public isClassDefinitionExtends(classNames: string | string[]) {
-        classNames = Array.isArray(classNames) ? classNames : [classNames];
-
-        let check = false;
+    public extendsClass(className: string) {
+        let result = false;
 
         this.loop((context) => {
-            if (classNames.some((className: string) => {
-                return (context as AutocompleteParsingResult.ClassDefinition).extends === className;
-            })) {
-                check = true;
+            if (context.type !== 'classDefinition') {
+                return true;
+            }
+
+            if (context.extends === className) {
+                result = true;
 
                 return false;
             }
@@ -90,18 +89,18 @@ export default class AutocompleteResult {
             return true;
         });
 
-        return check;
+        return result;
     }
 
-    public isMethodDefinition(methodNames: string | string[]) {
-        methodNames = Array.isArray(methodNames) ? methodNames : [methodNames];
-
+    public isInsideMethodDefinition(methodName: string) {
         let check = false;
 
         this.loop((context) => {
-            if (methodNames.some((methodName: string) => {
-                return (context as AutocompleteParsingResult.MethodDefinition).methodName === methodName;
-            })) {
+            if (context.type !== 'methodDefinition') {
+                return true;
+            }
+
+            if (context.methodName === methodName) {
                 check = true;
 
                 return false;

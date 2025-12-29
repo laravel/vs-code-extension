@@ -51,7 +51,7 @@ interface FeatureTagParam {
     argumentName?: string | string[];
     classDefinition?: string;
     methodDefinition?: string;
-    classExtends?: string | string[];
+    classExtends?: string;
     classImplements?: string;
     argumentIndex?: number | number[];
 }

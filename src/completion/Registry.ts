@@ -83,19 +83,19 @@ export class Registry implements vscode.CompletionItemProvider {
         };
 
         const hasClassExtends = (classExtends: FeatureTagParam["classExtends"]) => {
-            if (typeof classExtends === "undefined" || classExtends === null) {
+            if (typeof classExtends === "undefined") {
                 return true;
             }
 
-            return parseResult.isClassDefinitionExtends(classExtends);
+            return parseResult.extendsClass(classExtends);
         };
 
-        const hasMethodDefinition = (methodDefinitions: FeatureTagParam["methodDefinition"]) => {
-            if (typeof methodDefinitions === "undefined" || methodDefinitions === null) {
+        const isInsideMethodDefinition = (methodDefinition: FeatureTagParam["methodDefinition"]) => {
+            if (typeof methodDefinition === "undefined") {
                 return true;
             }
 
-            return parseResult.isMethodDefinition(methodDefinitions);
+            return parseResult.isInsideMethodDefinition(methodDefinition);
         };
 
         const isArgumentIndex = (
@@ -136,7 +136,7 @@ export class Registry implements vscode.CompletionItemProvider {
                         isArgumentIndex(tag.argumentIndex) &&
                         isNamedArg(tag.argumentName) &&
                         hasClassExtends(tag.classExtends) &&
-                        hasMethodDefinition(tag.methodDefinition),
+                        isInsideMethodDefinition(tag.methodDefinition),
                 );
             }) || null
         );
