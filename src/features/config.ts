@@ -235,11 +235,6 @@ const addToFile = async (
         missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
             .length - 1;
 
-    // Case when a user tries to add a new config key to an existing key that is not an array
-    if (!previousConfig.line && countNestedKeys > 1) {
-        return null;
-    }
-
     const configContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(path),
     );

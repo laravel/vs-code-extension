@@ -337,11 +337,6 @@ const addToPhpFile = async (
 
     const countNestedKeys = missingVar.split(".").length - 1;
 
-    // Case when a user tries to add a new translation key to an existing key that is not an array
-    if (!line && countNestedKeys > 1) {
-        return null;
-    }
-
     const translationContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(path),
     );
