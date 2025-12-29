@@ -8,7 +8,7 @@ import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { contract, facade, withLineFragment } from "@src/support/util";
+import { contract, facade, indent, withLineFragment } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
@@ -256,9 +256,7 @@ const addToFile = async (
 
     const key = missingVar.split(".").pop();
 
-    const indent = " ".repeat((getIndentNumber("php") ?? 4) * countNestedKeys);
-
-    const finalValue = `${indent}'${key}' => '',\n`;
+    const finalValue = `${indent("", countNestedKeys)}'${key}' => '',\n`;
 
     edit.insert(
         vscode.Uri.file(path),

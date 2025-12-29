@@ -11,6 +11,24 @@ export const getConfigByName = (name: string): Config | undefined => {
     return getConfigs().items.configs.find((item) => item.name === name);
 };
 
+export const getNestedConfigByName = (match: string): Config | undefined => {
+    const name = match.match(/^(.+)\./)?.[1];
+
+    if (!name) {
+        return undefined;
+    }
+
+    const config = getConfigs().items.configs.find(
+        (config) => config.name === name,
+    );
+
+    if (!config) {
+        return getNestedConfigByName(name);
+    }
+
+    return config;
+};
+
 export const getPreviousConfigByName = (match: string): Config | undefined => {
     const name = match.match(/^(.+)\./)?.[0];
 

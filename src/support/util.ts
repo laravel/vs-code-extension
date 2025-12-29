@@ -152,3 +152,10 @@ export const createIndexMapping = (
         },
     };
 };
+
+/**
+ * Get the level of a key, for example 'foo.bar.baz' will return 2
+ */
+export const level = (text: string): number => {
+    return text.split(".").length - 1;
+};
