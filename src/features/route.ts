@@ -6,7 +6,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath, relativePath } from "@src/support/project";
+import { pathForPhpEnv, projectPath, relativePath } from "@src/support/project";
 import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -32,6 +32,14 @@ const toFind: FeatureTag = [
         class: ["Livewire\\Volt\\Volt"],
         method: ["route"],
         argumentIndex: 1,
+    },
+    {
+        class: ["Illuminate\\Routing\\Router", ...facade("Route")],
+        method: "is",
+    },
+    {
+        class: ["Illuminate\\Http\\Request", ...facade("Request")],
+        method: "routeIs",
     },
 ];
 
@@ -88,7 +96,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(route.filename).with({
+                vscode.Uri.file(projectPath(route.filename)).with({
                     fragment: `L${route.line ?? 0}`,
                 }),
             );
@@ -135,7 +143,10 @@ export const diagnosticProvider = (
             }
 
             return notFound(
-                "Route",
+                // @ts-ignore
+                item.className === "Livewire\\Volt\\Volt"
+                    ? "Component"
+                    : "Route",
                 param.value,
                 detectedRange(param),
                 "route",
@@ -160,7 +171,15 @@ export const completionProvider = {
             return [];
         }
 
-        if (result.isParamIndex(1)) {
+        if (
+            result.isFunc([
+                "route",
+                "signedRoute",
+                "to_route",
+                "temporarySignedRoute",
+            ]) &&
+            result.isParamIndex(1)
+        ) {
             // Route parameters autocomplete
             return getRoutes()
                 .items.filter((route) => route.name === result.param(0).value)

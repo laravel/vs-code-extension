@@ -1,7 +1,15 @@
 <?php
 
+function vsCodeGetReflectionMethod(ReflectionClass $reflected): ReflectionMethod {
+  return match (true) {
+    $reflected->hasMethod('__invoke') => $reflected->getMethod('__invoke'),
+    default => $reflected->getMethod('handle'),
+  };
+}
+
 echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
   ->merge(app("Illuminate\Contracts\Http\Kernel")->getRouteMiddleware())
+  ->merge(app("router")->getMiddleware())
   ->map(function ($middleware, $key) {
     $result = [
       "class" => null,
@@ -22,7 +30,7 @@ echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
         }
 
         $reflected = new ReflectionClass($m);
-        $reflectedMethod = $reflected->getMethod("handle");
+        $reflectedMethod = vsCodeGetReflectionMethod($reflected);
 
         return [
           "class" => $m,
@@ -38,7 +46,7 @@ echo collect(app("Illuminate\Contracts\Http\Kernel")->getMiddlewareGroups())
     }
 
     $reflected = new ReflectionClass($middleware);
-    $reflectedMethod = $reflected->getMethod("handle");
+    $reflectedMethod = vsCodeGetReflectionMethod($reflected);
 
     $result = array_merge($result, [
       "class" => $middleware,

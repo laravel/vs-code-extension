@@ -6,7 +6,7 @@ import { toArray } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, FeatureTagParam } from "..";
 
-export default class Registry implements vscode.CompletionItemProvider {
+export class Registry implements vscode.CompletionItemProvider {
     private providers: CompletionProvider[] = [];
 
     constructor(...providers: CompletionProvider[]) {

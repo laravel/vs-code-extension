@@ -1,6 +1,8 @@
-import { notFound } from "@src/diagnostic";
+import { notFound, NotFoundCode } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getTranslationItemByName,
+    getTranslationPathByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -8,7 +10,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { relativePath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { contract, createIndexMapping, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -121,8 +123,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const translation =
-                getTranslations().items.translations[param.value];
+            const translation = getTranslationItemByName(param.value);
 
             if (!translation) {
                 return null;
@@ -148,7 +149,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getTranslations, (match) => {
-        const item = getTranslations().items.translations[match];
+        const item = getTranslationItemByName(match);
 
         if (!item) {
             return null;
@@ -179,22 +180,34 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getTranslations,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index !== 0) {
                 return null;
             }
 
-            const item = getTranslations().items.translations[param.value];
+            const translation = getTranslationItemByName(param.value);
 
-            if (item) {
+            if (translation) {
                 return null;
             }
+
+            const pathToFile = getTranslationPathByName(
+                param.value,
+                getLang(item as AutocompleteParsingResult.MethodCall),
+            );
+
+            const code: NotFoundCode = pathToFile
+                ? {
+                      value: "translation",
+                      target: vscode.Uri.file(projectPath(pathToFile)),
+                  }
+                : "translation";
 
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                "translation",
+                code,
             );
         },
     );
@@ -252,6 +265,15 @@ export const completionProvider = {
             getTranslations().items.translations,
         ).length;
 
+        const precedingCharacter = document.getText(
+            new vscode.Range(
+                position.line,
+                position.character - 1,
+                position.line,
+                position.character,
+            ),
+        );
+
         return Object.entries(getTranslations().items.translations).map(
             ([key, translations]) => {
                 let completionItem = new vscode.CompletionItem(
@@ -263,6 +285,12 @@ export const completionProvider = {
                     position,
                     wordMatchRegex,
                 );
+
+                if (precedingCharacter === "'") {
+                    completionItem.insertText = key.replaceAll("'", "\\'");
+                } else if (precedingCharacter === '"') {
+                    completionItem.insertText = key.replaceAll('"', '\\"');
+                }
 
                 if (totalTranslationItems < 200) {
                     // This will bomb if we have too many translations,

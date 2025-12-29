@@ -40,7 +40,7 @@ export const getMiddleware = repository<MiddlewareItem>({
             return items;
         });
     },
-    pattern: "app/Http/Kernel.php",
+    pattern: ["app/Http/Kernel.php", "bootstrap/app.php"],
     itemsDefault: {},
     fileWatcherEvents: ["change"],
 });
