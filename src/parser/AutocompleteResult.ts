@@ -76,7 +76,7 @@ export default class AutocompleteResult {
         let result = false;
 
         this.loop((context) => {
-            if (context.type !== 'classDefinition') {
+            if (context.type !== "classDefinition") {
                 return true;
             }
 
@@ -96,7 +96,7 @@ export default class AutocompleteResult {
         let result = false;
 
         this.loop((context) => {
-            if (context.type !== 'methodDefinition') {
+            if (context.type !== "methodDefinition") {
                 return true;
             }
 

@@ -82,7 +82,9 @@ export class Registry implements vscode.CompletionItemProvider {
             );
         };
 
-        const extendsClass = (classExtends: FeatureTagParam["classExtends"]) => {
+        const extendsClass = (
+            classExtends: FeatureTagParam["classExtends"],
+        ) => {
             if (typeof classExtends === "undefined") {
                 return true;
             }
@@ -90,7 +92,9 @@ export class Registry implements vscode.CompletionItemProvider {
             return parseResult.extendsClass(classExtends);
         };
 
-        const isInsideMethodDefinition = (methodDefinition: FeatureTagParam["methodDefinition"]) => {
+        const isInsideMethodDefinition = (
+            methodDefinition: FeatureTagParam["methodDefinition"],
+        ) => {
             if (typeof methodDefinition === "undefined") {
                 return true;
             }
