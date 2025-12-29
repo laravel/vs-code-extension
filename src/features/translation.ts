@@ -262,6 +262,8 @@ const addToJsonFile = async (
         return null;
     }
 
+    const path = projectPath(translationPath);
+
     const translationContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(projectPath(translationPath)),
     );
@@ -279,13 +281,13 @@ const addToJsonFile = async (
     const finalValue = `${indent}"${missingVar}": ""\n`;
 
     edit.insert(
-        vscode.Uri.file(projectPath(translationPath)),
+        vscode.Uri.file(path),
         new vscode.Position(lineNumber - 1, lines[lineNumber - 1].length),
         ",",
     );
 
     edit.insert(
-        vscode.Uri.file(projectPath(translationPath)),
+        vscode.Uri.file(path),
         new vscode.Position(lineNumber, 0),
         finalValue,
     );
@@ -296,11 +298,7 @@ const addToJsonFile = async (
     );
 
     action.edit = edit;
-    action.command = openFile(
-        projectPath(translationPath),
-        lineNumber,
-        finalValue.length - 2,
-    );
+    action.command = openFile(path, lineNumber, finalValue.length - 2);
     action.diagnostics = [diagnostic];
 
     return action;
@@ -321,13 +319,13 @@ const addToPhpFile = async (
     const previousTranslationItem =
         getPreviousTranslationItemByName(missingVar);
 
-    const lang =
-        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
-        getTranslations().items.default;
-
     if (!previousTranslationItem) {
         return null;
     }
+
+    const lang =
+        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
+        getTranslations().items.default;
 
     const path = previousTranslationItem?.[lang]?.path;
 
