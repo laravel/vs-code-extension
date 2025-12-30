@@ -189,7 +189,7 @@ export class Validation implements CompletionProvider {
         position: vscode.Position,
         result: AutocompleteResult,
     ): vscode.CompletionItem[] {
-        if (result.fillingInArrayKey()) {
+        if (result.fillingInArrayKey() && !result.isInsideArrayItem()) {
             return [];
         }
 

@@ -34,10 +34,7 @@ export default class AutocompleteResult {
 
     public fillingInArrayKey(): boolean {
         if (this.result.type === "array") {
-            return (
-                this.result.parent?.type !== "array_item" &&
-                this.result.autocompletingKey
-            );
+            return this.result.autocompletingKey;
         }
 
         return this.param()?.autocompletingKey ?? false;
@@ -50,6 +47,10 @@ export default class AutocompleteResult {
     public class() {
         // @ts-ignore
         return this.result.className ?? null;
+    }
+
+    public isInsideArrayItem(): boolean {
+        return this.result.parent?.type === "array_item";
     }
 
     public isClass(className: string | string[]) {
