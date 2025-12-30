@@ -1071,6 +1071,45 @@
                     ]
                 },
                 {
+                    "begin": "(<<<)\\s*(\"?)(BLADE)(\\2)(\\s*)$",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.begin.php"
+                        },
+                        "1": {
+                            "name": "punctuation.definition.string.php"
+                        },
+                        "3": {
+                            "name": "keyword.operator.heredoc.php"
+                        },
+                        "5": {
+                            "name": "invalid.illegal.trailing-whitespace.php"
+                        }
+                    },
+                    "contentName": "text.blade",
+                    "end": "^\\s*(\\3)\\b",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.end.php"
+                        },
+                        "1": {
+                            "name": "keyword.operator.heredoc.php"
+                        }
+                    },
+                    "name": "meta.embedded.blade",
+                    "patterns": [
+                        {
+                            "include": "#interpolation"
+                        },
+                        {
+                            "include": "text.html.basic"
+                        },
+                        {
+                            "include": "#blade"
+                        }
+                    ]
+                },
+                {
                     "begin": "(<<<)\\s*(\"?)(XML)(\\2)(\\s*)$",
                     "beginCaptures": {
                         "0": {
@@ -1392,6 +1431,42 @@
                     "patterns": [
                         {
                             "include": "text.html.basic"
+                        }
+                    ]
+                },
+                {
+                    "begin": "(<<<)\\s*'(BLADE)'(\\s*)$",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.begin.php"
+                        },
+                        "1": {
+                            "name": "punctuation.definition.string.php"
+                        },
+                        "2": {
+                            "name": "keyword.operator.nowdoc.php"
+                        },
+                        "3": {
+                            "name": "invalid.illegal.trailing-whitespace.php"
+                        }
+                    },
+                    "contentName": "text.blade",
+                    "end": "^\\s*(\\2)\\b",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.end.php"
+                        },
+                        "1": {
+                            "name": "keyword.operator.nowdoc.php"
+                        }
+                    },
+                    "name": "meta.embedded.blade",
+                    "patterns": [
+                        {
+                            "include": "text.html.basic"
+                        },
+                        {
+                            "include": "#blade"
                         }
                     ]
                 },
