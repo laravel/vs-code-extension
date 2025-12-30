@@ -2,6 +2,7 @@ import { openFile } from "@src/commands";
 import { DiagnosticWithContext, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getNestedPreviousTranslationItemByName,
     getNestedTranslationItemByName,
     getTranslationItemByName,
     getTranslations,
@@ -317,27 +318,29 @@ const addToPhpFile = async (
         return null;
     }
 
-    const nestedName = missingVar.split(".").slice(0, -1).join(".");
+    const nestedTranslation = getNestedTranslationItemByName(missingVar);
 
     // Case when user tries to add a key to a existing key that is not an array
-    if (getTranslationItemByName(nestedName)) {
+    if (nestedTranslation) {
         return null;
     }
 
-    const nestedTranslationItem = getNestedTranslationItemByName(missingVar);
+    const nestedPreviousTranslation =
+        getNestedPreviousTranslationItemByName(missingVar);
 
-    if (!nestedTranslationItem) {
+    if (!nestedPreviousTranslation) {
         return null;
     }
 
-    const nestedTranslationItemName = Object.keys(
+    const nestedPreviousTranslationName = Object.keys(
         getTranslations().items.translations,
     ).find(
         (k) =>
-            getTranslations().items.translations[k] === nestedTranslationItem,
+            getTranslations().items.translations[k] ===
+            nestedPreviousTranslation,
     );
 
-    if (!nestedTranslationItemName) {
+    if (!nestedPreviousTranslationName) {
         return null;
     }
 
@@ -345,18 +348,18 @@ const addToPhpFile = async (
         getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
         getTranslations().items.default;
 
-    const path = nestedTranslationItem?.[lang]?.path;
+    const path = nestedPreviousTranslation?.[lang]?.path;
 
     if (!path) {
         return null;
     }
 
-    const line = nestedTranslationItem?.[lang]?.line;
+    const line = nestedPreviousTranslation?.[lang]?.line;
 
     // We have to compare the missing var to the nested translation item name and find new keys
     // to add, for example: foo.bar.new-nested-key.new-key compares to foo.bar.baz.example gives
     // ["new-nested-key", "new-key"]
-    const commonKeys = nestedTranslationItemName
+    const commonKeys = nestedPreviousTranslationName
         .split(".")
         .filter((v, i) => v === missingVar.split(".")[i]);
 
@@ -370,8 +373,11 @@ const addToPhpFile = async (
         vscode.Uri.file(path),
     );
 
-    const lineNumberFromTranslation =
-        line && commonKeys.length > 1 ? line - 1 : undefined;
+    const nestedKeyDepth = nestedPreviousTranslationName
+        .slice(commonKeys.join(".").length + 1)
+        .split(".").length;
+
+    const lineNumberFromTranslation = line ? line - nestedKeyDepth : undefined;
 
     const lineNumber =
         lineNumberFromTranslation ??

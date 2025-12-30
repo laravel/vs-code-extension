@@ -81,31 +81,45 @@ export const getTranslationItemByName = (
 export const getNestedTranslationItemByName = (
     name: string,
 ): TranslationItem | undefined => {
-    const previousTranslationItem = getPreviousTranslationItemByName(name);
-
-    if (previousTranslationItem) {
-        return previousTranslationItem;
-    }
-
     const nestedName = name.match(/^(.+)\./)?.[1];
 
-    return nestedName ? getNestedTranslationItemByName(nestedName) : undefined;
+    if (!nestedName) {
+        return undefined;
+    }
+
+    const translationItem = getTranslationItemByName(nestedName);
+
+    if (!translationItem) {
+        return getNestedTranslationItemByName(nestedName);
+    }
+
+    return translationItem;
 };
 
-export const getPreviousTranslationItemByName = (
+export const getNestedPreviousTranslationItemByName = (
     name: string,
 ): TranslationItem | undefined => {
-    const newName = name.match(/^(.+)\./)?.[0];
+    const nestedName = name.match(/^(.+)\./)?.[1];
 
-    if (!newName) {
+    if (!nestedName) {
         return undefined;
     }
 
     const previousName = Object.keys(getTranslations().items.translations).find(
-        (key) => key.startsWith(newName.replaceAll("\\", "")),
+        (key) => key.startsWith(nestedName.replaceAll("\\", "") + "."),
     );
 
-    return previousName ? getTranslationItemByName(previousName) : undefined;
+    if (!previousName) {
+        return getNestedPreviousTranslationItemByName(nestedName);
+    }
+
+    const translationItem = getTranslationItemByName(previousName);
+
+    if (!translationItem) {
+        return getNestedPreviousTranslationItemByName(nestedName);
+    }
+
+    return translationItem;
 };
 
 export const getTranslations = repository<TranslationGroupResult>({
