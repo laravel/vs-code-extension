@@ -153,9 +153,27 @@ export const createIndexMapping = (
     };
 };
 
-/**
- * Get the level of a key, for example 'foo.bar.baz' will return 2
- */
-export const level = (text: string): number => {
-    return text.split(".").length - 1;
+export const generateNestedKeysStructure = (
+    nestedKeys: string[],
+    startIndentNumber: number,
+) => {
+    return nestedKeys
+        .map((key, index, arr) =>
+            [
+                indent("", startIndentNumber + index),
+                `'${key}'`,
+                ` => `,
+                index === arr.length - 1 ? "''," : "[",
+            ].join(""),
+        )
+        .concat(
+            nestedKeys
+                .slice(0, -1)
+                .map((key, index, arr) =>
+                    [
+                        indent("", startIndentNumber + arr.length - 1 - index),
+                        "],",
+                    ].join(""),
+                ),
+        );
 };

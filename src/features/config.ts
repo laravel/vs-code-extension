@@ -1,15 +1,28 @@
 import { openFile } from "@src/commands";
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getConfigs, getPreviousConfigByName } from "@src/repositories/configs";
+import {
+    ARRAY_VALUE,
+    getConfigByName,
+    getConfigs,
+    getNestedConfigByName,
+    getPreviousConfigByName,
+} from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { contract, facade, indent, withLineFragment } from "@src/support/util";
+import {
+    contract,
+    facade,
+    generateNestedKeysStructure,
+    indent,
+    withLineFragment,
+} from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
+import os from "os";
 import * as vscode from "vscode";
 import {
     CodeActionProviderFunction,
@@ -207,21 +220,28 @@ const addToFile = async (
 ): Promise<vscode.CodeAction | null> => {
     const edit = new vscode.WorkspaceEdit();
 
-    const config = getConfigs().items.configs.find(
-        (c) => c.name === missingVar,
-    );
+    const config = getConfigByName(missingVar);
 
     if (config) {
         return null;
     }
 
-    const previousConfig = getPreviousConfigByName(missingVar);
+    const nestedConfig = getNestedConfigByName(missingVar);
 
-    if (!previousConfig || !previousConfig.file) {
+    if (!nestedConfig) {
         return null;
     }
 
-    const path = projectPath(previousConfig.file);
+    if (!nestedConfig.file) {
+        return null;
+    }
+
+    // Case when user tries to add a key to a existing key that is not an array
+    if (nestedConfig.value !== ARRAY_VALUE) {
+        return null;
+    }
+
+    const path = projectPath(nestedConfig.file);
 
     const fileName = path.split("/").pop()?.replace(".php", "");
 
@@ -231,16 +251,20 @@ const addToFile = async (
 
     // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
     // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
-    const countNestedKeys =
-        missingVar.substring(missingVar.indexOf(`${fileName}.`)).split(".")
-            .length - 1;
+    const startIndentNumber = nestedConfig.name
+        .substring(missingVar.indexOf(`${fileName}.`))
+        .split(".").length;
+
+    const nestedKeys = missingVar
+        .slice(nestedConfig.name.length + 1)
+        .split(".");
 
     const configContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(path),
     );
 
-    const lineNumberFromConfig = previousConfig.line
-        ? Number(previousConfig.line) - 1
+    const lineNumberFromConfig = nestedConfig.line
+        ? Number(nestedConfig.line)
         : undefined;
 
     const lineNumber =
@@ -254,14 +278,15 @@ const addToFile = async (
         return null;
     }
 
-    const key = missingVar.split(".").pop();
-
-    const finalValue = `${indent("", countNestedKeys)}'${key}' => '',\n`;
+    const nestedKeyStructure = generateNestedKeysStructure(
+        nestedKeys,
+        startIndentNumber,
+    );
 
     edit.insert(
         vscode.Uri.file(path),
         new vscode.Position(lineNumber, 0),
-        finalValue,
+        nestedKeyStructure.join(os.EOL) + os.EOL,
     );
 
     const action = new vscode.CodeAction(
@@ -270,7 +295,11 @@ const addToFile = async (
     );
 
     action.edit = edit;
-    action.command = openFile(path, lineNumber, finalValue.length - 3);
+    action.command = openFile(
+        path,
+        lineNumber + nestedKeys.length - 1,
+        nestedKeyStructure[nestedKeys.length - 1].length - 2,
+    );
     action.diagnostics = [diagnostic];
 
     return action;

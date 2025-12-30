@@ -2,6 +2,8 @@ import { repository } from ".";
 import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
 
+export const ARRAY_VALUE = "array(...)";
+
 interface ConfigGroupResult {
     configs: Config[];
     paths: string[];
@@ -11,19 +13,17 @@ export const getConfigByName = (name: string): Config | undefined => {
     return getConfigs().items.configs.find((item) => item.name === name);
 };
 
-export const getNestedConfigByName = (match: string): Config | undefined => {
-    const name = match.match(/^(.+)\./)?.[1];
+export const getNestedConfigByName = (name: string): Config | undefined => {
+    const nestedName = name.match(/^(.+)\./)?.[1];
 
-    if (!name) {
+    if (!nestedName) {
         return undefined;
     }
 
-    const config = getConfigs().items.configs.find(
-        (config) => config.name === name,
-    );
+    const config = getConfigByName(nestedName);
 
     if (!config) {
-        return getNestedConfigByName(name);
+        return getNestedConfigByName(nestedName);
     }
 
     return config;
