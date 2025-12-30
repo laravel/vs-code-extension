@@ -331,34 +331,20 @@ const addToPhpFile = async (
         return null;
     }
 
-    const nestedPreviousTranslationName = Object.keys(
-        getTranslations().items.translations,
-    ).find(
-        (k) =>
-            getTranslations().items.translations[k] ===
-            nestedPreviousTranslation,
-    );
-
-    if (!nestedPreviousTranslationName) {
-        return null;
-    }
-
     const lang =
         getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
         getTranslations().items.default;
 
-    const path = nestedPreviousTranslation?.[lang]?.path;
+    const nestedPreviousTranslationItem = nestedPreviousTranslation?.[lang];
 
-    if (!path) {
+    if (!nestedPreviousTranslationItem) {
         return null;
     }
-
-    const line = nestedPreviousTranslation?.[lang]?.line;
 
     // We have to compare the missing var to the nested translation item name and find new keys
     // to add, for example: foo.bar.new-nested-key.new-key compares to foo.bar.baz.example gives
     // ["new-nested-key", "new-key"]
-    const commonKeys = nestedPreviousTranslationName
+    const commonKeys = nestedPreviousTranslationItem.name
         .split(".")
         .filter((v, i) => v === missingVar.split(".")[i]);
 
@@ -369,14 +355,16 @@ const addToPhpFile = async (
     const startIndentNumber = commonKeys.length;
 
     const translationContents = await vscode.workspace.fs.readFile(
-        vscode.Uri.file(path),
+        vscode.Uri.file(nestedPreviousTranslationItem.path),
     );
 
-    const nestedKeyDepth = nestedPreviousTranslationName
+    const nestedKeyDepth = nestedPreviousTranslationItem.name
         .slice(commonKeys.join(".").length + 1)
         .split(".").length;
 
-    const lineNumberFromTranslation = line ? line - nestedKeyDepth : undefined;
+    const lineNumberFromTranslation = nestedPreviousTranslationItem.line
+        ? nestedPreviousTranslationItem.line - nestedKeyDepth
+        : undefined;
 
     const lineNumber =
         lineNumberFromTranslation ??
@@ -397,7 +385,7 @@ const addToPhpFile = async (
     const finalValue = nestedKeyStructure.join(os.EOL) + os.EOL;
 
     edit.insert(
-        vscode.Uri.file(path),
+        vscode.Uri.file(nestedPreviousTranslationItem.path),
         new vscode.Position(lineNumber, 0),
         finalValue,
     );
@@ -409,7 +397,7 @@ const addToPhpFile = async (
 
     action.edit = edit;
     action.command = openFile(
-        path,
+        nestedPreviousTranslationItem.path,
         lineNumber + nestedKeys.length - 1,
         nestedKeyStructure[nestedKeys.length - 1].length - 2,
     );

@@ -5,6 +5,7 @@ import { repository } from ".";
 
 export interface TranslationItem {
     [key: string]: {
+        name: string;
         value: string;
         path: string;
         line: number;
@@ -52,6 +53,7 @@ const load = () => {
                     const [v, p, li, pa] = value;
 
                     result[namespace][key] = {
+                        name: namespace,
                         value: res.values[v],
                         path: projectPath(res.paths[p]),
                         line: li,
