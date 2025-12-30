@@ -377,12 +377,12 @@ const addToPhpFile = async (
         return null;
     }
 
-    const nestedKeyStructure = generateNestedKeysStructure(
+    const nestedKeysStructure = generateNestedKeysStructure(
         nestedKeys,
         startIndentNumber,
     );
 
-    const finalValue = nestedKeyStructure.join(os.EOL) + os.EOL;
+    const finalValue = nestedKeysStructure.join(os.EOL) + os.EOL;
 
     edit.insert(
         vscode.Uri.file(nestedPreviousTranslationItem.path),
@@ -399,7 +399,7 @@ const addToPhpFile = async (
     action.command = openFile(
         nestedPreviousTranslationItem.path,
         lineNumber + nestedKeys.length - 1,
-        nestedKeyStructure[nestedKeys.length - 1].length - 2,
+        nestedKeysStructure[nestedKeys.length - 1].length - 2,
     );
     action.diagnostics = [diagnostic];
 

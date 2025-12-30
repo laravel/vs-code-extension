@@ -274,12 +274,12 @@ const addToFile = async (
         return null;
     }
 
-    const nestedKeyStructure = generateNestedKeysStructure(
+    const nestedKeysStructure = generateNestedKeysStructure(
         nestedKeys,
         startIndentNumber,
     );
 
-    const finalValue = nestedKeyStructure.join(os.EOL) + os.EOL;
+    const finalValue = nestedKeysStructure.join(os.EOL) + os.EOL;
 
     edit.insert(
         vscode.Uri.file(path),
@@ -296,7 +296,7 @@ const addToFile = async (
     action.command = openFile(
         path,
         lineNumber + nestedKeys.length - 1,
-        nestedKeyStructure[nestedKeys.length - 1].length - 2,
+        nestedKeysStructure[nestedKeys.length - 1].length - 2,
     );
     action.diagnostics = [diagnostic];
 
