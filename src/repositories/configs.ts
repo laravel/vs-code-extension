@@ -29,18 +29,6 @@ export const getNestedConfigByName = (name: string): Config | undefined => {
     return config;
 };
 
-export const getPreviousConfigByName = (match: string): Config | undefined => {
-    const name = match.match(/^(.+)\./)?.[0];
-
-    if (!name) {
-        return undefined;
-    }
-
-    return getConfigs().items.configs.find((config) =>
-        new RegExp(`^${name}[^.]*$`).test(config.name),
-    );
-};
-
 export const getConfigs = repository<ConfigGroupResult>({
     load: () => {
         return runInLaravel<Config[]>(template("configs"), "Configs").then(

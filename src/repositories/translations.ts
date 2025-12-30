@@ -78,17 +78,31 @@ export const getTranslationItemByName = (
     return getTranslations().items.translations[match.replaceAll("\\", "")];
 };
 
-export const getPreviousTranslationItemByName = (
-    match: string,
+export const getNestedTranslationItemByName = (
+    name: string,
 ): TranslationItem | undefined => {
-    const name = match.match(/^(.+)\./)?.[0];
+    const previousTranslationItem = getPreviousTranslationItemByName(name);
 
-    if (!name) {
+    if (previousTranslationItem) {
+        return previousTranslationItem;
+    }
+
+    const nestedName = name.match(/^(.+)\./)?.[1];
+
+    return nestedName ? getNestedTranslationItemByName(nestedName) : undefined;
+};
+
+export const getPreviousTranslationItemByName = (
+    name: string,
+): TranslationItem | undefined => {
+    const newName = name.match(/^(.+)\./)?.[0];
+
+    if (!newName) {
         return undefined;
     }
 
     const previousName = Object.keys(getTranslations().items.translations).find(
-        (key) => key.startsWith(name.replaceAll("\\", "")),
+        (key) => key.startsWith(newName.replaceAll("\\", "")),
     );
 
     return previousName ? getTranslationItemByName(previousName) : undefined;

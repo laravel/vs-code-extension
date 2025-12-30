@@ -2,7 +2,7 @@ import { openFile } from "@src/commands";
 import { DiagnosticWithContext, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
-    getPreviousTranslationItemByName,
+    getNestedTranslationItemByName,
     getTranslationItemByName,
     getTranslations,
     TranslationItem,
@@ -17,9 +17,11 @@ import {
     contract,
     createIndexMapping,
     facade,
-    withLineFragment,
+    generateNestedKeysStructure,
+    indent,
 } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
+import os from "os";
 import * as vscode from "vscode";
 import {
     CodeActionProviderFunction,
@@ -276,9 +278,7 @@ const addToJsonFile = async (
         return null;
     }
 
-    const indent = " ".repeat(getIndentNumber("json") ?? 4);
-
-    const finalValue = `${indent}"${missingVar}": ""\n`;
+    const finalValue = [indent(""), `"${missingVar}":`, '""'].join("") + os.EOL;
 
     edit.insert(
         vscode.Uri.file(path),
@@ -316,10 +316,27 @@ const addToPhpFile = async (
         return null;
     }
 
-    const previousTranslationItem =
-        getPreviousTranslationItemByName(missingVar);
+    const nestedName = missingVar.split(".").slice(0, -1).join(".");
 
-    if (!previousTranslationItem) {
+    // Case when user tries to add a key to a existing key that is not an array
+    if (getTranslationItemByName(nestedName)) {
+        return null;
+    }
+
+    const nestedTranslationItem = getNestedTranslationItemByName(missingVar);
+
+    if (!nestedTranslationItem) {
+        return null;
+    }
+
+    const nestedTranslationItemName = Object.keys(
+        getTranslations().items.translations,
+    ).find(
+        (k) =>
+            getTranslations().items.translations[k] === nestedTranslationItem,
+    );
+
+    if (!nestedTranslationItemName) {
         return null;
     }
 
@@ -327,24 +344,36 @@ const addToPhpFile = async (
         getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
         getTranslations().items.default;
 
-    const path = previousTranslationItem?.[lang]?.path;
+    const path = nestedTranslationItem?.[lang]?.path;
 
     if (!path) {
         return null;
     }
 
-    const line = previousTranslationItem?.[lang]?.line;
+    const line = nestedTranslationItem?.[lang]?.line;
 
-    const countNestedKeys = missingVar.split(".").length - 1;
+    // We have to compare the missing var to the nested translation item name and find new keys
+    // to add, for example: foo.bar.new-nested-key.new-key compares to foo.bar.baz.example gives
+    // ["new-nested-key", "new-key"]
+    const commonKeys = nestedTranslationItemName
+        .split(".")
+        .filter((v, i) => v === missingVar.split(".")[i]);
+
+    const nestedKeys = missingVar
+        .slice(commonKeys.join(".").length + 1)
+        .split(".");
+
+    const startIndentNumber = commonKeys.length;
 
     const translationContents = await vscode.workspace.fs.readFile(
         vscode.Uri.file(path),
     );
 
-    const lineNumberFromConfig = line ? line - 1 : undefined;
+    const lineNumberFromTranslation =
+        line && commonKeys.length > 1 ? line - 1 : undefined;
 
     const lineNumber =
-        lineNumberFromConfig ??
+        lineNumberFromTranslation ??
         translationContents
             .toString()
             .split("\n")
@@ -354,11 +383,12 @@ const addToPhpFile = async (
         return null;
     }
 
-    const key = missingVar.split(".").pop();
+    const nestedKeyStructure = generateNestedKeysStructure(
+        nestedKeys,
+        startIndentNumber,
+    );
 
-    const indent = " ".repeat((getIndentNumber("php") ?? 4) * countNestedKeys);
-
-    const finalValue = `${indent}'${key}' => '',\n`;
+    const finalValue = nestedKeyStructure.join(os.EOL) + os.EOL;
 
     edit.insert(
         vscode.Uri.file(path),
@@ -372,7 +402,11 @@ const addToPhpFile = async (
     );
 
     action.edit = edit;
-    action.command = openFile(path, lineNumber, finalValue.length - 3);
+    action.command = openFile(
+        path,
+        lineNumber + nestedKeys.length - 1,
+        nestedKeyStructure[nestedKeys.length - 1].length - 2,
+    );
     action.diagnostics = [diagnostic];
 
     return action;

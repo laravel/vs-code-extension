@@ -6,11 +6,9 @@ import {
     getConfigByName,
     getConfigs,
     getNestedConfigByName,
-    getPreviousConfigByName,
 } from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
-import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
@@ -18,8 +16,6 @@ import {
     contract,
     facade,
     generateNestedKeysStructure,
-    indent,
-    withLineFragment,
 } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import os from "os";
@@ -283,10 +279,12 @@ const addToFile = async (
         startIndentNumber,
     );
 
+    const finalValue = nestedKeyStructure.join(os.EOL) + os.EOL;
+
     edit.insert(
         vscode.Uri.file(path),
         new vscode.Position(lineNumber, 0),
-        nestedKeyStructure.join(os.EOL) + os.EOL,
+        finalValue,
     );
 
     const action = new vscode.CodeAction(
