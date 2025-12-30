@@ -278,7 +278,8 @@ const addToJsonFile = async (
         return null;
     }
 
-    const finalValue = [indent(""), `"${missingVar}":`, '""'].join("") + os.EOL;
+    const finalValue =
+        [indent(""), `"${missingVar}": `, '""'].join("") + os.EOL;
 
     edit.insert(
         vscode.Uri.file(path),
