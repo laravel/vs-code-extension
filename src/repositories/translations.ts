@@ -87,13 +87,10 @@ export const getNestedTranslationItemByName = (
         return undefined;
     }
 
-    const translationItem = getTranslationItemByName(nestedName);
-
-    if (!translationItem) {
-        return getNestedTranslationItemByName(nestedName);
-    }
-
-    return translationItem;
+    return (
+        getTranslationItemByName(nestedName) ??
+        getNestedTranslationItemByName(nestedName)
+    );
 };
 
 export const getNestedPreviousTranslationItemByName = (
@@ -109,17 +106,13 @@ export const getNestedPreviousTranslationItemByName = (
         (key) => key.startsWith(nestedName.replaceAll("\\", "") + "."),
     );
 
-    if (!previousName) {
-        return getNestedPreviousTranslationItemByName(nestedName);
-    }
+    const translationItem = previousName
+        ? getTranslationItemByName(previousName)
+        : getNestedPreviousTranslationItemByName(nestedName);
 
-    const translationItem = getTranslationItemByName(previousName);
-
-    if (!translationItem) {
-        return getNestedPreviousTranslationItemByName(nestedName);
-    }
-
-    return translationItem;
+    return (
+        translationItem ?? getNestedPreviousTranslationItemByName(nestedName)
+    );
 };
 
 export const getTranslations = repository<TranslationGroupResult>({

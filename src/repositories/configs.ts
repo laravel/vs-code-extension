@@ -20,13 +20,7 @@ export const getNestedConfigByName = (name: string): Config | undefined => {
         return undefined;
     }
 
-    const config = getConfigByName(nestedName);
-
-    if (!config) {
-        return getNestedConfigByName(nestedName);
-    }
-
-    return config;
+    return getConfigByName(nestedName) ?? getNestedConfigByName(nestedName);
 };
 
 export const getConfigs = repository<ConfigGroupResult>({
