@@ -9,6 +9,7 @@ import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { LinkProvider } from "..";
+import { projectPath } from "@src/support/project";
 
 const toFind = [
     {
@@ -68,7 +69,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(route.filename).with({
+                vscode.Uri.file(projectPath(route.filename)).with({
                     fragment: `L${route.line}`,
                 }),
             );

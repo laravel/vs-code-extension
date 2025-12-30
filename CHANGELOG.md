@@ -2,6 +2,107 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.3.0 - 2025-12-26
+
+### What's Changed
+
+* Fix models.php template indentation by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/515
+* Use relative paths for route links by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/514
+* Support for the Pint exclude config by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/518
+* Add scope parameters to the repository and docblock generator by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/487
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.3...v1.3.0
+
+## v1.2.3 - 2025-12-19
+
+### What's Changed
+
+* Fix "app/Modelsdirectory does not exist" error by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/511
+
+### New Contributors
+
+* [@TitasGailius](https://github.com/TitasGailius) made their first contribution in https://github.com/laravel/vs-code-extension/pull/511
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.2...v1.2.3
+
+## v1.2.2 - 2025-12-18
+
+### What's Changed
+
+* Add a command that generates namespace by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/463
+* Build script cleanup by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/464
+* Fix typo in php-templates/translations.php file by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/505
+* Fix Pint Error: The path is not readable by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/502
+* Fix Middleware not found, defined in 3rd party composer package by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/496
+* Fix for docblock generator for decimals in model casts by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/495
+* Fix - Replace single quotes with double quotes for echo PHP_BINARY; in phpEnvironments by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/478
+* Support for models in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/335
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.1...v1.2.2
+
+## v1.2.1 - 2025-09-16
+
+### What's Changed
+
+* Fix - move refactor class commands from laravel.wrapWithHelper.submenu to editor/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/460
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.0...v1.2.1
+
+## v1.2.0 - 2025-09-15
+
+### What's Changed
+
+* Correct repository link in release script by [@duncanmcclean](https://github.com/duncanmcclean) in https://github.com/laravel/vs-code-extension/pull/453
+* Add Pint formatter to the available list by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/451
+* Add commands that refactor class attributes in blade files by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/432
+* Add a command that wraps selected text with a helper by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/431
+* Increase consistency for registered commands by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/459
+
+### New Contributors
+
+* [@duncanmcclean](https://github.com/duncanmcclean) made their first contribution in https://github.com/laravel/vs-code-extension/pull/453
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.1.1...v1.2.0
+
+## v1.1.1 - 2025-09-02
+
+### What's Changed
+
+* Pint for plain PHP projects by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/449
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.1.0...v1.1.1
+
+## v1.1.0 - 2025-09-02
+
+### What's Changed
+
+* Pint commands + run Pint on save by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/448
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.14...v1.1.0
+
+## v1.0.14 - 2025-08-25
+
+### What's Changed
+
+* Fix Auth bug when \Illuminate\Auth\AuthServiceProvider::class is disabled by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/445
+* bump required Php version by [@m-graham](https://github.com/m-graham) in https://github.com/laravel/vs-code-extension/pull/413
+
+### New Contributors
+
+* [@m-graham](https://github.com/m-graham) made their first contribution in https://github.com/laravel/vs-code-extension/pull/413
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.13...v1.0.14
+
+## v1.0.13 - 2025-08-22
+
+### What's Changed
+
+* Fix for getTranslationPathByName with nested translations by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/439
+* Fix for DIRECTORY_SEPARATOR for Windows environment by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/441
+* Add ddev support by [@damms005](https://github.com/damms005) in https://github.com/laravel/vs-code-extension/pull/398
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.0.12...v1.0.13
+
 ## v1.0.12 - 2025-08-19
 
 ### What's Changed

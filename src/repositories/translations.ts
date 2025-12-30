@@ -84,7 +84,7 @@ export const getTranslationPathByName = (
 ): string | undefined => {
     lang = lang ?? getTranslations().items.default;
 
-    const fileName = match.replace(/^.*::/, "").replace(/\.[^.]+$/, "");
+    const fileName = match.replace(/^.*::/, "").replace(/^([^.]+)\..*$/, "$1");
 
     return getTranslations().items.paths.find((path) => {
         return (
