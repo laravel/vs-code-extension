@@ -10,7 +10,6 @@ import {
 } from "@src/repositories/translations";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
-import { getIndentNumber } from "@src/support/indent";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
