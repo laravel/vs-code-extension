@@ -10,8 +10,8 @@ export class Validation implements CompletionProvider {
     private rules = {
         accepted: "accepted",
         active_url: "active_url",
-        after_or_equal: "after_or_equal:${0:date}",
-        after: "after:date",
+        after_or_equal: "after_or_equal:${1:date}",
+        after: "after:${1:date}",
         alpha_dash: "alpha_dash",
         alpha_num: "alpha_num",
         alpha: "alpha",
@@ -126,6 +126,10 @@ export class Validation implements CompletionProvider {
                 classExtends: "Illuminate\\Foundation\\Http\\FormRequest",
                 methodDefinition: "rules",
             },
+            {
+                classExtends: "Livewire\\Form",
+                methodDefinition: "rules",
+            },
         ];
     }
 
@@ -144,9 +148,7 @@ export class Validation implements CompletionProvider {
             return this.validatorValidation(document, position, result) || [];
         }
 
-        // TODO: Deal with FormRequest@rules method
-
-        return [];
+        return this.handleFormRequestRulesMethod(document, position, result);
     }
 
     private handleValidateMethod(
@@ -180,6 +182,18 @@ export class Validation implements CompletionProvider {
         ) {
             return this.getRules(document, position);
         }
+    }
+
+    private handleFormRequestRulesMethod(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        result: AutocompleteResult,
+    ): vscode.CompletionItem[] {
+        if (result.fillingInArrayKey() && !result.isInsideArrayItem()) {
+            return [];
+        }
+
+        return this.getRules(document, position);
     }
 
     private getRules(
