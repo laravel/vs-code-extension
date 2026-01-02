@@ -94,6 +94,14 @@ export namespace AutocompleteParsingResult {
         methodName: string | null;
         className: string | null;
         arguments: Arguments;
+        start?: {
+            line: number;
+            column: number;
+        };
+        end?: {
+            line: number;
+            column: number;
+        };
     }
 
     export interface MethodDefinition {
