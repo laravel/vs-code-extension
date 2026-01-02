@@ -322,7 +322,7 @@ const findInMapping = (
 const getActualType = (cast: string | null, type: string): string => {
     const finalType =
         findInMapping(castMapping, cast) ||
-        cast ||
+        cast?.split(":")[0] ||
         findInMapping(typeMapping, type) ||
         "mixed";
 
