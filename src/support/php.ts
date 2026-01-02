@@ -271,6 +271,10 @@ const getHashedFile = (code: string) => {
     return fixFilePath(hashedFile);
 };
 
+export const getCommand = (): string => {
+    return getCommandTemplate().replace('"{code}"', "").trim();
+};
+
 export const getCommandTemplate = (): string => {
     return config<string>("phpCommand", "") || getDefaultPhpCommand();
 };

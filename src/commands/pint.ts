@@ -1,5 +1,5 @@
 import { getPintConfig } from "@src/repositories/pint";
-import { fixFilePath } from "@src/support/php";
+import { fixFilePath, getCommand } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -38,7 +38,10 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        const phpPath = getCommand();
+
+        // Without php at the beginning, it won't work on Windows
+        const command = `${phpPath} "${pintPath}" ${args}`.trim();
 
         cp.exec(
             command,
