@@ -88,7 +88,7 @@ export class WayfinderHoverProvider implements vscode.HoverProvider {
             return null;
         }
 
-        const line = lineAsString ? Number(lineAsString) : undefined;
+        const line = lineAsString ? Number(lineAsString) : 0;
 
         const hoverActions = new HoverActions([
             {
@@ -96,7 +96,7 @@ export class WayfinderHoverProvider implements vscode.HoverProvider {
                 command: "laravel.open",
                 arguments: [
                     vscode.Uri.file(projectPath(controllerPath)),
-                    line ?? 0,
+                    line,
                     0,
                 ],
             },
