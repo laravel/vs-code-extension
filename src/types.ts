@@ -145,3 +145,30 @@ export namespace AutocompleteParsingResult {
         };
     }
 }
+
+export namespace TsParsingResult {
+    export type ContextValue = MethodCall | Base;
+
+    export interface Base {
+        type: "base";
+        symbolFlags: number[];
+        children: ContextValue[];
+        start: number;
+        end: number;
+    }
+
+    export interface MethodCall {
+        type: "methodCall";
+        symbolFlags: number[];
+        methodName: string;
+        children: ContextValue[];
+        returnTypes: ReturnType[];
+        start: number;
+        end: number;
+    }
+
+    export interface ReturnType {
+        name: string;
+        importPath: string | null;
+    }
+}

@@ -26,7 +26,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:php"
+        "onLanguage:php",
+        "onLanguage:typescript",
+        "onLanguage:typescriptreact"
     ],
     "main": "./dist/extension.js",
     "grammars": [

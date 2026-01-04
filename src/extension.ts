@@ -29,6 +29,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { WayfinderHoverProvider } from "./features/wayfinder";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -214,6 +215,10 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
+        ),
+        vscode.languages.registerHoverProvider(
+            ["typescript", "typescriptreact"],
+            new WayfinderHoverProvider(),
         ),
         // ...testRunnerCommands,
         // testController,
