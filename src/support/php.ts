@@ -271,6 +271,14 @@ const getHashedFile = (code: string) => {
     return fixFilePath(hashedFile);
 };
 
+export const getCommand = (code: string): string => {
+    const commandTemplate = getCommandTemplate();
+
+    return commandTemplate.includes("{code}")
+        ? commandTemplate.replace("{code}", code)
+        : `${commandTemplate} "${code}"`;
+};
+
 export const getCommandTemplate = (): string => {
     return config<string>("phpCommand", "") || getDefaultPhpCommand();
 };
@@ -283,13 +291,7 @@ export const runPhp = (
         code = "<?php\n\n" + code;
     }
 
-    const commandTemplate = getCommandTemplate();
-
-    const hashedFile = getHashedFile(code);
-
-    const command = commandTemplate.includes("{code}")
-        ? commandTemplate.replace("{code}", hashedFile)
-        : `${commandTemplate} "${hashedFile}"`;
+    const command = getCommand(getHashedFile(code));
 
     return new Promise<string>(function (resolve, error) {
         let result = "";
