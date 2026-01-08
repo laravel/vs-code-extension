@@ -321,15 +321,9 @@ export const runPhp = (
 
 export const artisan = (
     command: string,
-    workspaceFolder?: string | undefined,
+    workspaceFolder: string,
 ): Promise<string> => {
-    const phpPath = getCommand();
-
-    // Without php at the beginning, it doesn't work on Windows
-    const fullCommand = `${phpPath} artisan ${command}`.trim();
-
-    // Support for multi-root workspaces
-    workspaceFolder ??= getWorkspaceFolders()[0]?.uri?.fsPath;
+    const fullCommand = `${getCommand("artisan")} ${command}`.trim();
 
     return new Promise<string>((resolve, error) => {
         cp.exec(

@@ -1,19 +1,9 @@
-import {
-    Argument,
-    ArgumentType,
-    Command,
-    getArtisanMakeCommands,
-    Option,
-    SubCommand,
-} from "@src/repositories/artisanMakeCommands";
-import { artisan } from "@src/support/php";
-import { getWorkspaceFolders } from "@src/support/project";
-import { ucfirst } from "@src/support/str";
-import { escapeNamespace } from "@src/support/util";
-import path from "path";
 import * as vscode from "vscode";
-import { openFileCommand } from ".";
-import { getNamespace } from "./generateNamespace";
+import path from "path";
+
+import { Argument, ArgumentType, Command, Option } from "./types";
+import { getNamespace } from "@src/commands/generateNamespace";
+import { escapeNamespace } from "@src/support/util";
 
 const EndSelection = "End Selection";
 
@@ -126,19 +116,25 @@ const getUserOptions = async (
     let pickOptions = commandOptions.map((option) => ({
         label: `${option.name} ${option.description}`,
         command: option.name,
+        excludeIf: option.excludeIf,
     }));
 
     while (true) {
+        const optionsAsString = getOptionsAsString(userOptions);
+
         const choice = await vscode.window.showQuickPick(
             [
                 {
                     label: EndSelection,
                     command: EndSelection,
+                    exclude: undefined,
                 },
                 ...pickOptions,
             ],
             {
-                placeHolder: "Select an option or end selection...",
+                canPickMany: false,
+                placeHolder:
+                    optionsAsString || "Select an option or end selection.",
             },
         );
 
@@ -212,8 +208,11 @@ const getUserOptions = async (
 
         userOptions[choice.command] = value ?? choice.command;
 
-        // Remove the option from the list
-        pickOptions.splice(pickOptions.indexOf(choice), 1);
+        pickOptions = pickOptions.filter(
+            (option) =>
+                option.command !== choice.command &&
+                !option.excludeIf?.includes(choice.command),
+        );
 
         if (!pickOptions.length) {
             break;
@@ -228,122 +227,11 @@ const getOptionsAsString = (userOptions: Record<string, string | undefined>) =>
         .map(([key, value]) => (key !== value ? `${key}=${value}` : key))
         .join(" ");
 
-const getPathFromOutput = (
-    output: string,
-    command: SubCommand,
-    workspaceFolder: vscode.WorkspaceFolder,
-    uri: vscode.Uri,
-): string | undefined => {
-    let paths;
-
-    // Unfortunately, Livewire has own output format for make:livewire
-    if (command === "livewire") {
-        paths = output.match(/CLASS:\s+(.*)/);
-
-        if (paths?.[1]) {
-            return path.join(workspaceFolder.uri.fsPath, paths?.[1]);
-        }
-    }
-
-    paths = output.match(/\[(.*?)\]/g)?.map((path) => path.slice(1, -1));
-
-    if (!paths) {
-        return;
-    }
-
-    // If artisan command creates multiple files, we have to find the right one, for example:
-    //
-    // INFO  Test [tests/Feature/Http/Controllers/NewControllerTest.php] created successfully.
-    // INFO  Controller [app/Http/Controllers/NewController.php] created successfully.
-    const outputPath = paths
-        // Windows always returns absolute paths, Linux returns relative. We have to normalize the paths
-        .map((_path) =>
-            path.isAbsolute(_path)
-                ? path.relative(workspaceFolder.uri.fsPath, _path)
-                : _path,
-        )
-        .map((_path) => path.join(workspaceFolder.uri.fsPath, _path))
-        .find((_path) => _path.startsWith(uri.fsPath));
-
-    if (!outputPath) {
-        return;
-    }
-
-    return outputPath;
-};
-
-const getWorkspaceFolder = (
-    uri: vscode.Uri | undefined,
-): vscode.WorkspaceFolder | undefined => {
-    let workspaceFolder = undefined;
-
-    // Case when the user uses VSCode explorer/context (click on a folder in explorer)
-    if (uri) {
-        workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    // Case when the user uses VSCode command palette (click on "Laravel: Create new file")
-    // and some file is open in the editor
-    const editor = vscode.window.activeTextEditor;
-
-    if (editor) {
-        const fileUri = editor.document.uri;
-
-        workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    // Case when the user uses VSCode command palette (click on "Laravel: Create new file")
-    // and no file is open in the editor
-    return getWorkspaceFolders()?.[0];
-};
-
-export const artisanMakeCommandNameSubCommandName = (command: SubCommand) =>
-    `laravel.artisan.make.${command}`;
-
-export const artisanMakeOpenSubmenuCommand = async () => {
-    const choice = await vscode.window.showQuickPick(
-        getArtisanMakeCommands()
-            .filter((command) => command.submenu)
-            .map((command) => {
-                const name = ucfirst(command.name);
-
-                return {
-                    label: `New ${name}...`,
-                    command: artisanMakeCommandNameSubCommandName(command.name),
-                };
-            }),
-        {
-            placeHolder: "Select file type...",
-        },
-    );
-
-    if (choice) {
-        vscode.commands.executeCommand(choice.command);
-    }
-};
-
-export const artisanMakeCommand = async (
+export const buildArtisanCommand = async (
     command: Command,
-    uri?: vscode.Uri | undefined,
-) => {
-    const workspaceFolder = getWorkspaceFolder(uri);
-
-    if (!workspaceFolder) {
-        vscode.window.showErrorMessage("Cannot detect active workspace");
-
-        return;
-    }
-
-    uri ??= vscode.Uri.joinPath(workspaceFolder.uri);
-
+    uri: vscode.Uri,
+    workspaceFolder: vscode.WorkspaceFolder,
+): Promise<string | undefined> => {
     const userArguments = await getUserArguments(
         command.arguments,
         workspaceFolder,
@@ -360,34 +248,5 @@ export const artisanMakeCommand = async (
         return;
     }
 
-    const userArgumentsAsString = getArgumentsAsString(userArguments);
-    const userOptionsAsString = getOptionsAsString(userOptions);
-
-    const output = await artisan(
-        `make:${command.name} ${userArgumentsAsString} ${userOptionsAsString}`,
-        workspaceFolder.uri.fsPath,
-    );
-
-    const error = output.match(/ERROR\s+(.*)/);
-
-    if (error?.[1]) {
-        vscode.window.showErrorMessage(error[1]);
-    }
-
-    const outputPath = getPathFromOutput(
-        output,
-        command.name,
-        workspaceFolder,
-        uri,
-    );
-
-    if (!outputPath) {
-        vscode.window.showErrorMessage(
-            "Failed to get the path of the new file",
-        );
-
-        return;
-    }
-
-    openFileCommand(vscode.Uri.file(outputPath), 1, 1);
+    return `${command.name} ${getArgumentsAsString(userArguments)} ${getOptionsAsString(userOptions)}`;
 };
