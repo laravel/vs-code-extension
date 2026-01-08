@@ -1,7 +1,8 @@
 import fs from "fs";
+import * as vscode from "vscode";
 import { Eloquent } from "..";
 import { config } from "./config";
-import { internalVendorPath } from "./project";
+import { internalVendorPath, projectPath } from "./project";
 import { indent } from "./util";
 
 interface ClassBlock {
@@ -120,7 +121,11 @@ const getBlocks = (
                 )} ${method}()`;
             }),
         )
-        .concat(model.scopes.map((scope) => getScopeBlock(className, scope)))
+        .concat(
+            model.scopes.map((scope) =>
+                getScopeBlock(className, model.class, scope),
+            ),
+        )
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
         .map((block) => ` * ${block}`)
@@ -174,7 +179,11 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     return [`@property-read \\${relation.related} $${relation.name}`];
 };
 
-const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
+const getScopeBlock = (
+    className: string,
+    modelClass: string,
+    scope: Eloquent.Scope,
+): string => {
     const parameters = scope.parameters
         .slice(1)
         .map((param) => {
@@ -188,9 +197,23 @@ const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
         })
         .join(", ");
 
-    return `@method static ${modelBuilderType(
-        className,
-    )} ${scope.name}(${parameters})`;
+    const link =
+        scope.path && scope.start_line
+            ? markdownLink(
+                  `${modelClass}::${scope.name}`,
+                  projectPath(scope.path),
+                  scope.start_line,
+              )
+            : undefined;
+
+    return [
+        `@method static ${modelBuilderType(
+            className,
+        )} ${scope.name}(${parameters})`,
+        link ? `{@see ${link}}` : "",
+    ]
+        .join(" ")
+        .trim();
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
@@ -331,4 +354,14 @@ const getActualType = (cast: string | null, type: string): string => {
     }
 
     return finalType;
+};
+
+const markdownLink = (name: string, path: string, line: number) => {
+    const scheme = vscode.env.remoteName ? "vscode-remote" : "file";
+
+    if (!path.startsWith("/")) {
+        path = `/${path}`;
+    }
+
+    return `[${name}](${scheme}://${path}#L${line})`;
 };
