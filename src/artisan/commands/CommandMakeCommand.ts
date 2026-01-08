@@ -14,7 +14,8 @@ export const CommandMakeCommand: Command = {
         {
             name: "--command",
             type: "input",
-            description: "The terminal command that will be used to invoke the class"
+            description:
+                "The terminal command that will be used to invoke the class",
         },
         ...testOptions,
         forceOption,
