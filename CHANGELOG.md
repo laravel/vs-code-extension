@@ -2,6 +2,16 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.0 - 2026-01-08
+
+### What's Changed
+
+* Fix Invalid model helper generated for casts with parameters by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/525
+* Fix for PHP Command for Pint on Windows by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/469
+* Integration artisan make commands with VSCode explorer/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/466
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.3.1...v1.4.0
+
 ## v1.3.1 - 2026-01-02
 
 ### What's Changed
