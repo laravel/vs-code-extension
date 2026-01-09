@@ -3,6 +3,7 @@ import { repository } from ".";
 import { ideHelperPath, projectPathExists } from "../support/project";
 import { runInLaravel, template } from "./../support/php";
 import { config } from "../support/config";
+import { indent } from "../support/util";
 
 interface TestCaseExtension {
     testCase: string;
@@ -82,6 +83,54 @@ const writePestFunctions = () => {
     );
 };
 
+const generateExpectationClass = (expectations: string[]): string => {
+    if (expectations.length === 0) {
+        return "";
+    }
+
+    const methodBlocks = expectations
+        .map((expectation) => ` * @method self ${expectation}()`)
+        .sort();
+
+    return [
+        "/**",
+        " * Pest\\Expectation",
+        " *",
+        ...methodBlocks,
+        " */",
+        "class Expectation {}",
+    ]
+        .map((line) => indent(line))
+        .join("\n");
+};
+
+const generateTestCaseClass = (extension: TestCaseExtension): string => {
+    const parts = extension.testCase.split("\\");
+    const className = parts.pop() || "";
+
+    const traitUses =
+        extension.traits.length > 0
+            ? extension.traits
+                .map((trait) => {
+                    const traitName = trait.startsWith("\\")
+                        ? trait
+                        : `\\${trait}`;
+                    return `use ${traitName};`;
+                })
+                .map((line) => indent(line))
+                .join("\n")
+            : "";
+
+    const classContent = traitUses
+        ? `class ${className}\n{\n${traitUses}\n}`
+        : `class ${className} {}`;
+
+    return classContent
+        .split("\n")
+        .map((line) => indent(line))
+        .join("\n");
+};
+
 const generatePestHelpers = (config: PestConfig) => {
     if (!config.hasPest) {
         return;
@@ -90,13 +139,7 @@ const generatePestHelpers = (config: PestConfig) => {
     const namespaces: { [namespace: string]: string[] } = {};
 
     if (config.expectations.length > 0) {
-        const methods = config.expectations
-            .map((expectation) => `        public function ${expectation}() {}`)
-            .join("\n");
-
-        namespaces["Pest"] = [
-            `    class Expectation\n    {\n${methods}\n    }`,
-        ];
+        namespaces["Pest"] = [generateExpectationClass(config.expectations)];
     }
 
     for (const extension of config.testCaseExtensions) {
@@ -108,27 +151,11 @@ const generatePestHelpers = (config: PestConfig) => {
             continue;
         }
 
-        const traitUses =
-            extension.traits.length > 0
-                ? extension.traits
-                      .map((trait) => {
-                          const traitName = trait.startsWith("\\")
-                              ? trait
-                              : `\\${trait}`;
-                          return `        use ${traitName};`;
-                      })
-                      .join("\n")
-                : "";
-
-        const classContent = traitUses
-            ? `    class ${className}\n    {\n${traitUses}\n    }`
-            : `    class ${className} {}`;
-
         if (!namespaces[namespace]) {
             namespaces[namespace] = [];
         }
 
-        namespaces[namespace].push(classContent);
+        namespaces[namespace].push(generateTestCaseClass(extension));
     }
 
     if (Object.keys(namespaces).length === 0) {
@@ -137,7 +164,7 @@ const generatePestHelpers = (config: PestConfig) => {
 
     const content = Object.entries(namespaces)
         .map(([namespace, classes]) => {
-            return `namespace ${namespace} {\n${classes.join("\n\n")}\n}`;
+            return `namespace ${namespace} {\n\n${classes.join("\n\n")}\n\n}`;
         })
         .join("\n\n");
 
