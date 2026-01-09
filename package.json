@@ -736,6 +736,11 @@
                     "default": false,
                     "description": "Automatically run Pint on the current file when saved."
                 },
+                "Laravel.pest.generateHelpers": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Automatically generate IDE helper files for better PestPHP intelligence.\n\n_Only active when Pest is detected in your Laravel project._"
+                },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
                     "default": true,

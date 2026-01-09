@@ -7,6 +7,7 @@ import configs from "./configs";
 import inertia from "./inertia";
 import middleware from "./middleware";
 import models from "./models";
+import pest from "./pest";
 import routes from "./routes";
 import translations from "./translations";
 import views from "./views";
@@ -21,6 +22,7 @@ const templates = {
     inertia,
     middleware,
     models,
+    pest,
     routes,
     translations,
     views,
