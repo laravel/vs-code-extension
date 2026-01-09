@@ -103,14 +103,14 @@ const generateTestCaseClass = (extension: TestCaseExtension): string => {
     const traitUses =
         extension.traits.length > 0
             ? extension.traits
-                .map((trait) => {
-                    const traitName = trait.startsWith("\\")
-                        ? trait
-                        : `\\${trait}`;
-                    return `use ${traitName};`;
-                })
-                .map((line) => indent(line))
-                .join("\n")
+                  .map((trait) => {
+                      const traitName = trait.startsWith("\\")
+                          ? trait
+                          : `\\${trait}`;
+                      return `use ${traitName};`;
+                  })
+                  .map((line) => indent(line))
+                  .join("\n")
             : "";
 
     const classContent = traitUses
