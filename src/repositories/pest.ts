@@ -17,8 +17,7 @@ interface PestConfig {
     testCaseExtensions: TestCaseExtension[];
 }
 
-const PEST_FUNCTIONS_CONTENT = `<?php
-
+const PEST_FUNCTIONS_CONTENT = `
 use Pest\\Concerns\\Expectable;
 use Pest\\PendingCalls\\BeforeEachCall;
 use Pest\\PendingCalls\\TestCall;
@@ -74,13 +73,6 @@ const INACTIVE_PEST_CONFIG: PestConfig = {
     hasPest: false,
     expectations: [],
     testCaseExtensions: [],
-};
-
-const writePestFunctions = () => {
-    fs.writeFileSync(
-        ideHelperPath("_pest_function_helpers.php"),
-        PEST_FUNCTIONS_CONTENT,
-    );
 };
 
 const generateExpectationClass = (expectations: string[]): string => {
@@ -158,19 +150,15 @@ const generatePestHelpers = (config: PestConfig) => {
         namespaces[namespace].push(generateTestCaseClass(extension));
     }
 
-    if (Object.keys(namespaces).length === 0) {
-        return;
-    }
-
     const content = Object.entries(namespaces)
         .map(([namespace, classes]) => {
             return `namespace ${namespace} {\n\n${classes.join("\n\n")}\n\n}`;
         })
         .join("\n\n");
 
-    const finalContent = `<?php\n\n${content}\n`;
+    const finalContent = `<?php\n\nnamespace {\n${PEST_FUNCTIONS_CONTENT}\n}\n\n${content}\n`;
 
-    fs.writeFileSync(ideHelperPath("_pest_class_helpers.php"), finalContent);
+    fs.writeFileSync(ideHelperPath("_pest.php"), finalContent);
 };
 
 const load = (): Promise<PestConfig> => {
@@ -181,8 +169,6 @@ const load = (): Promise<PestConfig> => {
     if (!projectPathExists("vendor/pestphp/pest")) {
         return Promise.resolve(INACTIVE_PEST_CONFIG);
     }
-
-    writePestFunctions();
 
     return runInLaravel<PestConfig>(template("pest"), "Pest Config").then(
         (result) => {
