@@ -116,7 +116,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                     param.start?.line ?? 0,
                     param.start?.column ?? 0,
                 );
-                const controllerClass = findControllerFromDocument(doc, position);
+                const controllerClass = findControllerFromDocument(
+                    doc,
+                    position,
+                );
 
                 if (controllerClass) {
                     // Try to match with specific controller class
