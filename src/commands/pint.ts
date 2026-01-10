@@ -1,4 +1,5 @@
-import { fixFilePath } from "@src/support/php";
+import { getPintConfig } from "@src/repositories/pint";
+import { fixFilePath, getCommand } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -37,7 +38,7 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        const command = `${getCommand(pintPath)} ${args}`.trim();
 
         cp.exec(
             command,
@@ -71,6 +72,20 @@ export const runPint = () => {
     runPintCommand();
 };
 
+const isFileExcluded = (filePath: string): boolean => {
+    const pintConfig = getPintConfig().items;
+    const fileName = filePath.split("/").pop() ?? "";
+
+    return (
+        pintConfig.exclude?.some((path) => filePath.includes(path)) ||
+        pintConfig.notName?.some((pattern) =>
+            new RegExp(pattern.replace("*", ".*")).test(fileName),
+        ) ||
+        pintConfig.notPath?.some((path) => filePath.endsWith(path)) ||
+        false
+    );
+};
+
 export const runPintOnCurrentFile = () => {
     const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 
@@ -80,7 +95,7 @@ export const runPintOnCurrentFile = () => {
     }
 
     statusBarWorking("Running Pint on current file...");
-    runPintCommand(fixFilePath(filePath));
+    runPintCommand(`"${fixFilePath(filePath)}"`);
 };
 
 export const runPintOnDirtyFiles = () => {
@@ -109,6 +124,10 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
             getWorkspaceFolders()[0]?.uri?.fsPath || "",
         )
     ) {
+        return;
+    }
+
+    if (isFileExcluded(document.uri.fsPath)) {
         return;
     }
 
