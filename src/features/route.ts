@@ -6,7 +6,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
-import { projectPath, relativePath } from "@src/support/project";
+import { pathForPhpEnv, projectPath, relativePath } from "@src/support/project";
 import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -96,7 +96,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             return new vscode.DocumentLink(
                 detectedRange(param),
-                vscode.Uri.file(route.filename).with({
+                vscode.Uri.file(projectPath(route.filename)).with({
                     fragment: `L${route.line ?? 0}`,
                 }),
             );

@@ -43,7 +43,7 @@ $routes = new class {
             'name' => $route['name'],
             'action' => null,
             'parameters' => [],
-            'filename' => $path,
+            'filename' => LaravelVsCode::relativePath($path),
             'line' => 0,
         ];
     }
@@ -64,7 +64,7 @@ $routes = new class {
             'name' => $route->getName(),
             'action' => $route->getActionName(),
             'parameters' => $route->parameterNames(),
-            'filename' => $reflection ? $reflection->getFileName() : null,
+            'filename' => $reflection ? LaravelVsCode::relativePath($reflection->getFileName()) : null,
             'line' => $reflection ? $reflection->getStartLine() : null,
         ];
     }
