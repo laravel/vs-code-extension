@@ -328,16 +328,20 @@ $translator = new class
 
     protected function fromPhpFile($file, $path, $namespace)
     {
-        $key = pathinfo($file, PATHINFO_FILENAME);
+        $lang = str($file)
+            ->after($path.DIRECTORY_SEPARATOR)
+            ->before(DIRECTORY_SEPARATOR)
+            ->value();
+
+        $key = str($file)
+            ->after($path.DIRECTORY_SEPARATOR)
+            ->after(DIRECTORY_SEPARATOR)
+            ->replaceLast('.php', '')
+            ->value();
 
         if ($namespace) {
             $key = "{$namespace}::{$key}";
         }
-
-        $lang = collect(explode(DIRECTORY_SEPARATOR, str_replace($path, "", $file)))
-            ->filter()
-            ->slice(-2, 1)
-            ->first();
 
         $relativePath = $this->getPathIndex($file);
         $lines = $this->linesFromPhpFile($file);

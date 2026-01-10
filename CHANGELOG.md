@@ -2,6 +2,40 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.1 - 2026-01-09
+
+### What's Changed
+
+* Fix: Ensure environment is detected before generating hashed files by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/531
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.0...v1.4.1
+
+## v1.4.0 - 2026-01-08
+
+### What's Changed
+
+* Fix Invalid model helper generated for casts with parameters by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/525
+* Fix for PHP Command for Pint on Windows by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/469
+* Integration artisan make commands with VSCode explorer/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/466
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.3.1...v1.4.0
+
+## v1.3.1 - 2026-01-02
+
+### What's Changed
+
+* Support for autocompletion rules in FormRequest by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/336
+* Fix `after` validation rule completion template by [@ace-of-aces](https://github.com/ace-of-aces) in https://github.com/laravel/vs-code-extension/pull/523
+* Fix heredoc/nowdoc in blade files by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/297
+* Add heredoc/nowdoc for Blade syntax by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/316
+* Support for translations in files in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/314
+
+### New Contributors
+
+* [@ace-of-aces](https://github.com/ace-of-aces) made their first contribution in https://github.com/laravel/vs-code-extension/pull/523
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.3.0...v1.3.1
+
 ## v1.3.0 - 2025-12-26
 
 ### What's Changed

@@ -46,6 +46,7 @@ export namespace AutocompleteParsingResult {
         type: "array";
         parent: ContextValue | null;
         children: ArrayItem[];
+        autocompletingKey: boolean;
     }
 
     export interface Assignment {

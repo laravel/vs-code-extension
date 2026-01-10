@@ -45,6 +45,7 @@ import {
 } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
+import { registerArtisanMakeCommands } from "./artisan/registry";
 
 let client: LanguageClient;
 
@@ -269,6 +270,7 @@ export async function activate(context: vscode.ExtensionContext) {
             htmlClassToBladeDirectiveCommands.all,
             refactorAllHtmlClassesToBladeDirectives,
         ),
+        ...registerArtisanMakeCommands(),
     );
 
     collectDebugInfo();

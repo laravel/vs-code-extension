@@ -94,6 +94,26 @@ export class Registry implements vscode.CompletionItemProvider {
             return names.find((fn) => fn === parseResult.name()) !== undefined;
         };
 
+        const extendsClass = (
+            classExtends: FeatureTagParam["classExtends"],
+        ) => {
+            if (typeof classExtends === "undefined") {
+                return true;
+            }
+
+            return parseResult.extendsClass(classExtends);
+        };
+
+        const isInsideMethodDefinition = (
+            methodDefinition: FeatureTagParam["methodDefinition"],
+        ) => {
+            if (typeof methodDefinition === "undefined") {
+                return true;
+            }
+
+            return parseResult.isInsideMethodDefinition(methodDefinition);
+        };
+
         const isArgumentIndex = (
             argumentIndex: number | number[] | undefined,
         ) => {
@@ -131,7 +151,9 @@ export class Registry implements vscode.CompletionItemProvider {
                         hasFunc(tag.method) &&
                         hasName(tag.name) &&
                         isArgumentIndex(tag.argumentIndex) &&
-                        isNamedArg(tag.argumentName),
+                        isNamedArg(tag.argumentName) &&
+                        extendsClass(tag.classExtends) &&
+                        isInsideMethodDefinition(tag.methodDefinition),
                 );
             }) || null
         );

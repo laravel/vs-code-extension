@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.3.0",
+    "version": "1.4.1",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -46,6 +46,10 @@
             {
                 "id": "laravel.wrapWithHelper.submenu",
                 "label": "Wrap selection with helpers"
+            },
+            {
+                "id": "laravel.artisanMake.submenu",
+                "label": "New Laravel File..."
             }
         ],
         "menus": {
@@ -94,6 +98,130 @@
                     "command": "laravel.namespace.generate",
                     "when": "resourceLangId == php",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.cast",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.channel",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.class",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.command",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.component",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.controller",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.enum",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.event",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.exception",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.factory",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.interface",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.job",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.job-middleware",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.listener",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.livewire",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.mail",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.middleware",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.migration",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.model",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.notification",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.observer",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.policy",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.provider",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.request",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.resource",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.rule",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.scope",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.seeder",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.test",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.trait",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.make.view",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -116,6 +244,170 @@
                     "command": "laravel.refactorAllHtmlClassesToBladeDirectives",
                     "when": "resourceLangId == blade",
                     "group": "laravel"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "submenu": "laravel.artisanMake.submenu",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src|database|resource(s?)|test(s?))(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                }
+            ],
+            "laravel.artisanMake.submenu": [
+                {
+                    "command": "laravel.artisan.make.cast",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Cast(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.channel",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Broadcasting(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.class",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.command",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Console(\\/|\\\\)Command(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.component",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.controller",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Controller(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.enum",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(Enum|ValueObject)(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.event",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Event(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.exception",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Exception(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.factory",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Factor(y|ies)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.interface",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.job",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.job-middleware",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.listener",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Listener(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.livewire",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Livewire(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.mail",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Mail(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.middleware",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.migration",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Migration(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.model",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Model(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.notification",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Notification(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.observer",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Observer(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.policy",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Polic(y|ies)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.provider",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Provider(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.request",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Request(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.resource",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Resource(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.rule",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Rule(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.scope",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Scope(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.seeder",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Seed(er?)(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.test",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Test(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.trait",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "laravel.artisan.make.view",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\|$)/i",
+                    "group": "navigation"
                 }
             ],
             "laravel.wrapWithHelper.submenu": [
@@ -217,6 +509,161 @@
             {
                 "command": "laravel.namespace.generate",
                 "title": "Generate namespace",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.cast",
+                "title": "Make Cast",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.channel",
+                "title": "Make Channel",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.class",
+                "title": "Make Class",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.command",
+                "title": "Make Console Command",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.component",
+                "title": "Make View Component",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.controller",
+                "title": "Make Controller",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.enum",
+                "title": "Make Enum",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.event",
+                "title": "Make Event",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.exception",
+                "title": "Make Exception",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.factory",
+                "title": "Make Factory",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.interface",
+                "title": "Make Interface",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.job",
+                "title": "Make Job",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.job-middleware",
+                "title": "Make Job Middleware",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.listener",
+                "title": "Make Event Listener",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.livewire",
+                "title": "Make Livewire Component",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.mail",
+                "title": "Make Mail",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.middleware",
+                "title": "Make Middleware",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.migration",
+                "title": "Make Migration",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.model",
+                "title": "Make Model",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.notification",
+                "title": "Make Notification",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.observer",
+                "title": "Make Observer",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.policy",
+                "title": "Make Policy",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.provider",
+                "title": "Make Service Provider",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.request",
+                "title": "Make Form Request",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.resource",
+                "title": "Make Resource",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.rule",
+                "title": "Make Validation Rule",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.scope",
+                "title": "Make Scope",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.seeder",
+                "title": "Make Database Seeder",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.test",
+                "title": "Make Test",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.trait",
+                "title": "Make Trait",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.make.view",
+                "title": "Make View",
                 "category": "Laravel"
             }
         ],
