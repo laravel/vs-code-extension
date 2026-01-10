@@ -2,6 +2,78 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.1 - 2026-01-09
+
+### What's Changed
+
+* Fix: Ensure environment is detected before generating hashed files by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/531
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.0...v1.4.1
+
+## v1.4.0 - 2026-01-08
+
+### What's Changed
+
+* Fix Invalid model helper generated for casts with parameters by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/525
+* Fix for PHP Command for Pint on Windows by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/469
+* Integration artisan make commands with VSCode explorer/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/466
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.3.1...v1.4.0
+
+## v1.3.1 - 2026-01-02
+
+### What's Changed
+
+* Support for autocompletion rules in FormRequest by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/336
+* Fix `after` validation rule completion template by [@ace-of-aces](https://github.com/ace-of-aces) in https://github.com/laravel/vs-code-extension/pull/523
+* Fix heredoc/nowdoc in blade files by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/297
+* Add heredoc/nowdoc for Blade syntax by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/316
+* Support for translations in files in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/314
+
+### New Contributors
+
+* [@ace-of-aces](https://github.com/ace-of-aces) made their first contribution in https://github.com/laravel/vs-code-extension/pull/523
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.3.0...v1.3.1
+
+## v1.3.0 - 2025-12-26
+
+### What's Changed
+
+* Fix models.php template indentation by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/515
+* Use relative paths for route links by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/514
+* Support for the Pint exclude config by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/518
+* Add scope parameters to the repository and docblock generator by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/487
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.3...v1.3.0
+
+## v1.2.3 - 2025-12-19
+
+### What's Changed
+
+* Fix "app/Modelsdirectory does not exist" error by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/511
+
+### New Contributors
+
+* [@TitasGailius](https://github.com/TitasGailius) made their first contribution in https://github.com/laravel/vs-code-extension/pull/511
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.2...v1.2.3
+
+## v1.2.2 - 2025-12-18
+
+### What's Changed
+
+* Add a command that generates namespace by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/463
+* Build script cleanup by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/464
+* Fix typo in php-templates/translations.php file by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/505
+* Fix Pint Error: The path is not readable by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/502
+* Fix Middleware not found, defined in 3rd party composer package by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/496
+* Fix for docblock generator for decimals in model casts by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/495
+* Fix - Replace single quotes with double quotes for echo PHP_BINARY; in phpEnvironments by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/478
+* Support for models in subfolders by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/335
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.2.1...v1.2.2
+
 ## v1.2.1 - 2025-09-16
 
 ### What's Changed

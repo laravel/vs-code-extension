@@ -9,6 +9,7 @@ function vsCodeGetReflectionMethod(ReflectionClass $reflected): ReflectionMethod
 
 echo collect(app("Illuminate\\Contracts\\Http\\Kernel")->getMiddlewareGroups())
   ->merge(app("Illuminate\\Contracts\\Http\\Kernel")->getRouteMiddleware())
+  ->merge(app("router")->getMiddleware())
   ->map(function ($middleware, $key) {
     $result = [
       "class" => null,
