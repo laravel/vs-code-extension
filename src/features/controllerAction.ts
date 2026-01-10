@@ -59,9 +59,18 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const route = getRoutes().items.find(
+            // First try exact match
+            let route = getRoutes().items.find(
                 (route) => route.action === param.value,
             );
+
+            // If no exact match and param doesn't contain @, try matching method name only
+            // This handles Route::controller()->group() pattern where only method name is specified
+            if (!route && !param.value.includes("@")) {
+                route = getRoutes().items.find(
+                    (route) => route.action.endsWith(`@${param.value}`),
+                );
+            }
 
             if (!route || !route.filename || !route.line) {
                 return null;
@@ -92,7 +101,18 @@ export const diagnosticProvider = (
             const action = param.value;
 
             if (!action.includes("@")) {
-                // Intelliphense can take it from here
+                // For method-only strings (used in Route::controller()->group() pattern),
+                // check if any route ends with @methodName
+                const methodOnlyRoute = getRoutes().items.find(
+                    (r) => r.action.endsWith(`@${action}`),
+                );
+
+                if (methodOnlyRoute) {
+                    // Route exists, no diagnostic needed
+                    return null;
+                }
+
+                // Intelliphense can take it from here for undefined methods
                 return null;
             }
 
