@@ -1,9 +1,16 @@
 import fs from "fs";
+import * as vscode from "vscode";
 import { repository } from ".";
-import { ideHelperPath, projectPathExists } from "../support/project";
-import { runInLaravel, template } from "./../support/php";
+import {
+    ideHelperPath,
+    projectPathExists,
+    projectPath,
+} from "../support/project";
 import { config } from "../support/config";
 import { indent } from "../support/util";
+import { detect } from "../support/parser";
+import { AutocompleteParsingResult } from "../types";
+import { error } from "../support/logger";
 
 interface TestCaseExtension {
     testCase: string;
@@ -123,6 +130,98 @@ const generateTestCaseClass = (extension: TestCaseExtension): string => {
         .join("\n");
 };
 
+const extractArgumentValue = (
+    arg: AutocompleteParsingResult.Argument,
+    type: "class" | "string",
+): string | null => {
+    if (arg.children.length === 0) {
+        return null;
+    }
+
+    const value = arg.children[0];
+
+    if (type === "class") {
+        return value.type === "methodCall" && value.className
+            ? value.className
+            : value.type === "string"
+              ? value.value
+              : null;
+    }
+
+    return value.type === "string" ? value.value : null;
+};
+
+const parsePestConfig = (
+    detected: AutocompleteParsingResult.ContextValue[],
+): PestConfig => {
+    const expectations: string[] = [];
+    const traits: string[] = [];
+    let testCase: string | null = null;
+    let directory: string | null = null;
+
+    for (const item of detected) {
+        if (item.type !== "methodCall") {
+            continue;
+        }
+
+        const methodCall = item;
+        const args = methodCall.arguments?.children || [];
+        const { className, methodName } = methodCall;
+
+        if (
+            className === "expect" &&
+            methodName === "extend" &&
+            args.length > 0
+        ) {
+            const expectationName = extractArgumentValue(
+                args[0] as AutocompleteParsingResult.Argument,
+                "string",
+            );
+            if (expectationName) {
+                expectations.push(expectationName);
+            }
+        }
+
+        if (className === "pest") {
+            switch (methodName) {
+                case "extend":
+                    if (args.length > 0) {
+                        testCase = extractArgumentValue(
+                            args[0] as AutocompleteParsingResult.Argument,
+                            "class",
+                        );
+                    }
+                    break;
+                case "use":
+                    for (const arg of args) {
+                        const traitName = extractArgumentValue(
+                            arg as AutocompleteParsingResult.Argument,
+                            "class",
+                        );
+                        if (traitName) {
+                            traits.push(traitName);
+                        }
+                    }
+                    break;
+                case "in":
+                    if (args.length > 0) {
+                        directory = extractArgumentValue(
+                            args[0] as AutocompleteParsingResult.Argument,
+                            "string",
+                        );
+                    }
+                    break;
+            }
+        }
+    }
+
+    return {
+        hasPest: true,
+        expectations,
+        testCaseExtensions: testCase ? [{ testCase, traits, directory }] : [],
+    };
+};
+
 const generatePestHelpers = (config: PestConfig) => {
     if (!config.hasPest) {
         return;
@@ -161,26 +260,37 @@ const generatePestHelpers = (config: PestConfig) => {
     fs.writeFileSync(ideHelperPath("_pest.php"), finalContent);
 };
 
-const load = (): Promise<PestConfig> => {
-    if (config<boolean>("pest.generateHelpers", true) === false) {
-        return Promise.resolve(INACTIVE_PEST_CONFIG);
+const load = async (): Promise<PestConfig> => {
+    if (!config<boolean>("pest.generateHelpers", true)) {
+        return INACTIVE_PEST_CONFIG;
     }
 
     if (!projectPathExists("vendor/pestphp/pest")) {
-        return Promise.resolve(INACTIVE_PEST_CONFIG);
+        return INACTIVE_PEST_CONFIG;
     }
 
-    return runInLaravel<PestConfig>(template("pest"), "Pest Config").then(
-        (result) => {
-            if (!result) {
-                return INACTIVE_PEST_CONFIG;
-            }
+    const pestFilePath = projectPath("tests/Pest.php");
+    if (!fs.existsSync(pestFilePath)) {
+        return INACTIVE_PEST_CONFIG;
+    }
 
-            generatePestHelpers(result);
+    try {
+        const doc = await vscode.workspace.openTextDocument(
+            vscode.Uri.file(pestFilePath),
+        );
+        const detected = await detect(doc);
 
-            return result;
-        },
-    );
+        if (!detected?.length) {
+            return { ...INACTIVE_PEST_CONFIG, hasPest: true };
+        }
+
+        const pestConfig = parsePestConfig(detected);
+        generatePestHelpers(pestConfig);
+        return pestConfig;
+    } catch (err) {
+        error(`Failed to parse Pest.php: ${err}`);
+        return { ...INACTIVE_PEST_CONFIG, hasPest: true };
+    }
 };
 
 export const getPestConfig = repository<PestConfig>({
