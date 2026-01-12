@@ -12,7 +12,7 @@ import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
 import {
     getWorkspaceFolders,
-    projectPath,
+    pathForPhpEnv,
     projectPathExists,
 } from "../support/project";
 
@@ -28,7 +28,7 @@ const runPintCommand = (
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         // Check if pint exists in vendor/bin
-        const pintPath = projectPath("vendor/bin/pint");
+        const pintPath = pathForPhpEnv("vendor/bin/pint");
 
         if (!projectPathExists("vendor/bin/pint")) {
             const errorMessage =

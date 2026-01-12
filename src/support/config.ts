@@ -6,6 +6,7 @@ type ConfigKey =
     | "basePath"
     | "phpEnvironment"
     | "phpCommand"
+    | "dockerPhpCommand"
     | "tests.docker.enabled"
     | "tests.ssh.enabled"
     | "tests.suiteSuffix"
@@ -24,3 +25,9 @@ export const configAffected = (
     event: vscode.ConfigurationChangeEvent,
     ...keys: ConfigKey[]
 ): boolean => keys.some((key) => event.affectsConfiguration(configKey(key)));
+
+export const updateConfig = (key: ConfigKey, value: any) => {
+    return vscode.workspace
+        .getConfiguration("Laravel")
+        .update(key, value, true);
+};
