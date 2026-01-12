@@ -28,8 +28,6 @@ const runPintCommand = (
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         // Check if pint exists in vendor/bin
-        const pintPath = projectPath("vendor/bin/pint");
-
         if (!projectPathExists("vendor/bin/pint")) {
             const errorMessage =
                 "Pint not found. Make sure Laravel Pint is installed in your project.";
@@ -38,7 +36,7 @@ const runPintCommand = (
             return;
         }
 
-        const command = `${getCommand(pintPath)} ${args}`.trim();
+        const command = `${getCommand("vendor/bin/pint")} ${args}`.trim();
 
         cp.exec(
             command,
