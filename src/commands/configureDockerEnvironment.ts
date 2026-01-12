@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { execSync } from "child_process";
-import { updateConfig } from "@src/support/config";
+import { config, updateConfig } from "@src/support/config";
 
 interface DockerContainer {
     ID: string;
@@ -65,13 +65,44 @@ export const configureDockerEnvironment = async () => {
         return;
     }
 
-    const dockerPhpCommand = workingDirectory
+    const scope = await vscode.window.showQuickPick(
+        [
+            {
+                label: "Workspace",
+                target: vscode.ConfigurationTarget.Workspace,
+            },
+            {
+                label: "Global",
+                target: vscode.ConfigurationTarget.Global,
+            },
+        ],
+        {
+            placeHolder: "Apply configuration to workspace or globally?",
+            title: "Configuration Scope",
+        },
+    );
+
+    if (!scope) {
+        return;
+    }
+
+    if (config<string | null>("phpCommand", null)) {
+        const override = await vscode.window.showQuickPick(["Yes", "No"], {
+            placeHolder: "A Laravel PHP command is already configured. Do you want to override it?",
+            title: "Override PHP Command",
+        });
+
+        if (override !== "Yes") {
+            return;
+        }
+    }
+
+    const phpCommand = workingDirectory
         ? `docker exec -w ${workingDirectory} ${selectedContainer.container.Names} php`
         : `docker exec ${selectedContainer.container.Names} php`;
 
-    await updateConfig("phpEnvironment", "docker");
-    await updateConfig("dockerPhpCommand", dockerPhpCommand);
-    console.log(dockerPhpCommand);
+    await updateConfig("phpEnvironment", "docker", scope.target);
+    await updateConfig("phpCommand", phpCommand, scope.target);
 
     vscode.commands.executeCommand("workbench.action.reloadWindow");
 

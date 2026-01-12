@@ -710,11 +710,6 @@
                     "default": "auto",
                     "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."
                 },
-                "Laravel.dockerPhpCommand": {
-                    "type": "string",
-                    "default": "",
-                    "markdownDescription": "Template for running PHP code in Docker. Use {code} as an optional placeholder for the php file to run. e.g. `docker exec my-container php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
-                },
                 "Laravel.phpCommand": {
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."

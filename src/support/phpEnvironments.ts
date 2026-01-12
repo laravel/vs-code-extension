@@ -64,8 +64,8 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
     docker: {
         label: "Docker",
         check: "docker ps",
-        test: () => config<string>("dockerPhpCommand", "") !== "",
-        command: config<string>("dockerPhpCommand", ""),
+        test: () => config<string>("phpEnvironment", "") === "docker",
+        command: config<string>("phpCommand", ""),
         relativePath: true,
     },
 };
