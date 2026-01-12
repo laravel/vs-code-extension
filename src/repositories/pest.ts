@@ -24,26 +24,33 @@ interface PestConfig {
     testCaseExtensions: TestCaseExtension[];
 }
 
-const PEST_FUNCTIONS_CONTENT = `
+const generatePestFunctionsContent = (testCaseClass: string): string => {
+    const parts = testCaseClass.split("\\");
+    const className = parts.pop() || "TestCase";
+    const useStatement = testCaseClass.startsWith("\\")
+        ? `use ${testCaseClass.slice(1)};`
+        : `use ${testCaseClass};`;
+
+    return `
+${useStatement}
 use Pest\\Concerns\\Expectable;
 use Pest\\PendingCalls\\BeforeEachCall;
 use Pest\\PendingCalls\\TestCall;
 use Pest\\Support\\HigherOrderTapProxy;
-use Tests\\TestCase;
 
 /**
  * Runs the given closure before all tests in the current file.
  *
- * @param-closure-this TestCase  $closure
+ * @param-closure-this ${className}  $closure
  */
 function beforeAll(Closure $closure): void {}
 
 /**
  * Runs the given closure before each test in the current file.
  *
- * @param-closure-this TestCase  $closure
+ * @param-closure-this ${className}  $closure
  *
- * @return HigherOrderTapProxy<Expectable|TestCall|TestCase>|Expectable|TestCall|TestCase|mixed
+ * @return HigherOrderTapProxy<Expectable|TestCall|${className}>|Expectable|TestCall|${className}|mixed
  *
  * @disregard P1075 Not all paths return a value.
  */
@@ -54,9 +61,9 @@ function beforeEach(?Closure $closure = null): BeforeEachCall {}
  * is the test description; the second argument is
  * a closure that contains the test expectations.
  *
- * @param-closure-this TestCase  $closure
+ * @param-closure-this ${className}  $closure
  *
- * @return Expectable|TestCall|TestCase|mixed
+ * @return Expectable|TestCall|${className}|mixed
  *
  * @disregard P1075 Not all paths return a value.
  */
@@ -67,14 +74,15 @@ function test(?string $description = null, ?Closure $closure = null): HigherOrde
  * is the test description; the second argument is
  * a closure that contains the test expectations.
  *
- * @param-closure-this TestCase  $closure
+ * @param-closure-this ${className}  $closure
  *
- * @return Expectable|TestCall|TestCase|mixed
+ * @return Expectable|TestCall|${className}|mixed
  *
  * @disregard P1075 Not all paths return a value.
  */
 function it(string $description, ?Closure $closure = null): TestCall {}
 `;
+};
 
 const INACTIVE_PEST_CONFIG: PestConfig = {
     hasPest: false,
@@ -155,9 +163,8 @@ const parsePestConfig = (
     detected: AutocompleteParsingResult.ContextValue[],
 ): PestConfig => {
     const expectations: string[] = [];
-    const traits: string[] = [];
-    let testCase: string | null = null;
-    let directory: string | null = null;
+    const testCaseExtensions: TestCaseExtension[] = [];
+    let currentExtension: TestCaseExtension | null = null;
 
     for (const item of detected) {
         if (item.type !== "methodCall") {
@@ -185,27 +192,39 @@ const parsePestConfig = (
         if (className === "pest") {
             switch (methodName) {
                 case "extend":
+                    if (currentExtension) {
+                        testCaseExtensions.push(currentExtension);
+                    }
                     if (args.length > 0) {
-                        testCase = extractArgumentValue(
+                        const testCase = extractArgumentValue(
                             args[0] as AutocompleteParsingResult.Argument,
                             "class",
                         );
+                        if (testCase) {
+                            currentExtension = {
+                                testCase,
+                                traits: [],
+                                directory: null,
+                            };
+                        }
                     }
                     break;
                 case "use":
-                    for (const arg of args) {
-                        const traitName = extractArgumentValue(
-                            arg as AutocompleteParsingResult.Argument,
-                            "class",
-                        );
-                        if (traitName) {
-                            traits.push(traitName);
+                    if (currentExtension) {
+                        for (const arg of args) {
+                            const traitName = extractArgumentValue(
+                                arg as AutocompleteParsingResult.Argument,
+                                "class",
+                            );
+                            if (traitName) {
+                                currentExtension.traits.push(traitName);
+                            }
                         }
                     }
                     break;
                 case "in":
-                    if (args.length > 0) {
-                        directory = extractArgumentValue(
+                    if (currentExtension && args.length > 0) {
+                        currentExtension.directory = extractArgumentValue(
                             args[0] as AutocompleteParsingResult.Argument,
                             "string",
                         );
@@ -215,10 +234,14 @@ const parsePestConfig = (
         }
     }
 
+    if (currentExtension) {
+        testCaseExtensions.push(currentExtension);
+    }
+
     return {
         hasPest: true,
         expectations,
-        testCaseExtensions: testCase ? [{ testCase, traits, directory }] : [],
+        testCaseExtensions,
     };
 };
 
@@ -260,7 +283,12 @@ const generatePestHelpers = (config: PestConfig) => {
 * Do not modify this file directly as your changes will be overwritten.
 */\n\n`;
 
-    const finalContent = `<?php\n\n${autoGeneratedNotice}namespace {\n${PEST_FUNCTIONS_CONTENT}\n}\n\n${content}\n`;
+    // We can only safely determine $this for the Pest function helpers when there's exactly one test case extension
+    const pestFunctionsContent = config.testCaseExtensions.length === 1
+        ? `namespace {\n${generatePestFunctionsContent(config.testCaseExtensions[0].testCase)}\n}`
+        : "";
+
+    const finalContent = `<?php\n\n${autoGeneratedNotice}${pestFunctionsContent}\n\n${content}\n`;
 
     fs.writeFileSync(ideHelperPath("_pest.php"), finalContent);
 };
