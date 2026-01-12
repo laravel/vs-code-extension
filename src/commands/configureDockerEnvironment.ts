@@ -88,7 +88,8 @@ export const configureDockerEnvironment = async () => {
 
     if (config<string | null>("phpCommand", null)) {
         const override = await vscode.window.showQuickPick(["Yes", "No"], {
-            placeHolder: "A Laravel PHP command is already configured. Do you want to override it?",
+            placeHolder:
+                "A Laravel PHP command is already configured. Do you want to override it?",
             title: "Override PHP Command",
         });
 
