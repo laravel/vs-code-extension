@@ -101,157 +101,126 @@
                 },
                 {
                     "command": "laravel.artisan.make.cast",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.channel",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.class",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.command",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.component",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.controller",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.enum",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.event",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.exception",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.factory",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.interface",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.job",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.job-middleware",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.listener",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.livewire",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.mail",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.middleware",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.migration",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.model",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.notification",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.observer",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.policy",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.provider",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.request",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.resource",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.rule",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.scope",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.seeder",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.test",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.trait",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 },
                 {
                     "command": "laravel.artisan.make.view",
-                    "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
                 }
             ],
@@ -280,109 +249,109 @@
             "explorer/context": [
                 {
                     "submenu": "laravel.artisanMake.submenu",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src|database|resource(s?)|test(s?))(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src|database|resource(s?)|test(s?))(\\/|\\\\|$)/i",
                     "group": "navigation"
                 }
             ],
             "laravel.artisanMake.submenu": [
                 {
                     "command": "laravel.artisan.make.cast",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Cast(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Cast(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.channel",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Broadcasting(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Broadcasting(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.class",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.command",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Console(\\/|\\\\)Command(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Console(\\/|\\\\)Command(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.component",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.controller",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Controller(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Controller(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.enum",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(Enum|ValueObject)(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(Enum|ValueObject)(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.event",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Event(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Event(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.exception",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Exception(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Exception(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.factory",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Factor(y|ies)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Factor(y|ies)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.interface",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.job",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.job-middleware",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Job(s?)(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.listener",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Listener(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Listener(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.livewire",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Livewire(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Livewire(\\/|\\\\)Component(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.mail",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Mail(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Mail(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.middleware",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Middleware(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.migration",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Migration(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Migration(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.model",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Model(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Model(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.notification",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Notification(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Notification(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
@@ -392,52 +361,52 @@
                 },
                 {
                     "command": "laravel.artisan.make.policy",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Polic(y|ies)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Polic(y|ies)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.provider",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Provider(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Provider(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.request",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Request(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Request(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.resource",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Resource(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Http(\\/|\\\\)Resource(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.rule",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Rule(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Rule(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.scope",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Scope(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Scope(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.seeder",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Seed(er?)(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Database(\\/|\\\\)Seed(er?)(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.test",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Test(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)Test(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.trait",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)(app|src)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 },
                 {
                     "command": "laravel.artisan.make.view",
-                    "when": "config.Laravel.artisanMake.explorer && explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\|$)/i",
+                    "when": "explorerResourceIsFolder && resourcePath =~ /(\\/|\\\\)View(s?)(\\/|\\\\|$)/i",
                     "group": "navigation"
                 }
             ],
@@ -766,16 +735,6 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Automatically run Pint on the current file when saved."
-                },
-                "Laravel.artisanMake.explorer": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable Laravel Artisan Make commands in the VSCode explorer."
-                },
-                "Laravel.artisanMake.commandPalette": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable Laravel Artisan Make commands in the VSCode command palette."
                 },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
