@@ -1,8 +1,7 @@
 import fs from "fs";
-import * as vscode from "vscode";
 import { Eloquent } from "..";
 import { config } from "./config";
-import { internalVendorPath, projectPath } from "./project";
+import { internalVendorPath } from "./project";
 import { indent } from "./util";
 
 interface ClassBlock {
