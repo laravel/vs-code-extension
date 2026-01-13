@@ -1,6 +1,7 @@
 import { getTemplate, TemplateName } from "@src/templates";
 import * as cp from "child_process";
 import * as fs from "fs";
+import * as os from "os";
 import * as vscode from "vscode";
 import { BoundedFileCache } from "./cache";
 import { config } from "./config";
@@ -298,7 +299,7 @@ export const runPhp = (
 
         const child = cp.spawn(command, {
             cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
-            shell: true,
+            shell: os.platform() === "win32" ? undefined : "/bin/bash",
         });
 
         child.stdout.on("data", (data) => {
@@ -330,6 +331,7 @@ export const artisan = (
             fullCommand,
             {
                 cwd: workspaceFolder,
+                shell: os.platform() === "win32" ? undefined : "/bin/bash",
             },
             (err, stdout, stderr) => {
                 if (err === null) {

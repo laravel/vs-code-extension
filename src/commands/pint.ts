@@ -6,6 +6,7 @@ import {
     statusBarWorking,
 } from "@src/support/statusBar";
 import * as cp from "child_process";
+import * as os from "os";
 import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
@@ -42,6 +43,7 @@ const runPintCommand = (
             command,
             {
                 cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+                shell: os.platform() === "win32" ? undefined : "/bin/bash",
             },
             (err, stdout, stderr) => {
                 if (err === null) {
