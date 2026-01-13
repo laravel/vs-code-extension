@@ -45,4 +45,5 @@ export type RegisteredCommand =
     | "laravel.artisan.make.test"
     | "laravel.artisan.make.trait"
     | "laravel.artisan.make.view"
+    | "laravel.docker.configure"
     | "laravel.open";

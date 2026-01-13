@@ -10,11 +10,7 @@ import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
-import {
-    getWorkspaceFolders,
-    projectPath,
-    projectPathExists,
-} from "../support/project";
+import { getWorkspaceFolders, projectPathExists } from "../support/project";
 
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
