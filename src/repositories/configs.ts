@@ -2,28 +2,25 @@ import { repository } from ".";
 import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
 
+export const ARRAY_VALUE = "array(...)";
+
 interface ConfigGroupResult {
     configs: Config[];
     paths: string[];
 }
 
-export const getConfigPathByName = (match: string): string | undefined => {
-    const filePath = match.replace(/\.[^.]+$/, "");
+export const getConfigByName = (name: string): Config | undefined => {
+    return getConfigs().items.configs.find((item) => item.name === name);
+};
 
-    for (const tryPath of [
-        filePath.replaceAll(".", "/"),
-        filePath.replace(/^([^.]+)\..*$/, "$1"),
-    ]) {
-        const configPath = getConfigs().items.paths.find((path) => {
-            return (
-                !path.startsWith("vendor/") && path.endsWith(`${tryPath}.php`)
-            );
-        });
+export const getNestedConfigByName = (name: string): Config | undefined => {
+    const nestedName = name.match(/^(.+)\./)?.[1];
 
-        if (configPath) {
-            return configPath;
-        }
+    if (!nestedName) {
+        return undefined;
     }
+
+    return getConfigByName(nestedName) ?? getNestedConfigByName(nestedName);
 };
 
 export const getConfigs = repository<ConfigGroupResult>({
