@@ -162,6 +162,7 @@ $models = new class($factory) {
             ->filter(fn(\ReflectionMethod $method) => !$method->isStatic() && ($method->getAttributes(\Illuminate\Database\Eloquent\Attributes\Scope::class) || ($method->isPublic() && str_starts_with($method->name, 'scope'))))
             ->map(fn(\ReflectionMethod $method) => [
                 "name" => str($method->name)->replace('scope', '')->lcfirst()->toString(),
+                "method" => $method->name,
                 "parameters" => collect($method->getParameters())->map($this->getScopeParameterInfo(...)),
             ])
             ->values()
