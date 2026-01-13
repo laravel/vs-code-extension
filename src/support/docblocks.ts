@@ -122,9 +122,7 @@ const getBlocks = (
             }),
         )
         .concat(
-            model.scopes.map((scope) =>
-                getScopeBlock(className, model.class, scope),
-            ),
+            model.scopes.map((scope) => getScopeBlock(model, scope, className)),
         )
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
@@ -180,9 +178,9 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
 };
 
 const getScopeBlock = (
-    className: string,
-    modelClass: string,
+    model: Eloquent.Model,
     scope: Eloquent.Scope,
+    className: string,
 ): string => {
     const parameters = scope.parameters
         .slice(1)
@@ -197,23 +195,9 @@ const getScopeBlock = (
         })
         .join(", ");
 
-    const link =
-        scope.path && scope.start_line
-            ? markdownLink(
-                  `${modelClass}::${scope.name}`,
-                  projectPath(scope.path),
-                  scope.start_line,
-              )
-            : undefined;
-
-    return [
-        `@method static ${modelBuilderType(
-            className,
-        )} ${scope.name}(${parameters})`,
-        link ? `{@see ${link}}` : "",
-    ]
-        .join(" ")
-        .trim();
+    return `@method static ${modelBuilderType(
+        className,
+    )} ${scope.name}(${parameters}) {@see ${model.class}::${scope.method}()}`;
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
@@ -354,14 +338,4 @@ const getActualType = (cast: string | null, type: string): string => {
     }
 
     return finalType;
-};
-
-const markdownLink = (name: string, path: string, line: number) => {
-    const scheme = vscode.env.remoteName ? "vscode-remote" : "file";
-
-    if (!path.startsWith("/")) {
-        path = `/${path}`;
-    }
-
-    return `[${name}](${scheme}://${path}#L${line})`;
 };
