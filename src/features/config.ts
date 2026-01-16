@@ -6,7 +6,7 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { contract, facade } from "@src/support/util";
+import { attribute, contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
@@ -18,6 +18,10 @@ import {
 
 const toFind: FeatureTag = [
     { method: "config", argumentIndex: 0 },
+    {
+        class: attribute("Config"),
+        argumentIndex: 0,
+    },
     {
         class: [contract("Config\\Repository")],
         method: ["get", "prepend", "push"],

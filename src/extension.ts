@@ -46,6 +46,7 @@ import {
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import { registerArtisanMakeCommands } from "./artisan/registry";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 
 let client: LanguageClient;
 
@@ -263,6 +264,10 @@ export async function activate(context: vscode.ExtensionContext) {
             refactorAllHtmlClassesToBladeDirectives,
         ),
         ...registerArtisanMakeCommands(),
+        vscode.commands.registerCommand(
+            commandName("laravel.docker.configure"),
+            configureDockerEnvironment,
+        ),
     );
 
     collectDebugInfo();

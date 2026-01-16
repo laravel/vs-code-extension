@@ -120,7 +120,9 @@ const getBlocks = (
                 )} ${method}()`;
             }),
         )
-        .concat(model.scopes.map((scope) => getScopeBlock(className, scope)))
+        .concat(
+            model.scopes.map((scope) => getScopeBlock(model, scope, className)),
+        )
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
         .map((block) => ` * ${block}`)
@@ -174,7 +176,11 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     return [`@property-read \\${relation.related} $${relation.name}`];
 };
 
-const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
+const getScopeBlock = (
+    model: Eloquent.Model,
+    scope: Eloquent.Scope,
+    className: string,
+): string => {
     const parameters = scope.parameters
         .slice(1)
         .map((param) => {
@@ -190,7 +196,7 @@ const getScopeBlock = (className: string, scope: Eloquent.Scope): string => {
 
     return `@method static ${modelBuilderType(
         className,
-    )} ${scope.name}(${parameters})`;
+    )} ${scope.name}(${parameters}) {@see ${model.class}::${scope.method}()}`;
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
