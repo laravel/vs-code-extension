@@ -10,7 +10,7 @@ import { config } from "../support/config";
 import { indent } from "../support/util";
 import { detect } from "../support/parser";
 import { AutocompleteParsingResult } from "../types";
-import { error } from "../support/logger";
+import { error, info } from "../support/logger";
 import { runInLaravel, template } from "../support/php";
 import { ClassLike } from "..";
 
@@ -238,6 +238,50 @@ const parsePestConfig = async (
                         }
                     }
                     break;
+            }
+        }
+
+        if (className === "uses") {
+            switch (methodName) {
+                case "in":
+                    if (args.length > 0) {
+                        pendingDirectory = extractArgumentValue(
+                            args[0] as AutocompleteParsingResult.Argument,
+                            "string",
+                        );
+                    }
+                    break;
+                case "extend":
+                case "extends":
+                case "use":
+                case "uses":
+                    for (const arg of args) {
+                        const objectName = extractArgumentValue(
+                            arg as AutocompleteParsingResult.Argument,
+                            "class",
+                        );
+                        if (objectName) {
+                            pendingTraits.push(objectName);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if (className === null && methodName === "uses" && args.length > 0) {
+            const objectName = extractArgumentValue(
+                args[0] as AutocompleteParsingResult.Argument,
+                "class",
+            );
+            if (objectName) {
+                testCaseExtensions.push({
+                    testCase: objectName,
+                    traits: pendingTraits,
+                    directory: pendingDirectory,
+                });
+
+                pendingTraits = [];
+                pendingDirectory = null;
             }
         }
     }
