@@ -24,6 +24,7 @@ interface PestConfig {
     hasPest: boolean;
     expectations: string[];
     testCaseExtensions: TestCaseExtension[];
+    defaultTestCaseTraits: string[];
 }
 
 const toFQCN = (className: string): string => {
@@ -91,7 +92,10 @@ const INACTIVE_PEST_CONFIG: PestConfig = {
     hasPest: false,
     expectations: [],
     testCaseExtensions: [],
+    defaultTestCaseTraits: [],
 };
+
+const DEFAULT_TEST_NAMESPACE = "PHPUnit\\Framework";
 
 const generateExpectationClass = (expectations: string[]): string => {
     if (expectations.length === 0) {
@@ -114,22 +118,25 @@ const generateExpectationClass = (expectations: string[]): string => {
         .join("\n");
 };
 
+const generateTraitUseStatements = (traits: string[]): string => {
+    return traits.length > 0
+        ? traits
+              .map((trait) => {
+                  const traitName = trait.startsWith("\\")
+                      ? trait
+                      : `\\${trait}`;
+                  return `use ${traitName};`;
+              })
+              .map((line) => indent(line))
+              .join("\n")
+        : "";
+};
+
 const generateTestCaseClass = (extension: TestCaseExtension): string => {
     const parts = extension.testCase.split("\\");
     const className = parts.pop() || "";
 
-    const traitUses =
-        extension.traits.length > 0
-            ? extension.traits
-                  .map((trait) => {
-                      const traitName = trait.startsWith("\\")
-                          ? trait
-                          : `\\${trait}`;
-                      return `use ${traitName};`;
-                  })
-                  .map((line) => indent(line))
-                  .join("\n")
-            : "";
+    const traitUses = generateTraitUseStatements(extension.traits);
 
     const classContent = traitUses
         ? `class ${className}\n{\n${traitUses}\n}`
@@ -194,6 +201,12 @@ const parsePestConfig = async (
     let pendingTraits: string[] = [];
     let pendingDirectory: string | null = null;
 
+    let defaultTestCaseTraits: string[] = [];
+
+    const setTraitsOnDefaultTestCase = (traits: string[]) => {
+        defaultTestCaseTraits.push(...traits);
+    };
+
     const finalizeTestCaseExtension = (testCase: string) => {
         testCaseExtensions.push({
             testCase,
@@ -241,6 +254,8 @@ const parsePestConfig = async (
         }
 
         if (className === "pest" && isExtensionMethod(methodName)) {
+            let pendingTestCase: string | null = null;
+
             for (const objectName of extractClassNamesFromArgs(args)) {
                 const classLike = `${toFQCN(objectName)}::class`;
                 const extensionObjectType = await runInLaravel<ClassLike>(
@@ -253,8 +268,14 @@ const parsePestConfig = async (
                 if (extensionObjectType.type === "trait") {
                     pendingTraits.push(objectName);
                 } else if (extensionObjectType.type === "class") {
-                    finalizeTestCaseExtension(objectName);
+                    pendingTestCase = objectName;
                 }
+            }
+
+            if (pendingTestCase) {
+                finalizeTestCaseExtension(pendingTestCase);
+            } else if (pendingTraits.length > 0) {
+                setTraitsOnDefaultTestCase(pendingTraits);
             }
             continue;
         }
@@ -279,6 +300,7 @@ const parsePestConfig = async (
         hasPest: true,
         expectations,
         testCaseExtensions,
+        defaultTestCaseTraits,
     };
 };
 
@@ -307,6 +329,16 @@ const generatePestHelpers = (config: PestConfig) => {
         }
 
         namespaces[namespace].push(generateTestCaseClass(extension));
+    }
+
+    if (config.defaultTestCaseTraits.length > 0) {
+        namespaces[DEFAULT_TEST_NAMESPACE] = [
+            generateTestCaseClass({
+                testCase: "TestCase",
+                traits: config.defaultTestCaseTraits,
+                directory: null,
+            }),
+        ];
     }
 
     const content = Object.entries(namespaces)
