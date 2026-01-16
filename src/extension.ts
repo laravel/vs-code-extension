@@ -110,8 +110,14 @@ export async function activate(context: vscode.ExtensionContext) {
         { Eloquent: EloquentCompletion },
         { Validation: ValidationCompletion },
         { Blade: BladeCompletion },
-        { completionProvider: bladeComponentCompletion },
-        { completionProvider: livewireComponentCompletion },
+        {
+            completionComponentProvider: bladeComponentCompletion,
+            completionAttributeProvider: bladeComponentAttributeCompletion,
+        },
+        {
+            completionComponentProvider: livewireComponentCompletion,
+            completionAttributeProvider: livewireComponentAttributeCompletion,
+        },
         { CodeActionProvider },
         { updateDiagnostics },
         { viteEnvCodeActionProvider },
@@ -203,7 +209,17 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
         vscode.languages.registerCompletionItemProvider(
             BLADE_LANGUAGES,
+            bladeComponentAttributeCompletion,
+            ":",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
             livewireComponentCompletion,
+            ":",
+        ),
+        vscode.languages.registerCompletionItemProvider(
+            BLADE_LANGUAGES,
+            livewireComponentAttributeCompletion,
             ":",
         ),
         vscode.languages.registerCompletionItemProvider(

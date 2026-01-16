@@ -828,6 +828,12 @@
                     "generated": true,
                     "description": "Enable completion for Blade components."
                 },
+                "Laravel.bladeComponent.completion_attribute": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Blade components attributes."
+                },
                 "Laravel.bladeComponent.hover": {
                     "type": "boolean",
                     "default": true,
@@ -941,6 +947,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable completion for Livewire components."
+                },
+                "Laravel.livewireComponent.completion_attribute": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Livewire components attributes."
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
