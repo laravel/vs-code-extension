@@ -10,7 +10,8 @@ import { config } from "../support/config";
 import { indent } from "../support/util";
 import { detect } from "../support/parser";
 import { AutocompleteParsingResult } from "../types";
-import { error } from "../support/logger";
+import { error, info } from "../support/logger";
+import { runInLaravel } from "../support/php";
 
 interface TestCaseExtension {
     testCase: string;
@@ -24,13 +25,13 @@ interface PestConfig {
     testCaseExtensions: TestCaseExtension[];
 }
 
+const toFQCN = (className: string): string => {
+    return className.startsWith("\\") ? className : `\\${className}`;
+};
+
 const generatePestFunctionsContent = (testCaseClasses: string[]): string => {
     const normalizedClasses = [
-        ...new Set(
-            testCaseClasses.map((testClass) =>
-                testClass.startsWith("\\") ? testClass : `\\${testClass}`,
-            ),
-        ),
+        ...new Set(testCaseClasses.map(toFQCN)),
     ];
 
     const unionType = normalizedClasses.join("|");
@@ -162,9 +163,20 @@ const extractArgumentValue = (
     return value.type === "string" ? value.value : null;
 };
 
-const parsePestConfig = (
+const isExtendingMethod = (methodName: string|null): boolean => {
+    if (!methodName) {
+        return false;
+    }
+    return ["extend", "extends", "use", "uses"].includes(methodName);
+};
+
+type PestExtensionObject = {
+    type: "trait" | "class" | "none";
+}
+
+const parsePestConfig = async (
     detected: AutocompleteParsingResult.ContextValue[],
-): PestConfig => {
+): Promise<PestConfig> => {
     const expectations: string[] = [];
     const testCaseExtensions: TestCaseExtension[] = [];
 
@@ -182,7 +194,7 @@ const parsePestConfig = (
 
         if (
             className === "expect" &&
-            methodName === "extend" &&
+            isExtendingMethod(methodName) &&
             args.length > 0
         ) {
             const expectationName = extractArgumentValue(
@@ -205,17 +217,41 @@ const parsePestConfig = (
                     }
                     break;
                 case "use":
+                case "uses":
+                case "extend":
+                case "extends":
                     for (const arg of args) {
-                        const traitName = extractArgumentValue(
+                        const objectName = extractArgumentValue(
                             arg as AutocompleteParsingResult.Argument,
                             "class",
                         );
-                        if (traitName) {
-                            pendingTraits.push(traitName);
+                        info(`Detected Pest object usage: ${objectName}`);
+                        const extensionObjectType = await runInLaravel<PestExtensionObject>(
+                            `if (trait_exists(${objectName}::class)) {
+                                echo json_encode(['type' => 'trait']);
+                            } else if (class_exists(${objectName}::class)) {
+                                echo json_encode(['type' => 'class']);
+                            } else {
+                                echo json_encode(['type' => 'none']);
+                            }`,
+                        )
+                        if (objectName) {
+                            if (extensionObjectType.type === "trait") {
+                                pendingTraits.push(objectName);
+                            } else if (extensionObjectType.type === "class") {
+                                testCaseExtensions.push({
+                                    testCase: objectName,
+                                    traits: pendingTraits,
+                                    directory: pendingDirectory,
+                                });
+
+                                pendingTraits = [];
+                                pendingDirectory = null;
+                            }
                         }
                     }
                     break;
-                case "extend":
+                /* case "extend":
                     if (args.length > 0) {
                         const testCase = extractArgumentValue(
                             args[0] as AutocompleteParsingResult.Argument,
@@ -232,7 +268,7 @@ const parsePestConfig = (
                             pendingDirectory = null;
                         }
                     }
-                    break;
+                    break; */
             }
         }
     }
@@ -316,7 +352,7 @@ const load = async (): Promise<PestConfig> => {
             return { ...INACTIVE_PEST_CONFIG, hasPest: true };
         }
 
-        const pestConfig = parsePestConfig(detected);
+        const pestConfig = await parsePestConfig(detected);
         generatePestHelpers(pestConfig);
         return pestConfig;
     } catch (err) {
