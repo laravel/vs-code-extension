@@ -162,13 +162,6 @@ const extractArgumentValue = (
     return value.type === "string" ? value.value : null;
 };
 
-const isExtendingMethod = (methodName: string | null): boolean => {
-    if (!methodName) {
-        return false;
-    }
-    return ["extend", "extends", "use", "uses"].includes(methodName);
-};
-
 const parsePestConfig = async (
     detected: AutocompleteParsingResult.ContextValue[],
 ): Promise<PestConfig> => {
@@ -189,7 +182,7 @@ const parsePestConfig = async (
 
         if (
             className === "expect" &&
-            isExtendingMethod(methodName) &&
+            methodName === "extend" &&
             args.length > 0
         ) {
             const expectationName = extractArgumentValue(
