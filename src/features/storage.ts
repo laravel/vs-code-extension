@@ -6,15 +6,21 @@ import { config } from "@src/support/config";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { facade } from "@src/support/util";
+import { attribute, facade } from "@src/support/util";
 import * as vscode from "vscode";
 import { CompletionProvider, FeatureTag, LinkProvider } from "..";
 
-const toFind: FeatureTag = {
-    class: facade("Storage"),
-    method: ["disk", "fake", "persistentFake", "forgetDisk"],
-    argumentIndex: 0,
-};
+const toFind: FeatureTag = [
+    {
+        class: attribute("Storage"),
+        argumentIndex: 0,
+    },
+    {
+        class: facade("Storage"),
+        method: ["disk", "fake", "persistentFake", "forgetDisk"],
+        argumentIndex: 0,
+    },
+];
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
