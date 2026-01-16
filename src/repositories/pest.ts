@@ -162,6 +162,29 @@ const extractArgumentValue = (
     return value.type === "string" ? value.value : null;
 };
 
+const isExtensionMethod = (methodName: string | null): boolean => {
+    if (!methodName) {
+        return false;
+    }
+    return ["use", "uses", "extend", "extends"].includes(methodName);
+};
+
+const extractClassNamesFromArgs = (
+    args: AutocompleteParsingResult.ContextValue[],
+): string[] => {
+    const classNames: string[] = [];
+    for (const arg of args) {
+        const objectName = extractArgumentValue(
+            arg as AutocompleteParsingResult.Argument,
+            "class",
+        );
+        if (objectName) {
+            classNames.push(objectName);
+        }
+    }
+    return classNames;
+};
+
 const parsePestConfig = async (
     detected: AutocompleteParsingResult.ContextValue[],
 ): Promise<PestConfig> => {
@@ -170,6 +193,16 @@ const parsePestConfig = async (
 
     let pendingTraits: string[] = [];
     let pendingDirectory: string | null = null;
+
+    const finalizeTestCaseExtension = (testCase: string) => {
+        testCaseExtensions.push({
+            testCase,
+            traits: pendingTraits,
+            directory: pendingDirectory,
+        });
+        pendingTraits = [];
+        pendingDirectory = null;
+    };
 
     for (const item of detected) {
         if (item.type !== "methodCall") {
@@ -192,80 +225,43 @@ const parsePestConfig = async (
             if (expectationName) {
                 expectations.push(expectationName);
             }
+            continue;
         }
 
-        if (className === "pest") {
-            switch (methodName) {
-                case "in":
-                    if (args.length > 0) {
-                        pendingDirectory = extractArgumentValue(
-                            args[0] as AutocompleteParsingResult.Argument,
-                            "string",
-                        );
-                    }
-                    break;
-                case "use":
-                case "uses":
-                case "extend":
-                case "extends":
-                    for (const arg of args) {
-                        const objectName = extractArgumentValue(
-                            arg as AutocompleteParsingResult.Argument,
-                            "class",
-                        );
-                        if (objectName) {
-                            const classLike = `${toFQCN(objectName)}::class`;
-                            const extensionObjectType =
-                                await runInLaravel<ClassLike>(
-                                    template("classLikeType", {
-                                        classlike: classLike,
-                                    }),
-                                    "Pest Extension Type Detection",
-                                );
-
-                            if (extensionObjectType.type === "trait") {
-                                pendingTraits.push(objectName);
-                            } else if (extensionObjectType.type === "class") {
-                                testCaseExtensions.push({
-                                    testCase: objectName,
-                                    traits: pendingTraits,
-                                    directory: pendingDirectory,
-                                });
-
-                                pendingTraits = [];
-                                pendingDirectory = null;
-                            }
-                        }
-                    }
-                    break;
-            }
+        if (
+            (className === "pest" || className === "uses") &&
+            methodName === "in" &&
+            args.length > 0
+        ) {
+            pendingDirectory = extractArgumentValue(
+                args[0] as AutocompleteParsingResult.Argument,
+                "string",
+            );
+            continue;
         }
 
-        if (className === "uses") {
-            switch (methodName) {
-                case "in":
-                    if (args.length > 0) {
-                        pendingDirectory = extractArgumentValue(
-                            args[0] as AutocompleteParsingResult.Argument,
-                            "string",
-                        );
-                    }
-                    break;
-                case "extend":
-                case "extends":
-                case "use":
-                case "uses":
-                    for (const arg of args) {
-                        const objectName = extractArgumentValue(
-                            arg as AutocompleteParsingResult.Argument,
-                            "class",
-                        );
-                        if (objectName) {
-                            pendingTraits.push(objectName);
-                        }
-                    }
-                    break;
+        if (className === "pest" && isExtensionMethod(methodName)) {
+            for (const objectName of extractClassNamesFromArgs(args)) {
+                const classLike = `${toFQCN(objectName)}::class`;
+                const extensionObjectType = await runInLaravel<ClassLike>(
+                    template("classLikeType", {
+                        classlike: classLike,
+                    }),
+                    "Pest Extension Type Detection",
+                );
+
+                if (extensionObjectType.type === "trait") {
+                    pendingTraits.push(objectName);
+                } else if (extensionObjectType.type === "class") {
+                    finalizeTestCaseExtension(objectName);
+                }
             }
+            continue;
+        }
+
+        if (className === "uses" && isExtensionMethod(methodName)) {
+            pendingTraits.push(...extractClassNamesFromArgs(args));
+            continue;
         }
 
         if (className === null && methodName === "uses" && args.length > 0) {
@@ -274,14 +270,7 @@ const parsePestConfig = async (
                 "class",
             );
             if (objectName) {
-                testCaseExtensions.push({
-                    testCase: objectName,
-                    traits: pendingTraits,
-                    directory: pendingDirectory,
-                });
-
-                pendingTraits = [];
-                pendingDirectory = null;
+                finalizeTestCaseExtension(objectName);
             }
         }
     }
