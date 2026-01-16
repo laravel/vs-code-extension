@@ -151,7 +151,7 @@ export const detect = async (
         >;
     }
 
-    const promise = runCommand(`detect "${cleanArg(code)}"`)
+    const promise = runCommand("detect", cleanArg(code))
         .then((result: string) => {
             return result.length > 0 ? JSON.parse(result) : result;
         })
@@ -164,7 +164,7 @@ export const detect = async (
     return promise;
 };
 
-const runCommand = (command: string): Promise<string> => {
+const runCommand = (subCommand: string, arg: string): Promise<string> => {
     return new Promise(async function (resolve, error) {
         if (!parserBinaryPath) {
             const waitForPath = async () => {
@@ -180,18 +180,25 @@ const runCommand = (command: string): Promise<string> => {
             await waitForPath();
         }
 
-        const extraArgs = os.platform() === "win32" ? "--from-file" : "";
-        const toRun = `"${parserBinaryPath}" ${command} ${extraArgs}`;
+        const args = [subCommand, arg];
 
-        // console.log("running command", toRun);
+        if (os.platform() === "win32") {
+            args.push("--from-file");
+        }
 
-        cp.exec(
-            toRun,
+        // Using execFile with arguments as array avoids shell interpretation entirely
+        cp.execFile(
+            parserBinaryPath as string,
+            args,
             {
                 cwd: __dirname,
                 timeout: 5000,
             },
-            (err, stdout, stderr) => {
+            (
+                err: cp.ExecFileException | null,
+                stdout: string,
+                stderr: string,
+            ) => {
                 if (err === null) {
                     return resolve(stdout);
                 }
@@ -211,7 +218,7 @@ export const parseForAutocomplete = (
 
     const arg = cleanArg(code);
 
-    const promise = runCommand(`autocomplete "${arg}"`)
+    const promise = runCommand("autocomplete", arg)
         .then((result: string) => {
             return new AutocompleteResult(JSON.parse(result));
         })
