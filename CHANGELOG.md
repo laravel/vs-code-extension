@@ -2,6 +2,19 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.2 - 2026-01-16
+
+### What's Changed
+
+* Fix Pint not working on DDEV environment by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/536
+* Add configuration option to disable artisan make commands in VSCode explorer/context and command palette by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/530
+* Docker Support by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/537
+* Add Markdown hover links for scopes to the implementation by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/527
+* Support for Laravel attributes by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/542
+* Bump parser version to v0.1.44 by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/543
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.1...v1.4.2
+
 ## v1.4.1 - 2026-01-09
 
 ### What's Changed
