@@ -164,7 +164,9 @@ const parsePestConfig = (
 ): PestConfig => {
     const expectations: string[] = [];
     const testCaseExtensions: TestCaseExtension[] = [];
-    let currentExtension: TestCaseExtension | null = null;
+
+    let pendingTraits: string[] = [];
+    let pendingDirectory: string | null = null;
 
     for (const item of detected) {
         if (item.type !== "methodCall") {
@@ -191,51 +193,45 @@ const parsePestConfig = (
 
         if (className === "pest") {
             switch (methodName) {
-                case "extend":
-                    if (currentExtension) {
-                        testCaseExtensions.push(currentExtension);
+                case "in":
+                    if (args.length > 0) {
+                        pendingDirectory = extractArgumentValue(
+                            args[0] as AutocompleteParsingResult.Argument,
+                            "string",
+                        );
                     }
+                    break;
+                case "use":
+                    for (const arg of args) {
+                        const traitName = extractArgumentValue(
+                            arg as AutocompleteParsingResult.Argument,
+                            "class",
+                        );
+                        if (traitName) {
+                            pendingTraits.push(traitName);
+                        }
+                    }
+                    break;
+                case "extend":
                     if (args.length > 0) {
                         const testCase = extractArgumentValue(
                             args[0] as AutocompleteParsingResult.Argument,
                             "class",
                         );
                         if (testCase) {
-                            currentExtension = {
+                            testCaseExtensions.push({
                                 testCase,
-                                traits: [],
-                                directory: null,
-                            };
+                                traits: pendingTraits,
+                                directory: pendingDirectory,
+                            });
+
+                            pendingTraits = [];
+                            pendingDirectory = null;
                         }
-                    }
-                    break;
-                case "use":
-                    if (currentExtension) {
-                        for (const arg of args) {
-                            const traitName = extractArgumentValue(
-                                arg as AutocompleteParsingResult.Argument,
-                                "class",
-                            );
-                            if (traitName) {
-                                currentExtension.traits.push(traitName);
-                            }
-                        }
-                    }
-                    break;
-                case "in":
-                    if (currentExtension && args.length > 0) {
-                        currentExtension.directory = extractArgumentValue(
-                            args[0] as AutocompleteParsingResult.Argument,
-                            "string",
-                        );
                     }
                     break;
             }
         }
-    }
-
-    if (currentExtension) {
-        testCaseExtensions.push(currentExtension);
     }
 
     return {
