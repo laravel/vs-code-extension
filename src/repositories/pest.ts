@@ -10,8 +10,9 @@ import { config } from "../support/config";
 import { indent } from "../support/util";
 import { detect } from "../support/parser";
 import { AutocompleteParsingResult } from "../types";
-import { error, info } from "../support/logger";
-import { runInLaravel } from "../support/php";
+import { error } from "../support/logger";
+import { runInLaravel, template } from "../support/php";
+import { ClassLike } from "..";
 
 interface TestCaseExtension {
     testCase: string;
@@ -30,9 +31,7 @@ const toFQCN = (className: string): string => {
 };
 
 const generatePestFunctionsContent = (testCaseClasses: string[]): string => {
-    const normalizedClasses = [
-        ...new Set(testCaseClasses.map(toFQCN)),
-    ];
+    const normalizedClasses = [...new Set(testCaseClasses.map(toFQCN))];
 
     const unionType = normalizedClasses.join("|");
 
@@ -163,16 +162,12 @@ const extractArgumentValue = (
     return value.type === "string" ? value.value : null;
 };
 
-const isExtendingMethod = (methodName: string|null): boolean => {
+const isExtendingMethod = (methodName: string | null): boolean => {
     if (!methodName) {
         return false;
     }
     return ["extend", "extends", "use", "uses"].includes(methodName);
 };
-
-type PestExtensionObject = {
-    type: "trait" | "class" | "none";
-}
 
 const parsePestConfig = async (
     detected: AutocompleteParsingResult.ContextValue[],
@@ -225,17 +220,16 @@ const parsePestConfig = async (
                             arg as AutocompleteParsingResult.Argument,
                             "class",
                         );
-                        info(`Detected Pest object usage: ${objectName}`);
-                        const extensionObjectType = await runInLaravel<PestExtensionObject>(
-                            `if (trait_exists(${objectName}::class)) {
-                                echo json_encode(['type' => 'trait']);
-                            } else if (class_exists(${objectName}::class)) {
-                                echo json_encode(['type' => 'class']);
-                            } else {
-                                echo json_encode(['type' => 'none']);
-                            }`,
-                        )
                         if (objectName) {
+                            const classLike = `${toFQCN(objectName)}::class`;
+                            const extensionObjectType =
+                                await runInLaravel<ClassLike>(
+                                    template("classLikeType", {
+                                        classlike: classLike,
+                                    }),
+                                    "Pest Extension Type Detection",
+                                );
+
                             if (extensionObjectType.type === "trait") {
                                 pendingTraits.push(objectName);
                             } else if (extensionObjectType.type === "class") {
@@ -251,24 +245,6 @@ const parsePestConfig = async (
                         }
                     }
                     break;
-                /* case "extend":
-                    if (args.length > 0) {
-                        const testCase = extractArgumentValue(
-                            args[0] as AutocompleteParsingResult.Argument,
-                            "class",
-                        );
-                        if (testCase) {
-                            testCaseExtensions.push({
-                                testCase,
-                                traits: pendingTraits,
-                                directory: pendingDirectory,
-                            });
-
-                            pendingTraits = [];
-                            pendingDirectory = null;
-                        }
-                    }
-                    break; */
             }
         }
     }
