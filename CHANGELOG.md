@@ -2,6 +2,14 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.1 - 2026-01-09
+
+### What's Changed
+
+* Fix: Ensure environment is detected before generating hashed files by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/531
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.0...v1.4.1
+
 ## v1.4.0 - 2026-01-08
 
 ### What's Changed
