@@ -344,9 +344,18 @@ const addToPhpFile = async (
     // We have to compare the missing var to the nested translation item name and find new keys
     // to add, for example: foo.bar.new-nested-key.new-key compares to foo.bar.baz.example gives
     // ["new-nested-key", "new-key"]
-    const commonKeys = nestedPreviousTranslationItem.name
-        .split(".")
-        .filter((v, i) => v === missingVar.split(".")[i]);
+    const nestedPreviousKeys = nestedPreviousTranslationItem.name.split(".");
+    const missingKeys = missingVar.split(".");
+
+    const commonKeys: string[] = [];
+
+    for (let i = 0; i < nestedPreviousKeys.length; i++) {
+        if (nestedPreviousKeys[i] !== missingKeys[i]) {
+            break;
+        }
+
+        commonKeys.push(nestedPreviousKeys[i]);
+    }
 
     const nestedKeys = missingVar
         .slice(commonKeys.join(".").length + 1)
