@@ -10,7 +10,7 @@ import { config } from "../support/config";
 import { indent } from "../support/util";
 import { detect } from "../support/parser";
 import { AutocompleteParsingResult } from "../types";
-import { error, info } from "../support/logger";
+import { error } from "../support/logger";
 import { runInLaravel, template } from "../support/php";
 import { ClassLike } from "..";
 
