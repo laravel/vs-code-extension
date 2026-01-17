@@ -97,22 +97,23 @@ const INACTIVE_PEST_CONFIG: PestConfig = {
 
 const DEFAULT_TEST_NAMESPACE = "PHPUnit\\Framework";
 
-const generateExpectationClass = (expectations: string[]): string => {
-    if (expectations.length === 0) {
-        return "";
-    }
-
+const generateExpectationClass = (
+    expectations: string[],
+    opposite = false,
+): string => {
     const methodBlocks = expectations
         .map((expectation) => ` * @method self ${expectation}()`)
         .sort();
 
     return [
         "/**",
-        " * Pest\\Expectation",
+        opposite
+            ? " * Pest\\Expectation\\OppositeExpectation"
+            : " * Pest\\Expectation",
         " *",
         ...methodBlocks,
         " */",
-        "class Expectation {}",
+        opposite ? "class OppositeExpectation {}" : "class Expectation {}",
     ]
         .map((line) => indent(line))
         .join("\n");
@@ -302,6 +303,9 @@ const generatePestHelpers = (config: PestConfig) => {
 
     if (config.expectations.length > 0) {
         namespaces["Pest"] = [generateExpectationClass(config.expectations)];
+        namespaces["Pest\\Expectations"] = [
+            generateExpectationClass(config.expectations, true),
+        ];
     }
 
     for (const extension of config.testCaseExtensions) {
