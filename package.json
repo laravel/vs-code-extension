@@ -749,16 +749,6 @@
                     "default": true,
                     "markdownDescription": "Automatically generate IDE helper files for better PestPHP intelligence.\n\n_Only active when Pest is detected in your Laravel project._"
                 },
-                "Laravel.artisanMake.explorer": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable Laravel Artisan Make commands in the VSCode explorer."
-                },
-                "Laravel.artisanMake.commandPalette": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable Laravel Artisan Make commands in the VSCode command palette."
-                },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
                     "default": true,
