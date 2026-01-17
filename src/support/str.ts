@@ -4,5 +4,8 @@ export const kebab = (str: string): string =>
         .replace(/[\s_]+/g, "-")
         .toLowerCase();
 
+export const lcfirst = (str: string): string =>
+    str.charAt(0).toLowerCase() + str.slice(1);
+
 export const ucfirst = (str: string): string =>
     str.charAt(0).toUpperCase() + str.slice(1);
