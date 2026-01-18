@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -665,6 +665,11 @@
                 "command": "laravel.artisan.make.view",
                 "title": "Make View",
                 "category": "Laravel"
+            },
+            {
+                "command": "laravel.docker.configure",
+                "title": "Configure Docker Environment",
+                "category": "Laravel"
             }
         ],
         "configuration": {
@@ -679,7 +684,8 @@
                         "sail",
                         "lando",
                         "ddev",
-                        "local"
+                        "local",
+                        "docker"
                     ],
                     "enumItemLabels": [
                         "Auto Detect",
@@ -688,7 +694,8 @@
                         "Sail",
                         "Lando",
                         "DDEV",
-                        "Local"
+                        "Local",
+                        "Docker"
                     ],
                     "markdownEnumDescriptions": [
                         "Auto detect the local PHP environment.",
@@ -697,7 +704,8 @@
                         "Sail",
                         "Lando",
                         "DDEV",
-                        "Use PHP installed on the local machine."
+                        "Use PHP installed on the local machine.",
+                        "Docker"
                     ],
                     "default": "auto",
                     "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."

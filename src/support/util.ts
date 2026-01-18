@@ -35,6 +35,10 @@ export const toArray = <T>(value: T | T[]): T[] => {
     return Array.isArray(value) ? value : [value];
 };
 
+export const attribute = (className: string): string => {
+    return `Illuminate\\Container\\Attributes\\${className}`;
+};
+
 export const contract = (className: string): string => {
     return `Illuminate\\Contracts\\${className}`;
 };

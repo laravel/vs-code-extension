@@ -1,3 +1,5 @@
+import { config } from "./config";
+
 type PhpEnvironmentConfig = {
     label: string;
     description?: string;
@@ -14,6 +16,7 @@ export type PhpEnvironment =
     | "sail"
     | "lando"
     | "ddev"
+    | "docker"
     | "local";
 
 export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
@@ -57,6 +60,13 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
         description: "Use PHP installed on the local machine.",
         check: 'php -r "echo PHP_BINARY;"',
         command: '"{binaryPath}"',
+    },
+    docker: {
+        label: "Docker",
+        check: "docker ps",
+        test: () => config<string>("phpEnvironment", "") === "docker",
+        command: config<string>("phpCommand", ""),
+        relativePath: true,
     },
 };
 
