@@ -114,13 +114,14 @@ const getBlocks = (
     return model.attributes
         .map((attr) => getAttributeBlocks(attr, className))
         .concat(
-            [...model.scopes, "newModelQuery", "newQuery", "query"].map(
-                (method) => {
-                    return `@method static ${modelBuilderType(
-                        className,
-                    )} ${method}()`;
-                },
-            ),
+            ["newModelQuery", "newQuery", "query"].map((method) => {
+                return `@method static ${modelBuilderType(
+                    className,
+                )} ${method}()`;
+            }),
+        )
+        .concat(
+            model.scopes.map((scope) => getScopeBlock(model, scope, className)),
         )
         .concat(model.relations.map((relation) => getRelationBlocks(relation)))
         .flat()
@@ -173,6 +174,29 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     }
 
     return [`@property-read \\${relation.related} $${relation.name}`];
+};
+
+const getScopeBlock = (
+    model: Eloquent.Model,
+    scope: Eloquent.Scope,
+    className: string,
+): string => {
+    const parameters = scope.parameters
+        .slice(1)
+        .map((param) => {
+            return [
+                param.type,
+                param.isVariadic ? " ..." : " ",
+                param.isPassedByReference ? "&" : "",
+                `$${param.name}`,
+                param.default ? ` = ${param.default}` : "",
+            ].join("");
+        })
+        .join(", ");
+
+    return `@method static ${modelBuilderType(
+        className,
+    )} ${scope.name}(${parameters}) {@see ${model.class}::${scope.method}()}`;
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
@@ -239,6 +263,7 @@ const castMapping: TypeMapping = {
     mixed: ["attribute", "accessor", "encrypted"],
     object: ["encrypted:object"],
     string: ["hashed"],
+    float: [/^decimal:\d+$/],
     "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
     "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
@@ -303,7 +328,7 @@ const findInMapping = (
 const getActualType = (cast: string | null, type: string): string => {
     const finalType =
         findInMapping(castMapping, cast) ||
-        cast ||
+        cast?.split(":")[0] ||
         findInMapping(typeMapping, type) ||
         "mixed";
 

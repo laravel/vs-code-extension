@@ -81,7 +81,7 @@ declare namespace Eloquent {
         relations: Relation[];
         events: Event[];
         observers: Observer[];
-        scopes: string[];
+        scopes: Scope[];
         extends: string | null;
     }
 
@@ -114,5 +114,20 @@ declare namespace Eloquent {
     interface Observer {
         event: string;
         observer: string[];
+    }
+
+    interface Scope {
+        name: string;
+        method: string;
+        parameters: ScopeParameter[];
+    }
+
+    interface ScopeParameter {
+        name: string;
+        type: string;
+        default?: string | null;
+        isOptional: boolean;
+        isVariadic: boolean;
+        isPassedByReference: boolean;
     }
 }

@@ -33,6 +33,10 @@ export default class AutocompleteResult {
     }
 
     public fillingInArrayKey(): boolean {
+        if (this.result.type === "array") {
+            return this.result.autocompletingKey;
+        }
+
         return this.param()?.autocompletingKey ?? false;
     }
 
@@ -43,6 +47,10 @@ export default class AutocompleteResult {
     public class() {
         // @ts-ignore
         return this.result.className ?? null;
+    }
+
+    public isInsideArrayItem(): boolean {
+        return this.result.parent?.type === "array_item";
     }
 
     public isClass(className: string | string[]) {
@@ -63,6 +71,46 @@ export default class AutocompleteResult {
         return classNames.some((className: string) =>
             this.isClass(contract(className)),
         );
+    }
+
+    public extendsClass(className: string) {
+        let result = false;
+
+        this.loop((context) => {
+            if (context.type !== "classDefinition") {
+                return true;
+            }
+
+            if (context.extends === className) {
+                result = true;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return result;
+    }
+
+    public isInsideMethodDefinition(methodName: string) {
+        let result = false;
+
+        this.loop((context) => {
+            if (context.type !== "methodDefinition") {
+                return true;
+            }
+
+            if (context.methodName === methodName) {
+                result = true;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return result;
     }
 
     public func() {

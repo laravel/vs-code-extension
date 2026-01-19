@@ -29,6 +29,10 @@ export const toArray = <T>(value: T | T[]): T[] => {
     return Array.isArray(value) ? value : [value];
 };
 
+export const attribute = (className: string): string => {
+    return `Illuminate\\Container\\Attributes\\${className}`;
+};
+
 export const contract = (className: string): string => {
     return `Illuminate\\Contracts\\${className}`;
 };
@@ -145,4 +149,17 @@ export const createIndexMapping = (
             return mapping[className ?? ""][methodName ?? ""] ?? null;
         },
     };
+};
+
+export const escapeNamespace = (namespace: string): string => {
+    if (
+        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
+            os.platform().includes(unixPlatforms),
+        )
+    ) {
+        // We need to escape backslashes because finally it will be a part of CLI command
+        return namespace.replace(/(?<!\\)\\(?!\\)/g, "\\\\");
+    }
+
+    return namespace;
 };
