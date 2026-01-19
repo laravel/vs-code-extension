@@ -1,5 +1,5 @@
 import { getPintConfig } from "@src/repositories/pint";
-import { fixFilePath } from "@src/support/php";
+import { fixFilePath, getCommand } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -10,11 +10,7 @@ import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
-import {
-    getWorkspaceFolders,
-    projectPath,
-    projectPathExists,
-} from "../support/project";
+import { getWorkspaceFolders, projectPathExists } from "../support/project";
 
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
@@ -28,8 +24,6 @@ const runPintCommand = (
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         // Check if pint exists in vendor/bin
-        const pintPath = projectPath("vendor/bin/pint");
-
         if (!projectPathExists("vendor/bin/pint")) {
             const errorMessage =
                 "Pint not found. Make sure Laravel Pint is installed in your project.";
@@ -38,7 +32,7 @@ const runPintCommand = (
             return;
         }
 
-        const command = `"${pintPath}" ${args}`.trim();
+        const command = `${getCommand("vendor/bin/pint")} ${args}`.trim();
 
         cp.exec(
             command,

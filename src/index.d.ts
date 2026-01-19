@@ -120,6 +120,7 @@ declare namespace Eloquent {
 
     interface Scope {
         name: string;
+        method: string;
         parameters: ScopeParameter[];
     }
 

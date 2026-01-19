@@ -2,6 +2,7 @@ import { repository } from ".";
 import { Eloquent } from "..";
 import { writeEloquentDocBlocks } from "../support/docblocks";
 import { runInLaravel, template } from "./../support/php";
+import { escapeNamespace } from "../support/util";
 
 const modelPaths = ["app", "app/Models"];
 
@@ -37,3 +38,12 @@ export const getModels = repository<Eloquent.Models>({
         .map((path) => `${path}/*.php`),
     itemsDefault: {},
 });
+
+export const getModelClassnames = (): Record<string, string> => {
+    return Object.fromEntries(
+        Object.entries(getModels().items).map(([_, model]) => [
+            model.class,
+            escapeNamespace(model.class),
+        ]),
+    );
+};
