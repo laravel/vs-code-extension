@@ -25,7 +25,7 @@ $livewire = new class {
     public function parse(\\Illuminate\\Support\\Collection $views)
     {
         if (!$this->isVersionFour()) {
-            return;
+            return $views;
         }
 
         return $views
