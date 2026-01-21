@@ -10,7 +10,11 @@ import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
-import { getWorkspaceFolders, projectPathExists } from "../support/project";
+import {
+    getWorkspaceFolders,
+    projectPath,
+    projectPathExists,
+} from "../support/project";
 
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
@@ -37,7 +41,7 @@ const runPintCommand = (
         cp.exec(
             command,
             {
-                cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+                cwd: projectPath(),
             },
             (err, stdout, stderr) => {
                 if (err === null) {
