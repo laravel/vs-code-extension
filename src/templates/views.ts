@@ -60,9 +60,7 @@ $livewire = new class {
 
     protected function pathExists(string $path): bool
     {
-        return $this->paths->some(function (string $livewirePath) use ($path) {
-            return str_contains(realpath($path), $livewirePath);
-        });
+        return $this->paths->contains(fn (string $item) => str($path)->contains($item));
     }
 
     protected function componentExists(string $key): bool
