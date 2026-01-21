@@ -15,10 +15,13 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
         if (match && match.index !== undefined) {
             const componentName = match[1];
-            // Standard component
-            const viewName = `livewire.${componentName}`;
-            // Index component
-            const view = views.find((v) => v.key === viewName);
+
+            const view = views.find((v) => {
+                return (
+                    v.key === `livewire.${componentName}` ||
+                    (v.isLivewire && v.key === componentName)
+                );
+            });
 
             if (view) {
                 links.push(
@@ -62,7 +65,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
         }
 
         return getViews()
-            .items.filter((view) => view.key.startsWith(pathPrefix))
+            .items.filter((view) => view.isLivewire)
             .map(
                 (view) =>
                     new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
