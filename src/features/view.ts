@@ -43,7 +43,7 @@ const toFind: FeatureTag = [
     },
     {
         class: facade("Route"),
-        method: ["view"],
+        method: ["view", "livewire"],
         argumentIndex: 1,
     },
     {
@@ -269,6 +269,12 @@ export const completionProvider = {
         }
 
         if (result.isFacade("Route")) {
+            if (result.func() === "livewire" && result.isParamIndex(1)) {
+                return views
+                    .filter((view) => view.isLivewire)
+                    .map((view) => getCompletionItem(view, document, position));
+            }
+
             if (result.func() === "view" && result.isParamIndex(1)) {
                 return views.map((view) =>
                     getCompletionItem(view, document, position),

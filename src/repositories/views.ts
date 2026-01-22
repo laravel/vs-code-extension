@@ -6,6 +6,7 @@ export interface ViewItem {
     key: string;
     path: string;
     isVendor: boolean;
+    isLivewire: boolean;
 }
 
 const load = () => {
@@ -14,13 +15,15 @@ const load = () => {
             key: string;
             path: string;
             isVendor: boolean;
+            isLivewire: boolean;
         }[]
     >(template("views")).then((results) => {
-        return results.map(({ key, path, isVendor }) => {
+        return results.map(({ key, path, isVendor, isLivewire }) => {
             return {
                 key,
                 path,
                 isVendor,
+                isLivewire,
             };
         });
     });
