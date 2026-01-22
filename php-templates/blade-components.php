@@ -22,7 +22,7 @@ $components = new class {
             $this->getVendorComponents(),
         ))->groupBy('key')->pipe($this->setProps(...))->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
-            'paths' => $items->pluck('path')->values(),
+            'paths' => $items->pluck('path')->unique()->values(),
             'props' => $this->formatProps($items),
         ]);
 
