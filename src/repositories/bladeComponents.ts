@@ -7,11 +7,13 @@ export interface BladeComponents {
         [key: string]: {
             paths: string[];
             isVendor: boolean;
-            props: {
-                name: string;
-                type: string;
-                default: string | null;
-            }[] | string;
+            props:
+                | {
+                      name: string;
+                      type: string;
+                      default: string | null;
+                  }[]
+                | string;
         };
     };
     prefixes: string[];
