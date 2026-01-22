@@ -2,6 +2,17 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.4.3 - 2026-01-22
+
+### What's Changed
+
+* Add configuration option to disable artisan make commands in VSCode explorer/context by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/546
+* Fix Could not open input file: vendor/bin/pint by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/550
+* Livewire 4 Support by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/549
+* Fix namespaced Blade components by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/552
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.2...v1.4.3
+
 ## v1.4.2 - 2026-01-16
 
 ### What's Changed
