@@ -48,7 +48,7 @@ $livewire = new class {
                 ]);
             })
             ->whereNotNull()
-            ->unique('path')
+            ->unique('key')
             ->values();
     }
 
