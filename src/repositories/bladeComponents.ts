@@ -11,7 +11,7 @@ export interface BladeComponents {
                 name: string;
                 type: string;
                 default: string | null;
-            }[];
+            }[] | string;
         };
     };
     prefixes: string[];

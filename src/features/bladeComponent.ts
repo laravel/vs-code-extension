@@ -122,21 +122,29 @@ export const hoverProvider: HoverProvider = (
             return null;
         }
 
-        const lines = component.paths.map(
-            (path) => `[${path}](${vscode.Uri.file(projectPath(path))})`,
-        );
+        const markdown = new vscode.MarkdownString();
 
-        lines.push(
-            ...component.props.map((prop) =>
-                [
-                    "`" + prop.type + "` ",
-                    "`" + prop.name + "`",
-                    prop.default ? ` = ${prop.default}` : "",
-                ].join(""),
+        component.paths.map((path) =>
+            markdown.appendMarkdown(
+                `[${path}](${vscode.Uri.file(projectPath(path))})\n\n`,
             ),
         );
 
-        return new vscode.Hover(new vscode.MarkdownString(lines.join("\n\n")));
+        if (typeof component.props === "string") {
+            markdown.appendCodeblock(component.props, "blade");
+        } else {
+            component.props.map((prop) =>
+                markdown.appendMarkdown(
+                    [
+                        "`" + prop.type + "` ",
+                        "`" + prop.name + "`",
+                        prop.default ? ` = ${prop.default}` : "",
+                    ].join(""),
+                ),
+            );
+        }
+
+        return new vscode.Hover(markdown);
     }
 
     return null;
