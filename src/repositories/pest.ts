@@ -122,12 +122,7 @@ const generateExpectationClass = (
 const generateTraitUseStatements = (traits: string[]): string => {
     return traits.length > 0
         ? traits
-              .map((trait) => {
-                  const traitName = trait.startsWith("\\")
-                      ? trait
-                      : `\\${trait}`;
-                  return `use ${traitName};`;
-              })
+              .map((trait) => `use ${toFQCN(trait)};`)
               .map((line) => indent(line))
               .join("\n")
         : "";
