@@ -271,7 +271,7 @@ export const completionProvider = {
         if (result.isFacade("Route")) {
             if (result.func() === "livewire" && result.isParamIndex(1)) {
                 return views
-                    .filter((view) => view.isLivewire)
+                    .filter((view) => view.livewire)
                     .map((view) => getCompletionItem(view, document, position));
             }
 

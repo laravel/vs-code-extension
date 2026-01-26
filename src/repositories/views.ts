@@ -6,32 +6,23 @@ export interface ViewItem {
     key: string;
     path: string;
     isVendor: boolean;
-    isLivewire: boolean;
+    livewire?: {
+        props: {
+            name: string;
+            type: string;
+            hasDefaultValue: boolean;
+            defaultValue: string;
+        }[];
+    };
 }
 
 const load = () => {
-    return runInLaravel<
-        {
-            key: string;
-            path: string;
-            isVendor: boolean;
-            isLivewire: boolean;
-        }[]
-    >(template("views")).then((results) => {
-        return results.map(({ key, path, isVendor, isLivewire }) => {
-            return {
-                key,
-                path,
-                isVendor,
-                isLivewire,
-            };
-        });
-    });
+    return runInLaravel<ViewItem[]>(template("views"));
 };
 
 export const getViews = repository<ViewItem[]>({
     load,
     pattern: inAppDirs("{,**/}{view,views}/{*,**/*}"),
     itemsDefault: [],
-    fileWatcherEvents: ["create", "delete"],
+    fileWatcherEvents: ["create", "delete", "change"],
 });

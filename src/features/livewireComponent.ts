@@ -2,7 +2,8 @@ import { getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
-import { LinkProvider } from "..";
+import { HoverProvider, LinkProvider } from "..";
+import { appendProps } from "@src/support/markdown";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -19,7 +20,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             const view = views.find((v) => {
                 return (
                     v.key === `livewire.${componentName}` ||
-                    (v.isLivewire && v.key === componentName)
+                    (v.livewire && v.key === componentName)
                 );
             });
 
@@ -41,6 +42,41 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     });
 
     return Promise.resolve(links);
+};
+
+export const hoverProvider: HoverProvider = (
+    doc: vscode.TextDocument,
+    pos: vscode.Position,
+): vscode.ProviderResult<vscode.Hover> => {
+    const linkRange = doc.getWordRangeAtPosition(pos, /<\/?livewire:([^\s>]+)/);
+
+    if (!linkRange) {
+        return;
+    }
+
+    const views = getViews().items;
+
+    const match = doc
+        .getText(linkRange)
+        .replace("<", "")
+        .replace("/", "")
+        .replace("livewire:", "");
+
+    const view = views.find((view) => view.key === match);
+
+    if (!view || !view.livewire) {
+        return null;
+    }
+
+    const markdown = new vscode.MarkdownString();
+
+    markdown.appendMarkdown(
+        `[${view.path}](${vscode.Uri.file(projectPath(view.path))})`,
+    );
+
+    appendProps(markdown, view.livewire.props);
+
+    return new vscode.Hover(markdown);
 };
 
 export const completionProvider: vscode.CompletionItemProvider = {
@@ -65,7 +101,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
         }
 
         return getViews()
-            .items.filter((view) => view.isLivewire)
+            .items.filter((view) => view.livewire)
             .map(
                 (view) =>
                     new vscode.CompletionItem(view.key.replace(pathPrefix, "")),

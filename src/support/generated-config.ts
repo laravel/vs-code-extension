@@ -32,6 +32,7 @@ export type GeneratedConfigKey =
     | "inertia.completion"
     | "livewireComponent.link"
     | "livewireComponent.completion"
+    | "livewireComponent.hover"
     | "middleware.diagnostics"
     | "middleware.hover"
     | "middleware.link"
