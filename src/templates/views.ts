@@ -3,7 +3,6 @@ export default `
 $livewire = new class {
     protected $namespaces;
     protected $paths;
-    protected $extensions;
 
     public function __construct()
     {
@@ -15,11 +14,6 @@ $livewire = new class {
             ->merge(config("livewire.component_locations", []))
             ->unique()
             ->map(LaravelVsCode::relativePath(...));
-
-        $this->extensions = array_map(
-            fn($extension) => ".{$extension}",
-            app('view')->getExtensions(),
-        );
     }
 
     public function parse(\\Illuminate\\Support\\Collection $views)
@@ -92,7 +86,7 @@ $livewire = new class {
         $file = str($view["path"])
             ->replace("⚡", "")
             ->basename()
-            ->beforeLast(".blade.php");
+            ->replace([".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"], "");
 
         $class = str($view["path"])
             ->dirname()
