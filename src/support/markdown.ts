@@ -13,6 +13,7 @@ export const appendProps = (
         [
             `${prop.type} \$${prop.name}`,
             prop.hasDefaultValue ? ` = ${prop.defaultValue}` : "",
+            ";",
         ].join(""),
     );
 
