@@ -25,29 +25,31 @@ $livewire = new class {
     public function parse(\Illuminate\Support\Collection $views)
     {
         if (!$this->isVersionFour()) {
-            return;
+            return $views;
         }
 
-        $components = collect();
+        return $views
+            ->map(function (array $view) {
+                if (!$this->pathExists($view["path"])) {
+                    return $view;
+                }
 
-        $views->each(function (array $view) use ($components) {
-            if (!$this->pathExists($view["path"])) {
-                return;
-            }
+                if (!$this->componentExists($key = $this->key($view))) {
+                    return $view;
+                }
 
-            if (!$this->componentExists($key = $this->key($view))) {
-                return;
-            }
+                if ($this->isMfc($view) && str($view['path'])->doesntEndWith('.blade.php')) {
+                    return null;
+                }
 
-            if ($this->isMfc($view) && str($view['path'])->doesntEndWith('.blade.php')) {
-                return;
-            }
-
-            $components->push(array_merge($view, [
-                "key" => $key,
-                "isLivewire" => true,
-            ]));
-        })->push(...$components);
+                return array_merge($view, [
+                    "key" => $key,
+                    "isLivewire" => true,
+                ]);
+            })
+            ->whereNotNull()
+            ->unique('key')
+            ->values();
     }
 
     protected function isVersionFour(): bool
@@ -132,7 +134,7 @@ $blade = new class ($livewire) {
         return $local
             ->sortBy("key", SORT_NATURAL)
             ->merge($vendor->sortBy("key", SORT_NATURAL))
-            ->tap($this->livewire->parse(...));
+            ->pipe($this->livewire->parse(...));
     }
 
     public function getAllComponents()
