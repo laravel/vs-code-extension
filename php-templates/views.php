@@ -3,7 +3,6 @@
 $livewire = new class {
     protected $namespaces;
     protected $paths;
-    protected $extensions;
 
     public function __construct()
     {
@@ -15,26 +14,24 @@ $livewire = new class {
             ->merge(config("livewire.component_locations", []))
             ->unique()
             ->map(LaravelVsCode::relativePath(...));
-
-        $this->extensions = array_map(
-            fn($extension) => ".{$extension}",
-            app('view')->getExtensions(),
-        );
     }
 
     public function parse(\Illuminate\Support\Collection $views)
     {
-        if (!$this->isVersionFour()) {
-            return $views;
-        }
+        return $this->isVersionFour()
+            ? $this->parseLivewireFour($views)
+            : $this->parseLivewireThree($views);
+    }
 
+    protected function parseLivewireFour(\Illuminate\Support\Collection $views)
+    {
         return $views
             ->map(function (array $view) {
                 if (!$this->pathExists($view["path"])) {
                     return $view;
                 }
 
-                if (!$this->componentExists($key = $this->key($view))) {
+                if (is_null($component = $this->getComponent($key = $this->key($view)))) {
                     return $view;
                 }
 
@@ -44,12 +41,35 @@ $livewire = new class {
 
                 return array_merge($view, [
                     "key" => $key,
-                    "isLivewire" => true,
+                    'livewire' => [
+                        'props' => $this->getProps($component),
+                    ],
                 ]);
             })
             ->whereNotNull()
             ->unique('key')
             ->values();
+    }
+
+    protected function parseLivewireThree(\Illuminate\Support\Collection $views)
+    {
+        return $views->map(function (array $view) {
+            if (str($view['key'])->doesntStartWith('livewire.')) {
+                return $view;
+            }
+
+            $key = str($view['key'])->after('livewire.')->value();
+
+            if (is_null($component = $this->getComponent($key))) {
+                return $view;
+            }
+
+            return array_merge($view, [
+                'livewire' => [
+                    'props' => $this->getProps($component),
+                ],
+            ]);
+        });
     }
 
     protected function isVersionFour(): bool
@@ -63,54 +83,60 @@ $livewire = new class {
         return $this->paths->contains(fn (string $item) => str($path)->contains($item));
     }
 
-    protected function componentExists(string $key): bool
+    protected function getComponent(string $key)
     {
         try {
-            app("livewire")->new($key);
+            return app("livewire")->new($key);
         } catch (\Throwable $e) {
-            return false;
+            return null;
         }
+    }
 
-        return true;
+    protected function getProps($component): array
+    {
+        return array_map(function ($prop) use ($component) {
+            $reflection = new \ReflectionProperty($component, $prop);
+
+            return [
+                'name' => $prop,
+                'type' => $reflection->getType()->getName(),
+                'hasDefaultValue' => $reflection->hasDefaultValue(),
+                'defaultValue' => $this->formatDefaultValue($reflection->getDefaultValue()),
+            ];
+        }, array_keys($component->all()));
+    }
+
+    protected function formatDefaultValue(mixed $value)
+    {
+        return is_string($value) ? "'{$value}'": $value;
     }
 
     protected function key(array $view): string
     {
-        $livewirePath = $this->paths->firstWhere(
-            fn(string $path) => str($view["path"])->startsWith($path)
-        );
-
-        $namespace = $this->namespaces->search($livewirePath);
-
-        return str($view["path"])
-            ->replace($livewirePath, "")
+        return str($view["key"])
             ->replace("⚡", "")
-            ->beforeLast(".blade.php")
-            ->ltrim(DIRECTORY_SEPARATOR)
-            ->replace(DIRECTORY_SEPARATOR, ".")
-            ->when($namespace, fn($key) => $key->prepend($namespace . "::"))
-            ->when($this->isMfc($view), fn($key) => $key->beforeLast("."))
-            ->toString();
+            ->when($this->isMfc($view), fn ($key) => $key->beforeLast("."))
+            ->value();
     }
 
     protected function isMfc(array $view): bool
     {
-        $path = str($view["path"])->replace("⚡", "");
-
-        $file = str($path)
-            ->basename()
-            ->beforeLast(".blade.php");
-
-        $directory = str($path)
+        $directory = str($view["path"])
+            ->replace("⚡", "")
             ->dirname()
             ->afterLast(DIRECTORY_SEPARATOR);
+
+        $file = str($view["path"])
+            ->replace("⚡", "")
+            ->basename()
+            ->replace([".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"], "");
 
         $class = str($view["path"])
             ->dirname()
             ->append(DIRECTORY_SEPARATOR . $file . ".php");
 
-        return $file->is($directory) &&
-            \Illuminate\Support\Facades\File::exists($class);
+        return $directory->is($file)
+            && \Illuminate\Support\Facades\File::exists($class);
     }
 };
 
@@ -221,12 +247,11 @@ $blade = new class ($livewire) {
             $paths[] = [
                 "path" => str_replace(base_path(DIRECTORY_SEPARATOR), '', $file->getRealPath()),
                 "isVendor" => str_contains($file->getRealPath(), base_path("vendor")),
-                "key" => $key = str($file->getRealPath())
+                "key" => str($file->getRealPath())
                     ->replace(realpath($path), "")
                     ->replace($extensions, "")
                     ->ltrim(DIRECTORY_SEPARATOR)
                     ->replace(DIRECTORY_SEPARATOR, "."),
-                "isLivewire" => $key->startsWith("livewire."),
             ];
         }
 
