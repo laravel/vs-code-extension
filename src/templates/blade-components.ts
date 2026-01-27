@@ -20,16 +20,27 @@ $components = new class {
             $this->getAnonymous(),
             $this->getAliases(),
             $this->getVendorComponents(),
-        ))->groupBy('key')->map(fn($items) => [
+        ))->groupBy('key')->pipe($this->setProps(...))->map(fn($items) => [
             'isVendor' => $items->first()['isVendor'],
-            'paths' => $items->pluck('path')->values(),
-            'props' => $items->pluck('props')->values()->filter()->flatMap(fn($i) => $i),
+            'paths' => $items->pluck('path')->unique()->values(),
+            'props' => $this->formatProps($items),
         ]);
 
         return [
             'components' => $components,
             'prefixes' => $this->prefixes,
         ];
+    }
+
+    protected function formatProps($items)
+    {
+        $props = $items->pluck('props');
+
+        if ($codeBlock = $props->firstWhere(fn ($prop) => is_string($prop))) {
+            return $codeBlock;
+        }
+
+        return $props->values()->filter()->flatMap(fn($i) => $i);
     }
 
     protected function getStandardViews()
@@ -308,6 +319,52 @@ $components = new class {
         }
 
         return null;
+    }
+
+    protected function setProps($groups)
+    {
+        try {
+            $compiler = app('blade.compiler');
+        } catch (\\Throwable $e) {
+            return $groups;
+        }
+
+        return $groups->map(function ($group) use ($compiler) {
+            return $group->transform(function ($component) use ($compiler) {
+                if (isset($component['props'])) {
+                    return $component;
+                }
+
+                if (str($component['path'])->doesntEndWith('.blade.php')) {
+                    return $component;
+                }
+
+                if (! $props = $this->parseProps($compiler, $component)) {
+                    return $component;
+                }
+
+                return array_merge($component, ['props' => $props]);
+            });
+        });
+    }
+
+    protected function parseProps($compiler, array $component): ?string
+    {
+        $content = file_get_contents(base_path($component['path']));
+
+        $result = '';
+
+        $compiler->directive('props', function ($expression) use (&$result) {
+            return $result = $expression;
+        });
+
+        $compiler->compileString($content);
+
+        if (empty($result)) {
+            return null;
+        }
+
+        return '@props('.$result.')';
     }
 };
 

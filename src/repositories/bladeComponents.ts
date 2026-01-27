@@ -7,11 +7,13 @@ export interface BladeComponents {
         [key: string]: {
             paths: string[];
             isVendor: boolean;
-            props: {
-                name: string;
-                type: string;
-                default: string | null;
-            }[];
+            props:
+                | {
+                      name: string;
+                      type: string;
+                      default: string | null;
+                  }[]
+                | string;
         };
     };
     prefixes: string[];
@@ -31,5 +33,5 @@ export const getBladeComponents = repository<BladeComponents>({
         components: {},
         prefixes: [],
     },
-    fileWatcherEvents: ["create", "delete"],
+    fileWatcherEvents: ["create", "delete", "change"],
 });
