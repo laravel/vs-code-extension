@@ -33,5 +33,5 @@ export const getBladeComponents = repository<BladeComponents>({
         components: {},
         prefixes: [],
     },
-    fileWatcherEvents: ["create", "delete"],
+    fileWatcherEvents: ["create", "delete", "change"],
 });
