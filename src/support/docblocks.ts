@@ -258,13 +258,14 @@ const getAttributeType = (attr: Eloquent.Attribute): string => {
 type TypeMapping = Record<string, (string | RegExp)[]>;
 
 const castMapping: TypeMapping = {
-    array: ["json", "encrypted:json", "encrypted:array"],
+    array: ["encrypted:array"],
     int: ["timestamp"],
     mixed: ["attribute", "accessor", "encrypted"],
     object: ["encrypted:object"],
     string: ["hashed"],
     float: [/^decimal:\d+$/],
-    "\\Illuminate\\Support\\Carbon": ["date", "datetime"],
+    "object\|array": ["json", "json:unicode", "encrypted:json"],
+    "\\Illuminate\\Support\\Carbon": [/^(date|datetime)(\:(.+))?$/],
     "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
 };
