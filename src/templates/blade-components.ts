@@ -335,7 +335,7 @@ $components = new class {
                     return $component;
                 }
 
-                if (str($component['path'])->doesntEndWith('.blade.php')) {
+                if (!str($component['path'])->endsWith('.blade.php')) {
                     return $component;
                 }
 
