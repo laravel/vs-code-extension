@@ -2,6 +2,18 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.5.0 - 2026-01-29
+
+### What's Changed
+
+* Improve Livewire 4 component and namespace parsing by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/556
+* Livewire Props by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/553
+* Add missing semicolons to markdown props by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/558
+* Blade Props by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/554
+* Livewire 4: Better MFC Support by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/561
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.4.3...v1.5.0
+
 ## v1.4.3 - 2026-01-22
 
 ### What's Changed
