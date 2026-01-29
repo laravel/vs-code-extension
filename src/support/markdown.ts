@@ -9,6 +9,10 @@ export const appendProps = (
         defaultValue: string;
     }[],
 ) => {
+    if (props.length === 0) {
+        return;
+    }
+
     const result = props.map((prop) =>
         [
             `${prop.type} \$${prop.name}`,
