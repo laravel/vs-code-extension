@@ -62,7 +62,9 @@ export const hoverProvider: HoverProvider = (
         .replace("/", "")
         .replace("livewire:", "");
 
-    const view = views.find((view) => view.key === match);
+    const view = views.find((v) => {
+        return v.key === `livewire.${match}` || (v.livewire && v.key === match);
+    });
 
     if (!view || !view.livewire) {
         return null;
@@ -70,9 +72,11 @@ export const hoverProvider: HoverProvider = (
 
     const markdown = new vscode.MarkdownString();
 
-    markdown.appendMarkdown(
-        `[${view.path}](${vscode.Uri.file(projectPath(view.path))})`,
-    );
+    const files = view.livewire.files.map((path) => {
+        return `[${path}](${vscode.Uri.file(projectPath(path))})`;
+    });
+
+    markdown.appendMarkdown(files.join("\n\n"));
 
     appendProps(markdown, view.livewire.props);
 

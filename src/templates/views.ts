@@ -3,6 +3,7 @@ export default `
 $livewire = new class {
     protected $namespaces;
     protected $paths;
+    protected $extensions = [".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"];
 
     public function __construct()
     {
@@ -35,7 +36,9 @@ $livewire = new class {
                     return $view;
                 }
 
-                if ($this->isMfc($view) && str($view['path'])->doesntEndWith('.blade.php')) {
+                $files = $this->files($view);
+
+                if (count($files) === 1 && str($view['path'])->doesntEndWith('.blade.php')) {
                     return null;
                 }
 
@@ -43,6 +46,7 @@ $livewire = new class {
                     "key" => $key,
                     'livewire' => [
                         'props' => $this->getProps($component),
+                        'files' => $files,
                     ],
                 ]);
             })
@@ -67,6 +71,7 @@ $livewire = new class {
             return array_merge($view, [
                 'livewire' => [
                     'props' => $this->getProps($component),
+                    'files' => [$view['path']],
                 ],
             ]);
         });
@@ -119,6 +124,20 @@ $livewire = new class {
             ->value();
     }
 
+    protected function files(array $view): array
+    {
+        if (! $this->isMfc($view)) {
+            return [$view['path']];
+        }
+
+        $filePathWithoutExtension = str($view["path"])->replace($this->extensions, "");
+
+        return collect($this->extensions)
+            ->map(fn (string $extension) => $filePathWithoutExtension->append($extension))
+            ->filter(fn (string $path) => \\Illuminate\\Support\\Facades\\File::exists($path))
+            ->all();
+    }
+
     protected function isMfc(array $view): bool
     {
         $directory = str($view["path"])
@@ -129,7 +148,7 @@ $livewire = new class {
         $file = str($view["path"])
             ->replace("⚡", "")
             ->basename()
-            ->replace([".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"], "");
+            ->replace($this->extensions, "");
 
         $class = str($view["path"])
             ->dirname()

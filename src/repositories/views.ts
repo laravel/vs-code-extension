@@ -13,6 +13,7 @@ export interface ViewItem {
             hasDefaultValue: boolean;
             defaultValue: string;
         }[];
+        files: string[];
     };
 }
 
