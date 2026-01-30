@@ -104,7 +104,7 @@ $livewire = new class {
 
             return [
                 'name' => $prop,
-                'type' => $reflection->getType()->getName(),
+                'type' => $reflection->getType()?->getName() ?? 'mixed',
                 'hasDefaultValue' => $reflection->hasDefaultValue(),
                 'defaultValue' => $this->formatDefaultValue($reflection->getDefaultValue()),
             ];
