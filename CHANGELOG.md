@@ -2,6 +2,21 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.5.1 - 2026-01-30
+
+### What's Changed
+
+* Fix: Method Illuminate\Support\Stringable::doesntEndWith does not exist. by [@nonamich](https://github.com/nonamich) in https://github.com/laravel/vs-code-extension/pull/563
+* Fix props without types by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/566
+* Add comprehensive support for composite, union, and special PHP types by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/567
+* Fix Invalid model helpers generated for built in casts with optional parameters by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/559
+
+### New Contributors
+
+* [@nonamich](https://github.com/nonamich) made their first contribution in https://github.com/laravel/vs-code-extension/pull/563
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.5.0...v1.5.1
+
 ## v1.5.0 - 2026-01-29
 
 ### What's Changed
