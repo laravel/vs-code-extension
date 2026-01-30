@@ -265,7 +265,7 @@ const castMapping: TypeMapping = {
     string: ["hashed"],
     float: [/^decimal:\d+$/],
     "\\Illuminate\\Support\\Carbon": [/^(date|datetime)(\:(.+))?$/],
-    "\\Carbon\\CarbonImmutable": ["immutable_date", "immutable_datetime"],
+    "\\Carbon\\CarbonImmutable": [/^immutable_(date|datetime)(\:(.+))?$/],
     "\\Illuminate\\Support\\Collection": ["encrypted:collection"],
 };
 
