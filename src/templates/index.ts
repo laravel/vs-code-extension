@@ -7,6 +7,7 @@ import configs from "./configs";
 import inertia from "./inertia";
 import middleware from "./middleware";
 import models from "./models";
+import classLikeType from "./classlike-type";
 import routes from "./routes";
 import translations from "./translations";
 import views from "./views";
@@ -17,6 +18,7 @@ const templates = {
     bladeComponents,
     bladeDirectives,
     bootstrapLaravel,
+    classLikeType,
     configs,
     inertia,
     middleware,

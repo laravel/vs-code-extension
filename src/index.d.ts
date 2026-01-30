@@ -34,6 +34,10 @@ interface View {
 
 type FeatureTag = FeatureTagParam | FeatureTagParam[];
 
+type ClassLike = {
+    type: "class" | "trait" | null;
+};
+
 type ValidDetectParamTypes = "string" | "array";
 
 type HoverProvider = (

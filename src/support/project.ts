@@ -5,6 +5,7 @@ import { config } from "./config";
 import { isPhpEnv } from "./php";
 
 let internalVendorExists: boolean | null = null;
+let ideHelperDirExists: boolean | null = null;
 
 export const setInternalVendorExists = (value: boolean) => {
     internalVendorExists = value;
@@ -20,6 +21,22 @@ export const internalVendorPath = (subPath = ""): string => {
 
         if (!internalVendorExists) {
             fs.mkdirSync(baseVendorDir, { recursive: true });
+        }
+    }
+
+    return projectPath(`${baseDir}/${subPath}`);
+};
+
+export const ideHelperPath = (subPath = ""): string => {
+    const baseDir = ".ide-helper";
+
+    if (ideHelperDirExists !== true) {
+        const baseDirPath = projectPath(baseDir);
+
+        ideHelperDirExists = fs.existsSync(baseDirPath);
+
+        if (!ideHelperDirExists) {
+            fs.mkdirSync(baseDirPath, { recursive: true });
         }
     }
 
