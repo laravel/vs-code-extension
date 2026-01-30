@@ -38,7 +38,7 @@ $livewire = new class {
 
                 $files = $this->files($view);
 
-                if (count($files) === 1 && str($view['path'])->doesntEndWith('.blade.php')) {
+                if (count($files) === 1 && !str($view['path'])->endsWith('.blade.php')) {
                     return null;
                 }
 
@@ -58,7 +58,7 @@ $livewire = new class {
     protected function parseLivewireThree(\Illuminate\Support\Collection $views)
     {
         return $views->map(function (array $view) {
-            if (str($view['key'])->doesntStartWith('livewire.')) {
+            if (!str($view['key'])->startsWith('livewire.')) {
                 return $view;
             }
 
