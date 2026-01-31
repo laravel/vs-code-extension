@@ -23,6 +23,14 @@ const load = () => {
     });
 };
 
+export const getModelByName = (name: string): Eloquent.Model | undefined => {
+    const model = Object.entries(getModels().items).find(([, value]) => {
+        return value.name_cases.includes(name);
+    });
+
+    return model?.[1];
+};
+
 export const getModels = repository<Eloquent.Models>({
     load,
     pattern: modelPaths
