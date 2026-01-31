@@ -5,6 +5,7 @@ import { repository } from ".";
 
 export interface TranslationItem {
     [key: string]: {
+        name: string;
         value: string;
         path: string;
         line: number;
@@ -52,6 +53,7 @@ const load = () => {
                     const [v, p, li, pa] = value;
 
                     result[namespace][key] = {
+                        name: namespace,
                         value: res.values[v],
                         path: projectPath(res.paths[p]),
                         line: li,
@@ -78,20 +80,41 @@ export const getTranslationItemByName = (
     return getTranslations().items.translations[match.replaceAll("\\", "")];
 };
 
-export const getTranslationPathByName = (
-    match: string,
-    lang: string | undefined,
-): string | undefined => {
-    lang = lang ?? getTranslations().items.default;
+export const getNestedTranslationItemByName = (
+    name: string,
+): TranslationItem | undefined => {
+    const nestedName = name.match(/^(.+)\./)?.[1];
 
-    const fileName = match.replace(/^.*::/, "").replace(/^([^.]+)\..*$/, "$1");
+    if (!nestedName) {
+        return undefined;
+    }
 
-    return getTranslations().items.paths.find((path) => {
-        return (
-            !path.startsWith("vendor/") &&
-            path.endsWith(`${lang}/${fileName}.php`)
-        );
-    });
+    return (
+        getTranslationItemByName(nestedName) ??
+        getNestedTranslationItemByName(nestedName)
+    );
+};
+
+export const getNestedPreviousTranslationItemByName = (
+    name: string,
+): TranslationItem | undefined => {
+    const nestedName = name.match(/^(.+)\./)?.[1];
+
+    if (!nestedName) {
+        return undefined;
+    }
+
+    const previousName = Object.keys(getTranslations().items.translations).find(
+        (key) => key.startsWith(nestedName.replaceAll("\\", "") + "."),
+    );
+
+    const translationItem = previousName
+        ? getTranslationItemByName(previousName)
+        : getNestedPreviousTranslationItemByName(nestedName);
+
+    return (
+        translationItem ?? getNestedPreviousTranslationItemByName(nestedName)
+    );
 };
 
 export const getTranslations = repository<TranslationGroupResult>({
