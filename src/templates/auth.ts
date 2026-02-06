@@ -78,10 +78,12 @@ if (!\\Illuminate\\Support\\Facades\\App::bound('auth')) {
                                 if (get_class($closureThis) === \\Illuminate\\Auth\\Access\\Gate::class) {
                                     $vars = $reflection->getClosureUsedVariables();
 
-                                    if (isset($vars['callback'])) {
+                                    if (isset($vars['callback']) && str_contains($vars['callback'], '@')) {
                                         [$policyClass, $method] = explode('@', $vars['callback']);
 
-                                        $reflection = new \\ReflectionMethod($policyClass, $method);
+                                        if (method_exists($policyClass, $method)) {
+                                            $reflection = new \\ReflectionMethod($policyClass, $method);
+                                        }
                                     }
                                 }
                             }
