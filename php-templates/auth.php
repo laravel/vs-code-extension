@@ -18,6 +18,7 @@ if (!\Illuminate\Support\Facades\App::bound('auth')) {
             \Illuminate\Database\Eloquent\Relations\Pivot::class,
             \Illuminate\Foundation\Auth\User::class,
         ]))
+		->filter(fn($class) => (new \ReflectionClass($class))->isInstantiable())
         ->flatMap(fn($class) => [
             $class => \Illuminate\Support\Facades\Gate::getPolicyFor($class),
         ])
