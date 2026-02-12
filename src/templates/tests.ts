@@ -187,15 +187,12 @@ $tests = new class {
 
     protected function isPhpUnitTest(ReflectionClass $reflection): bool
     {
-        if (! $reflection->isSubclassOf(TestCase::class)) {
-            return false;
+        if (! $this->isPestInstalled()) {
+            return $reflection->isSubclassOf(TestCase::class);
         }
 
-        if (interface_exists(HasPrintableTestCaseName::class)) {
-            return ! $reflection->implementsInterface(HasPrintableTestCaseName::class);
-        }
-
-        return true;
+        return $reflection->isSubclassOf(TestCase::class)
+            && ! $reflection->implementsInterface(HasPrintableTestCaseName::class);
     }
 
     /**
