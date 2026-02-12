@@ -122,6 +122,10 @@ $tests = new class {
      */
     protected function collectPestTests(array $files): array
     {
+        if (! $this->isPestInstalled()) {
+            return [];
+        }
+
         if (is_null($pest = TestSuite::getInstance())) {
             return [];
         }
@@ -183,6 +187,10 @@ $tests = new class {
 
     protected function isPhpUnitTest(ReflectionClass $reflection): bool
     {
+        if (! $this->isPestInstalled()) {
+            return $reflection->isSubclassOf(TestCase::class);
+        }
+
         return $reflection->isSubclassOf(TestCase::class)
             && ! $reflection->implementsInterface(HasPrintableTestCaseName::class);
     }
