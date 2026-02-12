@@ -8,6 +8,7 @@ import inertia from "./inertia";
 import middleware from "./middleware";
 import models from "./models";
 import routes from "./routes";
+import tests from "./tests";
 import translations from "./translations";
 import views from "./views";
 
@@ -24,6 +25,7 @@ const templates = {
     routes,
     translations,
     views,
+    tests,
 };
 
 export type TemplateName = keyof typeof templates;
