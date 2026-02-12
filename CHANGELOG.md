@@ -2,6 +2,19 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.0 - 2026-02-12
+
+### What's Changed
+
+* Fix ReflectionException when policy method does not exist by [@dbpolito](https://github.com/dbpolito) in https://github.com/laravel/vs-code-extension/pull/581
+* Test Runner by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/583
+
+### New Contributors
+
+* [@dbpolito](https://github.com/dbpolito) made their first contribution in https://github.com/laravel/vs-code-extension/pull/581
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.5.1...v1.6.0
+
 ## v1.5.1 - 2026-01-30
 
 ### What's Changed
