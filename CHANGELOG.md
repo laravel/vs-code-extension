@@ -2,6 +2,14 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.2 - 2026-02-12
+
+### What's Changed
+
+* Fix test runner for PHPUnit projects by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/585
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.1...v1.6.2
+
 ## v1.6.1 - 2026-02-12
 
 ### What's Changed
