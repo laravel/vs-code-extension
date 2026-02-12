@@ -47,14 +47,21 @@ export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
         return message;
     }
 
-    const lastColonIndex = details.lastIndexOf(":");
+    const lines = details.split("\n").filter((line) => line.trim());
+    const lastLine = lines[lines.length - 1];
+
+    if (!lastLine) {
+        return message;
+    }
+
+    const lastColonIndex = lastLine.lastIndexOf(":");
 
     if (lastColonIndex === -1) {
         return message;
     }
 
-    const file = details.substring(0, lastColonIndex);
-    const line = parseInt(details.substring(lastColonIndex + 1), 10);
+    const file = lastLine.substring(0, lastColonIndex);
+    const line = parseInt(lastLine.substring(lastColonIndex + 1), 10);
 
     if (isNaN(line)) {
         return message;
