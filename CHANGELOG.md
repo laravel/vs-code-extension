@@ -2,6 +2,14 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.1 - 2026-02-12
+
+### What's Changed
+
+* Improve Test Runner error parsing by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/584
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.0...v1.6.1
+
 ## v1.6.0 - 2026-02-12
 
 ### What's Changed
