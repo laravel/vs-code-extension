@@ -118,6 +118,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { viteEnvCodeActionProvider },
         { hoverProviders },
         { linkProviders },
+        { initPestHelpers },
     ] = await Promise.all([
         import("./completion/Registry.js"),
         import("./completion/CompletionProvider.js"),
@@ -131,6 +132,7 @@ export async function activate(context: vscode.ExtensionContext) {
         import("./features/env.js"),
         import("./hover/HoverProvider.js"),
         import("./link/LinkProvider.js"),
+        import("./features/pest.js"),
     ]);
 
     console.log("Laravel VS Code Started...");
@@ -162,6 +164,8 @@ export async function activate(context: vscode.ExtensionContext) {
     };
 
     client = initClient(context);
+
+    initPestHelpers();
 
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor((editor) => {

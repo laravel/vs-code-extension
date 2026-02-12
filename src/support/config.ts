@@ -13,7 +13,8 @@ type ConfigKey =
     | "blade.autoSpaceTags"
     | "eloquent.generateDocBlocks"
     | "env.viteQuickFix"
-    | "pint.runOnSave";
+    | "pint.runOnSave"
+    | "pest.generateHelpers";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);
