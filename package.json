@@ -775,6 +775,11 @@
                     "default": false,
                     "description": "Automatically run Pint on the current file when saved."
                 },
+                "Laravel.testRunner.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable the test runner integration."
+                },
                 "Laravel.artisanMake.explorer": {
                     "type": "boolean",
                     "default": true,
