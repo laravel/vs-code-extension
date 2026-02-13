@@ -1,10 +1,15 @@
 import * as vscode from "vscode";
 
 import { createFileWatcher, inAppDirs } from "@src/support/fileWatcher";
+import { config } from "@src/support/config";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
-export const registerTestRunner = async (): Promise<vscode.TestController> => {
+export const registerTestRunner = () => {
+    if (!config("testRunner.enabled", true)) {
+        return;
+    }
+
     const controller = vscode.tests.createTestController(
         "laravel-tests",
         "Laravel Tests",
@@ -28,6 +33,4 @@ export const registerTestRunner = async (): Promise<vscode.TestController> => {
     });
 
     updateExplorer(controller);
-
-    return controller;
 };

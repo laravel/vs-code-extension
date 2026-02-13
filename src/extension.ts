@@ -275,7 +275,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    await registerTestRunner();
+    registerTestRunner();
 }
 
 export function deactivate() {
