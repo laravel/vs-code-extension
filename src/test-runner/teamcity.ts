@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import { getPaths } from "@src/repositories/paths";
+import { projectPath } from "@src/support/project";
 
 export interface TeamcityEvent {
     type: string;
@@ -60,7 +62,7 @@ export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
         return message;
     }
 
-    const file = lastLine.substring(0, lastColonIndex);
+    const file = resolveToHostPath(lastLine.substring(0, lastColonIndex));
     const line = parseInt(lastLine.substring(lastColonIndex + 1), 10);
 
     if (isNaN(line)) {
@@ -73,4 +75,16 @@ export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
     );
 
     return message;
+};
+
+const resolveToHostPath = (containerPath: string): string => {
+    const basePath = getPaths().items.find(
+        (item) => item.key === "base_path",
+    )?.path;
+
+    if (basePath && containerPath.startsWith(basePath)) {
+        return projectPath(containerPath.slice(basePath.length + 1));
+    }
+
+    return containerPath;
 };
