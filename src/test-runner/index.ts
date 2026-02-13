@@ -27,5 +27,7 @@ export const registerTestRunner = async (): Promise<vscode.TestController> => {
         updateExplorer(controller);
     });
 
+    updateExplorer(controller);
+
     return controller;
 };
