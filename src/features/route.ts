@@ -43,6 +43,8 @@ const toFind: FeatureTag = [
     },
 ];
 
+const isWildcard = (str: string) => str.includes("*");
+
 const isCorrectIndexForMethod = (
     item: AutocompleteParsingResult.ContextValue,
     index: number,
@@ -67,6 +69,10 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
         getRoutes,
         ({ param, item, index }) => {
             if (!isCorrectIndexForMethod(item, index)) {
+                return null;
+            }
+
+            if (isWildcard(param.value)) {
                 return null;
             }
 
@@ -109,6 +115,10 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getRoutes, (match) => {
+        if (isWildcard(match)) {
+            return null;
+        }
+
         const routeItem = getRoutes().items.find((r) => r.name === match);
 
         if (!routeItem || !routeItem.filename || !routeItem.line) {
@@ -133,6 +143,10 @@ export const diagnosticProvider = (
         getRoutes,
         ({ param, item, index }) => {
             if (!isCorrectIndexForMethod(item, index)) {
+                return null;
+            }
+
+            if (isWildcard(param.value)) {
                 return null;
             }
 
