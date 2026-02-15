@@ -95,6 +95,12 @@ const buildTestMapFromController = (
     return map;
 };
 
+const isPhpDebugEnabled = (): boolean =>
+    vscode.debug.activeDebugSession?.type === "php";
+
+const getXDebugCommand = (): string =>
+    isPhpDebugEnabled() ? "XDEBUG_TRIGGER=1" : "";
+
 const executeTests = async (
     args: string[],
     testMap: Map<string, vscode.TestItem>,
@@ -103,7 +109,7 @@ const executeTests = async (
 ): Promise<void> => {
     return new Promise((resolve) => {
         const proc = spawn(
-            getCommand("artisan"),
+            `${getXDebugCommand()} ${getCommand("artisan")}`.trim(),
             ["test", ...args, "--colors=always", "--log-teamcity=php://stdout"],
             {
                 cwd: projectPath(),
