@@ -15,3 +15,6 @@ package-lock.json
 
 # Logs
 *.log
+
+# Test fixtures
+src/test/fixtures/laravel-react/**
