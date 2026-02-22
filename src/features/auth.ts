@@ -1,6 +1,7 @@
 import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import { AuthItem, getPolicies } from "@src/repositories/auth";
+import { getModelByName } from "@src/repositories/models";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
@@ -126,22 +127,23 @@ const analyzeParam = (
 
     // @ts-ignore
     const nextArg = item.arguments.children[1].children[0];
-    let classArg: string | null = null;
 
-    if (nextArg?.type === "array") {
-        classArg = nextArg.children[0]?.value?.className;
-    } else {
-        classArg = nextArg?.className;
-    }
+    const classArg =
+        nextArg?.type === "array" ? nextArg.children[0]?.value : nextArg;
 
-    if (!classArg) {
+    const modelClass =
+        classArg?.type === "variable"
+            ? (classArg.className ?? getModelByName(classArg.name)?.class)
+            : classArg?.className;
+
+    if (!modelClass) {
         // If it's not a class we can even identify, just ignore it
         return {
             missingReason: "ignored",
         };
     }
 
-    const found = policies.find((items) => items.model === classArg);
+    const found = policies.find((items) => items.model === modelClass);
 
     if (!found) {
         return {
