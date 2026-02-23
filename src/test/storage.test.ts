@@ -1,6 +1,10 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { assertCompletions, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Storage Test Suite", () => {
@@ -35,6 +39,21 @@ suite("Storage Test Suite", () => {
                 {
                     line: "Storage::fake('public');",
                     target: "config/filesystems.php",
+                },
+            ],
+        });
+    });
+
+    test("provides storage diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/storage-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "Storage::disk('missing');",
+                    code: "storage_disk",
+                    contains: ["missing", "not found"],
                 },
             ],
         });

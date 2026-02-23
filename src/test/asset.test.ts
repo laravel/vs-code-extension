@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Asset Test Suite", () => {
@@ -30,6 +34,21 @@ suite("Asset Test Suite", () => {
                 {
                     line: "asset('favicon.svg');",
                     target: "public/favicon.svg",
+                },
+            ],
+        });
+    });
+
+    test("provides asset diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/asset-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "asset('missing-asset.txt');",
+                    code: "asset",
+                    contains: ["missing-asset.txt", "not found"],
                 },
             ],
         });

@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Translation Test Suite", () => {
@@ -44,6 +49,21 @@ suite("Translation Test Suite", () => {
                 {
                     line: "__('messages.welcome');",
                     contains: ["Welcome test message", "lang/en/messages.php"],
+                },
+            ],
+        });
+    });
+
+    test("provides translation diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/translation-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "__('messages.missing');",
+                    code: "translation",
+                    contains: ["messages.missing", "not found"],
                 },
             ],
         });

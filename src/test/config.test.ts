@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Config Test Suite", () => {
@@ -45,6 +50,21 @@ suite("Config Test Suite", () => {
                 {
                     line: "config('app.name');",
                     contains: ["config/app"],
+                },
+            ],
+        });
+    });
+
+    test("provides config diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/config-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "config('missing-config.entry');",
+                    code: "config",
+                    contains: ["missing-config.entry", "not found"],
                 },
             ],
         });

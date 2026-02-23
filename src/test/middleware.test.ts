@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Middleware Test Suite", () => {
@@ -48,6 +53,21 @@ suite("Middleware Test Suite", () => {
                 {
                     line: "Route::middleware('test.middleware')->get('middleware-link', fn () => null);",
                     contains: ["HandleAppearance.php"],
+                },
+            ],
+        });
+    });
+
+    test("provides middleware diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/middleware-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "Route::middleware('missing.middleware')->get('middleware-missing', fn () => null);",
+                    code: "middleware",
+                    contains: ["missing.middleware", "not found"],
                 },
             ],
         });

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\URL;
 
 // 1. Helper Functions
 route('home');
+route('missing.route');
 // signedRoute('dashboard');
 to_route('dashboard');
 

@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Env Test Suite", () => {
@@ -42,6 +47,21 @@ suite("Env Test Suite", () => {
                 {
                     line: "env('APP_NAME');",
                     contains: ["Laravel"],
+                },
+            ],
+        });
+    });
+
+    test("provides env diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/env-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "env('MISSING_ENV_KEY');",
+                    code: "env",
+                    contains: ["MISSING_ENV_KEY", "not found"],
                 },
             ],
         });

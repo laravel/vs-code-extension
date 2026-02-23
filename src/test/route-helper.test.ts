@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Route Helper Test Suite", () => {
@@ -70,6 +75,21 @@ suite("Route Helper Test Suite", () => {
                 {
                     line: "to_route('dashboard');",
                     contains: ["[Closure]", "routes/web.php"],
+                },
+            ],
+        });
+    });
+
+    test("provides route diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/route-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "route('missing.route');",
+                    code: "route",
+                    contains: ["missing.route", "not found"],
                 },
             ],
         });

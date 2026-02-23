@@ -1,7 +1,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import {
+    diagnosticCode,
     getCompletions,
+    getDiagnostics,
     getHovers,
     getLinks,
     hoverToText,
@@ -158,6 +160,73 @@ export async function assertHovers({
             assert.ok(
                 containsExpected,
                 `Case '${item.line}': Expected hover to include '${expected}'. Got: ${hoverText}`,
+            );
+        }
+    }
+}
+
+export async function assertDiagnostics({
+    doc,
+    lines,
+}: {
+    doc: vscode.TextDocument;
+    lines: {
+        line: string;
+        code?: string;
+        contains?: string[];
+        argument?: string;
+    }[];
+}): Promise<void> {
+    const text = doc.getText();
+    const diagnostics = await getDiagnostics(doc);
+
+    assert.ok(
+        diagnostics.length > 0,
+        "Expected diagnostics to be provided for document",
+    );
+
+    for (const item of lines) {
+        const lineIndex = text.indexOf(item.line);
+
+        assert.ok(
+            lineIndex !== -1,
+            `Could not find diagnostic case '${item.line}' in fixture`,
+        );
+
+        const selector = item.argument ?? item.line.match(/'([^']+)'/)?.[1];
+
+        if (!selector) {
+            assert.fail(
+                `Could not extract selector from '${item.line}'. Provide 'argument' explicitly for this case.`,
+            );
+        }
+
+        const selectorOffset = lineIndex + item.line.indexOf(selector);
+
+        const matchedDiagnostic = diagnostics.find((diagnostic) => {
+            return (
+                selectorOffset >= doc.offsetAt(diagnostic.range.start) &&
+                selectorOffset < doc.offsetAt(diagnostic.range.end)
+            );
+        });
+
+        assert.ok(
+            matchedDiagnostic,
+            `Case '${item.line}': Expected a diagnostic at '${selector}'`,
+        );
+
+        if (item.code) {
+            assert.strictEqual(
+                diagnosticCode(matchedDiagnostic!),
+                item.code,
+                `Case '${item.line}': Expected diagnostic code '${item.code}'. Got: '${diagnosticCode(matchedDiagnostic!)}'`,
+            );
+        }
+
+        for (const expected of item.contains ?? []) {
+            assert.ok(
+                matchedDiagnostic!.message.includes(expected),
+                `Case '${item.line}': Expected diagnostic message to include '${expected}'. Got: '${matchedDiagnostic!.message}'`,
             );
         }
     }

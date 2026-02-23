@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Controller Action Test Suite", () => {
@@ -31,6 +35,23 @@ suite("Controller Action Test Suite", () => {
                 //     line: "Route::get('controller-action-link', 'App\\\\Http\\\\Controllers\\\\Settings\\\\ProfileController@edit');",
                 //     target: "app/Http/Controllers/Settings/ProfileController.php",
                 // }, // Not working: no link target is returned for controller action strings in this fixture
+            ],
+        });
+    });
+
+    test("provides controller action diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/controller-action-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "Route::get('controller-action-missing', 'App\\\\Http\\\\Controllers\\\\MissingController@missing');",
+                    argument:
+                        "App\\\\Http\\\\Controllers\\\\MissingController@missing",
+                    code: "controllerAction",
+                    contains: ["MissingController@missing", "not found"],
+                },
             ],
         });
     });

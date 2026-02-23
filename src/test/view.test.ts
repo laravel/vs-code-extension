@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("View Test Suite", () => {
@@ -49,6 +54,21 @@ suite("View Test Suite", () => {
                 {
                     line: "view('app');",
                     contains: ["resources/views/app.blade.php"],
+                },
+            ],
+        });
+    });
+
+    test("provides view diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/view-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "view('missing-view');",
+                    code: "view",
+                    contains: ["missing-view", "not found"],
                 },
             ],
         });

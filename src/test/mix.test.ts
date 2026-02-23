@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Mix Test Suite", () => {
@@ -46,4 +51,19 @@ suite("Mix Test Suite", () => {
     //         ],
     //     });
     // }); // Not working on Windows: hover is not returned
+
+    test("provides mix diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/mix-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "mix('js/missing.js');",
+                    code: "mix",
+                    contains: ["js/missing.js", "not found"],
+                },
+            ],
+        });
+    });
 });

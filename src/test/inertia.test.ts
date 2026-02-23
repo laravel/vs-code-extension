@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("Inertia Test Suite", () => {
@@ -49,6 +54,21 @@ suite("Inertia Test Suite", () => {
                 {
                     line: "Inertia::render('welcome');",
                     contains: ["resources/js/pages"],
+                },
+            ],
+        });
+    });
+
+    test("provides inertia diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/inertia-helper.php"),
+            ),
+            lines: [
+                {
+                    line: "Inertia::render('missing-page');",
+                    code: "inertia",
+                    contains: ["missing-page", "not found"],
                 },
             ],
         });

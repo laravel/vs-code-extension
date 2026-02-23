@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
+import {
+    assertCompletions,
+    assertDiagnostics,
+    assertHovers,
+    assertLinks,
+} from "./assertions";
 import { activateExtension, uri } from "./helper";
 
 suite("App Binding Test Suite", () => {
@@ -77,6 +82,21 @@ suite("App Binding Test Suite", () => {
                         "AppBindingTestServiceProvider",
                         "app/Providers/AppBindingTestServiceProvider.php",
                     ],
+                },
+            ],
+        });
+    });
+
+    test("provides app binding diagnostics", async () => {
+        await assertDiagnostics({
+            doc: await vscode.workspace.openTextDocument(
+                uri("app/app-binding.php"),
+            ),
+            lines: [
+                {
+                    line: "app('missing.binding');",
+                    code: "appBinding",
+                    contains: ["missing.binding", "not found"],
                 },
             ],
         });
