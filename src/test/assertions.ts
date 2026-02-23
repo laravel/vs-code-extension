@@ -1,6 +1,12 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { getCompletions, getHovers, getLinks, hoverToText } from "./helper";
+import {
+    getCompletions,
+    getHovers,
+    getLinks,
+    hoverToText,
+    includesNormalized,
+} from "./helper";
 
 type AssertCompletionsOptions = {
     doc: vscode.TextDocument;
@@ -58,6 +64,10 @@ export async function assertLinks({
         argument?: string;
     }[];
 }): Promise<void> {
+    if (lines.length === 0) {
+        return;
+    }
+
     const text = doc.getText();
     const links = await getLinks(doc);
 
@@ -94,7 +104,7 @@ export async function assertLinks({
         );
 
         assert.ok(
-            matchedLink?.target?.fsPath.includes(item.target),
+            includesNormalized(matchedLink?.target?.fsPath ?? "", item.target),
             `Case '${item.line}': Expected link target to include '${item.target}'. Got: ${matchedLink?.target?.toString()}`,
         );
     }
@@ -140,8 +150,13 @@ export async function assertHovers({
         const hoverText = hoverToText(hovers[0]);
 
         for (const expected of item.contains) {
+            const containsExpected =
+                expected.includes("/") || expected.includes("\\")
+                    ? includesNormalized(hoverText, expected)
+                    : hoverText.includes(expected);
+
             assert.ok(
-                hoverText.includes(expected),
+                containsExpected,
                 `Case '${item.line}': Expected hover to include '${expected}'. Got: ${hoverText}`,
             );
         }

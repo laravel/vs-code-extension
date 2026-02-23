@@ -90,6 +90,20 @@ export function hoverToText(hover: vscode.Hover): string {
         .join("\n");
 }
 
+export function normalizeForCrossPlatformComparison(value: string): string {
+    try {
+        return decodeURIComponent(value).replace(/\\/g, "/").toLowerCase();
+    } catch {
+        return value.replace(/\\/g, "/").toLowerCase();
+    }
+}
+
+export function includesNormalized(actual: string, expected: string): boolean {
+    return normalizeForCrossPlatformComparison(actual).includes(
+        normalizeForCrossPlatformComparison(expected),
+    );
+}
+
 export function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
