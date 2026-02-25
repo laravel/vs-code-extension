@@ -16,5 +16,5 @@
             "@src/*": ["src/*"]
         }
     },
-    "exclude": ["server"]
+    "exclude": ["server", "src/test/fixtures"]
 }
