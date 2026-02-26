@@ -1142,7 +1142,7 @@
         }
     },
     "scripts": {
-        "pretest": "npm run compile && npm run lint",
+        "pretest": "npm run compile && tsc && npm run lint",
         "lint": "eslint src --ext ts",
         "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
         "test": "vscode-test",

@@ -67,7 +67,7 @@ const runPintCommand = (
 
 export const runPint = () => {
     statusBarWorking("Running Pint...");
-    runPintCommand();
+    return runPintCommand();
 };
 
 const isFileExcluded = (filePath: string): boolean => {
@@ -93,12 +93,12 @@ export const runPintOnCurrentFile = () => {
     }
 
     statusBarWorking("Running Pint on current file...");
-    runPintCommand(`"${fixFilePath(filePath)}"`);
+    return runPintCommand(`"${fixFilePath(filePath)}"`);
 };
 
 export const runPintOnDirtyFiles = () => {
     statusBarWorking("Running Pint on dirty files...");
-    runPintCommand("--dirty");
+    return runPintCommand("--dirty");
 };
 
 const runPintOnFile = (

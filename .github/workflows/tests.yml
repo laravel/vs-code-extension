@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
+
+jobs:
+    extension-tests:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os:
+                    - ubuntu-latest
+                    - windows-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.4"
+                  tools: composer:v2
+                  extensions: fileinfo, sqlite3, pdo_sqlite
+
+            - name: Install extension dependencies
+              run: npm ci
+
+            - name: Install Linux UI dependencies
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update
+                  ASOUND_PACKAGE=libasound2
+                  if apt-cache show libasound2t64 >/dev/null 2>&1; then
+                    ASOUND_PACKAGE=libasound2t64
+                  fi
+                  sudo apt-get install -y xvfb libnspr4 libnss3 libgtk-3-0 libxss1 libxshmfence1 libgbm1 "$ASOUND_PACKAGE"
+
+            - name: Setup Laravel fixture
+              run: composer run setup
+              working-directory: src/test/fixtures/laravel-react
+
+            - name: Run extension test suite (Linux)
+              if: runner.os == 'Linux'
+              run: xvfb-run -a npm test
+
+            - name: Run extension test suite (Windows)
+              if: runner.os == 'Windows'
+              run: npm test
