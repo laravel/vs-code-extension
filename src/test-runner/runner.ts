@@ -95,6 +95,14 @@ const buildTestMapFromController = (
     return map;
 };
 
+const isPhpDebugEnabled = (): boolean =>
+    vscode.debug.activeDebugSession?.type === "php";
+
+const getProcessEnv = (): NodeJS.ProcessEnv => ({
+    ...(isPhpDebugEnabled() ? { XDEBUG_TRIGGER: "1" } : {}),
+    ...process.env,
+});
+
 const executeTests = async (
     args: string[],
     testMap: Map<string, vscode.TestItem>,
@@ -109,6 +117,7 @@ const executeTests = async (
                 cwd: projectPath(),
                 shell: true,
                 detached: true,
+                env: getProcessEnv(),
             },
         );
 
