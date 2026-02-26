@@ -2,6 +2,23 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.3 - 2026-02-19
+
+### What's Changed
+
+* Discover tests on activation by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/587
+* Fix error location resolution for Docker/Sail environments by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/588
+* Test runner feature flag by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/589
+* Fix newline in the Blade class component hover by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/586
+* Fix error thrown by non-instantiable (abstract) policy classes by [@sjwebb](https://github.com/sjwebb) in https://github.com/laravel/vs-code-extension/pull/580
+* Fix for wildcards in Route::is by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/570
+
+### New Contributors
+
+* [@sjwebb](https://github.com/sjwebb) made their first contribution in https://github.com/laravel/vs-code-extension/pull/580
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.2...v1.6.3
+
 ## v1.6.2 - 2026-02-12
 
 ### What's Changed
