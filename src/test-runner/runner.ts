@@ -99,8 +99,8 @@ const isPhpDebugEnabled = (): boolean =>
     vscode.debug.activeDebugSession?.type === "php";
 
 const getProcessEnv = (): NodeJS.ProcessEnv => ({
-    ...process.env,
     ...(isPhpDebugEnabled() ? { XDEBUG_TRIGGER: "1" } : {}),
+    ...process.env,
 });
 
 const executeTests = async (
