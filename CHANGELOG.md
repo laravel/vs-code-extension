@@ -2,6 +2,20 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.4 - 2026-02-26
+
+### What's Changed
+
+* Initial tests by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/594
+* createOrFirst, updateOrCreate added by [@s1ghn](https://github.com/s1ghn) in https://github.com/laravel/vs-code-extension/pull/592
+* Support for XDebug trigger mode for Test Runner by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/591
+
+### New Contributors
+
+* [@s1ghn](https://github.com/s1ghn) made their first contribution in https://github.com/laravel/vs-code-extension/pull/592
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.3...v1.6.4
+
 ## v1.6.3 - 2026-02-19
 
 ### What's Changed
