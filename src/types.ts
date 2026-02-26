@@ -15,7 +15,8 @@ export namespace AutocompleteParsingResult {
         | Parameter
         | ParameterValue
         | Parameters
-        | StringValue;
+        | StringValue
+        | Variable;
 
     export interface Argument {
         type: "argument";
@@ -143,5 +144,11 @@ export namespace AutocompleteParsingResult {
             line: number;
             column: number;
         };
+    }
+
+    export interface Variable {
+        type: "variable";
+        parent: ContextValue | null;
+        name: string | null;
     }
 }
