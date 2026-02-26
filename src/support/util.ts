@@ -18,6 +18,12 @@ export const indent = (text: string = "", repeat: number = 1): string => {
     return "\t" + text;
 };
 
+export const withLineFragment = (
+    line: number | string | undefined | null,
+): { fragment?: string } => {
+    return line ? { fragment: `L${line}` } : {};
+};
+
 export const trimQuotes = (text: string): string =>
     text.substring(1, text.length - 1);
 
@@ -149,6 +155,31 @@ export const createIndexMapping = (
             return mapping[className ?? ""][methodName ?? ""] ?? null;
         },
     };
+};
+
+export const generateNestedKeysStructure = (
+    nestedKeys: string[],
+    startIndentNumber: number,
+) => {
+    return nestedKeys
+        .map((key, index, arr) =>
+            [
+                indent("", startIndentNumber + index),
+                `'${key}'`,
+                ` => `,
+                index === arr.length - 1 ? "''," : "[",
+            ].join(""),
+        )
+        .concat(
+            nestedKeys
+                .slice(0, -1)
+                .map((key, index, arr) =>
+                    [
+                        indent("", startIndentNumber + arr.length - 1 - index),
+                        "],",
+                    ].join(""),
+                ),
+        );
 };
 
 export const escapeNamespace = (namespace: string): string => {

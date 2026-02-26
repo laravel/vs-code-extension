@@ -1,15 +1,28 @@
-import { notFound, NotFoundCode } from "@src/diagnostic";
+import { openFile } from "@src/commands";
+import { notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
-import { getConfigPathByName, getConfigs } from "@src/repositories/configs";
+import {
+    ARRAY_VALUE,
+    getConfigByName,
+    getConfigs,
+    getNestedConfigByName,
+} from "@src/repositories/configs";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath } from "@src/support/project";
-import { attribute, contract, facade } from "@src/support/util";
+import {
+    attribute,
+    contract,
+    facade,
+    generateNestedKeysStructure,
+} from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
+import os from "os";
 import * as vscode from "vscode";
 import {
+    CodeActionProviderFunction,
     CompletionProvider,
     FeatureTag,
     HoverProvider,
@@ -171,18 +184,128 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getConfigPathByName(param.value);
-
-            const code: NotFoundCode = pathToFile
-                ? {
-                      value: "config",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
-                  }
-                : "config";
-
-            return notFound("Config", param.value, detectedRange(param), code);
+            return notFound(
+                "Config",
+                param.value,
+                detectedRange(param),
+                "config",
+            );
         },
     );
+};
+
+export const codeActionProvider: CodeActionProviderFunction = async (
+    diagnostic: vscode.Diagnostic,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (diagnostic.code !== "config") {
+        return [];
+    }
+
+    const missingVar = document.getText(diagnostic.range);
+
+    if (!missingVar) {
+        return [];
+    }
+
+    const actions = await Promise.all([addToFile(diagnostic, missingVar)]);
+
+    return actions.filter((action) => action !== null);
+};
+
+const addToFile = async (
+    diagnostic: vscode.Diagnostic,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const config = getConfigByName(missingVar);
+
+    if (config) {
+        return null;
+    }
+
+    const nestedConfig = getNestedConfigByName(missingVar);
+
+    if (!nestedConfig) {
+        return null;
+    }
+
+    if (!nestedConfig.file) {
+        return null;
+    }
+
+    // Case when user tries to add a key to a existing key that is not an array
+    if (nestedConfig.value !== ARRAY_VALUE) {
+        return null;
+    }
+
+    const path = projectPath(nestedConfig.file);
+
+    const fileName = path.split("/").pop()?.replace(".php", "");
+
+    if (!fileName) {
+        return null;
+    }
+
+    // Remember that Laravel config keys can go to subfolders, for example: foo.bar.baz.example
+    // can be: foo/bar.php with a key "baz.example" but also foo/bar/baz.php with a key "example"
+    const startIndentNumber = nestedConfig.name
+        .substring(missingVar.indexOf(`${fileName}.`))
+        .split(".").length;
+
+    const nestedKeys = missingVar
+        .slice(nestedConfig.name.length + 1)
+        .split(".");
+
+    const configContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(path),
+    );
+
+    const lineNumberFromConfig = nestedConfig.line
+        ? Number(nestedConfig.line)
+        : undefined;
+
+    const lineNumber =
+        lineNumberFromConfig ??
+        configContents
+            .toString()
+            .split("\n")
+            .findIndex((line) => line.startsWith("];"));
+
+    if (lineNumber === -1) {
+        return null;
+    }
+
+    const nestedKeysStructure = generateNestedKeysStructure(
+        nestedKeys,
+        startIndentNumber,
+    );
+
+    const finalValue = nestedKeysStructure.join(os.EOL) + os.EOL;
+
+    edit.insert(
+        vscode.Uri.file(path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(
+        "Add config to the file",
+        vscode.CodeActionKind.QuickFix,
+    );
+
+    action.edit = edit;
+    action.command = openFile(
+        path,
+        lineNumber + nestedKeys.length - 1,
+        nestedKeysStructure[nestedKeys.length - 1].length - 2,
+    );
+    action.diagnostics = [diagnostic];
+
+    return action;
 };
 
 export const completionProvider: CompletionProvider = {
