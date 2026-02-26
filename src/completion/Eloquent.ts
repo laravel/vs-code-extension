@@ -50,7 +50,12 @@ export class Eloquent implements CompletionProvider {
         "whereIn",
     ];
 
-    private anyParamMethods = ["firstOrNew", "firstOrCreate"];
+    private anyParamMethods = [
+        "createOrFirst",
+        "firstOrNew",
+        "firstOrCreate",
+        "updateOrCreate",
+    ];
 
     tags() {
         return Object.entries(getModels().items).map(([key]) => ({
