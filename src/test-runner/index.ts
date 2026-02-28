@@ -1,8 +1,7 @@
 import * as vscode from "vscode";
 
 import { config } from "@src/support/config";
-import { createFileWatcher, inAppDirs } from "@src/support/fileWatcher";
-import { projectPath } from "@src/support/project";
+import { createFileWatcher } from "@src/support/fileWatcher";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
