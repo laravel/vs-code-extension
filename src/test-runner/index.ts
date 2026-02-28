@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 
-import { createFileWatcher, inAppDirs } from "@src/support/fileWatcher";
 import { config } from "@src/support/config";
+import { createFileWatcher, inAppDirs } from "@src/support/fileWatcher";
+import { projectPath } from "@src/support/project";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
@@ -28,9 +29,11 @@ export const registerTestRunner = () => {
         }
     };
 
-    createFileWatcher([inAppDirs("tests/**/*")], () => {
-        updateExplorer(controller);
-    });
+    createFileWatcher(["tests/**/*"], () => updateExplorer(controller), [
+        "create",
+        "delete",
+        "change",
+    ]);
 
     updateExplorer(controller);
 };
