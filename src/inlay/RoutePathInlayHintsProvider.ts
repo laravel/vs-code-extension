@@ -98,7 +98,12 @@ const routeMethods = (method: string) =>
         .filter(Boolean);
 
 const scoreRouteMatch = (
-    route: { method: string; uri: string; filename: string | null; line: number | null },
+    route: {
+        method: string;
+        uri: string;
+        filename: string | null;
+        line: number | null;
+    },
     parsed: ParsedRouteLine,
     documentPath: string,
     lineNumber: number,
@@ -127,7 +132,10 @@ const scoreRouteMatch = (
     ) {
         const extraPrefix = candidateUri.length - declaredUri.length;
         score += 220 - Math.min(extraPrefix, 120);
-    } else if (declaredUri === "/" && (candidateUri === "/" || candidateUri === "")) {
+    } else if (
+        declaredUri === "/" &&
+        (candidateUri === "/" || candidateUri === "")
+    ) {
         score += 250;
     } else {
         return Number.NEGATIVE_INFINITY;
@@ -198,7 +206,12 @@ export class RoutePathInlayHintsProvider implements vscode.InlayHintsProvider {
             let bestScore = Number.NEGATIVE_INFINITY;
 
             for (const route of routes) {
-                const score = scoreRouteMatch(route, parsed, documentPath, line);
+                const score = scoreRouteMatch(
+                    route,
+                    parsed,
+                    documentPath,
+                    line,
+                );
 
                 if (score > bestScore) {
                     bestScore = score;

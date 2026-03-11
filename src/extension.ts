@@ -98,13 +98,16 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.namespace.generate"),
             generateNamespaceCommand,
         ),
-        vscode.commands.registerCommand(copyRoutePathCommand, (path: string) => {
-            vscode.env.clipboard.writeText(path);
-            vscode.window.setStatusBarMessage(
-                `Copied route path: ${path}`,
-                2000,
-            );
-        }),
+        vscode.commands.registerCommand(
+            copyRoutePathCommand,
+            (path: string) => {
+                vscode.env.clipboard.writeText(path);
+                vscode.window.setStatusBarMessage(
+                    `Copied route path: ${path}`,
+                    2000,
+                );
+            },
+        ),
     );
 
     if (!shouldActivate()) {
