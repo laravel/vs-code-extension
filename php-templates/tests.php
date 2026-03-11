@@ -14,6 +14,10 @@ use SebastianBergmann\FileIterator\Facade as FileIterator;
 $tests = new class {
     public function all(): array
     {
+        if (! $this->isPhpUnitInstalled()) {
+            return [];
+        }
+
         if ($this->isPestInstalled()) {
             $this->bootPest();
         }
@@ -44,6 +48,11 @@ $tests = new class {
                     ->filter(),
             ]);
         };
+    }
+
+    protected function isPhpUnitInstalled(): bool
+    {
+        return class_exists(TestCase::class);
     }
 
     protected function isPestInstalled(): bool
