@@ -165,7 +165,7 @@ export const detect = async (
 };
 
 const runCommand = (command: string): Promise<string> => {
-    return new Promise(async function (resolve, error) {
+    return new Promise(async function (resolve, reject) {
         if (!parserBinaryPath) {
             const waitForPath = async () => {
                 if (!parserBinaryPath) {
@@ -196,7 +196,10 @@ const runCommand = (command: string): Promise<string> => {
                     return resolve(stdout);
                 }
 
-                return error(stderr.length > 0 ? stderr : stdout);
+                const errorMessage =
+                    stderr.length > 0 ? stderr : stdout || err.message;
+
+                return reject(errorMessage);
             },
         );
     });
