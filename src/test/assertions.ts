@@ -265,7 +265,9 @@ export async function assertInlayHints({
         );
 
         const position = doc.positionAt(lineIndex);
-        const matchedHint = hints.find((hint) => hint.position.line === position.line);
+        const matchedHint = hints.find(
+            (hint) => hint.position.line === position.line,
+        );
 
         assert.ok(
             matchedHint,

@@ -196,7 +196,11 @@ const resolvePath = (routeUri: string) => {
 };
 
 const formatHintPath = (path: string, parsed: ParsedRouteLine) => {
-    if (normalizeUri(parsed.uri) === "/" && path !== "/" && !path.endsWith("/")) {
+    if (
+        normalizeUri(parsed.uri) === "/" &&
+        path !== "/" &&
+        !path.endsWith("/")
+    ) {
         return `${path}/`;
     }
 
