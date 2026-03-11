@@ -196,7 +196,10 @@ const runCommand = (command: string): Promise<string> => {
                     return resolve(stdout);
                 }
 
-                return reject([err, stderr.length > 0 ? stderr : stdout]);
+                const errorMessage =
+                    stderr.length > 0 ? stderr : stdout || err.message;
+
+                return reject(errorMessage);
             },
         );
     });

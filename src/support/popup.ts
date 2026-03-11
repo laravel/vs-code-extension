@@ -7,22 +7,8 @@ let showErrorPopups = config<boolean>("showErrorPopups", false);
 let lastErrorMessageShownAt = 0;
 const maxMessageInterval = 10;
 
-const normalizeMessages = (
-    errors: string | Error | (string | Error)[],
-): string[] => {
-    if (!Array.isArray(errors)) {
-        errors = [errors];
-    }
-
-    return errors.map((error) =>
-        error instanceof Error ? error.message : error,
-    );
-};
-
-export const showErrorPopup = (errors: string | Error | (string | Error)[]) => {
-    const messages = normalizeMessages(errors);
-
-    messages.forEach((message) => error(message));
+export const showErrorPopup = (...errors: string[]) => {
+    errors.forEach((message) => error(message));
 
     if (
         !showErrorPopups ||
@@ -50,7 +36,7 @@ export const showErrorPopup = (errors: string | Error | (string | Error)[]) => {
                     "",
                     "-".repeat(40),
                     "",
-                    ...messages,
+                    ...errors,
                 ];
 
                 vscode.env.clipboard.writeText(finalMessage.join("\n"));

@@ -306,10 +306,10 @@ export const runPhp = (
         });
 
         child.stderr.on("data", (data) => {
-            showErrorPopup([
+            showErrorPopup(
                 "Error:\n " + (description ?? "") + "\n\n" + data,
                 command,
-            ]);
+            );
             error(data);
         });
 
