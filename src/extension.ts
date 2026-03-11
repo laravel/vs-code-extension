@@ -3,6 +3,10 @@
 import * as vscode from "vscode";
 
 import os from "os";
+import {
+    copyRoutePathCommand,
+    RoutePathInlayHintsProvider,
+} from "./inlay/RoutePathInlayHintsProvider";
 import { LanguageClient } from "vscode-languageclient/node";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
@@ -94,6 +98,13 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.namespace.generate"),
             generateNamespaceCommand,
         ),
+        vscode.commands.registerCommand(copyRoutePathCommand, (path: string) => {
+            vscode.env.clipboard.writeText(path);
+            vscode.window.setStatusBarMessage(
+                `Copied route path: ${path}`,
+                2000,
+            );
+        }),
     );
 
     if (!shouldActivate()) {
@@ -211,6 +222,10 @@ export async function activate(context: vscode.ExtensionContext) {
             BLADE_LANGUAGES,
             new BladeCompletion(),
             "@",
+        ),
+        vscode.languages.registerInlayHintsProvider(
+            PHP_LANGUAGE,
+            new RoutePathInlayHintsProvider(),
         ),
         ...linkProviders.map((provider) =>
             vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),

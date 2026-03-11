@@ -1072,6 +1072,11 @@
                     "generated": true,
                     "description": "Enable completion for route."
                 },
+                "Laravel.route.pathHints": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show inline resolved route paths in route files and allow click-to-copy."
+                },
                 "Laravel.storage.link": {
                     "type": "boolean",
                     "default": true,

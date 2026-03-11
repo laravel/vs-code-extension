@@ -3,6 +3,7 @@ import { GeneratedConfigKey } from "./generated-config";
 
 type ConfigKey =
     | GeneratedConfigKey
+    | "route.pathHints"
     | "basePath"
     | "phpEnvironment"
     | "phpCommand"
