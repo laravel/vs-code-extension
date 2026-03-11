@@ -10,12 +10,24 @@ const ROUTE_FILE_REGEX = /(^|[\\/])[Rr]outes?(?:[\\/].+)?\.php$/;
 type ParsedRouteLine = {
     methods: string[];
     uri: string;
+    name: string | null;
 };
 
 const toSlashPath = (input: string) => input.replace(/\\/g, "/");
 
 const normalizePath = (input: string) => {
-    return toSlashPath(input).replace(/^\.\//, "");
+    return toSlashPath(input).replace(/^\.\//, "").replace(/^\/+/, "");
+};
+
+const pathMatches = (routeFile: string, documentPath: string) => {
+    if (routeFile === documentPath) {
+        return true;
+    }
+
+    return (
+        routeFile.endsWith(`/${documentPath}`) ||
+        documentPath.endsWith(`/${routeFile}`)
+    );
 };
 
 const normalizeUri = (input: string) => {
@@ -41,6 +53,9 @@ const parseMethodsFromMatch = (source: string): string[] => {
 };
 
 const parseRouteLine = (line: string): ParsedRouteLine | null => {
+    const routeNameMatch = /->\s*name\s*\(\s*(['"])([^'"]+)\1\s*\)/i.exec(line);
+    const routeName = routeNameMatch ? routeNameMatch[2] : null;
+
     const standard =
         /Route::\s*(get|post|put|patch|delete|options|head|any)\s*\(\s*(['\"])([^'\"]+)\2/i.exec(
             line,
@@ -61,12 +76,14 @@ const parseRouteLine = (line: string): ParsedRouteLine | null => {
                     "HEAD",
                 ],
                 uri: standard[3],
+                name: routeName,
             };
         }
 
         return {
             methods: [method],
             uri: standard[3],
+            name: routeName,
         };
     }
 
@@ -85,6 +102,7 @@ const parseRouteLine = (line: string): ParsedRouteLine | null => {
         return {
             methods,
             uri: matchRoute[3],
+            name: routeName,
         };
     }
 
@@ -101,6 +119,7 @@ const scoreRouteMatch = (
     route: {
         method: string;
         uri: string;
+        name: string;
         filename: string | null;
         line: number | null;
     },
@@ -124,6 +143,10 @@ const scoreRouteMatch = (
         }
     }
 
+    if (parsed.name && route.name === parsed.name) {
+        score += 400;
+    }
+
     if (candidateUri === declaredUri) {
         score += 300;
     } else if (
@@ -132,11 +155,13 @@ const scoreRouteMatch = (
     ) {
         const extraPrefix = candidateUri.length - declaredUri.length;
         score += 220 - Math.min(extraPrefix, 120);
-    } else if (
-        declaredUri === "/" &&
-        (candidateUri === "/" || candidateUri === "")
-    ) {
-        score += 250;
+    } else if (declaredUri === "/") {
+        if (candidateUri === "/" || candidateUri === "") {
+            score += 250;
+        } else {
+            // Routes declared as '/' can resolve to group prefixes like 'v2/users'.
+            score += 180;
+        }
     } else {
         return Number.NEGATIVE_INFINITY;
     }
@@ -144,7 +169,7 @@ const scoreRouteMatch = (
     if (route.filename) {
         const routeFile = normalizePath(route.filename);
 
-        if (routeFile === documentPath) {
+        if (pathMatches(routeFile, documentPath)) {
             score += 100;
 
             if (route.line) {
@@ -168,6 +193,14 @@ const resolvePath = (routeUri: string) => {
     }
 
     return routeUri.startsWith("/") ? routeUri : `/${routeUri}`;
+};
+
+const formatHintPath = (path: string, parsed: ParsedRouteLine) => {
+    if (normalizeUri(parsed.uri) === "/" && path !== "/" && !path.endsWith("/")) {
+        return `${path}/`;
+    }
+
+    return path;
 };
 
 export class RoutePathInlayHintsProvider implements vscode.InlayHintsProvider {
@@ -223,7 +256,7 @@ export class RoutePathInlayHintsProvider implements vscode.InlayHintsProvider {
                 continue;
             }
 
-            const path = resolvePath(bestRoute.uri);
+            const path = formatHintPath(resolvePath(bestRoute.uri), parsed);
             const position = new vscode.Position(
                 line,
                 textLine.range.end.character,

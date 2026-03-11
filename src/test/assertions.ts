@@ -5,10 +5,19 @@ import {
     getCompletions,
     getDiagnostics,
     getHovers,
+    getInlayHints,
     getLinks,
     hoverToText,
     includesNormalized,
 } from "./helper";
+
+const inlayHintText = (hint: vscode.InlayHint): string => {
+    if (typeof hint.label === "string") {
+        return hint.label;
+    }
+
+    return hint.label.map((part) => part.value).join("");
+};
 
 type AssertCompletionsOptions = {
     doc: vscode.TextDocument;
@@ -229,5 +238,44 @@ export async function assertDiagnostics({
                 `Case '${item.line}': Expected diagnostic message to include '${expected}'. Got: '${matchedDiagnostic!.message}'`,
             );
         }
+    }
+}
+
+export async function assertInlayHints({
+    doc,
+    lines,
+}: {
+    doc: vscode.TextDocument;
+    lines: {
+        line: string;
+        hint: string;
+    }[];
+}): Promise<void> {
+    const text = doc.getText();
+    const hints = await getInlayHints(doc);
+
+    assert.ok(hints.length > 0, "Expected inlay hints to be provided");
+
+    for (const item of lines) {
+        const lineIndex = text.indexOf(item.line);
+
+        assert.ok(
+            lineIndex !== -1,
+            `Could not find inlay hint case '${item.line}' in fixture`,
+        );
+
+        const position = doc.positionAt(lineIndex);
+        const matchedHint = hints.find((hint) => hint.position.line === position.line);
+
+        assert.ok(
+            matchedHint,
+            `Case '${item.line}': Expected an inlay hint on the same line`,
+        );
+
+        assert.strictEqual(
+            inlayHintText(matchedHint!).trim(),
+            item.hint,
+            `Case '${item.line}': Expected inlay hint '${item.hint}'. Got: '${inlayHintText(matchedHint!).trim()}'`,
+        );
     }
 }

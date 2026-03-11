@@ -74,6 +74,24 @@ export async function getHovers(
     );
 }
 
+export async function getInlayHints(
+    doc: vscode.TextDocument,
+    range?: vscode.Range,
+): Promise<vscode.InlayHint[]> {
+    const fullRange =
+        range ??
+        new vscode.Range(
+            doc.positionAt(0),
+            doc.positionAt(doc.getText().length),
+        );
+
+    return vscode.commands.executeCommand<vscode.InlayHint[]>(
+        "vscode.executeInlayHintProvider",
+        doc.uri,
+        fullRange,
+    );
+}
+
 export async function getDiagnostics(
     doc: vscode.TextDocument,
 ): Promise<vscode.Diagnostic[]> {
