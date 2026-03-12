@@ -2,6 +2,17 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.5 - 2026-03-12
+
+### What's Changed
+
+* Fix for Test Runner FileWatcher by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/599
+* Fix [Bug]: Startup errors when phpunit/phpunit is not installed by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/598
+* Fix [Bug]: On Windows Blade Jump to Blade - Path Not Found by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/602
+* Fix missing err handling in parser exec callback by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/600
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.4...v1.6.5
+
 ## v1.6.4 - 2026-02-26
 
 ### What's Changed
