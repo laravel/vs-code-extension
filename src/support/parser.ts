@@ -108,6 +108,8 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
 };
 
 const cleanArg = (arg: string): string => {
+    arg = arg.replace(/;;/g, ";");
+
     if (os.platform() === "win32") {
         const tempFile = tempPath(md5(arg));
 
@@ -117,25 +119,6 @@ const cleanArg = (arg: string): string => {
 
         return tempFile;
     }
-
-    const replacements: [string | RegExp, string][] = [[/;;/g, ";"]];
-
-    if (
-        ["linux", "openbsd", "sunos", "darwin"].some((unixPlatforms) =>
-            os.platform().includes(unixPlatforms),
-        )
-    ) {
-        replacements.push([/\$/g, "\\$"]);
-        replacements.push([/\\'/g, "\\\\'"]);
-        replacements.push([/\\"/g, '\\\\"']);
-    }
-
-    replacements.push([/\"/g, '\\"']);
-    replacements.push([/\`/g, "\\`"]);
-
-    replacements.forEach((replacement) => {
-        arg = arg.replace(replacement[0], replacement[1]);
-    });
 
     return arg;
 };
@@ -151,7 +134,7 @@ export const detect = async (
         >;
     }
 
-    const promise = runCommand(`detect "${cleanArg(code)}"`)
+    const promise = runCommand("detect", [cleanArg(code)])
         .then((result: string) => {
             return result.length > 0 ? JSON.parse(result) : result;
         })
@@ -164,7 +147,7 @@ export const detect = async (
     return promise;
 };
 
-const runCommand = (command: string): Promise<string> => {
+const runCommand = (command: string, args: string[]): Promise<string> => {
     return new Promise(async function (resolve, reject) {
         if (!parserBinaryPath) {
             const waitForPath = async () => {
@@ -180,13 +163,13 @@ const runCommand = (command: string): Promise<string> => {
             await waitForPath();
         }
 
-        const extraArgs = os.platform() === "win32" ? "--from-file" : "";
-        const toRun = `"${parserBinaryPath}" ${command} ${extraArgs}`;
+        if (os.platform() === "win32") {
+            args.push("--from-file");
+        }
 
-        // console.log("running command", toRun);
-
-        cp.exec(
-            toRun,
+        cp.execFile(
+            parserBinaryPath!,
+            [command, ...args],
             {
                 cwd: __dirname,
                 timeout: 5000,
@@ -214,7 +197,7 @@ export const parseForAutocomplete = (
 
     const arg = cleanArg(code);
 
-    const promise = runCommand(`autocomplete "${arg}"`)
+    const promise = runCommand("autocomplete", [arg])
         .then((result: string) => {
             return new AutocompleteResult(JSON.parse(result));
         })
