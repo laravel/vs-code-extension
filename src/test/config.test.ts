@@ -37,6 +37,10 @@ suite("Config Test Suite", () => {
                     line: "Config::get('filesystems.default');",
                     target: "config/filesystems.php",
                 },
+                {
+                    line: "config('database.connections');",
+                    target: "config/database.php",
+                },
             ],
         });
     });
@@ -50,6 +54,10 @@ suite("Config Test Suite", () => {
                 {
                     line: "config('app.name');",
                     contains: ["config/app"],
+                },
+                {
+                    line: "config('database.connections');",
+                    contains: ["config/database"],
                 },
             ],
         });

@@ -11,6 +11,7 @@ import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import {
     CompletionProvider,
+    Config,
     FeatureTag,
     HoverProvider,
     LinkProvider,
@@ -69,6 +70,18 @@ const isCorrectIndexForMethod = (
     return true;
 };
 
+const findConfigItem = (name: string): Config | undefined => {
+    const configs = getConfigs().items.configs;
+
+    const exact = configs.find((c) => c.name === name);
+
+    if (exact) {
+        return exact;
+    }
+
+    return configs.find((c) => c.name.startsWith(`${name}.`));
+};
+
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     return detectInDoc<vscode.DocumentLink, "string">(
         doc,
@@ -79,9 +92,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const configItem = getConfigs().items.configs.find(
-                (config) => config.name === param.value,
-            );
+            const configItem = findConfigItem(param.value);
 
             if (!configItem || !configItem.file) {
                 return null;
@@ -111,9 +122,7 @@ export const hoverProvider: HoverProvider = (
                 return null;
             }
 
-            const configItem = getConfigs().items.configs.find(
-                (config) => config.name === match,
-            );
+            const configItem = findConfigItem(match);
 
             if (!configItem) {
                 return null;
@@ -163,9 +172,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const config = getConfigs().items.configs.find(
-                (c) => c.name === param.value,
-            );
+            const config = findConfigItem(param.value);
 
             if (config) {
                 return null;
