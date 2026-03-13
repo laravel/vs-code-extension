@@ -36,6 +36,10 @@ suite("Translation Test Suite", () => {
                     line: "__('messages.welcome');",
                     target: "lang/en/messages.php",
                 },
+                {
+                    line: "__('messages.nested');",
+                    target: "lang/en/messages.php",
+                },
             ],
         });
     });
@@ -49,6 +53,10 @@ suite("Translation Test Suite", () => {
                 {
                     line: "__('messages.welcome');",
                     contains: ["Welcome test message", "lang/en/messages.php"],
+                },
+                {
+                    line: "__('messages.nested');",
+                    contains: ["lang/en/messages.php"],
                 },
             ],
         });
