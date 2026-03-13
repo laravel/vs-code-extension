@@ -88,7 +88,7 @@ export const getTranslationItemByName = (
     );
 
     if (childKey) {
-        return translations[childKey]
+        return translations[childKey];
     }
 };
 
