@@ -2,6 +2,17 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.6 - 2026-03-13
+
+### What's Changed
+
+* Fix parsing of PHP code containing special characters by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/605
+* Test case for intermediate config keys by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/607
+* Support intermediate (non-leaf) translation keys by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/609
+* Update issue assignees by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/610
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.5...v1.6.6
+
 ## v1.6.5 - 2026-03-12
 
 ### What's Changed
