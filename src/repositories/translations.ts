@@ -75,7 +75,21 @@ const load = () => {
 export const getTranslationItemByName = (
     match: string,
 ): TranslationItem | undefined => {
-    return getTranslations().items.translations[match.replaceAll("\\", "")];
+    const translations = getTranslations().items.translations;
+
+    const key = match.replaceAll("\\", "");
+
+    if (translations[key]) {
+        return translations[key];
+    }
+
+    const childKey = Object.keys(translations).find((k) =>
+        k.startsWith(`${key}.`),
+    );
+
+    if (childKey) {
+        return translations[childKey];
+    }
 };
 
 export const getTranslationPathByName = (
