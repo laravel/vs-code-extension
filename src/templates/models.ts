@@ -148,11 +148,14 @@ $models = new class($factory) {
 
         $data["extends"] = $this->getParentClass($reflection);
 
+        $data['name_cases'] = $this->getNameCases(str($className)->afterLast('\\\\')->toString());
+
         $existingProperties = $this->collectExistingProperties($reflection);
 
         $data['attributes'] = collect($data['attributes'])
             ->map(fn($attrs) => array_merge($attrs, [
                 'title_case' => str($attrs['name'])->title()->replace('_', '')->toString(),
+                'name_cases' => $this->getNameCases($attrs['name']),               
                 'documented' => $existingProperties->contains($attrs['name']),
                 'cast' =>  $this->getCastReturnType($attrs['cast'])
             ]))
@@ -175,6 +178,20 @@ $models = new class($factory) {
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
+    protected function getNameCases(string $name): array
+    {
+        return collect([
+            $name,
+            str($name)->camel()->toString(),
+            str($name)->snake()->toString(),
+            str($name)->studly()->toString(),
+            str($name)->studly()->lower()->toString(),
+        ])->unique()->values()->toArray();
+    }
+    
     protected function getScopeParameterInfo(\\ReflectionParameter $parameter): array
     {
         $result = [
