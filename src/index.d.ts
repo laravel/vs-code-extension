@@ -102,7 +102,7 @@ declare namespace Eloquent {
 
     interface Relation {
         name: string;
-        snake_name: string;
+        snake_case: string;
         type: string;
         related: string;
     }

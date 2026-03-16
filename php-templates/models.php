@@ -170,7 +170,7 @@ $models = new class($factory) {
 
         $data['relations'] = collect($data['relations'])
             ->map(fn($relation) => array_merge($relation, [
-                'snake_name' => \Illuminate\Support\Str::snake($relation['name']),
+                'snake_case' => \Illuminate\Support\Str::snake($relation['name']),
             ]))
             ->toArray();
 
