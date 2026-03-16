@@ -10,11 +10,38 @@ class LaravelVsCode
 {
     public static function relativePath($path)
     {
-        if (!str_contains($path, base_path())) {
-            return (string) $path;
+        if (! str_contains($path, base_path())) {
+            return self::relativePathBySegmentComparison($path);
         }
 
         return ltrim(str_replace(base_path(), '', realpath($path) ?: $path), DIRECTORY_SEPARATOR);
+    }
+
+    public static function relativePathBySegmentComparison(string $path): string
+    {
+        $realPath = realpath($path);
+
+        if (! $realPath) {
+            return $path;
+        }
+
+        $splitRealPath = explode(DIRECTORY_SEPARATOR, $realPath);
+        $splitBasePath = explode(DIRECTORY_SEPARATOR, base_path());
+
+        $diff = array_diff_assoc($splitRealPath, $splitBasePath);
+
+        $firstMissingSegmentIndex = array_key_first($diff);
+
+        // If the first segment is different, this path is likely on a different drive (Windows), so return the original path.
+        if ($firstMissingSegmentIndex === 0 || $firstMissingSegmentIndex === null) {
+            return $path;
+        }
+
+        array_splice($splitRealPath, 0, $firstMissingSegmentIndex);
+
+        $missingSegments = count($splitBasePath) - $firstMissingSegmentIndex;
+
+        return str_repeat('..'.DIRECTORY_SEPARATOR, $missingSegments).implode(DIRECTORY_SEPARATOR, $splitRealPath);
     }
 
     public static function isVendor($path)
