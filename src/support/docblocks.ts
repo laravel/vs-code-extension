@@ -169,7 +169,7 @@ const getRelationBlocks = (relation: Eloquent.Relation): string[] => {
     ) {
         return [
             `@property-read \\Illuminate\\Database\\Eloquent\\Collection<int, \\${relation.related}> $${relation.name}`,
-            `@property-read int|null $${relation.name}_count`,
+            `@property-read int|null $${relation.snake_case}_count`,
         ];
     }
 

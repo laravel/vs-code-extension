@@ -168,6 +168,12 @@ $models = new class($factory) {
             ->values()
             ->toArray();
 
+        $data['relations'] = collect($data['relations'])
+            ->map(fn($relation) => array_merge($relation, [
+                'snake_case' => \Illuminate\Support\Str::snake($relation['name']),
+            ]))
+            ->toArray();
+
         $data['uri'] = $reflection->getFileName();
 
         return [
