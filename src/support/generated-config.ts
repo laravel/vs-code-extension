@@ -41,6 +41,8 @@ export type GeneratedConfigKey =
     | "mix.hover"
     | "mix.link"
     | "mix.completion"
+    | "model.completion_attribute"
+    | "model.completion"
     | "paths.link"
     | "route.diagnostics"
     | "route.hover"
