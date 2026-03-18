@@ -1,8 +1,10 @@
-import { notFound, NotFoundCode } from "@src/diagnostic";
+import { openFile } from "@src/commands";
+import { DiagnosticWithContext, notFound } from "@src/diagnostic";
 import AutocompleteResult from "@src/parser/AutocompleteResult";
 import {
+    getNestedPreviousTranslationItemByName,
+    getNestedTranslationItemByName,
     getTranslationItemByName,
-    getTranslationPathByName,
     getTranslations,
     TranslationItem,
 } from "@src/repositories/translations";
@@ -11,10 +13,22 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
-import { contract, createIndexMapping, facade } from "@src/support/util";
+import {
+    contract,
+    createIndexMapping,
+    facade,
+    generateNestedKeysStructure,
+    indent,
+} from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
+import os from "os";
 import * as vscode from "vscode";
-import { FeatureTag, HoverProvider, LinkProvider } from "..";
+import {
+    CodeActionProviderFunction,
+    FeatureTag,
+    HoverProvider,
+    LinkProvider,
+} from "..";
 
 const toFind: FeatureTag = [
     {
@@ -191,26 +205,214 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const pathToFile = getTranslationPathByName(
-                param.value,
-                getLang(item as AutocompleteParsingResult.MethodCall),
-            );
-
-            const code: NotFoundCode = pathToFile
-                ? {
-                      value: "translation",
-                      target: vscode.Uri.file(projectPath(pathToFile)),
-                  }
-                : "translation";
-
             return notFound(
                 "Translation",
                 param.value,
                 detectedRange(param),
-                code,
+                "translation",
+                item,
             );
         },
     );
+};
+
+export const codeActionProvider: CodeActionProviderFunction = async (
+    diagnostic: DiagnosticWithContext,
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    token: vscode.CancellationToken,
+): Promise<vscode.CodeAction[]> => {
+    if (diagnostic.code !== "translation") {
+        return [];
+    }
+
+    const missingVar = document.getText(diagnostic.range);
+
+    if (!missingVar) {
+        return [];
+    }
+
+    const actions = await Promise.all([
+        addToPhpFile(diagnostic, missingVar),
+        addToJsonFile(diagnostic, missingVar),
+    ]);
+
+    return actions.filter((action) => action !== null);
+};
+
+const addToJsonFile = async (
+    diagnostic: DiagnosticWithContext,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const translation = getTranslationItemByName(missingVar);
+
+    if (translation) {
+        return null;
+    }
+
+    const lang =
+        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
+        getTranslations().items.default;
+
+    const translationPath = getTranslations().items.paths.find(
+        (path) => !path.startsWith("vendor/") && path.endsWith(`${lang}.json`),
+    );
+
+    if (!translationPath) {
+        return null;
+    }
+
+    const path = projectPath(translationPath);
+
+    const translationContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(projectPath(translationPath)),
+    );
+
+    const lines = translationContents.toString().split("\n");
+
+    const lineNumber = lines.findIndex((line) => line.startsWith("}"));
+
+    if (lineNumber === -1) {
+        return null;
+    }
+
+    const finalValue =
+        [indent(""), `"${missingVar}": `, '""'].join("") + os.EOL;
+
+    edit.insert(
+        vscode.Uri.file(path),
+        new vscode.Position(lineNumber - 1, lines[lineNumber - 1].length),
+        ",",
+    );
+
+    edit.insert(
+        vscode.Uri.file(path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(
+        "Add translation to the JSON file",
+        vscode.CodeActionKind.QuickFix,
+    );
+
+    action.edit = edit;
+    action.command = openFile(path, lineNumber, finalValue.length - 2);
+    action.diagnostics = [diagnostic];
+
+    return action;
+};
+
+const addToPhpFile = async (
+    diagnostic: DiagnosticWithContext,
+    missingVar: string,
+): Promise<vscode.CodeAction | null> => {
+    const edit = new vscode.WorkspaceEdit();
+
+    const translation = getTranslationItemByName(missingVar);
+
+    if (translation) {
+        return null;
+    }
+
+    const nestedTranslation = getNestedTranslationItemByName(missingVar);
+
+    // Case when user tries to add a key to a existing key that is not an array
+    if (nestedTranslation) {
+        return null;
+    }
+
+    const nestedPreviousTranslation =
+        getNestedPreviousTranslationItemByName(missingVar);
+
+    if (!nestedPreviousTranslation) {
+        return null;
+    }
+
+    const lang =
+        getLang(diagnostic.context as AutocompleteParsingResult.MethodCall) ??
+        getTranslations().items.default;
+
+    const nestedPreviousTranslationItem = nestedPreviousTranslation?.[lang];
+
+    if (!nestedPreviousTranslationItem) {
+        return null;
+    }
+
+    // We have to compare the missing var to the nested translation item name and find new keys
+    // to add, for example: foo.bar.new-nested-key.new-key compares to foo.bar.baz.example gives
+    // ["new-nested-key", "new-key"]
+    const nestedPreviousKeys = nestedPreviousTranslationItem.name.split(".");
+    const missingKeys = missingVar.split(".");
+
+    const commonKeys: string[] = [];
+
+    for (let i = 0; i < nestedPreviousKeys.length; i++) {
+        if (nestedPreviousKeys[i] !== missingKeys[i]) {
+            break;
+        }
+
+        commonKeys.push(nestedPreviousKeys[i]);
+    }
+
+    const nestedKeys = missingVar
+        .slice(commonKeys.join(".").length + 1)
+        .split(".");
+
+    const startIndentNumber = commonKeys.length;
+
+    const translationContents = await vscode.workspace.fs.readFile(
+        vscode.Uri.file(nestedPreviousTranslationItem.path),
+    );
+
+    const nestedKeyDepth = nestedPreviousTranslationItem.name
+        .slice(commonKeys.join(".").length + 1)
+        .split(".").length;
+
+    const lineNumberFromTranslation = nestedPreviousTranslationItem.line
+        ? nestedPreviousTranslationItem.line - nestedKeyDepth
+        : undefined;
+
+    const lineNumber =
+        lineNumberFromTranslation ??
+        translationContents
+            .toString()
+            .split("\n")
+            .findIndex((line) => line.startsWith("];"));
+
+    if (lineNumber === -1) {
+        return null;
+    }
+
+    const nestedKeysStructure = generateNestedKeysStructure(
+        nestedKeys,
+        startIndentNumber,
+    );
+
+    const finalValue = nestedKeysStructure.join(os.EOL) + os.EOL;
+
+    edit.insert(
+        vscode.Uri.file(nestedPreviousTranslationItem.path),
+        new vscode.Position(lineNumber, 0),
+        finalValue,
+    );
+
+    const action = new vscode.CodeAction(
+        "Add translation to the PHP file",
+        vscode.CodeActionKind.QuickFix,
+    );
+
+    action.edit = edit;
+    action.command = openFile(
+        nestedPreviousTranslationItem.path,
+        lineNumber + nestedKeys.length - 1,
+        nestedKeysStructure[nestedKeys.length - 1].length - 2,
+    );
+    action.diagnostics = [diagnostic];
+
+    return action;
 };
 
 export const completionProvider = {
