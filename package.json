@@ -752,7 +752,7 @@
                 },
                 "Laravel.showErrorPopups": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Show popups for errors."
                 },
                 "Laravel.env.viteQuickFix": {
