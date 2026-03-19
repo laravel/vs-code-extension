@@ -3,7 +3,7 @@ import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider } from "..";
-import { appendProps } from "@src/support/markdown";
+import { livewireHover } from "@src/support/markdown";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -66,21 +66,11 @@ export const hoverProvider: HoverProvider = (
         return v.key === `livewire.${match}` || (v.livewire && v.key === match);
     });
 
-    if (!view || !view.livewire) {
+    if (!view?.livewire) {
         return null;
     }
 
-    const markdown = new vscode.MarkdownString();
-
-    const files = view.livewire.files.map((path) => {
-        return `[${path}](${vscode.Uri.file(projectPath(path))})`;
-    });
-
-    markdown.appendMarkdown(files.join("\n\n"));
-
-    appendProps(markdown, view.livewire.props);
-
-    return new vscode.Hover(markdown);
+    return livewireHover(view.livewire);
 };
 
 export const completionProvider: vscode.CompletionItemProvider = {

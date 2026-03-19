@@ -66,7 +66,17 @@ $routes = new class {
             'parameters' => $route->parameterNames(),
             'filename' => $reflection ? LaravelVsCode::relativePath($reflection->getFileName()) : null,
             'line' => $reflection ? $reflection->getStartLine() : null,
+            'livewire' => $this->getLivewireView($route),
         ];
+    }
+
+    protected function getLivewireView(\\Illuminate\\Routing\\Route $route): ?string
+    {
+        if ($route->getActionName() !== 'Livewire\\Features\\SupportRouting\\LivewirePageController') {
+            return null;
+        }
+
+        return $route->defaults['_livewire_component'] ?? null;
     }
 
     protected function getRouteReflection(\\Illuminate\\Routing\\Route $route)
