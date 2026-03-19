@@ -1,4 +1,22 @@
+import { ViewItem } from "@src/repositories/views";
+import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
+
+export const livewireHover = (
+    livewire: NonNullable<ViewItem["livewire"]>,
+): vscode.Hover => {
+    const markdown = new vscode.MarkdownString();
+
+    const files = livewire.files.map((path) => {
+        return `[${path}](${vscode.Uri.file(projectPath(path))})`;
+    });
+
+    markdown.appendMarkdown(files.join("\n\n"));
+
+    appendProps(markdown, livewire.props);
+
+    return new vscode.Hover(markdown);
+};
 
 export const appendProps = (
     markdown: vscode.MarkdownString,
