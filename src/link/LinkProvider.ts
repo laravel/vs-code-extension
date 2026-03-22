@@ -27,22 +27,22 @@ import {
 } from "vscode";
 
 const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
-    "appBinding.link": appBinding,
-    "asset.link": asset,
-    "auth.link": auth,
-    "bladeComponent.link": bladeComponent,
+    // "appBinding.link": appBinding,
+    // "asset.link": asset,
+    // "auth.link": auth,
+    // "bladeComponent.link": bladeComponent,
     "config.link": config,
-    "controllerAction.link": controllerAction,
-    "env.link": env,
-    "inertia.link": inertia,
-    "livewireComponent.link": livewireComponent,
-    "middleware.link": middleware,
-    "mix.link": mix,
-    "paths.link": paths,
-    "route.link": route,
-    "storage.link": storage,
-    "translation.link": translation,
-    "view.link": view,
+    // "controllerAction.link": controllerAction,
+    // "env.link": env,
+    // "inertia.link": inertia,
+    // "livewireComponent.link": livewireComponent,
+    // "middleware.link": middleware,
+    // "mix.link": mix,
+    // "paths.link": paths,
+    // "route.link": route,
+    // "storage.link": storage,
+    // "translation.link": translation,
+    // "view.link": view,
 };
 
 export const linkProviders: DocumentLinkProvider[] = Object.entries(

@@ -10,11 +10,14 @@ export const setInternalVendorExists = (value: boolean) => {
     internalVendorExists = value;
 };
 
-export const internalVendorPath = (subPath = ""): string => {
+export const internalVendorPath = (
+    subPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolders()[0],
+): string => {
     const baseDir = path.join("vendor", "_laravel_ide");
 
     if (internalVendorExists !== true) {
-        const baseVendorDir = projectPath(baseDir);
+        const baseVendorDir = path.join(workspaceFolder.uri.fsPath, baseDir);
 
         internalVendorExists = fs.existsSync(baseVendorDir);
 
@@ -23,7 +26,7 @@ export const internalVendorPath = (subPath = ""): string => {
         }
     }
 
-    return projectPath(`${baseDir}/${subPath}`);
+    return path.join(workspaceFolder.uri.fsPath, baseDir, subPath);
 };
 
 const trimFirstSlash = (srcPath: string): string => {
@@ -45,17 +48,31 @@ export const basePath = (srcPath = ""): string => {
 export const projectPath = (srcPath = ""): string => {
     srcPath = basePath(srcPath);
 
+    return path.join(workspacePath(), srcPath);
+};
+
+export const workspacePath = (): string => {
+    if (vscode.window.activeTextEditor) {
+        const fileUri = vscode.window.activeTextEditor.document.uri;
+
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+
+        if (workspaceFolder && fs.existsSync(workspaceFolder.uri.fsPath)) {
+            return workspaceFolder.uri.fsPath;
+        }
+    }
+
     for (let workspaceFolder of getWorkspaceFolders()) {
         if (
             fs.existsSync(
                 path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
             )
         ) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
+            return workspaceFolder.uri.fsPath;
         }
 
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, srcPath))) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
+        if (fs.existsSync(workspaceFolder.uri.fsPath)) {
+            return workspaceFolder.uri.fsPath;
         }
     }
 

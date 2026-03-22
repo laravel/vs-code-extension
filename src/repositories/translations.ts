@@ -1,6 +1,7 @@
 import { runInLaravel, template } from "@src/support/php";
 import { projectPath } from "@src/support/project";
 import { waitForValue } from "@src/support/util";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 export interface TranslationItem {
@@ -37,9 +38,10 @@ interface TranslationGroupPhpResult {
 
 let dirsToWatch: string[] | null = null;
 
-const load = () => {
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
     return runInLaravel<TranslationGroupPhpResult>(
         template("translations"),
+        workspaceFolder,
         "Translations",
     ).then((res) => {
         const result: TranslationGroupResult["translations"] = {};

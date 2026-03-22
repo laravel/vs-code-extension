@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
@@ -16,9 +17,10 @@ interface MiddlewareItem {
 }
 
 export const getMiddleware = repository<MiddlewareItem>({
-    load: () => {
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
         return runInLaravel<MiddlewareItem>(
             template("middleware"),
+            workspaceFolder,
             "Middlewares",
         ).then((result) => {
             const items: MiddlewareItem = {};

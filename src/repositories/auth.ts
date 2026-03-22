@@ -1,5 +1,6 @@
 import { internalVendorPath } from "@src/support/project";
 import fs from "fs";
+import * as vscode from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "./../support/php";
 
@@ -105,14 +106,16 @@ interface Auth
     });
 };
 
-const load = () => {
-    return runInLaravel<AuthItems>(template("auth"), "Auth Data").then(
-        (result) => {
-            writeAuthBlocks(result.authenticatable);
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
+    return runInLaravel<AuthItems>(
+        template("auth"),
+        workspaceFolder,
+        "Auth Data",
+    ).then((result) => {
+        writeAuthBlocks(result.authenticatable);
 
-            return result;
-        },
-    );
+        return result;
+    });
 };
 
 export const getPolicies = repository<AuthItems>({

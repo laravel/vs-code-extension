@@ -193,6 +193,7 @@ const getFormattedError = (
 
 export const runInLaravel = <T>(
     code: string,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolders()[0]!,
     description: string | null = null,
     asJson: boolean = true,
     tryCount = 0,
@@ -204,7 +205,15 @@ export const runInLaravel = <T>(
 
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(runInLaravel(code, description, asJson, tryCount + 1));
+                resolve(
+                    runInLaravel(
+                        code,
+                        workspaceFolder,
+                        description,
+                        asJson,
+                        tryCount + 1,
+                    ),
+                );
             }, 1000);
         });
     }
@@ -217,7 +226,7 @@ export const runInLaravel = <T>(
         output: code,
     });
 
-    return runPhp(command, description)
+    return runPhp(command, workspaceFolder, description)
         .then((result: string) => {
             const regex = new RegExp(
                 toTemplateVar("start_output") +
@@ -257,16 +266,24 @@ export const fixFilePath = (path: string) => {
     return path;
 };
 
-const getHashedFile = (code: string) => {
-    if (discoverFiles.has(code)) {
-        return fixFilePath(discoverFiles.get(code)!);
+const getHashedFile = (
+    code: string,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
+    const discoverKey = `${workspaceFolder.name}:${code}`;
+
+    if (discoverFiles.has(discoverKey)) {
+        return fixFilePath(discoverFiles.get(discoverKey)!);
     }
 
-    const hashedFile = internalVendorPath(`discover-${md5(code)}.php`);
+    const hashedFile = internalVendorPath(
+        `discover-${md5(code)}.php`,
+        workspaceFolder,
+    );
 
     fs.writeFileSync(hashedFile, code);
 
-    discoverFiles.set(code, hashedFile);
+    discoverFiles.set(discoverKey, hashedFile);
 
     return fixFilePath(hashedFile);
 };
@@ -285,19 +302,20 @@ export const getCommandTemplate = (): string => {
 
 export const runPhp = (
     code: string,
+    workspaceFolder: vscode.WorkspaceFolder,
     description: string | null = null,
 ): Promise<string> => {
     if (!code.startsWith("<?php")) {
         code = "<?php\n\n" + code;
     }
 
-    const command = getCommand(getHashedFile(code));
+    const command = getCommand(getHashedFile(code, workspaceFolder));
 
     return new Promise<string>(function (resolve, error) {
         let result = "";
 
         const child = cp.spawn(command, {
-            cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+            cwd: workspaceFolder?.uri?.fsPath,
             shell: true,
         });
 

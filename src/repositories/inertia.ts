@@ -3,6 +3,7 @@ import { projectPath, relativePath } from "@src/support/project";
 import { waitForValue } from "@src/support/util";
 import * as fs from "fs";
 import * as sysPath from "path";
+import * as vscode from "vscode";
 import { repository } from ".";
 import { View } from "..";
 
@@ -78,11 +79,11 @@ const collectViews = (
 };
 
 export const getInertiaViews = repository<ViewItem>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         runInLaravel<{
             page_paths?: string[];
             page_extensions?: string[];
-        }>(template("inertia")).then((result) => {
+        }>(template("inertia"), workspaceFolder).then((result) => {
             return load(
                 result?.page_paths ?? [],
                 result?.page_extensions ?? [],

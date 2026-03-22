@@ -1,3 +1,5 @@
+import { getWorkspaceFolders, workspacePath } from "@src/support/project";
+import * as vscode from "vscode";
 import {
     type FileEvent,
     WatcherPattern,
@@ -12,51 +14,63 @@ export const repository = <T>({
     fileWatcherEvents = defaultFileEvents,
     reloadOnComposerChanges = true,
 }: {
-    load: () => Promise<T>;
+    load: (workspaceFolder: vscode.WorkspaceFolder) => Promise<T>;
     pattern: WatcherPattern;
     itemsDefault: T;
     fileWatcherEvents?: FileEvent[];
     reloadOnComposerChanges?: boolean;
 }) => {
-    let items: T = itemsDefault;
-    let loaded = false;
+    let items: Record<string, T> = {};
+    let loaded: Record<string, boolean> = {};
 
-    loadAndWatch(
-        () => {
-            load()
-                .then((result) => {
-                    if (typeof result === "undefined") {
-                        throw new Error("Failed to load items");
-                    }
+    for (let workspaceFolder of getWorkspaceFolders()) {
+        items[workspaceFolder.uri.fsPath] = itemsDefault;
+        loaded[workspaceFolder.uri.fsPath] = false;
 
-                    items = result;
-                    loaded = true;
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
-        },
-        pattern,
-        fileWatcherEvents,
-        reloadOnComposerChanges,
-    );
+        loadAndWatch(
+            (workspaceFolder: vscode.WorkspaceFolder) => {
+                load(workspaceFolder)
+                    .then((result) => {
+                        if (typeof result === "undefined") {
+                            throw new Error("Failed to load items");
+                        }
+
+                        items[workspaceFolder.uri.fsPath] = result;
+                        loaded[workspaceFolder.uri.fsPath] = true;
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                    });
+            },
+            pattern,
+            fileWatcherEvents,
+            workspaceFolder,
+            reloadOnComposerChanges,
+        );
+    }
 
     const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {
+        const path = workspacePath();
+
         let tries = 0;
 
-        while (!loaded && tries < maxTries) {
+        while (!loaded[path] && tries < maxTries) {
             tries++;
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        if (loaded) {
-            return callback(items);
+        if (loaded[path]) {
+            return callback(items[path]);
         }
     };
 
-    return () => ({
-        loaded,
-        items,
-        whenLoaded,
-    });
+    return () => {
+        const path = workspacePath();
+
+        return {
+            loaded: loaded[path],
+            items: items[path],
+            whenLoaded,
+        };
+    };
 };

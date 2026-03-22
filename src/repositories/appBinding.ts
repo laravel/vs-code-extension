@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
@@ -10,8 +11,12 @@ type AppBindingItem = {
 };
 
 export const getAppBindings = repository<AppBindingItem>({
-    load: () => {
-        return runInLaravel<AppBindingItem>(template("app"), "App Bindings");
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
+        return runInLaravel<AppBindingItem>(
+            template("app"),
+            workspaceFolder,
+            "App Bindings",
+        );
     },
     pattern: "app/Providers/{,*,**/*}.php",
     itemsDefault: {},

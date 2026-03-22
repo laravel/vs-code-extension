@@ -15,18 +15,19 @@ export type WatcherPattern =
 export const defaultFileEvents: FileEvent[] = ["change", "create", "delete"];
 
 export const loadAndWatch = (
-    load: () => void,
+    load: (workspaceFolder: vscode.WorkspaceFolder) => void,
     patterns: WatcherPattern,
     events: FileEvent[] = defaultFileEvents,
+    workspaceFolder: vscode.WorkspaceFolder,
     reloadOnComposerChanges: boolean = true,
 ): void => {
     if (!hasWorkspace()) {
         return;
     }
 
-    load();
+    load(workspaceFolder);
 
-    const loadFunc = leadingDebounce(load, 1000);
+    const loadFunc = leadingDebounce(() => load(workspaceFolder), 1000);
 
     if (patterns instanceof Function) {
         patterns().then((result) => {
@@ -35,12 +36,19 @@ export const loadAndWatch = (
                     result,
                     loadFunc,
                     events,
+                    workspaceFolder,
                     reloadOnComposerChanges,
                 );
             }
         });
     } else {
-        createFileWatcher(patterns, loadFunc, events, reloadOnComposerChanges);
+        createFileWatcher(
+            patterns,
+            loadFunc,
+            events,
+            workspaceFolder,
+            reloadOnComposerChanges,
+        );
     }
 };
 
@@ -110,6 +118,7 @@ export const createFileWatcher = (
     patterns: string | string[],
     callback: (e: vscode.Uri) => void,
     events: FileEvent[] = defaultFileEvents,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolders()[0]!,
     reloadOnComposerChanges: boolean = true,
 ): vscode.FileSystemWatcher[] => {
     if (!hasWorkspace()) {
@@ -130,7 +139,7 @@ export const createFileWatcher = (
         }
 
         const watcher = vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
+            new vscode.RelativePattern(workspaceFolder, pattern),
         );
 
         watcher.onDidChange((...args) => {
