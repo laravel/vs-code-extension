@@ -182,7 +182,9 @@ const runCommand = (command: string, args: string[]): Promise<string> => {
                 }
 
                 if (err.killed) {
-                    return reject(`Parser timed out after ${PARSER_TIMEOUT_MS / 1000} seconds. `);
+                    return reject(
+                        `Parser timed out after ${PARSER_TIMEOUT_MS / 1000} seconds. `,
+                    );
                 }
 
                 const details = [
