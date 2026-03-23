@@ -299,7 +299,9 @@ $components = new class {
     protected function normalizeDefault($value)
     {
         if ($value instanceof \\UnitEnum) {
-            return $value instanceof \\BackedEnum ? $value->value : $value::class.'::'.$value->name;
+            return $value instanceof \\BackedEnum
+                ? $value->value
+                : $value::class.'::'.$value->name;
         }
 
         return $value;
