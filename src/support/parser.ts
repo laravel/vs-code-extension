@@ -13,6 +13,8 @@ import { Cache } from "./cache";
 import { showErrorPopup } from "./popup";
 import { md5, tempPath, toArray } from "./util";
 
+const PARSER_TIMEOUT_MS = 30_000;
+
 const currentlyParsing = new Cache<string, Promise<AutocompleteResult>>(100);
 const detected = new Cache<
     string,
@@ -172,17 +174,29 @@ const runCommand = (command: string, args: string[]): Promise<string> => {
             [command, ...args],
             {
                 cwd: __dirname,
-                timeout: 5000,
+                timeout: PARSER_TIMEOUT_MS,
             },
             (err, stdout, stderr) => {
                 if (err === null) {
                     return resolve(stdout);
                 }
 
-                const errorMessage =
-                    stderr.length > 0 ? stderr : stdout || err.message;
+                if (err.killed) {
+                    return reject(
+                        `Parser timed out after ${PARSER_TIMEOUT_MS / 1000} seconds. `,
+                    );
+                }
 
-                return reject(errorMessage);
+                const details = [
+                    err.message,
+                    stderr.length > 0 ? stderr.trim() : null,
+                    stdout.length > 0 ? stdout.trim() : null,
+                    err.code != null ? `exit code: ${err.code}` : null,
+                ]
+                    .filter(Boolean)
+                    .join("\n");
+
+                return reject(details);
             },
         );
     });
