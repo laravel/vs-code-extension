@@ -7,6 +7,7 @@ import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
+import { livewireHover } from "@src/support/markdown";
 import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -96,7 +97,24 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 (route) => route.name === param.value,
             );
 
-            if (!route || !route.filename) {
+            if (!route) {
+                return null;
+            }
+
+            if (route.livewire) {
+                const view = getViews().items.find(
+                    (v) => v.key === route.livewire,
+                );
+
+                if (view) {
+                    return new vscode.DocumentLink(
+                        detectedRange(param),
+                        vscode.Uri.file(projectPath(view.path)),
+                    );
+                }
+            }
+
+            if (!route.filename) {
                 return null;
             }
 
@@ -121,7 +139,21 @@ export const hoverProvider: HoverProvider = (
 
         const routeItem = getRoutes().items.find((r) => r.name === match);
 
-        if (!routeItem || !routeItem.filename || !routeItem.line) {
+        if (!routeItem) {
+            return null;
+        }
+
+        if (routeItem.livewire) {
+            const view = getViews().items.find(
+                (v) => v.key === routeItem.livewire,
+            );
+
+            if (view?.livewire) {
+                return livewireHover(view.livewire);
+            }
+        }
+
+        if (!routeItem.filename || !routeItem.line) {
             return null;
         }
 
