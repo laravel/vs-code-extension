@@ -16,6 +16,9 @@ import {
     projectPathExists,
 } from "../support/project";
 
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+let runningProcess: cp.ChildProcess | undefined;
+
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
     currentFile: commandName("laravel.pint.runOnCurrentFile"),
@@ -38,12 +41,14 @@ const runPintCommand = (
 
         const command = `${getCommand("vendor/bin/pint")} ${args}`.trim();
 
-        cp.exec(
+        runningProcess = cp.exec(
             command,
             {
                 cwd: projectPath(),
             },
             (err, stdout, stderr) => {
+                runningProcess = undefined;
+
                 if (err === null) {
                     if (showSuccessMessage) {
                         statusBarSuccess("Pint completed successfully!");
@@ -129,7 +134,20 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
         return;
     }
 
-    runPintOnFile(document.uri.fsPath, false);
+    if (debounceTimer) {
+        clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(() => {
+        debounceTimer = undefined;
+
+        if (runningProcess) {
+            runningProcess.kill();
+            runningProcess = undefined;
+        }
+
+        runPintOnFile(document.uri.fsPath, false);
+    }, 300);
 };
 
 export class PintEditProvider implements vscode.DocumentFormattingEditProvider {
