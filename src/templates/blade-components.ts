@@ -113,7 +113,7 @@ $components = new class {
             $reflection = new \\ReflectionClass($class);
             $parameters = collect($reflection->getConstructor()?->getParameters() ?? [])
                 ->filter(fn($p) => $p->isPromoted())
-                ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $p->getDefaultValue() : null])
+                ->flatMap(fn($p) => [$p->getName() => $p->isOptional() ? $this->normalizeDefault($p->getDefaultValue()) : null])
                 ->all();
 
             $props = collect($reflection->getProperties())
@@ -121,7 +121,7 @@ $components = new class {
                 ->map(fn($p) => [
                     'name' => \\Illuminate\\Support\\Str::kebab($p->getName()),
                     'type' => (string) ($p->getType() ?? 'mixed'),
-                    'default' => $p->getDefaultValue() ?? $parameters[$p->getName()] ?? null,
+                    'default' => $this->normalizeDefault($p->getDefaultValue() ?? $parameters[$p->getName()] ?? null),
                 ]);
 
             [$except, $props] = $props->partition(fn($p) => $p['name'] === 'except');
@@ -294,6 +294,17 @@ $components = new class {
         }
 
         return $components;
+    }
+
+    protected function normalizeDefault($value)
+    {
+        if ($value instanceof \\UnitEnum) {
+            return $value instanceof \\BackedEnum
+                ? $value->value
+                : $value::class.'::'.$value->name;
+        }
+
+        return $value;
     }
 
     protected function getNamespacePath($classNamespace)
