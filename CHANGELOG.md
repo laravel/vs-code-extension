@@ -2,6 +2,20 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.7 - 2026-03-24
+
+### What's Changed
+
+* Fix snake_case conversion for relation count attributes by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/611
+* Increase binary download timeout to 5 minutes by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/613
+* Disable error popups by default by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/614
+* Debounce Pint processes on save by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/615
+* Link Livewire page routes to components by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/616
+* Increase parser timeout and improve error messages on Windows by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/619
+* Handle non-backed enums in Blade component discovery by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/620
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.6...v1.6.7
+
 ## v1.6.6 - 2026-03-13
 
 ### What's Changed
