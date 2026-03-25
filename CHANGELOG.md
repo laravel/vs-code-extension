@@ -2,6 +2,19 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.6.8 - 2026-03-25
+
+### What's Changed
+
+* Avoid overlapping test explorer updates by [@jaewun](https://github.com/jaewun) in https://github.com/laravel/vs-code-extension/pull/622
+* Inertia V3 Support by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/623
+
+### New Contributors
+
+* [@jaewun](https://github.com/jaewun) made their first contribution in https://github.com/laravel/vs-code-extension/pull/622
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.7...v1.6.8
+
 ## v1.6.7 - 2026-03-24
 
 ### What's Changed
