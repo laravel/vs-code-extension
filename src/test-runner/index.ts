@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { config } from "@src/support/config";
-import { createFileWatcher } from "@src/support/fileWatcher";
+import { loadAndWatch } from "@src/support/fileWatcher";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
@@ -28,11 +28,11 @@ export const registerTestRunner = () => {
         }
     };
 
-    createFileWatcher(["tests/**/*"], () => updateExplorer(controller), [
-        "create",
-        "delete",
-        "change",
-    ]);
-
-    updateExplorer(controller);
+    loadAndWatch(
+        () => {
+            void updateExplorer(controller);
+        },
+        ["tests/**/*"],
+        ["create", "delete", "change"],
+    );
 };
