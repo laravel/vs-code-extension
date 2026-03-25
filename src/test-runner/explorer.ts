@@ -17,32 +17,12 @@ export interface TestSuite {
     }[];
 }
 
-let runningUpdate: Promise<void> | undefined;
-let refreshQueued = false;
-
 export const updateExplorer = async (controller: vscode.TestController) => {
-    if (runningUpdate) {
-        refreshQueued = true;
-        return runningUpdate;
-    }
+    const suites = await getTestSuites();
 
-    const update = (async () => {
-        do {
-            refreshQueued = false;
-
-            const suites = await getTestSuites();
-
-            controller.items.replace(
-                suites.map((suite) => buildSuiteItem(controller, suite)),
-            );
-        } while (refreshQueued);
-    })().finally(() => {
-        runningUpdate = undefined;
-    });
-
-    runningUpdate = update;
-
-    return update;
+    controller.items.replace(
+        suites.map((suite) => buildSuiteItem(controller, suite)),
+    );
 };
 
 const getTestSuites = () => {
