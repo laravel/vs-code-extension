@@ -113,7 +113,7 @@ Route::inertia('/dashboard', 'Pages/Dashboard');
     - Create view
 - Hoverable
 
-**Note:** If the extension is unable to find your Inertia views, you may need to update your `inertia.testing.page_paths` and/or `inertia.testing.page_extensions` config values.
+**Note:** If the extension is unable to find your Inertia views, ensure your `inertia.pages.paths` and/or `inertia.pages.extensions` config values are correct. Older projects may still use `inertia.page_*` or `inertia.testing.page_*`.
 
 ### Route
 
