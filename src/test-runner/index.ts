@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 
 import { config } from "@src/support/config";
 import { loadAndWatch } from "@src/support/fileWatcher";
+import { getFirstWorkspaceFolder } from "@src/support/workspace";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
@@ -34,5 +35,6 @@ export const registerTestRunner = () => {
         },
         ["tests/**/*"],
         ["create", "delete", "change"],
+        getFirstWorkspaceFolder()!,
     );
 };

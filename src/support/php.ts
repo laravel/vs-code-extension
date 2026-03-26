@@ -13,7 +13,6 @@ import {
 } from "./phpEnvironments";
 import { showErrorPopup } from "./popup";
 import {
-    getWorkspaceFolders,
     internalVendorPath,
     projectPath,
     projectPathExists,
@@ -21,6 +20,7 @@ import {
     setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
+import { getFirstWorkspaceFolder } from "./workspace";
 
 const toTemplateVar = (str: string) => {
     const suffix = str === "output" ? ";" : "";
@@ -193,7 +193,7 @@ const getFormattedError = (
 
 export const runInLaravel = <T>(
     code: string,
-    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolders()[0]!,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstWorkspaceFolder()!,
     description: string | null = null,
     asJson: boolean = true,
     tryCount = 0,

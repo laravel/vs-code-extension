@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 
-import { Command } from "@src/artisan/types";
 import { buildArtisanCommand } from "@src/artisan/builder";
-import { artisan } from "@src/support/php";
+import { Command } from "@src/artisan/types";
 import { getPathFromOutput } from "@src/support/artisan";
-import { getWorkspaceFolders } from "@src/support/project";
+import { artisan } from "@src/support/php";
+import { getWorkspaceFolder } from "@src/support/workspace";
 import { openFileCommand } from ".";
 
 export const runArtisanMakeCommand = async (
@@ -64,28 +64,4 @@ export const runArtisanCommand = async (
     }
 
     return { output, workspaceFolder, uri };
-};
-
-const getWorkspaceFolder = (
-    uri: vscode.Uri | undefined,
-): vscode.WorkspaceFolder | undefined => {
-    if (uri) {
-        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    if (vscode.window.activeTextEditor) {
-        const fileUri = vscode.window.activeTextEditor.document.uri;
-
-        const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    return getWorkspaceFolders()?.[0];
 };

@@ -1,4 +1,4 @@
-import { getWorkspaceFolders } from "@src/support/project";
+import { getFirstWorkspaceFolder } from "@src/support/workspace";
 import * as fs from "fs";
 import * as path from "path";
 import { repository } from ".";
@@ -13,7 +13,7 @@ export const getPintConfig = repository<PintConfig>({
     load: () =>
         new Promise((resolve, reject) => {
             try {
-                const workspaceFolder = getWorkspaceFolders()[0];
+                const workspaceFolder = getFirstWorkspaceFolder();
 
                 if (!workspaceFolder) {
                     resolve({});

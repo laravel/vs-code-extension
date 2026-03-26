@@ -1,7 +1,11 @@
 import { readdirSync } from "fs";
 import * as vscode from "vscode";
-import { getWorkspaceFolders, hasWorkspace } from "./project";
 import { debounce, leadingDebounce } from "./util";
+import {
+    getFirstWorkspaceFolder,
+    getWorkspaceFolder,
+    getWorkspaceFolders,
+} from "./workspace";
 
 export type FileEvent = "change" | "create" | "delete";
 
@@ -21,10 +25,6 @@ export const loadAndWatch = (
     workspaceFolder: vscode.WorkspaceFolder,
     reloadOnComposerChanges: boolean = true,
 ): void => {
-    if (!hasWorkspace()) {
-        return;
-    }
-
     load(workspaceFolder);
 
     const loadFunc = leadingDebounce(() => load(workspaceFolder), 1000);
@@ -59,7 +59,7 @@ const ignoreDirs = ["node_modules", ".git", "vendor", "storage"];
 export const inAppDirs = (pattern: string) => {
     if (!appDirsRead) {
         appDirsRead = true;
-        readdirSync(getWorkspaceFolders()[0].uri.fsPath, {
+        readdirSync(getWorkspaceFolder()!.uri.fsPath, {
             withFileTypes: true,
         }).forEach((file) => {
             if (file.isDirectory() && !ignoreDirs.includes(file.name)) {
@@ -100,42 +100,48 @@ export const watchForComposerChanges = () => {
         }
     }, 1000);
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(
-            getWorkspaceFolders()[0],
-            "vendor/composer/autoload_*.php",
-        ),
-    );
+    getWorkspaceFolders().forEach((workspaceFolder) => {
+        const watcher = vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(
+                workspaceFolder,
+                "vendor/composer/autoload_*.php",
+            ),
+        );
 
-    watcher.onDidChange(onChange);
-    watcher.onDidCreate(onChange);
-    watcher.onDidDelete(onChange);
+        watcher.onDidChange(onChange);
+        watcher.onDidCreate(onChange);
+        watcher.onDidDelete(onChange);
 
-    registerWatcher(watcher);
+        registerWatcher(watcher);
+    });
 };
 
 export const createFileWatcher = (
     patterns: string | string[],
     callback: (e: vscode.Uri) => void,
     events: FileEvent[] = defaultFileEvents,
-    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolders()[0]!,
+    workspaceFolder:
+        | vscode.WorkspaceFolder
+        | undefined = getFirstWorkspaceFolder(),
     reloadOnComposerChanges: boolean = true,
 ): vscode.FileSystemWatcher[] => {
-    if (!hasWorkspace()) {
+    if (!workspaceFolder) {
         return [];
     }
 
     patterns = typeof patterns === "string" ? [patterns] : patterns;
 
     return patterns.map((pattern) => {
-        if (patternWatchers[pattern]) {
-            patternWatchers[pattern].callbacks.push({
+        const key = [workspaceFolder.name, pattern].join(".");
+
+        if (patternWatchers[key]) {
+            patternWatchers[key].callbacks.push({
                 callback,
                 events,
                 reloadOnComposerChanges,
             });
 
-            return patternWatchers[pattern].watcher;
+            return patternWatchers[key].watcher;
         }
 
         const watcher = vscode.workspace.createFileSystemWatcher(
@@ -143,7 +149,7 @@ export const createFileWatcher = (
         );
 
         watcher.onDidChange((...args) => {
-            patternWatchers[pattern].callbacks.forEach((cb) => {
+            patternWatchers[key].callbacks.forEach((cb) => {
                 if (cb.events.includes("change")) {
                     cb.callback(...args);
                 }
@@ -151,7 +157,7 @@ export const createFileWatcher = (
         });
 
         watcher.onDidCreate((...args) => {
-            patternWatchers[pattern].callbacks.forEach((cb) => {
+            patternWatchers[key].callbacks.forEach((cb) => {
                 if (cb.events.includes("create")) {
                     cb.callback(...args);
                 }
@@ -159,14 +165,14 @@ export const createFileWatcher = (
         });
 
         watcher.onDidDelete((...args) => {
-            patternWatchers[pattern].callbacks.forEach((cb) => {
+            patternWatchers[key].callbacks.forEach((cb) => {
                 if (cb.events.includes("delete")) {
                     cb.callback(...args);
                 }
             });
         });
 
-        patternWatchers[pattern] = {
+        patternWatchers[key] = {
             watcher,
             callbacks: [{ callback, events, reloadOnComposerChanges }],
         };

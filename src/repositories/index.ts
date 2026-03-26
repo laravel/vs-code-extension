@@ -1,4 +1,7 @@
-import { getWorkspaceFolders, workspacePath } from "@src/support/project";
+import {
+    getWorkspaceFolder,
+    getWorkspaceFolders,
+} from "@src/support/workspace";
 import * as vscode from "vscode";
 import {
     type FileEvent,
@@ -23,9 +26,9 @@ export const repository = <T>({
     let items: Record<string, T> = {};
     let loaded: Record<string, boolean> = {};
 
-    for (let workspaceFolder of getWorkspaceFolders()) {
-        items[workspaceFolder.uri.fsPath] = itemsDefault;
-        loaded[workspaceFolder.uri.fsPath] = false;
+    getWorkspaceFolders().forEach((workspaceFolder) => {
+        items[workspaceFolder.name] = itemsDefault;
+        loaded[workspaceFolder.name] = false;
 
         loadAndWatch(
             (workspaceFolder: vscode.WorkspaceFolder) => {
@@ -35,8 +38,8 @@ export const repository = <T>({
                             throw new Error("Failed to load items");
                         }
 
-                        items[workspaceFolder.uri.fsPath] = result;
-                        loaded[workspaceFolder.uri.fsPath] = true;
+                        items[workspaceFolder.name] = result;
+                        loaded[workspaceFolder.name] = true;
                     })
                     .catch((e) => {
                         console.error(e);
@@ -47,29 +50,29 @@ export const repository = <T>({
             workspaceFolder,
             reloadOnComposerChanges,
         );
-    }
+    });
 
     const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {
-        const path = workspacePath();
+        const name = getWorkspaceFolder()!.name;
 
         let tries = 0;
 
-        while (!loaded[path] && tries < maxTries) {
+        while (!loaded[name] && tries < maxTries) {
             tries++;
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        if (loaded[path]) {
-            return callback(items[path]);
+        if (loaded[name]) {
+            return callback(items[name]);
         }
     };
 
     return () => {
-        const path = workspacePath();
+        const name = getWorkspaceFolder()!.name;
 
         return {
-            loaded: loaded[path],
-            items: items[path],
+            loaded: loaded[name],
+            items: items[name],
             whenLoaded,
         };
     };
