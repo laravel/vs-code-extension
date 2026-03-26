@@ -28,19 +28,6 @@ export const getWorkspaceFolder = (
         }
     }
 
-    // Case when we don't know the file URI and we don't have an active text editor,
-    // so we try to find a workspace folder that contains an "artisan" file,
-    // which is a common file in Laravel projects
-    for (let workspaceFolder of getWorkspaceFolders()) {
-        if (
-            fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            )
-        ) {
-            return workspaceFolder;
-        }
-    }
-
     // Fallback, just return the first workspace folder if it exists
     return getFirstWorkspaceFolder();
 };
@@ -48,8 +35,17 @@ export const getWorkspaceFolder = (
 export const getFirstWorkspaceFolder = (): vscode.WorkspaceFolder | undefined =>
     getWorkspaceFolders()?.[0];
 
-export const getWorkspaceFolders = () =>
+export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
     vscode.workspace.workspaceFolders || [];
+
+export const getLaravelWorkspaceFolders =
+    (): readonly vscode.WorkspaceFolder[] => {
+        return vscode.workspace.workspaceFolders?.filter((workspaceFolder) => {
+            return fs.existsSync(
+                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+            );
+        })!;
+    };
 
 export const hasWorkspace = (): boolean => {
     return (

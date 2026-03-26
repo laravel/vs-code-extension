@@ -3,8 +3,8 @@ import * as vscode from "vscode";
 import { debounce, leadingDebounce } from "./util";
 import {
     getFirstWorkspaceFolder,
+    getLaravelWorkspaceFolders,
     getWorkspaceFolder,
-    getWorkspaceFolders,
 } from "./workspace";
 
 export type FileEvent = "change" | "create" | "delete";
@@ -100,7 +100,7 @@ export const watchForComposerChanges = () => {
         }
     }, 1000);
 
-    getWorkspaceFolders().forEach((workspaceFolder) => {
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
         const watcher = vscode.workspace.createFileSystemWatcher(
             new vscode.RelativePattern(
                 workspaceFolder,

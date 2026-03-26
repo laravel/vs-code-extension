@@ -1,6 +1,6 @@
 import {
+    getLaravelWorkspaceFolders,
     getWorkspaceFolder,
-    getWorkspaceFolders,
 } from "@src/support/workspace";
 import * as vscode from "vscode";
 import {
@@ -26,7 +26,7 @@ export const repository = <T>({
     let items: Record<string, T> = {};
     let loaded: Record<string, boolean> = {};
 
-    getWorkspaceFolders().forEach((workspaceFolder) => {
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
         items[workspaceFolder.name] = itemsDefault;
         loaded[workspaceFolder.name] = false;
 
