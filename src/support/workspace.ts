@@ -40,16 +40,16 @@ export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
 
 export const getLaravelWorkspaceFolders =
     (): readonly vscode.WorkspaceFolder[] => {
-        return vscode.workspace.workspaceFolders?.filter((workspaceFolder) => {
-            return fs.existsSync(
+        return getWorkspaceFolders().filter((workspaceFolder) =>
+            fs.existsSync(
                 path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            );
-        })!;
+            ),
+        )!;
     };
 
 export const hasWorkspace = (): boolean => {
     return (
-        vscode.workspace.workspaceFolders instanceof Array &&
-        vscode.workspace.workspaceFolders.length > 0
+        getWorkspaceFolders() instanceof Array &&
+        getWorkspaceFolders().length > 0
     );
 };
