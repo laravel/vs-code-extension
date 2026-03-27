@@ -19,7 +19,11 @@ const load = (workspaceFolder: vscode.WorkspaceFolder) => {
             return {};
         }
 
-        writeEloquentDocBlocks(result.models, result.builderMethods);
+        writeEloquentDocBlocks(
+            result.models,
+            result.builderMethods,
+            workspaceFolder,
+        );
 
         return result.models;
     });

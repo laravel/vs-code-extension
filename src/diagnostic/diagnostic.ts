@@ -21,9 +21,9 @@ const providers: {
     provider: (doc: vscode.TextDocument) => Promise<vscode.Diagnostic[]>;
     configKey: GeneratedConfigKey;
 }[] = [
-    // { provider: appBinding, configKey: "appBinding.diagnostics" },
+    { provider: appBinding, configKey: "appBinding.diagnostics" },
     // { provider: asset, configKey: "asset.diagnostics" },
-    // { provider: auth, configKey: "auth.diagnostics" },
+    { provider: auth, configKey: "auth.diagnostics" },
     { provider: config, configKey: "config.diagnostics" },
     // { provider: controllerAction, configKey: "controllerAction.diagnostics" },
     // { provider: env, configKey: "env.diagnostics" },
@@ -33,7 +33,7 @@ const providers: {
     // { provider: route, configKey: "route.diagnostics" },
     // { provider: storage, configKey: "storage.diagnostics" },
     // { provider: translation, configKey: "translation.diagnostics" },
-    // { provider: view, configKey: "view.diagnostics" },
+    { provider: view, configKey: "view.diagnostics" },
 ];
 
 export const updateDiagnostics = (

@@ -20,7 +20,10 @@ import {
     setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
-import { getFirstWorkspaceFolder } from "./workspace";
+import {
+    getFirstWorkspaceFolder,
+    getLaravelWorkspaceFolders,
+} from "./workspace";
 
 const toTemplateVar = (str: string) => {
     const suffix = str === "output" ? ";" : "";
@@ -32,12 +35,20 @@ let defaultPhpCommand: string | null = null;
 
 const discoverFiles = new BoundedFileCache(50);
 
-let hasVendor: boolean | null = null;
-let hasBootstrap: boolean | null = null;
+let hasVendor: Record<string, boolean> = {};
+let hasBootstrap: Record<string, boolean> = {};
 
 export const initPhp = () => {
-    hasVendor = projectPathExists("vendor/autoload.php");
-    hasBootstrap = projectPathExists("bootstrap/app.php");
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
+        hasVendor[workspaceFolder.name] = projectPathExists(
+            "vendor/autoload.php",
+            workspaceFolder,
+        );
+        hasBootstrap[workspaceFolder.name] = projectPathExists(
+            "bootstrap/app.php",
+            workspaceFolder,
+        );
+    });
 };
 
 let phpEnvKey: PhpEnvironment | null = null;
@@ -49,46 +60,54 @@ export const initVendorWatchers = () => {
     //     }
     // });
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(internalVendorPath(), "discover-*"),
-        true,
-        true,
-    );
-
-    watcher.onDidDelete((file) => {
-        discoverFiles.deleteByFilePath(file.fsPath);
-    });
-
-    [internalVendorPath(), projectPath("vendor")].forEach((path) => {
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
         const watcher = vscode.workspace.createFileSystemWatcher(
-            path,
+            new vscode.RelativePattern(
+                internalVendorPath("", workspaceFolder),
+                "discover-*",
+            ),
             true,
             true,
         );
 
-        watcher.onDidDelete(() => {
-            setInternalVendorExists(false);
-            discoverFiles.clear();
-            hasVendor = false;
+        watcher.onDidDelete((file) => {
+            discoverFiles.deleteByFilePath(file.fsPath);
         });
+
+        [
+            internalVendorPath("", workspaceFolder),
+            projectPath("vendor", workspaceFolder),
+        ].forEach((path) => {
+            const watcher = vscode.workspace.createFileSystemWatcher(
+                path,
+                true,
+                true,
+            );
+
+            watcher.onDidDelete(() => {
+                setInternalVendorExists(false);
+                discoverFiles.clear();
+                hasVendor[workspaceFolder.name] = false;
+            });
+        });
+
+        const autoloadWatcher = vscode.workspace.createFileSystemWatcher(
+            projectPath("vendor/autoload.php", workspaceFolder),
+            false,
+            true,
+        );
+
+        autoloadWatcher.onDidCreate(() => {
+            hasVendor[workspaceFolder.name] = true;
+        });
+
+        autoloadWatcher.onDidDelete(() => {
+            hasVendor[workspaceFolder.name] = false;
+        });
+
+        registerWatcher(watcher);
+        registerWatcher(autoloadWatcher);
     });
-
-    const autoloadWatcher = vscode.workspace.createFileSystemWatcher(
-        projectPath("vendor/autoload.php"),
-        false,
-        true,
-    );
-
-    autoloadWatcher.onDidCreate(() => {
-        hasVendor = true;
-    });
-
-    autoloadWatcher.onDidDelete(() => {
-        hasVendor = false;
-    });
-
-    registerWatcher(watcher);
-    registerWatcher(autoloadWatcher);
 };
 
 const getPhpCommand = (): string => {
@@ -198,7 +217,7 @@ export const runInLaravel = <T>(
     asJson: boolean = true,
     tryCount = 0,
 ): Promise<T> => {
-    if (!hasVendor) {
+    if (!hasVendor[workspaceFolder.name]) {
         if (tryCount >= 30) {
             throw new Error("Vendor autoload not found, run composer install");
         }
@@ -218,7 +237,7 @@ export const runInLaravel = <T>(
         });
     }
 
-    if (!hasBootstrap) {
+    if (!hasBootstrap[workspaceFolder.name]) {
         throw new Error("Bootstrap file not found, not a Laravel project");
     }
 

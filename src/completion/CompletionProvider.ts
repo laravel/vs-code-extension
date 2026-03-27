@@ -17,9 +17,9 @@ import { GeneratedConfigKey } from "@src/support/generated-config";
 import { CompletionProvider } from "..";
 
 const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
-    // "appBinding.completion": appBinding,
+    "appBinding.completion": appBinding,
     // "asset.completion": asset,
-    // "auth.completion": auth,
+    "auth.completion": auth,
     "config.completion": config,
     // "controllerAction.completion": controllerAction,
     // "env.completion": env,
@@ -29,7 +29,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     // "route.completion": route,
     // "storage.completion": storage,
     // "translation.completion": translation,
-    // "view.completion": view,
+    "view.completion": view,
 };
 
 export const completionProviders = Object.entries(allProviders).map(

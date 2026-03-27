@@ -50,10 +50,13 @@ export const basePath = (srcPath = ""): string => {
     return path.join(config<string>("basePath", ""), pathForPhpEnv(srcPath));
 };
 
-export const projectPath = (srcPath = ""): string => {
+export const projectPath = (
+    srcPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): string => {
     srcPath = basePath(srcPath);
 
-    return path.join(getWorkspaceFolder()!.uri.fsPath, srcPath);
+    return path.join(workspaceFolder.uri.fsPath, srcPath);
 };
 
 export const relativePath = (srcPath: string): string => {
@@ -71,10 +74,16 @@ export const relativePath = (srcPath: string): string => {
     return srcPath;
 };
 
-export const projectPathExists = (path: string): boolean => {
-    return fs.existsSync(projectPath(path));
+export const projectPathExists = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): boolean => {
+    return fs.existsSync(projectPath(path, workspaceFolder));
 };
 
-export const readFileInProject = (path: string): string => {
-    return fs.readFileSync(projectPath(path), "utf8");
+export const readFileInProject = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): string => {
+    return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
 };

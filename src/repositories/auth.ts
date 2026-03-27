@@ -18,7 +18,10 @@ export type AuthItem = {
     model: string | null;
 };
 
-const writeAuthBlocks = (authenticatable: string | null) => {
+const writeAuthBlocks = (
+    authenticatable: string | null,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
     if (!authenticatable) {
         return;
     }
@@ -102,7 +105,10 @@ interface Auth
     ];
 
     blocks.forEach((block) => {
-        fs.writeFileSync(internalVendorPath(block.file), block.content.trim());
+        fs.writeFileSync(
+            internalVendorPath(block.file, workspaceFolder),
+            block.content.trim(),
+        );
     });
 };
 
@@ -112,7 +118,7 @@ const load = (workspaceFolder: vscode.WorkspaceFolder) => {
         workspaceFolder,
         "Auth Data",
     ).then((result) => {
-        writeAuthBlocks(result.authenticatable);
+        writeAuthBlocks(result.authenticatable, workspaceFolder);
 
         return result;
     });

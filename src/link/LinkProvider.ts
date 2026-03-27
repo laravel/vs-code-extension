@@ -27,9 +27,9 @@ import {
 } from "vscode";
 
 const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
-    // "appBinding.link": appBinding,
+    "appBinding.link": appBinding,
     // "asset.link": asset,
-    // "auth.link": auth,
+    "auth.link": auth,
     // "bladeComponent.link": bladeComponent,
     "config.link": config,
     // "controllerAction.link": controllerAction,
@@ -42,7 +42,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     // "route.link": route,
     // "storage.link": storage,
     // "translation.link": translation,
-    // "view.link": view,
+    "view.link": view,
 };
 
 export const linkProviders: DocumentLinkProvider[] = Object.entries(

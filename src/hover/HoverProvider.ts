@@ -24,8 +24,8 @@ import {
 import { HoverProvider as ProviderFunc } from "..";
 
 const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
-    // "appBinding.hover": appBinding,
-    // "auth.hover": auth,
+    "appBinding.hover": appBinding,
+    "auth.hover": auth,
     "config.hover": config,
     // "env.hover": env,
     // "inertia.hover": inertia,
@@ -33,7 +33,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     // "mix.hover": mix,
     // "route.hover": route,
     // "translation.hover": translation,
-    // "view.hover": view,
+    "view.hover": view,
     // "bladeComponent.hover": bladeComponent,
     // "livewireComponent.hover": livewireComponent,
 };

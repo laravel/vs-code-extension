@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 import { runInLaravel, template } from "@src/support/php";
+import { projectPath } from "@src/support/project";
 import path from "path";
 
 export interface TestSuite {
@@ -46,9 +47,7 @@ const buildSuiteItem = (
     );
 
     suite.files.forEach((file) => {
-        const uri = vscode.Uri.file(
-            path.join(workspaceFolder.uri.fsPath, file.path),
-        );
+        const uri = vscode.Uri.file(projectPath(file.path, workspaceFolder));
         const basePath = getBasePath(file.path, file.directories);
 
         const parent = ensureFolderPath(
