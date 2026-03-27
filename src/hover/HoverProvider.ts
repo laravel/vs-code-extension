@@ -29,13 +29,13 @@ const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     "config.hover": config,
     // "env.hover": env,
     // "inertia.hover": inertia,
-    // "middleware.hover": middleware,
+    "middleware.hover": middleware,
     // "mix.hover": mix,
-    // "route.hover": route,
-    // "translation.hover": translation,
+    "route.hover": route,
+    "translation.hover": translation,
     "view.hover": view,
-    // "bladeComponent.hover": bladeComponent,
-    // "livewireComponent.hover": livewireComponent,
+    "bladeComponent.hover": bladeComponent,
+    "livewireComponent.hover": livewireComponent,
 };
 
 export const hoverProviders: HoverProvider[] = Object.entries(allProviders).map(

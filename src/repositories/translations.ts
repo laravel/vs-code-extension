@@ -55,7 +55,7 @@ const load = (workspaceFolder: vscode.WorkspaceFolder) => {
 
                     result[namespace][key] = {
                         value: res.values[v],
-                        path: projectPath(res.paths[p]),
+                        path: projectPath(res.paths[p], workspaceFolder),
                         line: li,
                         params: pa === null ? [] : res.params[pa],
                     };

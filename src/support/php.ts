@@ -289,10 +289,10 @@ const getHashedFile = (
     code: string,
     workspaceFolder: vscode.WorkspaceFolder,
 ) => {
-    const discoverKey = `${workspaceFolder.name}:${code}`;
+    const key = [workspaceFolder.name, code].join(":");
 
-    if (discoverFiles.has(discoverKey)) {
-        return fixFilePath(discoverFiles.get(discoverKey)!);
+    if (discoverFiles.has(key)) {
+        return fixFilePath(discoverFiles.get(key)!);
     }
 
     const hashedFile = internalVendorPath(
@@ -302,7 +302,7 @@ const getHashedFile = (
 
     fs.writeFileSync(hashedFile, code);
 
-    discoverFiles.set(discoverKey, hashedFile);
+    discoverFiles.set(key, hashedFile);
 
     return fixFilePath(hashedFile);
 };

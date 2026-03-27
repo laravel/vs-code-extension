@@ -132,7 +132,7 @@ export const createFileWatcher = (
     patterns = typeof patterns === "string" ? [patterns] : patterns;
 
     return patterns.map((pattern) => {
-        const key = [workspaceFolder.name, pattern].join(".");
+        const key = [workspaceFolder.name, pattern].join(":");
 
         if (patternWatchers[key]) {
             patternWatchers[key].callbacks.push({

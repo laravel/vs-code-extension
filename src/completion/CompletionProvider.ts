@@ -24,11 +24,11 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     // "controllerAction.completion": controllerAction,
     // "env.completion": env,
     // "inertia.completion": inertia,
-    // "middleware.completion": middleware,
+    "middleware.completion": middleware,
     // "mix.completion": mix,
-    // "route.completion": route,
+    "route.completion": route,
     // "storage.completion": storage,
-    // "translation.completion": translation,
+    "translation.completion": translation,
     "view.completion": view,
 };
 
