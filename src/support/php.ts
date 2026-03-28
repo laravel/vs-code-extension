@@ -85,7 +85,7 @@ export const initVendorWatchers = () => {
             );
 
             watcher.onDidDelete(() => {
-                setInternalVendorExists(false);
+                setInternalVendorExists(false, workspaceFolder);
                 discoverFiles.clear();
                 hasVendor[workspaceFolder.name] = false;
             });

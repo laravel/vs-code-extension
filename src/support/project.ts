@@ -9,11 +9,12 @@ import {
     getWorkspaceFolders,
 } from "./workspace";
 
-let internalVendorExists: boolean | null = null;
+let internalVendorExists: Record<string, boolean> = {};
 
-export const setInternalVendorExists = (value: boolean) => {
-    internalVendorExists = value;
-};
+export const setInternalVendorExists = (
+    value: boolean,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => (internalVendorExists[workspaceFolder.name] = value);
 
 export const internalVendorPath = (
     subPath = "",
@@ -21,17 +22,18 @@ export const internalVendorPath = (
 ): string => {
     const baseDir = path.join("vendor", "_laravel_ide");
 
-    if (internalVendorExists !== true) {
-        const baseVendorDir = path.join(workspaceFolder.uri.fsPath, baseDir);
+    if (internalVendorExists[workspaceFolder.name] !== true) {
+        const baseVendorDir = path.join(projectPath(baseDir, workspaceFolder));
 
-        internalVendorExists = fs.existsSync(baseVendorDir);
+        internalVendorExists[workspaceFolder.name] =
+            fs.existsSync(baseVendorDir);
 
-        if (!internalVendorExists) {
+        if (!internalVendorExists[workspaceFolder.name]) {
             fs.mkdirSync(baseVendorDir, { recursive: true });
         }
     }
 
-    return path.join(workspaceFolder.uri.fsPath, baseDir, subPath);
+    return path.join(projectPath(baseDir, workspaceFolder), subPath);
 };
 
 const trimFirstSlash = (srcPath: string): string => {

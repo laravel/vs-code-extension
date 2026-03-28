@@ -53,26 +53,26 @@ export const repository = <T>({
     });
 
     const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {
-        const name = getWorkspaceFolder()!.name;
+        const workspace = getWorkspaceFolder()!;
 
         let tries = 0;
 
-        while (!loaded[name] && tries < maxTries) {
+        while (!loaded[workspace.name] && tries < maxTries) {
             tries++;
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        if (loaded[name]) {
-            return callback(items[name]);
+        if (loaded[workspace.name]) {
+            return callback(items[workspace.name]);
         }
     };
 
     return () => {
-        const name = getWorkspaceFolder()!.name;
+        const workspace = getWorkspaceFolder()!;
 
         return {
-            loaded: loaded[name],
-            items: items[name],
+            loaded: loaded[workspace.name],
+            items: items[workspace.name],
             whenLoaded,
         };
     };
