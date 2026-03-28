@@ -36,7 +36,7 @@ interface TranslationGroupPhpResult {
     languages: string[];
 }
 
-let dirsToWatch: string[] | null = null;
+let dirsToWatch: Record<string, string[]> = {};
 
 const load = (workspaceFolder: vscode.WorkspaceFolder) => {
     return runInLaravel<TranslationGroupPhpResult>(
@@ -63,7 +63,7 @@ const load = (workspaceFolder: vscode.WorkspaceFolder) => {
             },
         );
 
-        dirsToWatch = res.to_watch;
+        dirsToWatch[workspaceFolder.name] = res.to_watch;
 
         return {
             default: res.default,
@@ -112,8 +112,8 @@ export const getTranslationPathByName = (
 
 export const getTranslations = repository<TranslationGroupResult>({
     load,
-    pattern: () =>
-        waitForValue(() => dirsToWatch).then((value) => {
+    pattern: (workspaceFolder: vscode.WorkspaceFolder) =>
+        waitForValue(() => dirsToWatch[workspaceFolder.name]).then((value) => {
             if (value === null || value.length === 0) {
                 return null;
             }

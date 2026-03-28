@@ -22,16 +22,16 @@ const providers: {
     configKey: GeneratedConfigKey;
 }[] = [
     { provider: appBinding, configKey: "appBinding.diagnostics" },
-    // { provider: asset, configKey: "asset.diagnostics" },
+    { provider: asset, configKey: "asset.diagnostics" },
     { provider: auth, configKey: "auth.diagnostics" },
     { provider: config, configKey: "config.diagnostics" },
-    // { provider: controllerAction, configKey: "controllerAction.diagnostics" },
-    // { provider: env, configKey: "env.diagnostics" },
-    // { provider: inertia, configKey: "inertia.diagnostics" },
+    { provider: controllerAction, configKey: "controllerAction.diagnostics" },
+    { provider: env, configKey: "env.diagnostics" },
+    { provider: inertia, configKey: "inertia.diagnostics" },
     { provider: middleware, configKey: "middleware.diagnostics" },
-    // { provider: mix, configKey: "mix.diagnostics" },
+    { provider: mix, configKey: "mix.diagnostics" },
     { provider: route, configKey: "route.diagnostics" },
-    // { provider: storage, configKey: "storage.diagnostics" },
+    { provider: storage, configKey: "storage.diagnostics" },
     { provider: translation, configKey: "translation.diagnostics" },
     { provider: view, configKey: "view.diagnostics" },
 ];

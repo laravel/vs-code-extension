@@ -14,7 +14,9 @@ let watchers: vscode.FileSystemWatcher[] = [];
 export type WatcherPattern =
     | string
     | string[]
-    | (() => Promise<string | string[] | null>);
+    | ((
+          workspaceFolder: vscode.WorkspaceFolder,
+      ) => Promise<string | string[] | null>);
 
 export const defaultFileEvents: FileEvent[] = ["change", "create", "delete"];
 
@@ -30,7 +32,7 @@ export const loadAndWatch = (
     const loadFunc = leadingDebounce(() => load(workspaceFolder), 1000);
 
     if (patterns instanceof Function) {
-        patterns().then((result) => {
+        patterns(workspaceFolder).then((result) => {
             if (result !== null) {
                 createFileWatcher(
                     result,
