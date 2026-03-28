@@ -109,11 +109,10 @@ export class Eloquent implements CompletionProvider {
                 this.isInsideObjectValue(result) &&
                 result.fillingInArrayValue()
             ) {
-                return this.getFillableAttributeCompletionItems(
-                    result,
+                return this.getCompletionItems(
                     document,
                     position,
-                    model,
+                    model.attributes.map((attribute) => attribute.name),
                 );
             }
 
