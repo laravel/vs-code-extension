@@ -168,7 +168,13 @@ $models = new class($factory) {
             ->values()
             ->toArray();
 
-        $data['uri'] = $reflection->getFileName();
+        $data['relations'] = collect($data['relations'])
+            ->map(fn($relation) => array_merge($relation, [
+                'snake_case' => \\Illuminate\\Support\\Str::snake($relation['name']),
+            ]))
+            ->toArray();
+
+        $data['path'] = LaravelVsCode::relativePath($reflection->getFileName() ?: '');
 
         return [
             $className => $data,

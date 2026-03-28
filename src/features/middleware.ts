@@ -11,10 +11,16 @@ import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
-const toFind: FeatureTag = {
-    class: facade("Route"),
-    method: ["middleware", "withoutMiddleware"],
-};
+const toFind: FeatureTag = [
+    {
+        class: "Illuminate\\Routing\\Attributes\\Controllers\\Middleware",
+        argumentIndex: 0,
+    },
+    {
+        class: facade("Route"),
+        method: ["middleware", "withoutMiddleware"],
+    },
+];
 
 const getName = (match: string) => {
     return match.split(":").shift() ?? "";
