@@ -21,6 +21,7 @@ suite("Middleware Test Suite", () => {
                 "Route::middleware('test.middleware')->get('middleware-link', fn () => null);",
                 "Route::withoutMiddleware('test.middleware')->get('middleware-1', fn () => null);",
                 "Route::middleware('test.middleware')->get('middleware-2', fn () => null);",
+                "#[Middleware('test.middleware')]",
             ],
             expects: ["test.middleware"],
         });
@@ -40,6 +41,10 @@ suite("Middleware Test Suite", () => {
                     line: "Route::withoutMiddleware(['test.middleware'])->get('middleware-link-2', fn () => null);",
                     target: "app/Http/Middleware/HandleAppearance.php",
                 },
+                {
+                    line: "#[Middleware('test.middleware')]",
+                    target: "app/Http/Middleware/HandleAppearance.php",
+                },
             ],
         });
     });
@@ -54,6 +59,10 @@ suite("Middleware Test Suite", () => {
                     line: "Route::middleware('test.middleware')->get('middleware-link', fn () => null);",
                     contains: ["HandleAppearance.php"],
                 },
+                {
+                    line: "#[Middleware('test.middleware')]",
+                    contains: ["HandleAppearance.php"],
+                },
             ],
         });
     });
@@ -66,6 +75,11 @@ suite("Middleware Test Suite", () => {
             lines: [
                 {
                     line: "Route::middleware('missing.middleware')->get('middleware-missing', fn () => null);",
+                    code: "middleware",
+                    contains: ["missing.middleware", "not found"],
+                },
+                {
+                    line: "#[Middleware('missing.middleware')]",
                     code: "middleware",
                     contains: ["missing.middleware", "not found"],
                 },

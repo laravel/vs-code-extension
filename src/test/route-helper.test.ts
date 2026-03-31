@@ -34,6 +34,7 @@ suite("Route Helper Test Suite", () => {
                 "Route::is('dashboard');",
                 "Request::routeIs('home');",
                 // "request()->routeIs('dashboard');", // Not working: missing expected route completions
+                "#[RedirectToRoute('home')]",
             ],
             expects: ["home", "dashboard"],
         });
@@ -58,6 +59,10 @@ suite("Route Helper Test Suite", () => {
                     line: "Request::routeIs('home');",
                     target: "routes/web.php",
                 },
+                {
+                    line: "#[RedirectToRoute('home')]",
+                    target: "routes/web.php",
+                },
             ],
         });
     });
@@ -76,6 +81,10 @@ suite("Route Helper Test Suite", () => {
                     line: "to_route('dashboard');",
                     contains: ["[Closure]", "routes/web.php"],
                 },
+                {
+                    line: "#[RedirectToRoute('home')]",
+                    contains: ["[Closure]", "routes/web.php"],
+                },
             ],
         });
     });
@@ -88,6 +97,11 @@ suite("Route Helper Test Suite", () => {
             lines: [
                 {
                     line: "route('missing.route');",
+                    code: "route",
+                    contains: ["missing.route", "not found"],
+                },
+                {
+                    line: "#[RedirectToRoute('missing.route')]",
                     code: "route",
                     contains: ["missing.route", "not found"],
                 },
