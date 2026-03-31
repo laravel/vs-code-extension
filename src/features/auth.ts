@@ -119,7 +119,7 @@ const analyzeParam = (
         .map((value) => getPolicies().items.policies[value.value])
         .flat();
 
-    if (item.type === "methodCall" && ["has"].includes(item.methodName ?? "")) {
+    if (item.type === "object" || (item.type === "methodCall" && ["has"].includes(item.methodName ?? ""))) {
         return {
             policies,
             values,
