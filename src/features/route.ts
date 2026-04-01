@@ -4,16 +4,20 @@ import { getRoutes } from "@src/repositories/routes";
 import { getViews } from "@src/repositories/views";
 import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
+import { livewireHover } from "@src/support/markdown";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
-import { livewireHover } from "@src/support/markdown";
 import { contract, facade } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
 import { FeatureTag, HoverProvider, LinkProvider } from "..";
 
 const toFind: FeatureTag = [
+    {
+        class: "Illuminate\\Foundation\\Http\\Attributes\\RedirectToRoute",
+        argumentIndex: 0,
+    },
     { method: ["route", "signedRoute", "to_route"] },
     {
         class: [...facade("Redirect"), ...facade("URL"), "redirect", "url"],

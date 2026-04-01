@@ -174,7 +174,7 @@ $models = new class($factory) {
             ]))
             ->toArray();
 
-        $data['uri'] = $reflection->getFileName();
+        $data['path'] = LaravelVsCode::relativePath($reflection->getFileName() ?: '');
 
         return [
             $className => $data,

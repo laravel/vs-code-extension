@@ -23,7 +23,7 @@ export default class AutocompleteResult {
     public currentParamArrayKeys(): string[] {
         const param = this.param();
 
-        if (typeof param === "undefined" || param.type !== "array") {
+        if (param?.type !== "array") {
             return [];
         }
 
@@ -41,6 +41,10 @@ export default class AutocompleteResult {
     }
 
     public fillingInArrayValue(): boolean {
+        if (this.result.type === "array") {
+            return this.result.autocompletingValue;
+        }
+
         return this.param()?.autocompletingValue ?? false;
     }
 
@@ -102,6 +106,26 @@ export default class AutocompleteResult {
             }
 
             if (context.methodName === methodName) {
+                result = true;
+
+                return false;
+            }
+
+            return true;
+        });
+
+        return result;
+    }
+
+    public isInsideObjectValue(className: string) {
+        let result = false;
+
+        this.loop((context) => {
+            if (context.type !== "object") {
+                return true;
+            }
+
+            if (context.className === className) {
                 result = true;
 
                 return false;

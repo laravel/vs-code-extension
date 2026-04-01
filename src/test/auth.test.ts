@@ -16,6 +16,8 @@ suite("Auth Test Suite", () => {
                 "Gate::has('test-auth');",
                 "Gate::has('test-auth-alt');",
                 "Gate::has('test-auth');",
+                "#[Authorize('test-auth')]",
+                "#[Authorize('test-auth-alt')]",
             ],
             expects: ["test-auth"],
         });
@@ -35,6 +37,14 @@ suite("Auth Test Suite", () => {
                     line: "Gate::has('test-auth-alt');",
                     target: "app/Providers/AuthTestServiceProvider.php",
                 },
+                {
+                    line: "#[Authorize('test-auth')]",
+                    target: "app/Providers/AuthTestServiceProvider.php",
+                },
+                {
+                    line: "#[Authorize('test-auth-alt')]",
+                    target: "app/Providers/AuthTestServiceProvider.php",
+                },
             ],
         });
     });
@@ -47,6 +57,10 @@ suite("Auth Test Suite", () => {
             lines: [
                 {
                     line: "Gate::has('test-auth');",
+                    contains: ["AuthTestServiceProvider"],
+                },
+                {
+                    line: "#[Authorize('test-auth')]",
                     contains: ["AuthTestServiceProvider"],
                 },
             ],
