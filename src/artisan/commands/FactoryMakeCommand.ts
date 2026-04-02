@@ -3,6 +3,7 @@ import { getModelClassnames } from "@src/repositories/models";
 
 export const FactoryMakeCommand: Command = {
     name: "make:factory",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",
