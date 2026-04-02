@@ -14,6 +14,7 @@ export type GeneratedConfigKey =
     | "bladeComponent.link"
     | "bladeComponent.completion"
     | "bladeComponent.hover"
+    | "bladeComponent.renameFile"
     | "config.diagnostics"
     | "config.hover"
     | "config.link"

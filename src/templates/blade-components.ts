@@ -369,7 +369,11 @@ $components = new class {
             return $result = $expression;
         });
 
-        $compiler->compileString($content);
+        try {
+            $compiler->compileString($content);
+        } catch (\\Throwable $e) {
+            return null;
+        }
 
         if (empty($result)) {
             return null;

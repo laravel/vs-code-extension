@@ -2,11 +2,14 @@
 
 import * as vscode from "vscode";
 
+import { get } from "axios";
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
+import { registerArtisanMakeCommands } from "./artisan/registry";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import {
     pintCommands,
@@ -29,6 +32,8 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { renameFileProviders } from "./rename-file/RenameFileProvider";
+import { getBladeComponents } from "./repositories/bladeComponents";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -45,8 +50,6 @@ import {
 } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
-import { registerArtisanMakeCommands } from "./artisan/registry";
-import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;
@@ -218,6 +221,11 @@ export async function activate(context: vscode.ExtensionContext) {
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
         ),
+        // ...renameFileProviders.map((provider) =>
+        //     vscode.workspace.onDidRenameFiles((event) =>
+        //         provider.provideRenameFile(event),
+        //     ),
+        // ),
         // ...testRunnerCommands,
         // testController,
         vscode.languages.registerCodeActionsProvider(
@@ -265,6 +273,40 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
+        vscode.workspace.onWillRenameFiles((event) => {
+            getBladeComponents().whenLoaded((components) => {
+                event.files.forEach((file) => {
+                    const oldFilePath = vscode.workspace.asRelativePath(
+                        file.oldUri,
+                    );
+
+                    const oldComponent = Object.entries(
+                        components.components,
+                    ).find(([_, component]) =>
+                        component.paths.includes(oldFilePath),
+                    );
+
+                    const dziala = true;
+                });
+            });
+        }),
+        vscode.workspace.onDidRenameFiles((event) => {
+            getBladeComponents().whenRefreshed((components) => {
+                event.files.forEach((file) => {
+                    const newFilePath = vscode.workspace.asRelativePath(
+                        file.newUri,
+                    );
+
+                    const newComponent = Object.entries(
+                        components.components,
+                    ).find(([_, component]) =>
+                        component.paths.includes(newFilePath),
+                    );
+
+                    const dziala = true;
+                });
+            });
+        }),
     );
 
     collectDebugInfo();

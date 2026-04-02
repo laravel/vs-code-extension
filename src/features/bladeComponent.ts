@@ -3,7 +3,7 @@ import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
 import os from "os";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import { HoverProvider, LinkProvider, RenameFileProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -151,3 +151,27 @@ export const hoverProvider: HoverProvider = (
 
     return null;
 };
+
+// export const renameFileProvider: RenameFileProvider = (
+//     event: vscode.FileRenameEvent,
+//     previousComponents = getBladeComponents().items,
+// ): void => {
+//     event.files.forEach((file) => {
+//         const newFilePath = vscode.workspace.asRelativePath(file.newUri);
+//         const oldFilePath = vscode.workspace.asRelativePath(file.oldUri);
+
+//         const components = getBladeComponents();
+
+//         components.whenLoaded((components, previousComponents) => {
+//             const oldComponent = Object.entries(
+//                 previousComponents.components,
+//             ).find(([_, component]) => component.paths.includes(oldFilePath));
+
+//             const newComponent = Object.entries(components.components).find(
+//                 ([_, component]) => component.paths.includes(newFilePath),
+//             );
+
+//             const dziala = true;
+//         });
+//     });
+// };

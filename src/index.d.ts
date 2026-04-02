@@ -45,6 +45,8 @@ type LinkProvider = (
     doc: vscode.TextDocument,
 ) => Promise<(vscode.DocumentLink | null)[]>;
 
+type RenameFileProvider = (event: vscode.FileRenameEvent) => void;
+
 interface FeatureTagParam {
     class?: string | string[] | null;
     method?: string | string[] | null;
