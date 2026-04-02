@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const RouteListCommand: Command = {
     name: "route:list",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

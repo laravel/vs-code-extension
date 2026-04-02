@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const DbWipeCommand: Command = {
     name: "db:wipe",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     confirmation: {
         message: "This will drop all tables, views, and types.",

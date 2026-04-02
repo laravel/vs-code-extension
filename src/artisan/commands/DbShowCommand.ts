@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const DbShowCommand: Command = {
     name: "db:show",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

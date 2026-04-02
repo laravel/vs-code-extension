@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const WayfinderGenerateCommand: Command = {
     name: "wayfinder:generate",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

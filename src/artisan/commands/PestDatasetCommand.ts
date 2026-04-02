@@ -9,7 +9,6 @@ export const PestDatasetCommand: Command = {
             description: "The name of the dataset",
         },
     ],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

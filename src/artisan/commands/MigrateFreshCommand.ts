@@ -2,7 +2,6 @@ import { Command } from "../types";
 
 export const MigrateFreshCommand: Command = {
     name: "migrate:fresh",
-    postRun: "none",
     runIn: "terminal",
     confirmation: {
         message: "This will drop all tables and re-run all migrations.",

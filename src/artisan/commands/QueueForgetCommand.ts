@@ -8,6 +8,5 @@ export const QueueForgetCommand: Command = {
             description: "The ID of the failed job",
         },
     ],
-    postRun: "none",
     runIn: "terminal",
 };

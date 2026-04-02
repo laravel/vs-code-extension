@@ -2,7 +2,6 @@ import { Command } from "../types";
 
 export const MigrateRollbackCommand: Command = {
     name: "migrate:rollback",
-    postRun: "none",
     runIn: "terminal",
     confirmation: {
         message: "This will roll back the latest database migrations.",

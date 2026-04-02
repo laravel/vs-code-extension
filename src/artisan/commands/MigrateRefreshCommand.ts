@@ -2,7 +2,6 @@ import { Command } from "../types";
 
 export const MigrateRefreshCommand: Command = {
     name: "migrate:refresh",
-    postRun: "none",
     runIn: "terminal",
     confirmation: {
         message: "This will roll back and re-run migrations.",

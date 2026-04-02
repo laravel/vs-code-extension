@@ -2,7 +2,6 @@ import { Command } from "../types";
 
 export const MigrateCommand: Command = {
     name: "migrate",
-    postRun: "none",
     runIn: "terminal",
     arguments: [],
     options: [

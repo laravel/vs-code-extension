@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const TinkerCommand: Command = {
     name: "tinker",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

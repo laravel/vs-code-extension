@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const DbSeedCommand: Command = {
     name: "db:seed",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

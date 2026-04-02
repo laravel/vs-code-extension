@@ -8,7 +8,6 @@ export const QueueRetryCommand: Command = {
             description: 'The ID of the failed job or "all" to retry all jobs',
         },
     ],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

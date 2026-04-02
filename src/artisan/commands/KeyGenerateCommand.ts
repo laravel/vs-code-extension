@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const KeyGenerateCommand: Command = {
     name: "key:generate",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

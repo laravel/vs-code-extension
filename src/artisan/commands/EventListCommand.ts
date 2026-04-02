@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const EventListCommand: Command = {
     name: "event:list",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

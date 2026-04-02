@@ -8,7 +8,6 @@ export const DbTableCommand: Command = {
             description: "The name of the table",
         },
     ],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

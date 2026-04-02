@@ -8,7 +8,6 @@ export const ModelShowCommand: Command = {
             description: "The model to show",
         },
     ],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

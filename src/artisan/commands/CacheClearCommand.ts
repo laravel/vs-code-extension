@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const CacheClearCommand: Command = {
     name: "cache:clear",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

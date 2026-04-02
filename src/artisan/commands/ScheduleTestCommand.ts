@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const ScheduleTestCommand: Command = {
     name: "schedule:test",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

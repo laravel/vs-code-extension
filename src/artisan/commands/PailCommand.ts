@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const PailCommand: Command = {
     name: "pail",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

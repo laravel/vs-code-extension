@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const QueueFlushCommand: Command = {
     name: "queue:flush",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

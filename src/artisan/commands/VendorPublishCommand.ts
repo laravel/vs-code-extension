@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const VendorPublishCommand: Command = {
     name: "vendor:publish",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const SchemaDumpCommand: Command = {
     name: "schema:dump",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {

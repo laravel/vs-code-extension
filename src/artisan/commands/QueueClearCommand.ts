@@ -3,7 +3,6 @@ import { Command } from "../types";
 export const QueueClearCommand: Command = {
     name: "queue:clear",
     arguments: [],
-    postRun: "none",
     runIn: "terminal",
     options: [
         {
