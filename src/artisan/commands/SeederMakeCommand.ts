@@ -2,6 +2,7 @@ import { Command } from "../types";
 
 export const SeederMakeCommand: Command = {
     name: "make:seeder",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

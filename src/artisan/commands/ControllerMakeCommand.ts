@@ -4,6 +4,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const ControllerMakeCommand: Command = {
     name: "make:controller",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

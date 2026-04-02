@@ -2,6 +2,7 @@ import { Command } from "../types";
 
 export const CastMakeCommand: Command = {
     name: "make:cast",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

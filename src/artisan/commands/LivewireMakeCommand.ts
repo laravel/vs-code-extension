@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const LivewireMakeCommand: Command = {
     name: "make:livewire",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

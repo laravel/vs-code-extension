@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "../options";
 
 export const CommandMakeCommand: Command = {
     name: "make:command",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

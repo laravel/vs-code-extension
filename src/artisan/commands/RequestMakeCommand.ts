@@ -3,6 +3,7 @@ import { forceOption } from "@src/artisan/options";
 
 export const RequestMakeCommand: Command = {
     name: "make:request",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

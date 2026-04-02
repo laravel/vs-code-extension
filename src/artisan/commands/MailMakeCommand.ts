@@ -4,6 +4,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const MailMakeCommand: Command = {
     name: "make:mail",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",
