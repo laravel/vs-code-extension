@@ -72,5 +72,7 @@ export type RegisteredCommand =
     | "laravel.artisan.scheduleTest"
     | "laravel.artisan.schemaDump"
     | "laravel.artisan.wayfinderGenerate"
+    | "laravel.artisan.cacheClear"
+    | "laravel.artisan.vendorPublish"
     | "laravel.docker.configure"
     | "laravel.open";

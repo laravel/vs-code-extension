@@ -58,6 +58,8 @@ import { ScheduleListCommand } from "./commands/ScheduleListCommand";
 import { ScheduleTestCommand } from "./commands/ScheduleTestCommand";
 import { SchemaDumpCommand } from "./commands/SchemaDumpCommand";
 import { WayfinderGenerateCommand } from "./commands/WayfinderGenerateCommand";
+import { CacheClearCommand } from "./commands/CacheClearCommand";
+import { VendorPublishCommand } from "./commands/VendorPublishCommand";
 
 const artisanMakeCommands = {
     "laravel.artisan.make.cast": CastMakeCommand,
@@ -128,6 +130,8 @@ const artisanCommands = {
     "laravel.artisan.scheduleTest": ScheduleTestCommand,
     "laravel.artisan.schemaDump": SchemaDumpCommand,
     "laravel.artisan.wayfinderGenerate": WayfinderGenerateCommand,
+    "laravel.artisan.cacheClear": CacheClearCommand,
+    "laravel.artisan.vendorPublish": VendorPublishCommand,
 };
 
 export const registerArtisanCommands = () => {

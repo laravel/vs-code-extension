@@ -388,6 +388,16 @@
                     "command": "laravel.artisan.wayfinderGenerate",
                     "when": "config.Laravel.artisanCommands.commandPalette",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.cacheClear",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.vendorPublish",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -965,6 +975,16 @@
             {
                 "command": "laravel.artisan.wayfinderGenerate",
                 "title": "artisan wayfinder:generate | Generate Wayfinder",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.cacheClear",
+                "title": "artisan cache:clear | Flush the application cache",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.vendorPublish",
+                "title": "artisan vendor:publish | Publish any publishable assets from vendor packages",
                 "category": "Laravel"
             },
             {
