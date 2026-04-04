@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { runArtisanMakeCommand } from "@src/commands/artisan";
+import { runArtisanCommand } from "@src/commands/artisan";
 
 import { CastMakeCommand } from "./commands/CastMakeCommand";
 import { ChannelMakeCommand } from "./commands/ChannelMakeCommand";
@@ -31,6 +31,35 @@ import { SeederMakeCommand } from "./commands/SeederMakeCommand";
 import { TestMakeCommand } from "./commands/TestMakeCommand";
 import { TraitMakeCommand } from "./commands/TraitMakeCommand";
 import { ViewMakeCommand } from "./commands/ViewMakeCommand";
+import { MigrateCommand } from "./commands/MigrateCommand";
+import { MigrateFreshCommand } from "./commands/MigrateFreshCommand";
+import { MigrateRefreshCommand } from "./commands/MigrateRefreshCommand";
+import { MigrateRollbackCommand } from "./commands/MigrateRollbackCommand";
+import { MigrateStatusCommand } from "./commands/MigrateStatusCommand";
+import { TinkerCommand } from "./commands/TinkerCommand";
+import { DbCommand } from "./commands/DbCommand";
+import { RouteListCommand } from "./commands/RouteListCommand";
+import { DbShowCommand } from "./commands/DbShowCommand";
+import { PailCommand } from "./commands/PailCommand";
+import { AuthClearResetsCommand } from "./commands/AuthClearResetsCommand";
+import { DbSeedCommand } from "./commands/DbSeedCommand";
+import { DbTableCommand } from "./commands/DbTableCommand";
+import { DbWipeCommand } from "./commands/DbWipeCommand";
+import { EventListCommand } from "./commands/EventListCommand";
+import { KeyGenerateCommand } from "./commands/KeyGenerateCommand";
+import { ModelShowCommand } from "./commands/ModelShowCommand";
+import { PestDatasetCommand } from "./commands/PestDatasetCommand";
+import { QueueClearCommand } from "./commands/QueueClearCommand";
+import { QueueFailedCommand } from "./commands/QueueFailedCommand";
+import { QueueFlushCommand } from "./commands/QueueFlushCommand";
+import { QueueForgetCommand } from "./commands/QueueForgetCommand";
+import { QueueRetryCommand } from "./commands/QueueRetryCommand";
+import { ScheduleListCommand } from "./commands/ScheduleListCommand";
+import { ScheduleTestCommand } from "./commands/ScheduleTestCommand";
+import { SchemaDumpCommand } from "./commands/SchemaDumpCommand";
+import { WayfinderGenerateCommand } from "./commands/WayfinderGenerateCommand";
+import { CacheClearCommand } from "./commands/CacheClearCommand";
+import { VendorPublishCommand } from "./commands/VendorPublishCommand";
 
 const artisanMakeCommands = {
     "laravel.artisan.make.cast": CastMakeCommand,
@@ -68,7 +97,47 @@ const artisanMakeCommands = {
 export const registerArtisanMakeCommands = () => {
     return Object.entries(artisanMakeCommands).map(([name, command]) => {
         return vscode.commands.registerCommand(name, (uri: vscode.Uri) => {
-            runArtisanMakeCommand(command, uri);
+            runArtisanCommand(command, uri);
+        });
+    });
+};
+
+const artisanCommands = {
+    "laravel.artisan.migrate": MigrateCommand,
+    "laravel.artisan.migrateFresh": MigrateFreshCommand,
+    "laravel.artisan.migrateRefresh": MigrateRefreshCommand,
+    "laravel.artisan.migrateRollback": MigrateRollbackCommand,
+    "laravel.artisan.migrateStatus": MigrateStatusCommand,
+    "laravel.artisan.tinker": TinkerCommand,
+    "laravel.artisan.db": DbCommand,
+    "laravel.artisan.dbShow": DbShowCommand,
+    "laravel.artisan.dbSeed": DbSeedCommand,
+    "laravel.artisan.dbTable": DbTableCommand,
+    "laravel.artisan.dbWipe": DbWipeCommand,
+    "laravel.artisan.pail": PailCommand,
+    "laravel.artisan.authClearResets": AuthClearResetsCommand,
+    "laravel.artisan.eventList": EventListCommand,
+    "laravel.artisan.keyGenerate": KeyGenerateCommand,
+    "laravel.artisan.modelShow": ModelShowCommand,
+    "laravel.artisan.pestDataset": PestDatasetCommand,
+    "laravel.artisan.queueClear": QueueClearCommand,
+    "laravel.artisan.queueFailed": QueueFailedCommand,
+    "laravel.artisan.queueFlush": QueueFlushCommand,
+    "laravel.artisan.queueForget": QueueForgetCommand,
+    "laravel.artisan.queueRetry": QueueRetryCommand,
+    "laravel.artisan.routeList": RouteListCommand,
+    "laravel.artisan.scheduleList": ScheduleListCommand,
+    "laravel.artisan.scheduleTest": ScheduleTestCommand,
+    "laravel.artisan.schemaDump": SchemaDumpCommand,
+    "laravel.artisan.wayfinderGenerate": WayfinderGenerateCommand,
+    "laravel.artisan.cacheClear": CacheClearCommand,
+    "laravel.artisan.vendorPublish": VendorPublishCommand,
+};
+
+export const registerArtisanCommands = () => {
+    return Object.entries(artisanCommands).map(([name, command]) => {
+        return vscode.commands.registerCommand(name, (uri: vscode.Uri) => {
+            runArtisanCommand(command, uri);
         });
     });
 };

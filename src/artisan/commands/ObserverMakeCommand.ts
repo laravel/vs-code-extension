@@ -3,6 +3,7 @@ import { getModelClassnames } from "@src/repositories/models";
 
 export const ObserverMakeCommand: Command = {
     name: "make:observer",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

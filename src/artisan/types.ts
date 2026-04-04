@@ -2,6 +2,16 @@ export interface Command {
     name: string;
     arguments: Argument[];
     options?: Option[];
+    postRun?: PostRunAction | undefined;
+    confirmation?: Confirmation | undefined;
+    runIn?: CommandRunTarget | undefined;
+}
+
+export type PostRunAction = "openGeneratedFile" | "none";
+export type CommandRunTarget = "background" | "terminal";
+
+export interface Confirmation {
+    message: string;
 }
 
 export interface Option {

@@ -3,6 +3,7 @@ import { forceOption } from "../options";
 
 export const ChannelMakeCommand: Command = {
     name: "make:channel",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

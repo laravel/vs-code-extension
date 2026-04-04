@@ -1,11 +1,17 @@
 import * as vscode from "vscode";
 import path from "path";
 
-import { Argument, ArgumentType, Command, Option } from "./types";
 import { getNamespace } from "@src/commands/generateNamespace";
 import { escapeNamespace } from "@src/support/util";
+import { Argument, ArgumentType, Command, Option } from "./types";
 
 const EndSelection = "End Selection";
+
+export const artisanBuilderUi = {
+    showInputBox: vscode.window.showInputBox.bind(vscode.window),
+    showQuickPick: vscode.window.showQuickPick.bind(vscode.window),
+    showWarningMessage: vscode.window.showWarningMessage.bind(vscode.window),
+};
 
 const getValueForArgumentType = async (
     value: string,
@@ -50,13 +56,13 @@ const getValueForArgumentType = async (
 
 const validateInput = (input: string, field: string): boolean => {
     if (input === "") {
-        vscode.window.showWarningMessage(`${field} is required`);
+        artisanBuilderUi.showWarningMessage(`${field} is required`);
 
         return false;
     }
 
     if (/\s/.test(input)) {
-        vscode.window.showWarningMessage(`${field} cannot contain spaces`);
+        artisanBuilderUi.showWarningMessage(`${field} cannot contain spaces`);
 
         return false;
     }
@@ -75,7 +81,7 @@ const getUserArguments = async (
         let input = undefined;
 
         while (!input) {
-            input = await vscode.window.showInputBox({
+            input = await artisanBuilderUi.showInputBox({
                 prompt: argument.description,
             });
 
@@ -122,7 +128,7 @@ const getUserOptions = async (
     while (true) {
         const optionsAsString = getOptionsAsString(userOptions);
 
-        const choice = await vscode.window.showQuickPick(
+        const choice = await artisanBuilderUi.showQuickPick(
             [
                 {
                     label: EndSelection,
@@ -154,7 +160,7 @@ const getUserOptions = async (
         );
 
         if (option?.type === "select" && option?.options) {
-            const optionsChoice = await vscode.window.showQuickPick(
+            const optionsChoice = await artisanBuilderUi.showQuickPick(
                 Object.entries(option.options()).map(([key, value]) => ({
                     label: key,
                     command: value,
@@ -183,7 +189,7 @@ const getUserOptions = async (
                     _default = option.default(...Object.values(userArguments));
                 }
 
-                input = await vscode.window.showInputBox({
+                input = await artisanBuilderUi.showInputBox({
                     prompt: option.description,
                     value: _default ?? "",
                 });
@@ -248,5 +254,11 @@ export const buildArtisanCommand = async (
         return;
     }
 
-    return `${command.name} ${getArgumentsAsString(userArguments)} ${getOptionsAsString(userOptions)}`;
+    return [
+        command.name,
+        getArgumentsAsString(userArguments),
+        getOptionsAsString(userOptions),
+    ]
+        .filter((part) => part.length > 0)
+        .join(" ");
 };

@@ -2,6 +2,7 @@ import { Command } from "../types";
 
 export const TestMakeCommand: Command = {
     name: "make:test",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",
