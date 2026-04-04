@@ -19,6 +19,7 @@ import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
 import { projectPath, relativePath } from "@src/support/project";
 import { facade } from "@src/support/util";
+import { getWorkspaceFolder } from "@src/support/workspace";
 import { AutocompleteParsingResult } from "@src/types";
 import fs from "fs";
 import * as sysPath from "path";
@@ -156,9 +157,15 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         return [];
     }
 
+    const workspace = getWorkspaceFolder(document.uri);
+
+    if (!workspace) {
+        return [];
+    }
+
     const extension =
         Object.values(getInertiaViews().items)[0].path.split(".").pop() ??
-        inertiaPageExtensions?.[0] ??
+        inertiaPageExtensions[workspace.name]?.[0] ??
         "vue";
 
     const mapping: Record<string, string> = {
@@ -167,7 +174,7 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         ),
     };
 
-    return (inertiaPagePaths ?? []).map((path) => {
+    return (inertiaPagePaths[workspace.name] ?? []).map((path) => {
         const filepath = sysPath.join(path, `${missingFilename}.${extension}`);
         const uri = vscode.Uri.file(projectPath(filepath));
 

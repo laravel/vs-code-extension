@@ -3,6 +3,7 @@ import { projectPath, relativePath } from "@src/support/project";
 import { waitForValue } from "@src/support/util";
 import * as fs from "fs";
 import * as sysPath from "path";
+import * as vscode from "vscode";
 import { repository } from ".";
 import { View } from "..";
 
@@ -10,12 +11,16 @@ interface ViewItem {
     [key: string]: View;
 }
 
-export let inertiaPagePaths: string[] | null = null;
-export let inertiaPageExtensions: string[] | null = null;
+export let inertiaPagePaths: Record<string, string[]> = {};
+export let inertiaPageExtensions: Record<string, string[]> = {};
 
-const load = (pagePaths: string[], validExtensions: string[]) => {
-    inertiaPagePaths = pagePaths;
-    inertiaPageExtensions = validExtensions;
+const load = (
+    pagePaths: string[],
+    validExtensions: string[],
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
+    inertiaPagePaths[workspaceFolder.name] = pagePaths;
+    inertiaPageExtensions[workspaceFolder.name] = validExtensions;
 
     let views: ViewItem = {};
 
@@ -24,11 +29,13 @@ const load = (pagePaths: string[], validExtensions: string[]) => {
     pagePaths
         .map((path) => sysPath.sep + relativePath(path))
         .forEach((path) => {
-            collectViews(projectPath(path), path, validExtensions).forEach(
-                (view) => {
-                    views[view.name] = view;
-                },
-            );
+            collectViews(
+                projectPath(path, workspaceFolder),
+                path,
+                validExtensions,
+            ).forEach((view) => {
+                views[view.name] = view;
+            });
         });
 
     return views;
@@ -78,24 +85,27 @@ const collectViews = (
 };
 
 export const getInertiaViews = repository<ViewItem>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         runInLaravel<{
             page_paths?: string[];
             page_extensions?: string[];
-        }>(template("inertia")).then((result) => {
+        }>(template("inertia"), workspaceFolder).then((result) => {
             return load(
                 result?.page_paths ?? [],
                 result?.page_extensions ?? [],
+                workspaceFolder,
             );
         }),
-    pattern: () =>
-        waitForValue(() => inertiaPagePaths).then((pagePaths) => {
-            if (pagePaths === null || pagePaths.length === 0) {
-                return null;
-            }
+    pattern: (workspaceFolder: vscode.WorkspaceFolder) =>
+        waitForValue(() => inertiaPagePaths[workspaceFolder.name]).then(
+            (pagePaths) => {
+                if (pagePaths === null || pagePaths.length === 0) {
+                    return null;
+                }
 
-            return `{${pagePaths.join(",")}}/{*,**/*}`;
-        }),
+                return `{${pagePaths.join(",")}}/{*,**/*}`;
+            },
+        ),
     itemsDefault: {},
     fileWatcherEvents: ["create", "delete"],
 });

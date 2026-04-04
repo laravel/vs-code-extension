@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
@@ -7,9 +8,10 @@ interface CustomDirectiveItem {
 }
 
 export const getCustomBladeDirectives = repository<CustomDirectiveItem[]>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         runInLaravel<CustomDirectiveItem[]>(
             template("bladeDirectives"),
+            workspaceFolder,
             "Custom Blade Directives",
         ),
     pattern: "app/{,*,**/*}Provider.php",

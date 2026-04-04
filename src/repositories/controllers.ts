@@ -1,12 +1,13 @@
 import { inAppDirs } from "@src/support/fileWatcher";
 import * as fs from "fs";
+import * as vscode from "vscode";
 import { repository } from ".";
 import { projectPath } from "../support/project";
 
-const load = (): string[] => {
-    return collectControllers(projectPath("app/Http/Controllers")).map(
-        (controller) => controller.replace(/@__invoke/, ""),
-    );
+const load = (workspaceFolder: vscode.WorkspaceFolder): string[] => {
+    return collectControllers(
+        projectPath("app/Http/Controllers", workspaceFolder),
+    ).map((controller) => controller.replace(/@__invoke/, ""));
 };
 
 const collectControllers = (path: string): string[] => {
@@ -76,9 +77,9 @@ const collectControllers = (path: string): string[] => {
 };
 
 export const getControllers = repository<string[]>({
-    load: () => {
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
         return new Promise((resolve) => {
-            resolve(load());
+            resolve(load(workspaceFolder));
         });
     },
     pattern: inAppDirs("{,**/}{Controllers}{.php,/*.php,/**/*.php}"),
