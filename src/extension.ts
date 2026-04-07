@@ -5,7 +5,10 @@ import * as vscode from "vscode";
 import { get } from "axios";
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
-import { registerArtisanMakeCommands } from "./artisan/registry";
+import {
+    registerArtisanCommands,
+    registerArtisanMakeCommands,
+} from "./artisan/registry";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
@@ -269,6 +272,7 @@ export async function activate(context: vscode.ExtensionContext) {
             refactorAllHtmlClassesToBladeDirectives,
         ),
         ...registerArtisanMakeCommands(),
+        ...registerArtisanCommands(),
         vscode.commands.registerCommand(
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,

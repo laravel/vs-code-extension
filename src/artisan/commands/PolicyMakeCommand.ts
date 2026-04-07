@@ -3,6 +3,7 @@ import { getModelClassnames } from "@src/repositories/models";
 
 export const PolicyMakeCommand: Command = {
     name: "make:policy",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

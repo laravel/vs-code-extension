@@ -85,6 +85,7 @@ declare namespace Eloquent {
         observers: Observer[];
         scopes: Scope[];
         extends: string | null;
+        path: string;
     }
 
     interface Attribute {

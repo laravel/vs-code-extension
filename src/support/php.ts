@@ -347,3 +347,26 @@ export const artisan = (
         );
     });
 };
+
+let artisanTerminal: vscode.Terminal | undefined;
+
+export const runArtisanInTerminal = async (
+    command: string,
+    workspaceFolder: string,
+): Promise<void> => {
+    const fullCommand = `${getCommand("artisan")} ${command}`.trim();
+
+    if (
+        !artisanTerminal ||
+        !vscode.window.terminals.includes(artisanTerminal)
+    ) {
+        artisanTerminal = vscode.window.createTerminal({
+            name: "Laravel Artisan",
+            cwd: workspaceFolder,
+        });
+    }
+
+    artisanTerminal.show();
+    await vscode.commands.executeCommand("workbench.action.terminal.clear");
+    artisanTerminal.sendText(fullCommand, true);
+};

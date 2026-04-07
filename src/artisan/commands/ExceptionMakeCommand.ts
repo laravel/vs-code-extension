@@ -2,6 +2,7 @@ import { Command } from "../types";
 
 export const ExceptionMakeCommand: Command = {
     name: "make:exception",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

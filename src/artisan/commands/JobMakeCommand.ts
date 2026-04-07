@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const JobMakeCommand: Command = {
     name: "make:job",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

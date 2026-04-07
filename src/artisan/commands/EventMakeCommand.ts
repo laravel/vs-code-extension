@@ -3,6 +3,7 @@ import { forceOption } from "@src/artisan/options";
 
 export const EventMakeCommand: Command = {
     name: "make:event",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

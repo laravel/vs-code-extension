@@ -3,6 +3,7 @@ import { forceOption } from "@src/artisan/options";
 
 export const TraitMakeCommand: Command = {
     name: "make:trait",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

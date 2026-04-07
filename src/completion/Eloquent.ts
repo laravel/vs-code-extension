@@ -1,10 +1,27 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { CompletionProvider, Eloquent as EloquentType } from "..";
+import {
+    CompletionProvider,
+    Eloquent as EloquentType,
+    FeatureTagParam,
+} from "..";
 import AutocompleteResult from "../parser/AutocompleteResult";
 import { getModels } from "./../repositories/models";
 import { wordMatchRegex } from "./../support/patterns";
+
+const toFind: FeatureTagParam[] = [
+    {
+        class: [
+            "Illuminate\\Database\\Eloquent\\Attributes\\Fillable",
+            "Illuminate\\Database\\Eloquent\\Attributes\\Guarded",
+            "Illuminate\\Database\\Eloquent\\Attributes\\Hidden",
+            "Illuminate\\Database\\Eloquent\\Attributes\\Visible",
+            "Illuminate\\Database\\Eloquent\\Attributes\\Appends",
+        ],
+        argumentIndex: 0,
+    },
+];
 
 export class Eloquent implements CompletionProvider {
     private relationMethods = [
@@ -58,10 +75,12 @@ export class Eloquent implements CompletionProvider {
     ];
 
     tags() {
-        return Object.entries(getModels().items).map(([key]) => ({
-            class: key,
-            method: this.getAllFunctions(),
-        }));
+        return toFind.concat(
+            Object.entries(getModels().items).map(([key]) => ({
+                class: key,
+                method: this.getAllFunctions(),
+            })),
+        );
     }
 
     provideCompletionItems(
@@ -75,27 +94,37 @@ export class Eloquent implements CompletionProvider {
 
         const className = info?.class || result.class();
 
-        if (className && !result.func() && getModels().items[className]) {
-            if (result.currentParamIsArray() && result.fillingInArrayKey()) {
-                return this.getFillableAttributeCompletionItems(
-                    result,
-                    document,
-                    position,
-                    getModels().items[className],
-                );
-            }
-
-            return [];
-        }
-
-        if (!className || !result.func()) {
+        if (!className) {
             return [];
         }
 
         const model = getModels().items[className];
 
-        // If we can't find the model, we can't provide completions
         if (!model) {
+            return [];
+        }
+
+        if (!result.func() && model) {
+            if (
+                this.isInsideObjectValue(result) &&
+                result.fillingInArrayValue()
+            ) {
+                return this.getCompletionItems(
+                    document,
+                    position,
+                    model.attributes.map((attribute) => attribute.name),
+                );
+            }
+
+            if (result.currentParamIsArray() && result.fillingInArrayKey()) {
+                return this.getFillableAttributeCompletionItems(
+                    result,
+                    document,
+                    position,
+                    model,
+                );
+            }
+
             return [];
         }
 
@@ -186,6 +215,31 @@ export class Eloquent implements CompletionProvider {
         result: AutocompleteResult,
         document: string,
     ): AutocompleteResult | false {
+        if (result.fillingInArrayValue()) {
+            const isInsideObjectValue = this.isInsideObjectValue(result);
+
+            const filePath =
+                vscode.window.activeTextEditor?.document.uri.fsPath;
+
+            if (isInsideObjectValue && filePath) {
+                const relativePath = vscode.workspace.asRelativePath(filePath);
+
+                const model = Object.values(getModels().items).find(
+                    (model) => model.path.replace(/\\/g, "/") === relativePath,
+                );
+
+                if (!model) {
+                    return false;
+                }
+
+                result.addInfo("eloquent", { class: model.class });
+
+                return result;
+            }
+
+            return false;
+        }
+
         const func = result.func();
 
         if (!func) {
@@ -253,6 +307,17 @@ export class Eloquent implements CompletionProvider {
         }
 
         return false;
+    }
+
+    private isInsideObjectValue(result: AutocompleteResult): boolean {
+        return toFind.some((tag) => {
+            const classes =
+                typeof tag.class === "string" ? [tag.class] : tag.class;
+
+            return classes?.some((className) =>
+                result.isInsideObjectValue(className),
+            );
+        });
     }
 
     private getAllFunctions(): string[] {

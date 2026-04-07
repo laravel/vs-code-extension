@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
@@ -32,3 +33,10 @@ response()->redirectToRoute('dashboard');
 Route::is('dashboard');
 Request::routeIs('home');
 request()->routeIs('dashboard');
+
+// 6. Attributes
+#[RedirectToRoute('home')]
+class RedirectToRouteHelper {}
+
+#[RedirectToRoute('missing.route')]
+class RedirectToRouteMissingHelper {}

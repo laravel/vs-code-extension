@@ -18,6 +18,10 @@ import {
 
 const toFind: FeatureTag = [
     {
+        class: "Illuminate\\Routing\\Attributes\\Controllers\\Authorize",
+        argumentIndex: 0,
+    },
+    {
         class: contract("Auth\\Access\\Gate"),
         method: [
             "has",
@@ -69,7 +73,13 @@ const analyzeParam = (
           values: AutocompleteParsingResult.StringValue[] | { value: string }[];
           missingReason: null;
       } => {
-    if (item.type !== "methodCall" || !item.methodName || index !== 0) {
+    if (item.type !== "methodCall" && item.type !== "object") {
+        return {
+            missingReason: "ignored",
+        };
+    }
+
+    if (item.type === "methodCall" && (!item.methodName || index !== 0)) {
         return {
             missingReason: "ignored",
         };
@@ -109,7 +119,10 @@ const analyzeParam = (
         .map((value) => getPolicies().items.policies[value.value])
         .flat();
 
-    if (["has"].includes(item.methodName)) {
+    if (
+        item.type === "object" ||
+        (item.type === "methodCall" && ["has"].includes(item.methodName ?? ""))
+    ) {
         return {
             policies,
             values,

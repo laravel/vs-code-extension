@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const ViewMakeCommand: Command = {
     name: "make:view",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",
