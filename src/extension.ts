@@ -46,7 +46,10 @@ import {
 } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
-import { registerArtisanMakeCommands } from "./artisan/registry";
+import {
+    registerArtisanCommands,
+    registerArtisanMakeCommands,
+} from "./artisan/registry";
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { registerTestRunner } from "./test-runner";
 
@@ -266,6 +269,7 @@ export async function activate(context: vscode.ExtensionContext) {
             refactorAllHtmlClassesToBladeDirectives,
         ),
         ...registerArtisanMakeCommands(),
+        ...registerArtisanCommands(),
         vscode.commands.registerCommand(
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,

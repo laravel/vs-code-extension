@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const NotificationMakeCommand: Command = {
     name: "make:notification",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

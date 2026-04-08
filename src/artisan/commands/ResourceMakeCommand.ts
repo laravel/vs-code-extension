@@ -2,6 +2,7 @@ import { Command } from "../types";
 
 export const ResourceMakeCommand: Command = {
     name: "make:resource",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

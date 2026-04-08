@@ -3,6 +3,7 @@ import { forceOption, testOptions } from "@src/artisan/options";
 
 export const JobMiddlewareMakeCommand: Command = {
     name: "make:job-middleware",
+    postRun: "openGeneratedFile",
     arguments: [
         {
             name: "name",

@@ -257,6 +257,151 @@
                     "command": "laravel.artisan.make.view",
                     "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.migrate",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.migrateFresh",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.migrateRefresh",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.migrateRollback",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.migrateStatus",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.tinker",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.db",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.dbShow",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.routeList",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.pail",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.authClearResets",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.dbSeed",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.dbTable",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.dbWipe",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.eventList",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.keyGenerate",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.modelShow",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.pestDataset",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.queueClear",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.queueFailed",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.queueFlush",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.queueForget",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.queueRetry",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.scheduleList",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.scheduleTest",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.schemaDump",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.wayfinderGenerate",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.cacheClear",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.artisan.vendorPublish",
+                    "when": "config.Laravel.artisanCommands.commandPalette",
+                    "group": "laravel"
                 }
             ],
             "editor/context": [
@@ -707,6 +852,151 @@
                 "category": "Laravel"
             },
             {
+                "command": "laravel.artisan.migrate",
+                "title": "artisan migrate | Run the database migrations",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.migrateFresh",
+                "title": "artisan migrate:fresh | Drop all tables and re-run all migrations",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.migrateRefresh",
+                "title": "artisan migrate:refresh | Reset and re-run all migrations",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.migrateRollback",
+                "title": "artisan migrate:rollback | Rollback the last database migration",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.migrateStatus",
+                "title": "artisan migrate:status | Show the status of each migration",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.tinker",
+                "title": "artisan tinker | Interact with your application",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.db",
+                "title": "artisan db | Start a new database CLI session",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.dbShow",
+                "title": "artisan db:show | Display information about the given database",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.routeList",
+                "title": "artisan route:list | List all registered routes",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.pail",
+                "title": "artisan pail | Tail the application logs",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.authClearResets",
+                "title": "artisan auth:clear-resets | Flush expired password reset tokens",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.dbSeed",
+                "title": "artisan db:seed | Seed the database with records",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.dbTable",
+                "title": "artisan db:table | Display information about the given database table",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.dbWipe",
+                "title": "artisan db:wipe | Drop all tables, views, and types",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.eventList",
+                "title": "artisan event:list | List the application's events and listeners",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.keyGenerate",
+                "title": "artisan key:generate | Set the application key",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.modelShow",
+                "title": "artisan model:show | Show information about an Eloquent model",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.pestDataset",
+                "title": "artisan pest:dataset | Create a new dataset file",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.queueClear",
+                "title": "artisan queue:clear | Delete all of the jobs from the specified queue",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.queueFailed",
+                "title": "artisan queue:failed | List all of the failed queue jobs",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.queueFlush",
+                "title": "artisan queue:flush | Flush all of the failed queue jobs",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.queueForget",
+                "title": "artisan queue:forget | Delete a failed queue job",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.queueRetry",
+                "title": "artisan queue:retry | Retry a failed queue job",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.scheduleList",
+                "title": "artisan schedule:list | List all scheduled tasks",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.scheduleTest",
+                "title": "artisan schedule:test | Run a scheduled command",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.schemaDump",
+                "title": "artisan schema:dump | Dump the given database schema",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.wayfinderGenerate",
+                "title": "artisan wayfinder:generate | Generate Wayfinder",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.cacheClear",
+                "title": "artisan cache:clear | Flush the application cache",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.artisan.vendorPublish",
+                "title": "artisan vendor:publish | Publish any publishable assets from vendor packages",
+                "category": "Laravel"
+            },
+            {
                 "command": "laravel.docker.configure",
                 "title": "Configure Docker Environment",
                 "category": "Laravel"
@@ -798,6 +1088,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable Laravel Artisan Make commands in the VSCode command palette."
+                },
+                "Laravel.artisanCommands.commandPalette": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable Laravel Artisan commands in the VSCode command palette."
                 },
                 "Laravel.appBinding.diagnostics": {
                     "type": "boolean",
