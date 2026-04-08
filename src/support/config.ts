@@ -12,6 +12,7 @@ type ConfigKey =
     | "showErrorPopups"
     | "blade.autoSpaceTags"
     | "eloquent.generateDocBlocks"
+    | "pest.generateDocBlocks"
     | "env.viteQuickFix"
     | "pint.runOnSave"
     | "testRunner.enabled";

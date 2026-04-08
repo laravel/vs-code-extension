@@ -50,6 +50,7 @@ import {
     registerArtisanMakeCommands,
 } from "./artisan/registry";
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
+import { registerPestHelper } from "./features/pest";
 import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;
@@ -279,6 +280,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    registerPestHelper();
     registerTestRunner();
 }
 
