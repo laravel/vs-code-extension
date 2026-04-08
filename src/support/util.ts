@@ -163,3 +163,21 @@ export const escapeNamespace = (namespace: string): string => {
 
     return namespace;
 };
+
+export const globToRegex = (glob: string): RegExp => {
+    const DOUBLE_STAR_SLASH = "__DOUBLE_STAR_SLASH__";
+    const DOUBLE_STAR_FILE = "__DOUBLE_STAR_FILE__";
+
+    const pattern = glob
+        .replace(/[.+^$()|[\]\\]/g, "\\$&")
+        .replace(/\*\*\/\*/g, DOUBLE_STAR_FILE)
+        .replace(/\*\*\//g, DOUBLE_STAR_SLASH)
+        .replace(/\*/g, "[^/]*")
+        .replaceAll(DOUBLE_STAR_FILE, ".*")
+        .replaceAll(DOUBLE_STAR_SLASH, "(?:.*\\/)?")
+        .replace(/\{([^}]*)\}/g, (_, group) => {
+            return "(?:" + group.split(",").join("|") + ")";
+        });
+
+    return new RegExp(`^${pattern}$`);
+};

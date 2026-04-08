@@ -1,9 +1,16 @@
-import { getBladeComponents } from "@src/repositories/bladeComponents";
+import { Keys } from "@src/rename";
+import {
+    getBladeComponents,
+    patterns,
+} from "@src/repositories/bladeComponents";
+import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
+import { globToRegex } from "@src/support/util";
+import fs from "fs/promises";
 import os from "os";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider, RenameFileProvider } from "..";
+import { HoverProvider, LinkProvider, RenameFilesProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -152,26 +159,93 @@ export const hoverProvider: HoverProvider = (
     return null;
 };
 
-// export const renameFileProvider: RenameFileProvider = (
-//     event: vscode.FileRenameEvent,
-//     previousComponents = getBladeComponents().items,
-// ): void => {
-//     event.files.forEach((file) => {
-//         const newFilePath = vscode.workspace.asRelativePath(file.newUri);
-//         const oldFilePath = vscode.workspace.asRelativePath(file.oldUri);
+const keys = new Cache<string, Keys>(100);
 
-//         const components = getBladeComponents();
+export const renameFilesProvider: RenameFilesProvider = {
+    customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
+        return event.files.filter((file) => {
+            const path = vscode.workspace.asRelativePath(file.oldUri);
 
-//         components.whenLoaded((components, previousComponents) => {
-//             const oldComponent = Object.entries(
-//                 previousComponents.components,
-//             ).find(([_, component]) => component.paths.includes(oldFilePath));
+            return Object.values(patterns).some((pattern) =>
+                globToRegex(pattern).test(path),
+            );
+        });
+    },
 
-//             const newComponent = Object.entries(components.components).find(
-//                 ([_, component]) => component.paths.includes(newFilePath),
-//             );
+    beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
+        getBladeComponents().whenLoaded((components) => {
+            files.forEach((file) => {
+                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
 
-//             const dziala = true;
-//         });
-//     });
-// };
+                const oldKey = Object.entries(components.components).find(
+                    ([_, component]) =>
+                        component.paths.some((p) => p.startsWith(oldPath)),
+                )?.[0];
+
+                if (!oldKey) {
+                    return;
+                }
+
+                keys.set(oldPath, { oldKey });
+            });
+        });
+    },
+
+    afterRenameFiles(files: vscode.FileRenameEvent["files"]) {
+        getBladeComponents().whenReloaded(async (components) => {
+            files.forEach((file) => {
+                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
+
+                const oldKey = keys.get(oldPath)?.oldKey;
+
+                if (!oldKey) {
+                    return;
+                }
+
+                const newPath = vscode.workspace.asRelativePath(file.newUri);
+
+                const newKey = Object.entries(components.components).find(
+                    ([_, component]) =>
+                        component.paths.some((p) => p.startsWith(newPath)),
+                )?.[0];
+
+                if (!newKey || newKey === oldKey) {
+                    return;
+                }
+
+                keys.set(oldPath, { oldKey, newKey });
+            });
+
+            const componentFiles = await vscode.workspace.findFiles(
+                patterns.bladeComponents,
+            );
+
+            const promises = componentFiles.map(async (file) => {
+                const filePath = file.fsPath;
+                const text = await fs.readFile(filePath, "utf-8");
+                let updated = text;
+
+                for (const key of keys.all().values()) {
+                    if (!key.newKey) {
+                        continue;
+                    }
+
+                    updated = updated.replaceAll(
+                        new RegExp(`<x-${key.oldKey}(\\s|\\/>)`, "g"),
+                        `<x-${key.newKey}$1`,
+                    );
+                }
+
+                if (updated === text) {
+                    return;
+                }
+
+                await fs.writeFile(filePath, updated, "utf-8");
+            });
+
+            await Promise.all(promises);
+
+            keys.clear();
+        });
+    },
+};

@@ -35,8 +35,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
-import { renameFileProviders } from "./rename-file/RenameFileProvider";
-import { getBladeComponents } from "./repositories/bladeComponents";
+import { renameFilesProviders } from "./rename/RenameFilesProvider";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -124,6 +123,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { viteEnvCodeActionProvider },
         { hoverProviders },
         { linkProviders },
+        { Registry: RenameFilesRegistry },
     ] = await Promise.all([
         import("./completion/Registry.js"),
         import("./completion/CompletionProvider.js"),
@@ -137,6 +137,7 @@ export async function activate(context: vscode.ExtensionContext) {
         import("./features/env.js"),
         import("./hover/HoverProvider.js"),
         import("./link/LinkProvider.js"),
+        import("./rename/Registry.js"),
     ]);
 
     console.log("Laravel VS Code Started...");
@@ -159,6 +160,10 @@ export async function activate(context: vscode.ExtensionContext) {
     const delegatedRegistry = new Registry(
         ...completionProviders,
         new EloquentCompletion(),
+    );
+
+    const delegatedRenameFilesRegistry = new RenameFilesRegistry(
+        ...renameFilesProviders,
     );
 
     const validationRegistry = new Registry(new ValidationCompletion());
@@ -224,11 +229,12 @@ export async function activate(context: vscode.ExtensionContext) {
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
         ),
-        // ...renameFileProviders.map((provider) =>
-        //     vscode.workspace.onDidRenameFiles((event) =>
-        //         provider.provideRenameFile(event),
-        //     ),
-        // ),
+        vscode.workspace.onWillRenameFiles((event) =>
+            delegatedRenameFilesRegistry.provideBeforeRenameFiles(event),
+        ),
+        vscode.workspace.onDidRenameFiles((event) =>
+            delegatedRenameFilesRegistry.provideAfterRenameFiles(event),
+        ),
         // ...testRunnerCommands,
         // testController,
         vscode.languages.registerCodeActionsProvider(
@@ -277,40 +283,40 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
-        vscode.workspace.onWillRenameFiles((event) => {
-            getBladeComponents().whenLoaded((components) => {
-                event.files.forEach((file) => {
-                    const oldFilePath = vscode.workspace.asRelativePath(
-                        file.oldUri,
-                    );
+        // vscode.workspace.onWillRenameFiles((event) => {
+        //     getBladeComponents().whenLoaded((components) => {
+        //         event.files.forEach((file) => {
+        //             const oldFilePath = vscode.workspace.asRelativePath(
+        //                 file.oldUri,
+        //             );
 
-                    const oldComponent = Object.entries(
-                        components.components,
-                    ).find(([_, component]) =>
-                        component.paths.includes(oldFilePath),
-                    );
+        //             const oldComponent = Object.entries(
+        //                 components.components,
+        //             ).find(([_, component]) =>
+        //                 component.paths.includes(oldFilePath),
+        //             );
 
-                    const dziala = true;
-                });
-            });
-        }),
-        vscode.workspace.onDidRenameFiles((event) => {
-            getBladeComponents().whenRefreshed((components) => {
-                event.files.forEach((file) => {
-                    const newFilePath = vscode.workspace.asRelativePath(
-                        file.newUri,
-                    );
+        //             const dziala = true;
+        //         });
+        //     });
+        // }),
+        // vscode.workspace.onDidRenameFiles((event) => {
+        //     getBladeComponents().whenRefreshed((components) => {
+        //         event.files.forEach((file) => {
+        //             const newFilePath = vscode.workspace.asRelativePath(
+        //                 file.newUri,
+        //             );
 
-                    const newComponent = Object.entries(
-                        components.components,
-                    ).find(([_, component]) =>
-                        component.paths.includes(newFilePath),
-                    );
+        //             const newComponent = Object.entries(
+        //                 components.components,
+        //             ).find(([_, component]) =>
+        //                 component.paths.includes(newFilePath),
+        //             );
 
-                    const dziala = true;
-                });
-            });
-        }),
+        //             const dziala = true;
+        //         });
+        //     });
+        // }),
     );
 
     collectDebugInfo();
