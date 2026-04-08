@@ -193,6 +193,8 @@ export const renameFilesProvider: RenameFilesProvider = {
 
     afterRenameFiles(files: vscode.FileRenameEvent["files"]) {
         getBladeComponents().whenReloaded(async (components) => {
+            const pLimit = (await import("p-limit")).default;
+
             files.forEach((file) => {
                 const oldPath = vscode.workspace.asRelativePath(file.oldUri);
 
@@ -220,28 +222,37 @@ export const renameFilesProvider: RenameFilesProvider = {
                 patterns.bladeComponents,
             );
 
-            const promises = componentFiles.map(async (file) => {
-                const filePath = file.fsPath;
-                const text = await fs.readFile(filePath, "utf-8");
-                let updated = text;
+            const keysMap = new Map(
+                Array.from(keys.all().values())
+                    .filter((k) => k.newKey)
+                    .map((k) => [k.oldKey, k.newKey]),
+            );
 
-                for (const key of keys.all().values()) {
-                    if (!key.newKey) {
-                        continue;
+            const pattern = new RegExp(
+                `<x-(${Array.from(keysMap.keys()).join("|")})(\\s|\\/>)`,
+                "g",
+            );
+
+            const limit = pLimit(10);
+
+            const promises = componentFiles.map((file) =>
+                limit(async () => {
+                    const filePath = file.fsPath;
+                    const text = await fs.readFile(filePath, "utf-8");
+
+                    const updated = text.replace(
+                        pattern,
+                        (_, oldKey, suffix) =>
+                            `<x-${keysMap.get(oldKey)}${suffix}`,
+                    );
+
+                    if (updated === text) {
+                        return;
                     }
 
-                    updated = updated.replaceAll(
-                        new RegExp(`<x-${key.oldKey}(\\s|\\/>)`, "g"),
-                        `<x-${key.newKey}$1`,
-                    );
-                }
-
-                if (updated === text) {
-                    return;
-                }
-
-                await fs.writeFile(filePath, updated, "utf-8");
-            });
+                    await fs.writeFile(filePath, updated, "utf-8");
+                }),
+            );
 
             await Promise.all(promises);
 
