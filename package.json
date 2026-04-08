@@ -100,6 +100,10 @@
                     "group": "laravel"
                 },
                 {
+                    "command": "laravel.goToRoute",
+                    "group": "laravel"
+                },
+                {
                     "command": "laravel.artisan.make.cast",
                     "when": "config.Laravel.artisanMake.commandPalette",
                     "group": "laravel"
@@ -685,6 +689,11 @@
             {
                 "command": "laravel.namespace.generate",
                 "title": "Generate namespace",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.goToRoute",
+                "title": "Go to route",
                 "category": "Laravel"
             },
             {

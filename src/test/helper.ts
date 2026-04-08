@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import * as vscode from "vscode";
 
 let extensionReady: Promise<void> | undefined;
@@ -148,4 +149,59 @@ export function includesNormalized(actual: string, expected: string): boolean {
 
 export function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+type QuickPickResult = {
+    assertIncludes(label: string, message?: string): void;
+};
+
+export async function withQuickPick(options: {
+    select: string;
+    trigger: () => Thenable<unknown>;
+}): Promise<QuickPickResult> {
+    const originalShowQuickPick = vscode.window.showQuickPick;
+    const labels: string[] = [];
+
+    try {
+        (
+            vscode.window as {
+                showQuickPick: typeof vscode.window.showQuickPick;
+            }
+        ).showQuickPick = (async (
+            items:
+                | readonly vscode.QuickPickItem[]
+                | Thenable<readonly vscode.QuickPickItem[]>,
+        ) => {
+            const pickerItems = await Promise.resolve(items);
+
+            labels.splice(
+                0,
+                labels.length,
+                ...pickerItems.map((item) => item.label),
+            );
+
+            return (
+                pickerItems.find((item) => item.label === options.select) ??
+                undefined
+            );
+        }) as unknown as typeof vscode.window.showQuickPick;
+
+        await options.trigger();
+    } finally {
+        (
+            vscode.window as {
+                showQuickPick: typeof vscode.window.showQuickPick;
+            }
+        ).showQuickPick = originalShowQuickPick;
+    }
+
+    return {
+        assertIncludes(label: string, message?: string) {
+            assert.ok(
+                labels.includes(label),
+                message ??
+                    `Expected label "${label}" in picker, got: ${labels.join(", ")}`,
+            );
+        },
+    };
 }

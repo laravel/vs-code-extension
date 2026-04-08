@@ -8,6 +8,7 @@ import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
+import { goToRouteCommand } from "./commands/goToRoute";
 import {
     pintCommands,
     PintEditProvider,
@@ -97,6 +98,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             commandName("laravel.namespace.generate"),
             generateNamespaceCommand,
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.goToRoute"),
+            goToRouteCommand,
         ),
     );
 
