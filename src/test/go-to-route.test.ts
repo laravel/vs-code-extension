@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { activateExtension, withQuickPick } from "./helper";
+import { activateExtension, includesNormalized, withQuickPick } from "./helper";
 
 suite("Go To Route Command Test Suite", () => {
     suiteSetup(async () => {
@@ -18,7 +18,8 @@ suite("Go To Route Command Test Suite", () => {
         const activeEditor = vscode.window.activeTextEditor;
 
         assert.ok(
-            activeEditor?.document.uri.fsPath.endsWith(
+            includesNormalized(
+                activeEditor?.document.uri.fsPath ?? "",
                 "app/Http/Controllers/Settings/ProfileController.php",
             ),
             `Expected controller file to open, got ${activeEditor?.document.uri.fsPath}`,
