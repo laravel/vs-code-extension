@@ -283,40 +283,6 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
-        // vscode.workspace.onWillRenameFiles((event) => {
-        //     getBladeComponents().whenLoaded((components) => {
-        //         event.files.forEach((file) => {
-        //             const oldFilePath = vscode.workspace.asRelativePath(
-        //                 file.oldUri,
-        //             );
-
-        //             const oldComponent = Object.entries(
-        //                 components.components,
-        //             ).find(([_, component]) =>
-        //                 component.paths.includes(oldFilePath),
-        //             );
-
-        //             const dziala = true;
-        //         });
-        //     });
-        // }),
-        // vscode.workspace.onDidRenameFiles((event) => {
-        //     getBladeComponents().whenRefreshed((components) => {
-        //         event.files.forEach((file) => {
-        //             const newFilePath = vscode.workspace.asRelativePath(
-        //                 file.newUri,
-        //             );
-
-        //             const newComponent = Object.entries(
-        //                 components.components,
-        //             ).find(([_, component]) =>
-        //                 component.paths.includes(newFilePath),
-        //             );
-
-        //             const dziala = true;
-        //         });
-        //     });
-        // }),
     );
 
     collectDebugInfo();
