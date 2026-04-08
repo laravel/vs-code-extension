@@ -65,6 +65,10 @@ $tests = new class {
         require_once base_path('vendor/pestphp/pest/overrides/Runner/TestSuiteLoader.php');
 
         TestSuite::getInstance(base_path(), 'tests');
+
+        if (file_exists($pestFile = base_path('tests/Pest.php'))) {
+            require_once $pestFile;
+        }
     }
 
     /**
