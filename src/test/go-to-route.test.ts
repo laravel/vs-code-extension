@@ -12,24 +12,27 @@ suite("Go To Route Command Test Suite", () => {
         let labels: string[] = [];
 
         try {
-            (vscode.window as { showQuickPick: typeof vscode.window.showQuickPick }).showQuickPick =
-                (async (
-                    items:
-                        | readonly vscode.QuickPickItem[]
-                        | Thenable<readonly vscode.QuickPickItem[]>,
-                ) => {
-                    const pickerItems = await Promise.resolve(items);
+            (
+                vscode.window as {
+                    showQuickPick: typeof vscode.window.showQuickPick;
+                }
+            ).showQuickPick = (async (
+                items:
+                    | readonly vscode.QuickPickItem[]
+                    | Thenable<readonly vscode.QuickPickItem[]>,
+            ) => {
+                const pickerItems = await Promise.resolve(items);
 
-                    labels = pickerItems.map((item) => item.label);
+                labels = pickerItems.map((item) => item.label);
 
-                    return (
-                        pickerItems.find(
-                            (item) =>
-                                item.label ===
-                                "GET settings/profile | profile.edit",
-                        ) ?? undefined
-                    );
-                }) as unknown as typeof vscode.window.showQuickPick;
+                return (
+                    pickerItems.find(
+                        (item) =>
+                            item.label ===
+                            "GET settings/profile | profile.edit",
+                    ) ?? undefined
+                );
+            }) as unknown as typeof vscode.window.showQuickPick;
 
             await vscode.commands.executeCommand("laravel.goToRoute");
 
@@ -53,7 +56,10 @@ suite("Go To Route Command Test Suite", () => {
                 activeEditor = vscode.window.activeTextEditor;
             }
 
-            assert.ok(activeEditor, "Expected an active editor after navigation");
+            assert.ok(
+                activeEditor,
+                "Expected an active editor after navigation",
+            );
             assert.ok(
                 activeEditor?.document.uri.fsPath.endsWith(
                     "app/Http/Controllers/Settings/ProfileController.php",
@@ -62,8 +68,11 @@ suite("Go To Route Command Test Suite", () => {
             );
             assert.strictEqual(activeEditor?.selection.active.line, 19);
         } finally {
-            (vscode.window as { showQuickPick: typeof vscode.window.showQuickPick }).showQuickPick =
-                originalShowQuickPick;
+            (
+                vscode.window as {
+                    showQuickPick: typeof vscode.window.showQuickPick;
+                }
+            ).showQuickPick = originalShowQuickPick;
         }
     });
 });

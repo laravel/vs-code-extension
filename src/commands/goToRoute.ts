@@ -24,12 +24,15 @@ export const goToRouteCommand = async () => {
         return;
     }
 
-    const selected = await vscode.window.showQuickPick(buildRouteQuickPickItems(routes), {
-        title: "Laravel: Go to route",
-        matchOnDescription: false,
-        matchOnDetail: false,
-        placeHolder: "Select a route to open its handler",
-    });
+    const selected = await vscode.window.showQuickPick(
+        buildRouteQuickPickItems(routes),
+        {
+            title: "Laravel: Go to route",
+            matchOnDescription: false,
+            matchOnDetail: false,
+            placeHolder: "Select a route to open its handler",
+        },
+    );
 
     if (!selected) {
         return;
@@ -63,7 +66,9 @@ export const buildRouteQuickPickItems = (
 ): RouteQuickPickItem[] => {
     return [...routes]
         .sort((left, right) => {
-            return formatRouteLabel(left).localeCompare(formatRouteLabel(right));
+            return formatRouteLabel(left).localeCompare(
+                formatRouteLabel(right),
+            );
         })
         .map((route) => ({
             label: formatRouteLabel(route),
@@ -91,7 +96,9 @@ const loadViews = async (): Promise<ViewItem[]> => {
     return (await repository.whenLoaded((items) => items)) ?? [];
 };
 
-const resolveRouteTarget = async (route: RouteItem): Promise<RouteTarget | null> => {
+const resolveRouteTarget = async (
+    route: RouteItem,
+): Promise<RouteTarget | null> => {
     if (!route.filename) {
         return null;
     }
@@ -110,7 +117,9 @@ const resolveLivewireRouteTarget = async (
         return null;
     }
 
-    const view = (await loadViews()).find((item) => item.key === route.livewire);
+    const view = (await loadViews()).find(
+        (item) => item.key === route.livewire,
+    );
 
     if (!view) {
         return null;
