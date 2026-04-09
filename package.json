@@ -1067,7 +1067,12 @@
                 "Laravel.pest.generateDocBlocks": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically generate Pest doc blocks for test closures as IDE helpers."
+                    "description": "Automatically generate a Pest helper file for test closures to enhance IDE support."
+                },
+                "Laravel.pest.helperFilePath": {
+                    "type": "string",
+                    "default": "storage/framework/testing/_pest.php",
+                    "description": "Path to the generated Pest helper file, relative to the project root."
                 },
                 "Laravel.blade.autoSpaceTags": {
                     "type": "boolean",
