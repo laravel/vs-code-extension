@@ -1,8 +1,8 @@
 import { getRoutes, type RouteItem } from "@src/repositories/routes";
 import { getViews, type ViewItem } from "@src/repositories/views";
 import { projectPath } from "@src/support/project";
-import { commandName } from ".";
 import * as vscode from "vscode";
+import { commandName } from ".";
 
 type RouteQuickPickItem = vscode.QuickPickItem & {
     route: RouteItem;
@@ -27,7 +27,7 @@ export const goToRouteCommand = async () => {
     const selected = await vscode.window.showQuickPick(
         buildRouteQuickPickItems(routes),
         {
-            title: "Laravel: Go to route",
+            title: "Laravel: Go to Route",
             matchOnDescription: false,
             matchOnDetail: false,
             placeHolder: "Select a route to open its handler",

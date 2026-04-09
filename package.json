@@ -688,12 +688,12 @@
             },
             {
                 "command": "laravel.namespace.generate",
-                "title": "Generate namespace",
+                "title": "Generate Namespace",
                 "category": "Laravel"
             },
             {
                 "command": "laravel.goToRoute",
-                "title": "Go to route",
+                "title": "Go to Route",
                 "category": "Laravel"
             },
             {
