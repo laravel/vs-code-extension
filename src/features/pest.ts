@@ -49,7 +49,9 @@ const writePestDocBlocks = (pest: PestConfig | null): void => {
         ...renderExpectations(pest.expectations),
     ]);
 
-    const pestFilePath = projectPath("storage/framework/testing/_pest.php");
+    const pestFilePath = projectPath(
+        config("pest.helperFilePath", "storage/framework/testing/_pest.php"),
+    );
 
     fs.mkdirSync(path.dirname(pestFilePath), { recursive: true });
     fs.writeFileSync(pestFilePath, content);
@@ -76,13 +78,6 @@ const renderFunctionStub = (uses: PestUse[]): string => {
     return `namespace {
 
     /**
-     * Runs the given closure before all tests in the current file.
-     *
-     * @param-closure-this ${unionType}  $closure
-     */
-    function beforeAll(Closure $closure): void {}
-
-    /**
      * Runs the given closure before each test in the current file.
      *
      * @param-closure-this ${unionType}  $closure
@@ -95,13 +90,6 @@ const renderFunctionStub = (uses: PestUse[]): string => {
      * @param-closure-this ${unionType}  $closure
      */
     function afterEach(?Closure $closure = null): \\Pest\\PendingCalls\\AfterEachCall {}
-
-    /**
-     * Runs the given closure after all tests in the current file.
-     *
-     * @param-closure-this ${unionType}  $closure
-     */
-    function afterAll(Closure $closure): void {}
 
     /**
      * Adds the given closure as a test.
