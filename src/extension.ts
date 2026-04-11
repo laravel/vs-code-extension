@@ -2,7 +2,6 @@
 
 import * as vscode from "vscode";
 
-import { get } from "axios";
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
 import {
@@ -14,6 +13,7 @@ import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
+import { goToRouteCommand } from "./commands/goToRoute";
 import {
     pintCommands,
     PintEditProvider,
@@ -35,6 +35,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { registerPestHelper } from "./features/pest";
 import { renameFilesProviders } from "./rename/RenameFilesProvider";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
@@ -98,6 +99,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             commandName("laravel.namespace.generate"),
             generateNamespaceCommand,
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.goToRoute"),
+            goToRouteCommand,
         ),
     );
 
@@ -293,6 +298,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    registerPestHelper();
     registerTestRunner();
 }
 

@@ -24,7 +24,7 @@ export const openFileCommand = (
     lineNumber: number,
     position: number,
 ) => {
-    vscode.window.showTextDocument(uri, {
+    return vscode.window.showTextDocument(uri, {
         selection: new vscode.Range(
             new vscode.Position(lineNumber, position),
             new vscode.Position(lineNumber, position),
