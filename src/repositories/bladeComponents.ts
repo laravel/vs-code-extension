@@ -2,6 +2,11 @@ import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
+export const patterns = {
+    bladeComponents: inAppDirs("{,**/}{view,views}/{*,**/*}.blade.php"),
+    classComponents: "app/View/Components/{,*,**/*}.php",
+};
+
 export interface BladeComponents {
     components: {
         [key: string]: {
@@ -25,10 +30,7 @@ const load = () => {
 
 export const getBladeComponents = repository<BladeComponents>({
     load,
-    pattern: [
-        inAppDirs("{,**/}{view,views}/{*,**/*}"),
-        "app/View/Components/{,*,**/*}.php",
-    ],
+    pattern: Object.values(patterns),
     itemsDefault: {
         components: {},
         prefixes: [],

@@ -4,9 +4,14 @@ import * as vscode from "vscode";
 
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
+import {
+    registerArtisanCommands,
+    registerArtisanMakeCommands,
+} from "./artisan/registry";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import { goToRouteCommand } from "./commands/goToRoute";
 import {
@@ -30,6 +35,8 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { registerPestHelper } from "./features/pest";
+import { renameFilesProviders } from "./rename/RenameFilesProvider";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -46,12 +53,6 @@ import {
 } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
-import {
-    registerArtisanCommands,
-    registerArtisanMakeCommands,
-} from "./artisan/registry";
-import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
-import { registerPestHelper } from "./features/pest";
 import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;
@@ -127,6 +128,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { viteEnvCodeActionProvider },
         { hoverProviders },
         { linkProviders },
+        { Registry: RenameFilesRegistry },
     ] = await Promise.all([
         import("./completion/Registry.js"),
         import("./completion/CompletionProvider.js"),
@@ -140,6 +142,7 @@ export async function activate(context: vscode.ExtensionContext) {
         import("./features/env.js"),
         import("./hover/HoverProvider.js"),
         import("./link/LinkProvider.js"),
+        import("./rename/Registry.js"),
     ]);
 
     console.log("Laravel VS Code Started...");
@@ -162,6 +165,10 @@ export async function activate(context: vscode.ExtensionContext) {
     const delegatedRegistry = new Registry(
         ...completionProviders,
         new EloquentCompletion(),
+    );
+
+    const delegatedRenameFilesRegistry = new RenameFilesRegistry(
+        ...renameFilesProviders,
     );
 
     const validationRegistry = new Registry(new ValidationCompletion());
@@ -226,6 +233,12 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
+        ),
+        vscode.workspace.onWillRenameFiles((event) =>
+            delegatedRenameFilesRegistry.provideBeforeRenameFiles(event),
+        ),
+        vscode.workspace.onDidRenameFiles((event) =>
+            delegatedRenameFilesRegistry.provideAfterRenameFiles(event),
         ),
         // ...testRunnerCommands,
         // testController,

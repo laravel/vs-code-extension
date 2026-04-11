@@ -20,6 +20,7 @@ export const repository = <T>({
 }) => {
     let items: T = itemsDefault;
     let loaded = false;
+    let reloaded = false;
 
     loadAndWatch(
         () => {
@@ -31,6 +32,7 @@ export const repository = <T>({
 
                     items = result;
                     loaded = true;
+                    reloaded = true;
                 })
                 .catch((e) => {
                     console.error(e);
@@ -41,22 +43,32 @@ export const repository = <T>({
         reloadOnComposerChanges,
     );
 
-    const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {
-        let tries = 0;
+    const waitForValue =
+        (value: () => boolean, maxTries = 20) =>
+        async (callback: (items: T) => any) => {
+            let tries = 0;
 
-        while (!loaded && tries < maxTries) {
-            tries++;
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
+            while (!value() && tries < maxTries) {
+                tries++;
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
 
-        if (loaded) {
-            return callback(items);
-        }
+            if (value()) {
+                return callback(items);
+            }
+        };
+
+    const whenLoaded = waitForValue(() => loaded);
+    const whenReloaded = waitForValue(() => reloaded);
+
+    return () => {
+        reloaded = false;
+
+        return {
+            loaded,
+            items,
+            whenLoaded,
+            whenReloaded,
+        };
     };
-
-    return () => ({
-        loaded,
-        items,
-        whenLoaded,
-    });
 };

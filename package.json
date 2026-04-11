@@ -1194,6 +1194,12 @@
                     "generated": true,
                     "description": "Enable hover information for Blade components."
                 },
+                "Laravel.bladeComponent.renameFile": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,

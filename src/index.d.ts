@@ -27,6 +27,19 @@ interface CompletionProvider {
     ): vscode.CompletionItem[];
 }
 
+interface RenameFilesRegistryProvider {
+    provideBeforeRenameFiles(event: vscode.FileWillRenameEvent): void;
+    provideAfterRenameFiles(event: vscode.FileRenameEvent): void;
+}
+
+interface RenameFilesProvider {
+    customCheck(
+        event: vscode.FileWillRenameEvent | vscode.FileRenameEvent,
+    ): vscode.FileRenameEvent["files"];
+    beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]): void;
+    afterRenameFiles(files: vscode.FileRenameEvent["files"]): void;
+}
+
 interface View {
     name: string;
     path: string;
