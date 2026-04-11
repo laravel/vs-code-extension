@@ -1,4 +1,3 @@
-import { Keys } from "@src/rename";
 import {
     getBladeComponents,
     patterns,
@@ -159,7 +158,7 @@ export const hoverProvider: HoverProvider = (
     return null;
 };
 
-const keys = new Cache<string, Keys>(100);
+const keys = new Cache<string, string>(100);
 
 export const renameFilesProvider: RenameFilesProvider = {
     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
@@ -186,7 +185,7 @@ export const renameFilesProvider: RenameFilesProvider = {
                     return;
                 }
 
-                keys.set(oldPath, { oldKey });
+                keys.set(oldPath, oldKey);
             });
         });
     },
@@ -198,7 +197,9 @@ export const renameFilesProvider: RenameFilesProvider = {
             files.forEach((file) => {
                 const oldPath = vscode.workspace.asRelativePath(file.oldUri);
 
-                const oldKey = keys.get(oldPath)?.oldKey;
+                const oldKey = keys.get(oldPath);
+
+                keys.delete(oldPath);
 
                 if (!oldKey) {
                     return;
@@ -206,51 +207,77 @@ export const renameFilesProvider: RenameFilesProvider = {
 
                 const newPath = vscode.workspace.asRelativePath(file.newUri);
 
-                const newKey = Object.entries(components.components).find(
+                const newComponent = Object.entries(components.components).find(
                     ([_, component]) =>
                         component.paths.some((p) => p.startsWith(newPath)),
-                )?.[0];
+                );
 
-                if (!newKey || newKey === oldKey) {
+                if (!newComponent) {
                     return;
                 }
 
-                keys.set(oldPath, { oldKey, newKey });
+                const newKey = newComponent[0];
+
+                if (newKey === oldKey) {
+                    return;
+                }
+
+                if (!newPath.endsWith(".blade.php")) {
+                    const [oldBladePath, newBladePath] = [oldKey, newKey].map(
+                        (key) =>
+                            vscode.Uri.file(
+                                projectPath(
+                                    `resources/views/components/${key.replaceAll(".", "/")}.blade.php`,
+                                ),
+                            ),
+                    );
+
+                    vscode.workspace.fs.rename(oldBladePath, newBladePath);
+
+                    fs.readFile(file.newUri.fsPath, "utf-8").then((text) => {
+                        const updated = text.replace(
+                            new RegExp(
+                                `(?<=\\b(?:view|View::make)\\(('|")components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                                "g",
+                            ),
+                            newKey,
+                        );
+
+                        fs.writeFile(file.newUri.fsPath, updated, "utf-8");
+                    });
+                }
+
+                keys.set(oldKey, newKey);
             });
 
             const componentFiles = await vscode.workspace.findFiles(
                 patterns.bladeComponents,
             );
 
-            const keysMap = new Map(
-                Array.from(keys.all().values())
-                    .filter((k) => k.newKey)
-                    .map((k) => [k.oldKey, k.newKey]),
-            );
-
             const pattern = new RegExp(
-                `<x-(${Array.from(keysMap.keys()).join("|")})(\\s|\\/>)`,
+                `<x-(${Array.from(keys.all().keys()).join("|")})(\\s|\\/>)`,
                 "g",
             );
 
             const limit = pLimit(10);
 
             const promises = componentFiles.map((file) =>
-                limit(async () => {
+                limit(() => {
                     const filePath = file.fsPath;
-                    const text = await fs.readFile(filePath, "utf-8");
 
-                    const updated = text.replace(
-                        pattern,
-                        (_, oldKey, suffix) =>
-                            `<x-${keysMap.get(oldKey)}${suffix}`,
-                    );
+                    fs.readFile(filePath, "utf-8").then((text) => {
+                        const updated = text.replace(
+                            pattern,
+                            (_, oldKey, suffix) =>
+                                `<x-${keys.get(oldKey)}${suffix}`,
+                        );
 
-                    if (updated === text) {
-                        return;
-                    }
+                        if (updated === text) {
+                            return;
+                        }
 
-                    await fs.writeFile(filePath, updated, "utf-8");
+                        fs.writeFile(filePath, updated, "utf-8");
+                    });
                 }),
             );
 
