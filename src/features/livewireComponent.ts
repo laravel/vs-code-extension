@@ -122,8 +122,7 @@ const getNewKeyForClass = (newPath: string): string | undefined => {
     }
 
     const key = newPath
-        .replace("app/Livewire/Components", "")
-        .replace("app/Livewire", "")
+        .replace(/^app\/Livewire(\/Components)?/, "")
         .replace(/(\.[^/.]+)+$/, "")
         .replace(/^\/+/, "")
         .replaceAll("/", ".");
