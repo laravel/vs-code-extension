@@ -34,6 +34,7 @@ export type GeneratedConfigKey =
     | "livewireComponent.link"
     | "livewireComponent.completion"
     | "livewireComponent.hover"
+    | "livewireComponent.renameFile"
     | "middleware.diagnostics"
     | "middleware.hover"
     | "middleware.link"

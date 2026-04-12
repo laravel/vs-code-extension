@@ -3,8 +3,8 @@ import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
 export const patterns = {
-    bladeComponents: inAppDirs("{,**/}{view,views}/{*,**/*}.blade.php"),
-    classComponents: "app/View/Components/{,*,**/*}.php",
+    bladeFiles: inAppDirs("{,**/}{view,views}/{*,**/*}.blade.php"),
+    classFiles: "app/View/Components/{,*,**/*}.php",
 };
 
 export interface BladeComponents {

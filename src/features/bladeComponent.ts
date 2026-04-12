@@ -207,18 +207,12 @@ export const renameFilesProvider: RenameFilesProvider = {
 
                 const newPath = vscode.workspace.asRelativePath(file.newUri);
 
-                const newComponent = Object.entries(components.components).find(
+                const newKey = Object.entries(components.components).find(
                     ([_, component]) =>
                         component.paths.some((p) => p.startsWith(newPath)),
-                );
+                )?.[0];
 
-                if (!newComponent) {
-                    return;
-                }
-
-                const newKey = newComponent[0];
-
-                if (newKey === oldKey) {
+                if (!newKey || newKey === oldKey) {
                     return;
                 }
 
@@ -251,7 +245,7 @@ export const renameFilesProvider: RenameFilesProvider = {
             });
 
             const componentFiles = await vscode.workspace.findFiles(
-                patterns.bladeComponents,
+                patterns.bladeFiles,
             );
 
             const pattern = new RegExp(
@@ -262,22 +256,22 @@ export const renameFilesProvider: RenameFilesProvider = {
             const limit = pLimit(10);
 
             const promises = componentFiles.map((file) =>
-                limit(() => {
+                limit(async () => {
                     const filePath = file.fsPath;
 
-                    fs.readFile(filePath, "utf-8").then((text) => {
-                        const updated = text.replace(
-                            pattern,
-                            (_, oldKey, suffix) =>
-                                `<x-${keys.get(oldKey)}${suffix}`,
-                        );
+                    const text = await fs.readFile(filePath, "utf-8");
 
-                        if (updated === text) {
-                            return;
-                        }
+                    const updated = text.replace(
+                        pattern,
+                        (_, oldKey, suffix) =>
+                            `<x-${keys.get(oldKey)}${suffix}`,
+                    );
 
-                        fs.writeFile(filePath, updated, "utf-8");
-                    });
+                    if (updated === text) {
+                        return;
+                    }
+
+                    await fs.writeFile(filePath, updated, "utf-8");
                 }),
             );
 
