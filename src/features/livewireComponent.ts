@@ -117,7 +117,7 @@ const keys = new Cache<string, string>(100);
  * This function is a fallback when the Livewire class file is renamed without renaming the blade file
  */
 const getNewKeyForClass = (newPath: string): string | undefined => {
-    if (!newPath.endsWith(".php")) {
+    if (newPath.endsWith(".blade.php") || !newPath.endsWith(".php")) {
         return undefined;
     }
 
