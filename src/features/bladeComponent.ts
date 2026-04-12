@@ -4,7 +4,7 @@ import {
 } from "@src/repositories/bladeComponents";
 import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
-import { projectPath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { globToRegex } from "@src/support/util";
 import fs from "fs/promises";
 import os from "os";
@@ -174,7 +174,7 @@ export const renameFilesProvider: RenameFilesProvider = {
     beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
         getBladeComponents().whenLoaded((components) => {
             files.forEach((file) => {
-                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
+                const oldPath = relativePath(file.oldUri.fsPath);
 
                 const oldKey = Object.entries(components.components).find(
                     ([_, component]) =>
@@ -195,7 +195,7 @@ export const renameFilesProvider: RenameFilesProvider = {
             const pLimit = (await import("p-limit")).default;
 
             files.forEach((file) => {
-                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
+                const oldPath = relativePath(file.oldUri.fsPath);
 
                 const oldKey = keys.get(oldPath);
 
@@ -205,13 +205,14 @@ export const renameFilesProvider: RenameFilesProvider = {
                     return;
                 }
 
-                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newPath = relativePath(file.newUri.fsPath);
 
                 const newKey = Object.entries(components.components).find(
                     ([_, component]) =>
                         component.paths.some((p) => p.startsWith(newPath)),
                 )?.[0];
 
+                console.log("newKey", newKey, newPath);
                 if (!newKey || newKey === oldKey) {
                     return;
                 }
