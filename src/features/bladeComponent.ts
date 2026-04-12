@@ -222,7 +222,11 @@ export const renameFilesProvider: RenameFilesProvider = {
                         (key) =>
                             vscode.Uri.file(
                                 projectPath(
-                                    `resources/views/components/${key.replaceAll(".", "/")}.blade.php`,
+                                    [
+                                        "resources/views/components/",
+                                        key.replaceAll(".", "/"),
+                                        ".blade.php",
+                                    ].join(""),
                                 ),
                             ),
                     );
@@ -232,7 +236,11 @@ export const renameFilesProvider: RenameFilesProvider = {
                     fs.readFile(file.newUri.fsPath, "utf-8").then((text) => {
                         const updated = text.replace(
                             new RegExp(
-                                `(?<=\\b(?:view|View::make)\\(('|")components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                                [
+                                    `(?<=\\b(?:view|View::make)\\(('|")components\\.)`,
+                                    oldKey.replaceAll(".", "\\."),
+                                    `(?=\\1\\))`,
+                                ].join(""),
                                 "g",
                             ),
                             newKey,
@@ -254,7 +262,11 @@ export const renameFilesProvider: RenameFilesProvider = {
             );
 
             const pattern = new RegExp(
-                `(<\\/?x-)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+                [
+                    `(<\\/?x-)`,
+                    `(${Array.from(keys.all().keys()).join("|")})`,
+                    `(?=\\s|>|\\/>)`,
+                ].join(""),
                 "g",
             );
 

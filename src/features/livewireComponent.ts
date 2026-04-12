@@ -195,7 +195,11 @@ export const renameFilesProvider: RenameFilesProvider = {
                         (key) =>
                             vscode.Uri.file(
                                 projectPath(
-                                    `resources/views/livewire/${key.replaceAll(".", "/")}.blade.php`,
+                                    [
+                                        "resources/views/livewire/",
+                                        key.replaceAll(".", "/"),
+                                        ".blade.php",
+                                    ].join(""),
                                 ),
                             ),
                     );
@@ -205,7 +209,11 @@ export const renameFilesProvider: RenameFilesProvider = {
                     fs.readFile(file.newUri.fsPath, "utf-8").then((text) => {
                         const updated = text.replace(
                             new RegExp(
-                                `(?<=\\b(?:view|View::make)\\(('|")livewire\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                                [
+                                    `(?<=\\b(?:view|View::make)\\(('|")livewire\\.)`,
+                                    oldKey.replaceAll(".", "\\."),
+                                    `(?=\\1\\))`,
+                                ].join(""),
                                 "g",
                             ),
                             newKey,
@@ -227,7 +235,11 @@ export const renameFilesProvider: RenameFilesProvider = {
             );
 
             const pattern = new RegExp(
-                `(<\\/?livewire:)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+                [
+                    `(<\\/?livewire:)`,
+                    `(${Array.from(keys.all().keys()).join("|")})`,
+                    `(?=\\s|>|\\/>)`,
+                ].join(""),
                 "g",
             );
 
