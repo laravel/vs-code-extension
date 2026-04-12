@@ -163,6 +163,7 @@ const keys = new Cache<string, string>(100);
 export const renameFilesProvider: RenameFilesProvider = {
     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
         return event.files.filter((file) => {
+            // asRelativePath returns paths with forward slashes on all platforms
             const path = vscode.workspace.asRelativePath(file.oldUri);
 
             return Object.values(patterns).some((pattern) =>

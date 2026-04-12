@@ -2,7 +2,7 @@ import { getViews, patterns } from "@src/repositories/views";
 import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
 import { livewireHover } from "@src/support/markdown";
-import { projectPath } from "@src/support/project";
+import { projectPath, relativePath } from "@src/support/project";
 import { kebab } from "@src/support/str";
 import { globToRegex } from "@src/support/util";
 import { get } from "axios";
@@ -133,6 +133,7 @@ const getNewKeyForClass = (newPath: string): string | undefined => {
 export const renameFilesProvider: RenameFilesProvider = {
     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
         return event.files.filter((file) => {
+            // asRelativePath returns paths with forward slashes on all platforms
             const path = vscode.workspace.asRelativePath(file.oldUri);
 
             return Object.values(patterns).some((pattern) =>
@@ -144,7 +145,7 @@ export const renameFilesProvider: RenameFilesProvider = {
     beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
         getViews().whenLoaded((views) => {
             files.forEach((file) => {
-                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
+                const oldPath = relativePath(file.oldUri.fsPath);
 
                 const oldKey = views.find((component) =>
                     component.livewire?.files.some((p) =>
@@ -166,7 +167,7 @@ export const renameFilesProvider: RenameFilesProvider = {
             const pLimit = (await import("p-limit")).default;
 
             files.forEach((file) => {
-                const oldPath = vscode.workspace.asRelativePath(file.oldUri);
+                const oldPath = relativePath(file.oldUri.fsPath);
 
                 const oldKey = keys.get(oldPath);
 
@@ -176,7 +177,7 @@ export const renameFilesProvider: RenameFilesProvider = {
                     return;
                 }
 
-                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newPath = relativePath(file.newUri.fsPath);
 
                 const newKey =
                     views.find((component) =>
