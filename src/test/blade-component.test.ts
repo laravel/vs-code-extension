@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import { mkdir } from "fs";
 import fs from "fs/promises";
 import path from "path";
 import * as vscode from "vscode";
@@ -240,7 +239,7 @@ suite("Blade Component Test Suite", () => {
         test(`updates blade component namespace after moving class component file`, async () => {
             await fs.writeFile(files.component.fsPath, "<div>Component</div>");
 
-            fs.mkdir(path.dirname(files.classComponent.fsPath), {
+            await fs.mkdir(path.dirname(files.classComponent.fsPath), {
                 recursive: true,
             });
 
