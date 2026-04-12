@@ -217,12 +217,16 @@ export const renameFilesProvider: RenameFilesProvider = {
                 keys.set(oldKey, newKey);
             });
 
+            if (keys.size() === 0) {
+                return;
+            }
+
             const componentFiles = await vscode.workspace.findFiles(
                 patterns.bladeFiles,
             );
 
             const pattern = new RegExp(
-                `<livewire:(${Array.from(keys.all().keys()).join("|")})(\\s|\\/>)`,
+                `(<\\/?livewire:)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
                 "g",
             );
 
@@ -236,8 +240,7 @@ export const renameFilesProvider: RenameFilesProvider = {
 
                     const updated = text.replace(
                         pattern,
-                        (_, oldKey, suffix) =>
-                            `<livewire:${keys.get(oldKey)}${suffix}`,
+                        (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
                     );
 
                     if (updated === text) {
