@@ -212,7 +212,6 @@ export const renameFilesProvider: RenameFilesProvider = {
                         component.paths.some((p) => p.startsWith(newPath)),
                 )?.[0];
 
-                console.log("newKey", newKey, newPath);
                 if (!newKey || newKey === oldKey) {
                     return;
                 }
