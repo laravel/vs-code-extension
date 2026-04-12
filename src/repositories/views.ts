@@ -2,6 +2,11 @@ import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { repository } from ".";
 
+export const patterns = {
+    bladeFiles: inAppDirs("{,**/}{view,views}/{*,**/*}"),
+    livewireFiles: "app/Livewire/{,*,**/*}.php",
+};
+
 export interface ViewItem {
     key: string;
     path: string;
@@ -23,7 +28,7 @@ const load = () => {
 
 export const getViews = repository<ViewItem[]>({
     load,
-    pattern: inAppDirs("{,**/}{view,views}/{*,**/*}"),
+    pattern: Object.values(patterns),
     itemsDefault: [],
     fileWatcherEvents: ["create", "delete", "change"],
 });
