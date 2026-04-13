@@ -216,38 +216,42 @@ export const renameFilesProvider: RenameFilesProvider = {
 
                 keys.set(oldKey, newKey);
 
-                if (!newPath.endsWith(".blade.php")) {
-                    const oldBladePath = getUri(oldKey);
-                    const newBladePath = getUri(newKey);
-
-                    vscode.workspace.fs.rename(oldBladePath, newBladePath);
-
-                    const doc = await vscode.workspace.openTextDocument(
-                        file.newUri,
-                    );
-                    const text = doc.getText();
-
-                    const regex = new RegExp(
-                        `(?<=\\b(?:view|View::make)\\((['"])components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
-                        "g",
-                    );
-
-                    const updated = text.replace(regex, newKey);
-
-                    if (updated === text) {
-                        return;
-                    }
-
-                    const edit = new vscode.WorkspaceEdit();
-
-                    edit.replace(
-                        file.newUri,
-                        new vscode.Range(0, 0, doc.lineCount, 0),
-                        updated,
-                    );
-
-                    await vscode.workspace.applyEdit(edit);
+                if (newPath.endsWith(".blade.php")) {
+                    return;
                 }
+
+                const oldBladePath = getUri(oldKey);
+                const newBladePath = getUri(newKey);
+
+                vscode.workspace.fs.rename(oldBladePath, newBladePath);
+
+                // Case when a component class namespace is changed by Intelephense or other extension.
+                // We can't use fs.readFile/fs.writeFile because Intelephense overwrites content file after our change
+                const doc = await vscode.workspace.openTextDocument(
+                    file.newUri,
+                );
+                const text = doc.getText();
+
+                const regex = new RegExp(
+                    `(?<=\\b(?:view|View::make)\\((['"])components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                    "g",
+                );
+
+                const updated = text.replace(regex, newKey);
+
+                if (updated === text) {
+                    return;
+                }
+
+                const edit = new vscode.WorkspaceEdit();
+
+                edit.replace(
+                    file.newUri,
+                    new vscode.Range(0, 0, doc.lineCount, 0),
+                    updated,
+                );
+
+                await vscode.workspace.applyEdit(edit);
             }),
         );
 
