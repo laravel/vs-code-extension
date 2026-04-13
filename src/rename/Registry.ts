@@ -10,22 +10,12 @@ export class Registry implements RenameFilesRegistryProvider {
         this.providers.push(...providers);
     }
 
-    provideBeforeRenameFiles(event: vscode.FileWillRenameEvent): void {
+    provideRenameFiles(event: vscode.FileRenameEvent): void {
         this.providers.forEach((provider) => {
             const files = provider.customCheck(event);
 
             if (files.length > 0) {
-                provider.beforeRenameFiles(files);
-            }
-        });
-    }
-
-    provideAfterRenameFiles(event: vscode.FileRenameEvent): void {
-        this.providers.forEach((provider) => {
-            const files = provider.customCheck(event);
-
-            if (files.length > 0) {
-                provider.afterRenameFiles(files);
+                provider.provideRenameFiles(files);
             }
         });
     }

@@ -4,7 +4,8 @@ import {
 } from "@src/repositories/bladeComponents";
 import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
-import { projectPath, relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
+import { kebab } from "@src/support/str";
 import { globToRegex } from "@src/support/util";
 import fs from "fs/promises";
 import os from "os";
@@ -158,7 +159,23 @@ export const hoverProvider: HoverProvider = (
     return null;
 };
 
-const keys = new Cache<string, string>(100);
+const getKey = (newPath: string): string => {
+    const key = newPath
+        .replace(/^app\/View(\/Components)?/, "")
+        .replace("resources/views/components/", "")
+        .replace(/(\.[^/.]+)+$/, "")
+        .replace(/^\/+/, "")
+        .replaceAll("/", ".");
+
+    return kebab(key);
+};
+
+const getUri = (key: string): vscode.Uri =>
+    vscode.Uri.file(
+        projectPath(
+            `resources/views/components/${key.replaceAll(".", "/")}.blade.php`,
+        ),
+    );
 
 export const renameFilesProvider: RenameFilesProvider = {
     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
@@ -172,128 +189,102 @@ export const renameFilesProvider: RenameFilesProvider = {
         });
     },
 
-    beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
-        getBladeComponents().whenLoaded((components) => {
-            files.forEach((file) => {
-                const oldPath = relativePath(file.oldUri.fsPath);
+    async provideRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
+        const pLimit = (await import("p-limit")).default;
+        const limit = pLimit(10);
 
-                const oldKey = Object.entries(components.components).find(
-                    ([_, component]) =>
-                        component.paths.some((p) => p.startsWith(oldPath)),
-                )?.[0];
+        const keys: Cache<string, string> = new Cache(100);
+        const components = getBladeComponents().items.components;
 
-                if (!oldKey) {
+        const filePromise = files.map((file) =>
+            limit(async () => {
+                const oldPath = vscode.workspace.asRelativePath(
+                    file.oldUri.fsPath,
+                );
+                const oldKey = getKey(oldPath);
+
+                if (!components[oldKey]) {
                     return;
                 }
 
-                keys.set(oldPath, oldKey);
-            });
-        });
-    },
+                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newKey = getKey(newPath);
 
-    afterRenameFiles(files: vscode.FileRenameEvent["files"]) {
-        getBladeComponents().whenReloaded(async (components) => {
-            const pLimit = (await import("p-limit")).default;
-
-            files.forEach((file) => {
-                const oldPath = relativePath(file.oldUri.fsPath);
-
-                const oldKey = keys.get(oldPath);
-
-                keys.delete(oldPath);
-
-                if (!oldKey) {
+                if (newKey === oldKey) {
                     return;
-                }
-
-                const newPath = relativePath(file.newUri.fsPath);
-
-                const newKey = Object.entries(components.components).find(
-                    ([_, component]) =>
-                        component.paths.some((p) => p.startsWith(newPath)),
-                )?.[0];
-
-                if (!newKey || newKey === oldKey) {
-                    return;
-                }
-
-                if (!newPath.endsWith(".blade.php")) {
-                    const [oldBladePath, newBladePath] = [oldKey, newKey].map(
-                        (key) =>
-                            vscode.Uri.file(
-                                projectPath(
-                                    [
-                                        "resources/views/components/",
-                                        key.replaceAll(".", "/"),
-                                        ".blade.php",
-                                    ].join(""),
-                                ),
-                            ),
-                    );
-
-                    vscode.workspace.fs.rename(oldBladePath, newBladePath);
-
-                    fs.readFile(file.newUri.fsPath, "utf-8").then((text) => {
-                        const updated = text.replace(
-                            new RegExp(
-                                [
-                                    `(?<=\\b(?:view|View::make)\\(('|")components\\.)`,
-                                    oldKey.replaceAll(".", "\\."),
-                                    `(?=\\1\\))`,
-                                ].join(""),
-                                "g",
-                            ),
-                            newKey,
-                        );
-
-                        fs.writeFile(file.newUri.fsPath, updated, "utf-8");
-                    });
                 }
 
                 keys.set(oldKey, newKey);
-            });
 
-            if (keys.size() === 0) {
-                return;
-            }
+                if (!newPath.endsWith(".blade.php")) {
+                    const oldBladePath = getUri(oldKey);
+                    const newBladePath = getUri(newKey);
 
-            const componentFiles = await vscode.workspace.findFiles(
-                patterns.bladeFiles,
-            );
+                    vscode.workspace.fs.rename(oldBladePath, newBladePath);
 
-            const pattern = new RegExp(
-                [
-                    `(<\\/?x-)`,
-                    `(${Array.from(keys.all().keys()).join("|")})`,
-                    `(?=\\s|>|\\/>)`,
-                ].join(""),
-                "g",
-            );
-
-            const limit = pLimit(10);
-
-            const promises = componentFiles.map((file) =>
-                limit(async () => {
-                    const filePath = file.fsPath;
-
-                    const text = await fs.readFile(filePath, "utf-8");
-
-                    const updated = text.replace(
-                        pattern,
-                        (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
+                    const doc = await vscode.workspace.openTextDocument(
+                        file.newUri,
                     );
+                    const text = doc.getText();
+
+                    const regex = new RegExp(
+                        `(?<=\\b(?:view|View::make)\\((['"])components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                        "g",
+                    );
+
+                    const updated = text.replace(regex, newKey);
 
                     if (updated === text) {
                         return;
                     }
 
-                    await fs.writeFile(filePath, updated, "utf-8");
-                }),
-            );
+                    const edit = new vscode.WorkspaceEdit();
 
-            await Promise.all(promises);
+                    edit.replace(
+                        file.newUri,
+                        new vscode.Range(0, 0, doc.lineCount, 0),
+                        updated,
+                    );
 
-            keys.clear();
-        });
+                    await vscode.workspace.applyEdit(edit);
+                }
+            }),
+        );
+
+        await Promise.all(filePromise);
+
+        if (keys.size() === 0) {
+            return;
+        }
+
+        const componentFiles = await vscode.workspace.findFiles(
+            patterns.bladeFiles,
+        );
+
+        const pattern = new RegExp(
+            `(<\\/?x-)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+            "g",
+        );
+
+        const componentPromise = componentFiles.map((file) =>
+            limit(async () => {
+                const filePath = file.fsPath;
+
+                const text = await fs.readFile(filePath, "utf-8");
+
+                const updated = text.replace(
+                    pattern,
+                    (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
+                );
+
+                if (updated === text) {
+                    return;
+                }
+
+                await fs.writeFile(filePath, updated, "utf-8");
+            }),
+        );
+
+        await Promise.all(componentPromise);
     },
 };

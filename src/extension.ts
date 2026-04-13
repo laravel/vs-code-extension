@@ -234,11 +234,8 @@ export async function activate(context: vscode.ExtensionContext) {
         ...hoverProviders.map((provider) =>
             vscode.languages.registerHoverProvider(LANGUAGES, provider),
         ),
-        vscode.workspace.onWillRenameFiles((event) =>
-            delegatedRenameFilesRegistry.provideBeforeRenameFiles(event),
-        ),
         vscode.workspace.onDidRenameFiles((event) =>
-            delegatedRenameFilesRegistry.provideAfterRenameFiles(event),
+            delegatedRenameFilesRegistry.provideRenameFiles(event),
         ),
         // ...testRunnerCommands,
         // testController,

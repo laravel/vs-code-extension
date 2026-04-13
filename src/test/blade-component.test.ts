@@ -96,18 +96,20 @@ suite("Blade Component Test Suite", () => {
             retryUntil = 5000,
         ) => {
             const start = Date.now();
-            let text = await fs.readFile(uri.fsPath, "utf-8");
 
-            while (
-                !text.includes(expected) &&
-                Date.now() - start < retryUntil
-            ) {
+            while (Date.now() - start < retryUntil) {
+                const text = (
+                    await vscode.workspace.openTextDocument(uri)
+                ).getText();
+
+                if (text.includes(expected)) {
+                    return text;
+                }
+
                 await sleep(100);
-
-                text = await fs.readFile(uri.fsPath, "utf-8");
             }
 
-            return text;
+            return (await vscode.workspace.openTextDocument(uri)).getText();
         };
 
         const waitForComponentToExist = async (
@@ -136,11 +138,8 @@ suite("Blade Component Test Suite", () => {
         ) => {
             const doc = await vscode.workspace.openTextDocument(uri);
             const start = Date.now();
-            const expectedTarget = [
-                "resources/views/components/",
-                key.replace(/^x-/, "").replaceAll(".", "/"),
-                ".blade.php",
-            ].join("");
+
+            const expectedTarget = `resources/views/components/${key.replaceAll(".", "/")}.blade.php`;
 
             while (Date.now() - start < retryUntil) {
                 const links = await getLinks(doc);
