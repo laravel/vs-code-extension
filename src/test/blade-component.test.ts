@@ -139,7 +139,7 @@ suite("Blade Component Test Suite", () => {
             const doc = await vscode.workspace.openTextDocument(uri);
             const start = Date.now();
 
-            const expectedTarget = `resources/views/components/${key.replaceAll(".", "/")}.blade.php`;
+            const expectedTarget = `resources/views/components/${key.replace(/^x-/, "").replaceAll(".", "/")}.blade.php`;
 
             while (Date.now() - start < retryUntil) {
                 const links = await getLinks(doc);
