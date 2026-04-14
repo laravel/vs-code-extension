@@ -9,7 +9,10 @@ export const patterns = {
 
 export interface Views {
     views: ViewItem[];
-    livewirePaths: string[];
+    livewireLocations: string[];
+    livewireNamespaces: {
+        [namespace: string]: string;
+    };
 }
 
 export interface ViewItem {
@@ -36,7 +39,8 @@ export const getViews = repository<Views>({
     pattern: Object.values(patterns),
     itemsDefault: {
         views: [],
-        livewirePaths: [],
+        livewireLocations: [],
+        livewireNamespaces: {},
     },
     fileWatcherEvents: ["create", "delete", "change"],
 });
