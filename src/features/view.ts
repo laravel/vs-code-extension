@@ -105,7 +105,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                 return null;
             }
 
-            const path = getViews().items.find(
+            const path = getViews().items.views.find(
                 (view) => view.key === param.value,
             )?.path;
 
@@ -126,7 +126,7 @@ export const hoverProvider: HoverProvider = (
     pos: vscode.Position,
 ): vscode.ProviderResult<vscode.Hover> => {
     return findHoverMatchesInDoc(doc, pos, toFind, getViews, (match) => {
-        const item = getViews().items.find((view) => view.key === match);
+        const item = getViews().items.views.find((view) => view.key === match);
 
         if (!item) {
             return null;
@@ -157,7 +157,7 @@ export const diagnosticProvider = (
                 return null;
             }
 
-            const view = getViews().items.find(
+            const view = getViews().items.views.find(
                 (view) => view.key === param.value,
             );
 
@@ -247,7 +247,7 @@ export const completionProvider = {
             return [];
         }
 
-        const views = getViews().items;
+        const views = getViews().items.views;
 
         if (result.func() && ["@section", "@push"].includes(result.func()!)) {
             return this.getYields(result.func()!, document.getText());
@@ -341,7 +341,7 @@ export const completionProvider = {
     getYields(func: string, documentText: string): vscode.CompletionItem[] {
         let extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
         let regexResult = extendsRegex.exec(documentText);
-        const views = getViews().items;
+        const views = getViews().items.views;
 
         if (!regexResult) {
             return [];

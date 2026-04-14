@@ -1,8 +1,8 @@
 <?php
 
 $livewire = new class {
+    public $paths;
     protected $namespaces;
-    protected $paths;
     protected $extensions = [".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"];
 
     public function __construct()
@@ -308,4 +308,7 @@ $blade = new class ($livewire) {
     }
 };
 
-echo json_encode($blade->getAllViews()->merge($blade->getAllComponents()));
+echo json_encode([
+    "views" => $blade->getAllViews()->merge($blade->getAllComponents())->all(),
+    "livewirePaths" => $livewire->paths->all(),
+]);

@@ -46,10 +46,6 @@ export class Cache<K, V> {
         return this.cache.size;
     }
 
-    delete(key: K): void {
-        this.cache.delete(key);
-    }
-
     all(): Map<K, V> {
         return this.cache;
     }

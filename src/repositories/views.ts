@@ -7,6 +7,11 @@ export const patterns = {
     livewireFiles: "app/Livewire/{,*,**/*}.php",
 };
 
+export interface Views {
+    views: ViewItem[];
+    livewirePaths: string[];
+}
+
 export interface ViewItem {
     key: string;
     path: string;
@@ -23,12 +28,15 @@ export interface ViewItem {
 }
 
 const load = () => {
-    return runInLaravel<ViewItem[]>(template("views"));
+    return runInLaravel<Views>(template("views"));
 };
 
-export const getViews = repository<ViewItem[]>({
+export const getViews = repository<Views>({
     load,
     pattern: Object.values(patterns),
-    itemsDefault: [],
+    itemsDefault: {
+        views: [],
+        livewirePaths: [],
+    },
     fileWatcherEvents: ["create", "delete", "change"],
 });

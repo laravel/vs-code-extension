@@ -2,10 +2,9 @@ import { getViews, patterns } from "@src/repositories/views";
 import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
 import { livewireHover } from "@src/support/markdown";
-import { projectPath, relativePath } from "@src/support/project";
+import { projectPath } from "@src/support/project";
 import { kebab } from "@src/support/str";
 import { globToRegex } from "@src/support/util";
-import { get } from "axios";
 import fs from "fs/promises";
 import * as vscode from "vscode";
 import { HoverProvider, LinkProvider, RenameFilesProvider } from "..";
@@ -14,7 +13,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
+    const views = getViews().items.views;
 
     lines.forEach((line, index) => {
         const match = line.match(/<\/?livewire:([^\s>]+)/);
@@ -59,7 +58,7 @@ export const hoverProvider: HoverProvider = (
         return;
     }
 
-    const views = getViews().items;
+    const views = getViews().items.views;
 
     const match = doc
         .getText(linkRange)
@@ -100,7 +99,7 @@ export const completionProvider: vscode.CompletionItemProvider = {
         }
 
         return getViews()
-            .items.filter((view) => view.livewire)
+            .items.views.filter((view) => view.livewire)
             .map(
                 (view) =>
                     new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
@@ -108,165 +107,144 @@ export const completionProvider: vscode.CompletionItemProvider = {
     },
 };
 
-// const keys = new Cache<string, string>(100);
+const getKey = (newPath: string): string => {
+    const livewirePaths = getViews().items.livewirePaths;
 
-// /**
-//  * We don't have the Livewire components repository, just Blade view files repository,
-//  * so we cannot know the new key for the class if the blade file is not renamed together with the class file.
-//  *
-//  * This function is a fallback when the Livewire class file is renamed without renaming the blade file
-//  */
-// const getNewKeyForClass = (newPath: string): string | undefined => {
-//     if (newPath.endsWith(".blade.php") || !newPath.endsWith(".php")) {
-//         return undefined;
-//     }
+    const key = newPath
+        .replaceAll("⚡", "")
+        .replace(/^app\/Livewire(\/Components)?/, "")
+        .replace(new RegExp(`^(${livewirePaths.join("|")})`), "")
+        .replace(/(\.[^/.]+)+$/, "")
+        .replace(/^\/+/, "")
+        .replaceAll("/", ".");
 
-//     const key = newPath
-//         .replace(/^app\/Livewire(\/Components)?/, "")
-//         .replace(/(\.[^/.]+)+$/, "")
-//         .replace(/^\/+/, "")
-//         .replaceAll("/", ".");
+    return kebab(key);
+};
 
-//     return kebab(key);
-// };
+const getUri = (key: string): vscode.Uri =>
+    vscode.Uri.file(
+        projectPath(
+            `resources/views/livewire/${key.replaceAll(".", "/")}.blade.php`,
+        ),
+    );
 
-// export const renameFilesProvider: RenameFilesProvider = {
-//     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
-//         return event.files.filter((file) => {
-//             // asRelativePath returns paths with forward slashes on all platforms
-//             const path = vscode.workspace.asRelativePath(file.oldUri);
+export const renameFilesProvider: RenameFilesProvider = {
+    customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
+        return event.files.filter((file) => {
+            // asRelativePath returns paths with forward slashes on all platforms
+            const path = vscode.workspace.asRelativePath(file.oldUri);
 
-//             return Object.values(patterns).some((pattern) =>
-//                 globToRegex(pattern).test(path),
-//             );
-//         });
-//     },
+            return Object.values(patterns).some((pattern) =>
+                globToRegex(pattern).test(path),
+            );
+        });
+    },
 
-//     beforeRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
-//         getViews().whenLoaded((views) => {
-//             files.forEach((file) => {
-//                 const oldPath = relativePath(file.oldUri.fsPath);
+    async provideRenameFiles(files: vscode.FileRenameEvent["files"]) {
+        const pLimit = (await import("p-limit")).default;
+        const limit = pLimit(10);
 
-//                 const oldKey = views.find((component) =>
-//                     component.livewire?.files.some((p) =>
-//                         p.startsWith(oldPath),
-//                     ),
-//                 )?.key;
+        const keys: Cache<string, string> = new Cache(100);
+        const components = getViews().items.views;
 
-//                 if (!oldKey) {
-//                     return;
-//                 }
+        const filePromise = files.map((file) =>
+            limit(async () => {
+                const oldPath = vscode.workspace.asRelativePath(
+                    file.oldUri.fsPath,
+                );
+                const oldKey = getKey(oldPath);
 
-//                 keys.set(oldPath, oldKey);
-//             });
-//         });
-//     },
+                const component = components.find(
+                    (component) =>
+                        component.livewire && component.key === oldKey,
+                );
 
-//     afterRenameFiles(files: vscode.FileRenameEvent["files"]) {
-//         getViews().whenReloaded(async (views) => {
-//             const pLimit = (await import("p-limit")).default;
+                if (!component) {
+                    return;
+                }
 
-//             files.forEach((file) => {
-//                 const oldPath = relativePath(file.oldUri.fsPath);
+                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newKey = getKey(newPath);
 
-//                 const oldKey = keys.get(oldPath);
+                if (newKey === oldKey) {
+                    return;
+                }
 
-//                 keys.delete(oldPath);
+                keys.set(oldKey, newKey);
 
-//                 if (!oldKey) {
-//                     return;
-//                 }
+                if (newPath.endsWith(".blade.php")) {
+                    return;
+                }
 
-//                 const newPath = relativePath(file.newUri.fsPath);
+                const oldBladePath = getUri(oldKey);
+                const newBladePath = getUri(newKey);
 
-//                 const newKey =
-//                     views.find((component) =>
-//                         component.livewire?.files.some((p) =>
-//                             p.startsWith(newPath),
-//                         ),
-//                     )?.key ?? getNewKeyForClass(newPath);
+                vscode.workspace.fs.rename(oldBladePath, newBladePath);
 
-//                 if (!newKey || newKey === oldKey) {
-//                     return;
-//                 }
+                // Case when a component class namespace is changed by Intelephense or other extension.
+                // We can't use fs.readFile/fs.writeFile because Intelephense overwrites content file after our change
+                const doc = await vscode.workspace.openTextDocument(
+                    file.newUri,
+                );
+                const text = doc.getText();
 
-//                 if (!newPath.endsWith(".blade.php")) {
-//                     const [oldBladePath, newBladePath] = [oldKey, newKey].map(
-//                         (key) =>
-//                             vscode.Uri.file(
-//                                 projectPath(
-//                                     [
-//                                         "resources/views/livewire/",
-//                                         key.replaceAll(".", "/"),
-//                                         ".blade.php",
-//                                     ].join(""),
-//                                 ),
-//                             ),
-//                     );
+                const regex = new RegExp(
+                    `(?<=\\b(?:view|View::make)\\(('|")livewire\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                    "g",
+                );
 
-//                     vscode.workspace.fs.rename(oldBladePath, newBladePath);
+                const updated = text.replace(regex, newKey);
 
-//                     fs.readFile(file.newUri.fsPath, "utf-8").then((text) => {
-//                         const updated = text.replace(
-//                             new RegExp(
-//                                 [
-//                                     `(?<=\\b(?:view|View::make)\\(('|")livewire\\.)`,
-//                                     oldKey.replaceAll(".", "\\."),
-//                                     `(?=\\1\\))`,
-//                                 ].join(""),
-//                                 "g",
-//                             ),
-//                             newKey,
-//                         );
+                if (updated === text) {
+                    return;
+                }
 
-//                         fs.writeFile(file.newUri.fsPath, updated, "utf-8");
-//                     });
-//                 }
+                const edit = new vscode.WorkspaceEdit();
 
-//                 keys.set(oldKey, newKey);
-//             });
+                edit.replace(
+                    file.newUri,
+                    new vscode.Range(0, 0, doc.lineCount, 0),
+                    updated,
+                );
 
-//             if (keys.size() === 0) {
-//                 return;
-//             }
+                await vscode.workspace.applyEdit(edit);
+            }),
+        );
 
-//             const componentFiles = await vscode.workspace.findFiles(
-//                 patterns.bladeFiles,
-//             );
+        await Promise.all(filePromise);
 
-//             const pattern = new RegExp(
-//                 [
-//                     `(<\\/?livewire:)`,
-//                     `(${Array.from(keys.all().keys()).join("|")})`,
-//                     `(?=\\s|>|\\/>)`,
-//                 ].join(""),
-//                 "g",
-//             );
+        if (keys.size() === 0) {
+            return;
+        }
 
-//             const limit = pLimit(10);
+        const componentFiles = await vscode.workspace.findFiles(
+            patterns.bladeFiles,
+        );
 
-//             const promises = componentFiles.map((file) =>
-//                 limit(async () => {
-//                     const filePath = file.fsPath;
+        const pattern = new RegExp(
+            `(<\\/?livewire:)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+            "g",
+        );
 
-//                     const text = await fs.readFile(filePath, "utf-8");
+        const componentPromise = componentFiles.map((file) =>
+            limit(async () => {
+                const filePath = file.fsPath;
 
-//                     const updated = text.replace(
-//                         pattern,
-//                         (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
-//                     );
+                const text = await fs.readFile(filePath, "utf-8");
 
-//                     if (updated === text) {
-//                         return;
-//                     }
+                const updated = text.replace(
+                    pattern,
+                    (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
+                );
 
-//                     await fs.writeFile(filePath, updated, "utf-8");
-//                 }),
-//             );
+                if (updated === text) {
+                    return;
+                }
 
-//             await Promise.all(promises);
+                await fs.writeFile(filePath, updated, "utf-8");
+            }),
+        );
 
-//             keys.clear();
-//         });
-//     },
-// };
+        await Promise.all(componentPromise);
+    },
+};
