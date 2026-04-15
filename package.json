@@ -1198,7 +1198,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable rename refactoring for Blade components."
                 },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
@@ -1318,7 +1318,7 @@
                     "type": "boolean",
                     "default": true,
                     "generated": true,
-                    "description": null
+                    "description": "Enable rename refactoring for Livewire components."
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",
