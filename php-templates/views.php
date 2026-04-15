@@ -40,7 +40,7 @@ $livewire = new class {
                     return $view;
                 }
 
-                $files = $this->files($component, $view);
+                $files = $this->files($view);
 
                 if (count($files) === 1 && !str($view['path'])->endsWith('.blade.php')) {
                     return null;
@@ -72,12 +72,10 @@ $livewire = new class {
                 return $view;
             }
 
-            $files = $this->files($component, $view);
-
             return array_merge($view, [
                 'livewire' => [
                     'props' => $this->getProps($component),
-                    'files' => $files,
+                    'files' => [$view['path']],
                 ],
             ]);
         });
@@ -130,50 +128,22 @@ $livewire = new class {
             ->value();
     }
 
-    protected function classFile(object $class): ?string
+    protected function files(array $view): array
     {
-        try {
-            $reflection = new \ReflectionClass($class);
-
-            if ($reflection->isAnonymous()) {
-                return null;
-            }
-
-            return LaravelVsCode::relativePath($reflection->getFileName());
-        } catch (\Throwable $e) {
-            return null;
+        if (! $this->isMfc($view)) {
+            return [$view['path']];
         }
-    }
 
-    protected function files(object $component, array $view): array
-    {
-        return collect()
-            ->when(
-                $this->isMfc($view),
-                function (\Illuminate\Support\Collection $files) use ($view) {
-                    $filePathWithoutExtension = str($view['path'])->replace($this->extensions, '');
+        $filePathWithoutExtension = str($view["path"])->replace($this->extensions, "");
 
-                    return $files->merge(
-                        collect($this->extensions)
-                            ->map(fn (string $extension) => $filePathWithoutExtension->append($extension))
-                            ->filter(fn (string $path) => \Illuminate\Support\Facades\File::exists($path))
-                    );
-                },
-                fn (\Illuminate\Support\Collection $files) => $files->prepend($view['path'])
-            )
-            ->push($this->classFile($component))
-            ->filter()
-            ->unique()
-            ->values()
+        return collect($this->extensions)
+            ->map(fn (string $extension) => $filePathWithoutExtension->append($extension))
+            ->filter(fn (string $path) => \Illuminate\Support\Facades\File::exists($path))
             ->all();
     }
 
     protected function isMfc(array $view): bool
     {
-        if (! $this->isVersionFour()) {
-            return false;
-        }
-
         $directory = str($view["path"])
             ->replace("⚡", "")
             ->dirname()
