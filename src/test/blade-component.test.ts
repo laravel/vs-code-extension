@@ -144,7 +144,7 @@ suite("Blade Component Test Suite", () => {
                 const hasExpectedLink = links.some((link) =>
                     link.target?.fsPath
                         ?.replaceAll("\\", "/")
-                        .endsWith(expectedUri.fsPath),
+                        .endsWith(expectedUri.fsPath.replaceAll("\\", "/")),
                 );
 
                 if (hasExpectedLink) {
