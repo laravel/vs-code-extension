@@ -179,12 +179,17 @@ const getUri = (key: string): vscode.Uri =>
 
 export const renameFilesProvider: RenameFilesProvider = {
     customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
+        const components = getBladeComponents().items.components;
+
         return event.files.filter((file) => {
             // asRelativePath returns paths with forward slashes on all platforms
             const path = vscode.workspace.asRelativePath(file.oldUri);
+            const key = getKey(path);
 
-            return Object.values(patterns).some((pattern) =>
-                globToRegex(pattern).test(path),
+            return (
+                Object.values(patterns).some((pattern) =>
+                    globToRegex(pattern).test(path),
+                ) && components[key]
             );
         });
     },
@@ -194,7 +199,6 @@ export const renameFilesProvider: RenameFilesProvider = {
         const limit = pLimit(10);
 
         const keys: Cache<string, string> = new Cache(100);
-        const components = getBladeComponents().items.components;
 
         const filePromise = files.map((file) =>
             limit(async () => {
@@ -202,10 +206,6 @@ export const renameFilesProvider: RenameFilesProvider = {
                     file.oldUri.fsPath,
                 );
                 const oldKey = getKey(oldPath);
-
-                if (!components[oldKey]) {
-                    return;
-                }
 
                 const newPath = vscode.workspace.asRelativePath(file.newUri);
                 const newKey = getKey(newPath);

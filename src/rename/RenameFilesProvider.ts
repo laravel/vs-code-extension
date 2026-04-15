@@ -5,21 +5,22 @@ import { renameFilesProvider as livewireComponent } from "@src/features/livewire
 import { RenameFilesProvider as RenameFilesProviderType } from "@src/index";
 import { config as getConfig } from "@src/support/config";
 import { GeneratedConfigKey } from "@src/support/generated-config";
-import * as vscode from "vscode";
 
 const allProviders: Partial<
     Record<GeneratedConfigKey, RenameFilesProviderType>
 > = {
-    "bladeComponent.renameFile": bladeComponent,
-    "livewireComponent.renameFile": livewireComponent,
+    "bladeComponent.rename": bladeComponent,
+    "livewireComponent.rename": livewireComponent,
 };
 
-export const renameFilesProviders = Object.entries(allProviders).map(
-    ([configKey, provider]) => {
-        // if (!getConfig(configKey as GeneratedConfigKey, true)) {
-        //     return;
-        // }
+export const renameFilesProviders: RenameFilesProviderType[] = Object.entries(
+    allProviders,
+)
+    .map(([configKey, provider]) => {
+        if (!getConfig(configKey as GeneratedConfigKey, true)) {
+            return;
+        }
 
         return provider;
-    },
-);
+    })
+    .filter((provider) => provider !== undefined);

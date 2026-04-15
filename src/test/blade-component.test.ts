@@ -90,7 +90,7 @@ suite("Blade Component Test Suite", () => {
             ),
         };
 
-        const waitForComponentToContain = async (
+        const waitForFileToContain = async (
             uri: vscode.Uri,
             expected: string,
             retryUntil = 5000,
@@ -112,7 +112,7 @@ suite("Blade Component Test Suite", () => {
             return (await vscode.workspace.openTextDocument(uri)).getText();
         };
 
-        const waitForComponentToExist = async (
+        const waitForFileToExist = async (
             uri: vscode.Uri,
             retryUntil = 5000,
         ) => {
@@ -131,22 +131,20 @@ suite("Blade Component Test Suite", () => {
             assert.fail(`Expected file to exist: ${uri.fsPath}`);
         };
 
-        const waitForComponentToBeIndexed = async (
+        const waitForFileToBeIndexed = async (
             uri: vscode.Uri,
-            key: string,
+            expectedUri: vscode.Uri,
             retryUntil = 5000,
         ) => {
             const doc = await vscode.workspace.openTextDocument(uri);
             const start = Date.now();
-
-            const expectedTarget = `resources/views/components/${key.replace(/^x-/, "").replaceAll(".", "/")}.blade.php`;
 
             while (Date.now() - start < retryUntil) {
                 const links = await getLinks(doc);
                 const hasExpectedLink = links.some((link) =>
                     link.target?.fsPath
                         ?.replaceAll("\\", "/")
-                        .endsWith(expectedTarget),
+                        .endsWith(expectedUri.fsPath),
                 );
 
                 if (hasExpectedLink) {
@@ -157,37 +155,41 @@ suite("Blade Component Test Suite", () => {
             }
 
             assert.fail(
-                `Component '${key}' was not linked in time by Blade components repository`,
+                `File '${expectedUri}' was not linked in time by Blade components repository`,
             );
         };
 
-        const deleteIfExist = async (target: vscode.Uri) =>
+        const deleteFileIfExist = async (target: vscode.Uri) =>
             fs.rm(target.fsPath, {
                 force: true,
             });
 
         setup(async () => {
             await Promise.all(
-                Object.values(files).map((file) => deleteIfExist(file)),
+                Object.values(files).map((file) => deleteFileIfExist(file)),
             );
         });
 
         teardown(async () => {
             await Promise.all(
-                Object.values(files).map((file) => deleteIfExist(file)),
+                Object.values(files).map((file) => deleteFileIfExist(file)),
             );
         });
 
         const componentNamespaceCases = [
             {
                 name: "self-closing component tag",
-                key: "x-rename-source",
+                expectedFile: uri(
+                    "resources/views/components/rename-source.blade.php",
+                ),
                 source: "<x-rename-source />",
                 expected: "<x-testing.rename-source />",
             },
             {
                 name: "paired component tag",
-                key: "x-rename-source",
+                expectedFile: uri(
+                    "resources/views/components/rename-source.blade.php",
+                ),
                 source: "<x-rename-source></x-rename-source>",
                 expected: "<x-testing.rename-source></x-testing.rename-source>",
             },
@@ -205,9 +207,9 @@ suite("Blade Component Test Suite", () => {
                     componentNamespaceCase.source,
                 );
 
-                await waitForComponentToBeIndexed(
+                await waitForFileToBeIndexed(
                     files.consumer,
-                    componentNamespaceCase.key,
+                    componentNamespaceCase.expectedFile,
                 );
 
                 const edit = new vscode.WorkspaceEdit();
@@ -223,7 +225,7 @@ suite("Blade Component Test Suite", () => {
                     "Expected rename WorkspaceEdit to be applied",
                 );
 
-                const text = await waitForComponentToContain(
+                const text = await waitForFileToContain(
                     files.consumer,
                     componentNamespaceCase.expected,
                 );
@@ -262,9 +264,9 @@ suite("Blade Component Test Suite", () => {
 
             await fs.writeFile(files.consumer.fsPath, "<x-rename-source />");
 
-            await waitForComponentToBeIndexed(
+            await waitForFileToBeIndexed(
                 files.consumer,
-                "x-rename-source",
+                uri("resources/views/components/rename-source.blade.php"),
             );
 
             const edit = new vscode.WorkspaceEdit();
@@ -277,7 +279,7 @@ suite("Blade Component Test Suite", () => {
 
             assert.ok(applied, "Expected rename WorkspaceEdit to be applied");
 
-            await waitForComponentToExist(files.movedComponent);
+            await waitForFileToExist(files.movedComponent);
 
             const hasOldComponent = await fs
                 .access(files.component.fsPath)
@@ -289,7 +291,7 @@ suite("Blade Component Test Suite", () => {
                 `Expected old component file to be moved from '${files.component.fsPath}'`,
             );
 
-            const classContent = await waitForComponentToContain(
+            const classContent = await waitForFileToContain(
                 files.movedClassComponent,
                 "return view('components.testing.rename-source');",
             );

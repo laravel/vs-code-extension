@@ -1194,7 +1194,7 @@
                     "generated": true,
                     "description": "Enable hover information for Blade components."
                 },
-                "Laravel.bladeComponent.renameFile": {
+                "Laravel.bladeComponent.rename": {
                     "type": "boolean",
                     "default": true,
                     "generated": true,
@@ -1313,6 +1313,12 @@
                     "default": true,
                     "generated": true,
                     "description": "Enable hover information for Livewire components."
+                },
+                "Laravel.livewireComponent.rename": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": null
                 },
                 "Laravel.middleware.diagnostics": {
                     "type": "boolean",

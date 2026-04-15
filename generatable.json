@@ -51,7 +51,7 @@
             "link",
             "completion",
             "hover",
-            "renameFile"
+            "rename"
         ]
     },
     {
@@ -61,7 +61,7 @@
             "link",
             "completion",
             "hover",
-            "renameFile"
+            "rename"
         ]
     },
     {
