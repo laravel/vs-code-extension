@@ -7,6 +7,7 @@ import configs from "./configs";
 import inertia from "./inertia";
 import middleware from "./middleware";
 import models from "./models";
+import pest from "./pest";
 import routes from "./routes";
 import tests from "./tests";
 import translations from "./translations";
@@ -26,6 +27,7 @@ const templates = {
     translations,
     views,
     tests,
+    pest,
 };
 
 export type TemplateName = keyof typeof templates;

@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.6.8",
+    "version": "1.7.0",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -97,6 +97,10 @@
                 {
                     "command": "laravel.namespace.generate",
                     "when": "resourceLangId == php",
+                    "group": "laravel"
+                },
+                {
+                    "command": "laravel.goToRoute",
                     "group": "laravel"
                 },
                 {
@@ -684,7 +688,12 @@
             },
             {
                 "command": "laravel.namespace.generate",
-                "title": "Generate namespace",
+                "title": "Generate Namespace",
+                "category": "Laravel"
+            },
+            {
+                "command": "laravel.goToRoute",
+                "title": "Go to Route",
                 "category": "Laravel"
             },
             {
@@ -1054,6 +1063,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Automatically generate Eloquent doc blocks for models as IDE helpers."
+                },
+                "Laravel.pest.generateDocBlocks": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically generate a Pest helper file for test closures to enhance IDE support."
+                },
+                "Laravel.pest.helperFilePath": {
+                    "type": "string",
+                    "default": "storage/framework/testing/_pest.php",
+                    "description": "Path to the generated Pest helper file, relative to the project root."
                 },
                 "Laravel.blade.autoSpaceTags": {
                     "type": "boolean",

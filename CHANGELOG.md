@@ -2,6 +2,20 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v1.7.0 - 2026-04-09
+
+### What's Changed
+
+* Build models template for snake_case relation fix by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/627
+* Support for new Laravel 13 attributes by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/626
+* Add Common Artisan Commands With Terminal Execution Support by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/629
+* PestPHP Intellisense by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/632
+* Add "Laravel: Go to route" command by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/633
+* Polish Pest helper file generation by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/635
+* Consistent command casing by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/636
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.6.8...v1.7.0
+
 ## v1.6.8 - 2026-03-25
 
 ### What's Changed

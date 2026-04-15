@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { repository } from ".";
 import { runInLaravel, template } from "../support/php";
 
-interface RouteItem {
+export interface RouteItem {
     method: string;
     uri: string;
     name: string;
