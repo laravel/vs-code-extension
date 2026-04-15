@@ -110,9 +110,10 @@ export const completionProvider: vscode.CompletionItemProvider = {
 const getKey = (path: string): string => {
     const views = getViews().items;
 
-    const livewireLocations = views.livewireLocations.map((location) =>
-        location.replaceAll("\\", "/"),
-    );
+    const livewireLocations = views.livewireLocations
+        .map((location) => location.replaceAll("\\", "/"))
+        // Backward compatibility with Livewire 3 Volt
+        .concat("resources/views/livewire");
 
     const livewireNamespaces = Object.fromEntries(
         Object.entries(views.livewireNamespaces).map(([namespace, nsPath]) => [
@@ -152,7 +153,7 @@ export const renameFilesProvider: RenameFilesProvider = {
 
         return event.files.filter((file) => {
             // asRelativePath returns paths with forward slashes on all platforms
-            const path = vscode.workspace.asRelativePath(file.oldUri);
+            const path = vscode.workspace.asRelativePath(file.oldUri, false);
             const key = getKey(path);
 
             return (
@@ -160,7 +161,9 @@ export const renameFilesProvider: RenameFilesProvider = {
                     globToRegex(pattern).test(path),
                 ) &&
                 components.find(
-                    (component) => component.livewire && component.key === key,
+                    (component) =>
+                        component.key === `livewire.${key}` ||
+                        (component.livewire && component.key === key),
                 )
             );
         });
@@ -176,10 +179,14 @@ export const renameFilesProvider: RenameFilesProvider = {
             limit(async () => {
                 const oldPath = vscode.workspace.asRelativePath(
                     file.oldUri.fsPath,
+                    false,
                 );
                 const oldKey = getKey(oldPath);
 
-                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newPath = vscode.workspace.asRelativePath(
+                    file.newUri,
+                    false,
+                );
                 const newKey = getKey(newPath);
 
                 if (newKey === oldKey) {

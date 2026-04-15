@@ -183,7 +183,7 @@ export const renameFilesProvider: RenameFilesProvider = {
 
         return event.files.filter((file) => {
             // asRelativePath returns paths with forward slashes on all platforms
-            const path = vscode.workspace.asRelativePath(file.oldUri);
+            const path = vscode.workspace.asRelativePath(file.oldUri, false);
             const key = getKey(path);
 
             return (
@@ -204,10 +204,14 @@ export const renameFilesProvider: RenameFilesProvider = {
             limit(async () => {
                 const oldPath = vscode.workspace.asRelativePath(
                     file.oldUri.fsPath,
+                    false,
                 );
                 const oldKey = getKey(oldPath);
 
-                const newPath = vscode.workspace.asRelativePath(file.newUri);
+                const newPath = vscode.workspace.asRelativePath(
+                    file.newUri,
+                    false,
+                );
                 const newKey = getKey(newPath);
 
                 if (newKey === oldKey) {
