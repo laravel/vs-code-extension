@@ -107,16 +107,27 @@ export const completionProvider: vscode.CompletionItemProvider = {
     },
 };
 
-const getKey = (newPath: string): string => {
-    const { livewireLocations, livewireNamespaces } = getViews().items;
+const getKey = (path: string): string => {
+    const views = getViews().items;
 
-    const namespace = Object.entries(livewireNamespaces).find(([_, path]) =>
-        newPath.startsWith(path),
+    const livewireLocations = views.livewireLocations.map((location) =>
+        location.replaceAll("\\", "/"),
+    );
+
+    const livewireNamespaces = Object.fromEntries(
+        Object.entries(views.livewireNamespaces).map(([namespace, nsPath]) => [
+            namespace,
+            nsPath.replaceAll("\\", "/"),
+        ]),
+    );
+
+    const namespace = Object.entries(livewireNamespaces).find(([_, nsPath]) =>
+        path.startsWith(nsPath),
     );
 
     const basePath = namespace
-        ? newPath.replace(new RegExp(`^${namespace[1]}`), "")
-        : newPath.replace(new RegExp(`^(${livewireLocations.join("|")})`), "");
+        ? path.replace(new RegExp(`^${namespace[1]}`), "")
+        : path.replace(new RegExp(`^(${livewireLocations.join("|")})`), "");
 
     const key = basePath
         .replaceAll("⚡", "")

@@ -159,8 +159,8 @@ export const hoverProvider: HoverProvider = (
     return null;
 };
 
-const getKey = (newPath: string): string => {
-    const key = newPath
+const getKey = (path: string): string => {
+    const key = path
         .replace(/^app\/View(\/Components)?/, "")
         .replace("resources/views/components/", "")
         .replace(/(\.[^/.]+)+$/, "")
