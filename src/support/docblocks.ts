@@ -9,6 +9,7 @@ interface ClassBlock {
     className: string;
     blocks: string[];
     extends: string | null;
+    traitUses: Eloquent.TraitUse[];
 }
 
 const modelBuilderType = (className: string) =>
@@ -31,6 +32,7 @@ export const writeEloquentDocBlocks = (
             className: cls || "",
             blocks: getBlocks(model, cls || "", builderMethods),
             extends: model.extends || null,
+            traitUses: model.traitUses || [],
         };
     });
 
@@ -200,6 +202,14 @@ const getScopeBlock = (
 };
 
 const classToDocBlock = (block: ClassBlock, namespace: string) => {
+    const traitLines =
+        block.traitUses.length > 0
+            ? block.traitUses.flatMap((tu) => [
+                  `/** @use ${tu.annotation} */`,
+                  `use ${tu.traits};`,
+              ])
+            : ["//"];
+
     return [
         `/**`,
         ` * ${namespace}\\${block.className}`,
@@ -211,7 +221,7 @@ const classToDocBlock = (block: ClassBlock, namespace: string) => {
             block.extends ?? "\\Illuminate\\Database\\Eloquent\\Model"
         }`,
         `{`,
-        indent("//"),
+        ...traitLines.map((line) => indent(line)),
         `}`,
     ]
         .map((b) => indent(b))

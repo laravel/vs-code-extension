@@ -84,6 +84,12 @@ declare namespace Eloquent {
         scopes: Scope[];
         extends: string | null;
         path: string;
+        traitUses: TraitUse[];
+    }
+
+    interface TraitUse {
+        annotation: string;
+        traits: string;
     }
 
     interface Attribute {

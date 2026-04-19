@@ -138,6 +138,64 @@ $models = new class($factory) {
         return \\Illuminate\\Support\\Str::start($parent, '\\\\');
     }
 
+    protected function collectTraitUseAnnotations(\\ReflectionClass $reflection)
+    {
+        $fileName = $reflection->getFileName();
+
+        if (!$fileName || !file_exists($fileName)) {
+            return [];
+        }
+
+        $source = file_get_contents($fileName);
+
+        $imports = [];
+        $classPos = preg_match('/^\\s*(?:abstract\\s+|final\\s+|readonly\\s+)*class\\s+/m', $source, $classMatch, PREG_OFFSET_CAPTURE)
+            ? $classMatch[0][1]
+            : strlen($source);
+
+        $headerSource = substr($source, 0, $classPos);
+
+        if (preg_match_all('/^\\s*use\\s+([\\w\\\\\\\\]+?)(?:\\s+as\\s+(\\w+))?\\s*;/m', $headerSource, $importMatches, PREG_SET_ORDER)) {
+            foreach ($importMatches as $im) {
+                $fqcn = $im[1];
+                $alias = $im[2] ?? substr(strrchr($fqcn, '\\\\'), 1) ?: $fqcn;
+                $imports[$alias] = $fqcn;
+            }
+        }
+
+        $traitUses = [];
+        $bodySource = substr($source, $classPos);
+
+        if (preg_match_all('/\\/\\*\\*(?:[^*]|\\*(?!\\/))*?@use\\s+([^\\s*]+)(?:[^*]|\\*(?!\\/))*?\\*\\/\\s*\\n\\s*use\\s+([^;]+);/m', $bodySource, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $annotation = trim($match[1]);
+                $traits = trim($match[2]);
+
+                $resolvedAnnotation = preg_replace_callback('/^([\\w]+)/', function ($m) use ($imports) {
+                    return isset($imports[$m[1]])
+                        ? '\\\\' . $imports[$m[1]]
+                        : $m[1];
+                }, $annotation);
+
+                $resolvedTraits = collect(explode(',', $traits))
+                    ->map(function ($trait) use ($imports) {
+                        $trait = trim($trait);
+                        return isset($imports[$trait])
+                            ? '\\\\' . $imports[$trait]
+                            : $trait;
+                    })
+                    ->implode(', ');
+
+                $traitUses[] = [
+                    'annotation' => $resolvedAnnotation,
+                    'traits' => $resolvedTraits,
+                ];
+            }
+        }
+
+        return $traitUses;
+    }
+
     protected function getInfo($className)
     {
         if (($data = $this->fromArtisan($className)) === null) {
@@ -175,6 +233,8 @@ $models = new class($factory) {
             ->toArray();
 
         $data['path'] = LaravelVsCode::relativePath($reflection->getFileName() ?: '');
+
+        $data['traitUses'] = $this->collectTraitUseAnnotations($reflection);
 
         return [
             $className => $data,
