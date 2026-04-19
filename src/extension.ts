@@ -53,6 +53,7 @@ import {
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { registerPestHelper } from "./features/pest";
 import { registerTestRunner } from "./test-runner";
+import { PhpRenameProvider } from "./renameProvider";
 
 let client: LanguageClient;
 
@@ -275,6 +276,7 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
+        vscode.languages.registerRenameProvider(PHP_LANGUAGE, new PhpRenameProvider()),
     );
 
     collectDebugInfo();
