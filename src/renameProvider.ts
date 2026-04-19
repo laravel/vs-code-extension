@@ -6,19 +6,20 @@ import {
     SymbolKind,
     LocationLink,
     Location,
-} from 'vscode';
-import { getReferences, getSymbol } from './renameApi';
-import { getTargetUri } from './renameUtils';
-import { BaseRenameProvider } from './renameBase';
+} from "vscode";
+import { getReferences, getSymbol } from "./renameApi";
+import { getTargetUri } from "./renameUtils";
+import { BaseRenameProvider } from "./renameBase";
 
-export class PhpRenameProvider extends BaseRenameProvider implements RenameProvider {
-
+export class PhpRenameProvider
+    extends BaseRenameProvider
+    implements RenameProvider
+{
     public async provideRenameEdits(
         document: TextDocument,
         position: Position,
-        newName: string
+        newName: string,
     ): Promise<WorkspaceEdit | null> {
-
         const wordRange = document.getWordRangeAtPosition(position);
         if (!wordRange) {
             return null;
@@ -29,7 +30,7 @@ export class PhpRenameProvider extends BaseRenameProvider implements RenameProvi
         const references = await getReferences(document.uri, position);
 
         if (!references || references.length === 0) {
-            throw new Error('You can not rename this symbol');
+            throw new Error("You can not rename this symbol");
         }
 
         const symbolResult = await getSymbol(document.uri, position);
@@ -39,7 +40,7 @@ export class PhpRenameProvider extends BaseRenameProvider implements RenameProvi
             const targetUri = getTargetUri(def);
 
             if (targetUri && this.isFromVendor(targetUri)) {
-                throw new Error('You can not rename symbols from vendor');
+                throw new Error("You can not rename symbols from vendor");
             }
         }
 
@@ -55,7 +56,7 @@ export class PhpRenameProvider extends BaseRenameProvider implements RenameProvi
                             document.getText(location.range),
                             location,
                             newName,
-                            edit
+                            edit,
                         );
                         break;
 
@@ -69,7 +70,6 @@ export class PhpRenameProvider extends BaseRenameProvider implements RenameProvi
                         edit.replace(location.uri, location.range, newName);
                         break;
                 }
-
             } else {
                 edit.replace(location.uri, location.range, newName);
             }

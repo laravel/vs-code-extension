@@ -276,7 +276,10 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
-        vscode.languages.registerRenameProvider(PHP_LANGUAGE, new PhpRenameProvider()),
+        vscode.languages.registerRenameProvider(
+            PHP_LANGUAGE,
+            new PhpRenameProvider(),
+        ),
     );
 
     collectDebugInfo();

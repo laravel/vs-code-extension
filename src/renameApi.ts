@@ -6,17 +6,17 @@ import {
     SymbolInformation,
     Uri,
     commands,
-} from 'vscode';
-import { getTargetUri } from './renameUtils';
+} from "vscode";
+import { getTargetUri } from "./renameUtils";
 
 const isDocumentSymbol = (
-    symbol: DocumentSymbol | SymbolInformation
+    symbol: DocumentSymbol | SymbolInformation,
 ): symbol is DocumentSymbol => {
     return (symbol as DocumentSymbol).children !== undefined;
 };
 
 const toDocumentSymbol = (
-    symbol: DocumentSymbol | SymbolInformation
+    symbol: DocumentSymbol | SymbolInformation,
 ): DocumentSymbol => {
     if (isDocumentSymbol(symbol)) {
         return symbol;
@@ -25,36 +25,34 @@ const toDocumentSymbol = (
     const range = symbol.location.range;
     return new DocumentSymbol(
         symbol.name,
-        symbol.containerName ?? '',
+        symbol.containerName ?? "",
         symbol.kind,
         range,
-        range
+        range,
     );
 };
 
-export const getDocumentSymbols = async (uri: Uri): Promise<DocumentSymbol[]> => {
+export const getDocumentSymbols = async (
+    uri: Uri,
+): Promise<DocumentSymbol[]> => {
     if (!uri) {
         return [];
     }
 
-    const result = await commands.executeCommand<(DocumentSymbol | SymbolInformation)[]>(
-        'vscode.executeDocumentSymbolProvider',
-        uri
-    );
+    const result = await commands.executeCommand<
+        (DocumentSymbol | SymbolInformation)[]
+    >("vscode.executeDocumentSymbolProvider", uri);
 
     return (result ?? []).map(toDocumentSymbol);
 };
 
 export const getDefinition = async (
     uri: Uri,
-    position: Position
+    position: Position,
 ): Promise<Location | LocationLink | null> => {
-
-    const definitions = await commands.executeCommand<(Location | LocationLink)[]>(
-        'vscode.executeDefinitionProvider',
-        uri,
-        position
-    );
+    const definitions = await commands.executeCommand<
+        (Location | LocationLink)[]
+    >("vscode.executeDefinitionProvider", uri, position);
 
     if (!definitions || definitions.length === 0) {
         return null;
@@ -65,13 +63,12 @@ export const getDefinition = async (
 
 export const getReferences = async (
     uri: Uri,
-    position: Position
+    position: Position,
 ): Promise<Location[]> => {
-
     const refs = await commands.executeCommand<Location[]>(
-        'vscode.executeReferenceProvider',
+        "vscode.executeReferenceProvider",
         uri,
-        position
+        position,
     );
 
     return refs ?? [];
@@ -79,9 +76,8 @@ export const getReferences = async (
 
 export const getSymbol = async (
     uri: Uri,
-    position: Position
+    position: Position,
 ): Promise<[DocumentSymbol, Location | LocationLink] | null> => {
-
     const definition = await getDefinition(uri, position);
 
     if (!definition) {
@@ -94,11 +90,9 @@ export const getSymbol = async (
         return null;
     }
 
-    const symbols = flattenDocumentSymbols(
-        await getDocumentSymbols(targetUri)
-    );
+    const symbols = flattenDocumentSymbols(await getDocumentSymbols(targetUri));
 
-    if ('targetRange' in definition) {
+    if ("targetRange" in definition) {
         for (const symbol of symbols) {
             if (definition.targetRange.contains(symbol.selectionRange)) {
                 return [symbol, definition];
@@ -119,7 +113,9 @@ export const getSymbol = async (
     return null;
 };
 
-const flattenDocumentSymbols = (symbols: DocumentSymbol[]): DocumentSymbol[] => {
+const flattenDocumentSymbols = (
+    symbols: DocumentSymbol[],
+): DocumentSymbol[] => {
     const result: DocumentSymbol[] = [];
 
     const visit = (symbol: DocumentSymbol) => {

@@ -1,25 +1,20 @@
-import * as path from 'path';
-import {
-    Location,
-    LocationLink,
-    Uri,
-    WorkspaceEdit,
-} from 'vscode';
-import { getTargetUri } from './renameUtils';
+import * as path from "path";
+import { Location, LocationLink, Uri, WorkspaceEdit } from "vscode";
+import { getTargetUri } from "./renameUtils";
 
 export abstract class BaseRenameProvider {
     protected renameProperty(
         actualName: string,
         location: Location,
         newName: string,
-        edit: WorkspaceEdit
+        edit: WorkspaceEdit,
     ): void {
-        const normalized = newName.replace(/^\$/, '');
+        const normalized = newName.replace(/^\$/, "");
 
         edit.replace(
             location.uri,
             location.range,
-            actualName.startsWith('$') ? `$${normalized}` : normalized
+            actualName.startsWith("$") ? `$${normalized}` : normalized,
         );
     }
 
@@ -27,21 +22,21 @@ export abstract class BaseRenameProvider {
         location: Location,
         oldName: string,
         newName: string,
-        edit: WorkspaceEdit
+        edit: WorkspaceEdit,
     ): void {
         edit.replace(
             location.uri,
             location.range.with(
-                location.range.end.translate(0, -oldName.length)
+                location.range.end.translate(0, -oldName.length),
             ),
-            newName
+            newName,
         );
     }
 
     protected renameFile(
         edit: WorkspaceEdit,
         definition: Location | LocationLink,
-        newName: string
+        newName: string,
     ): void {
         const uri = getTargetUri(definition);
 
@@ -52,13 +47,13 @@ export abstract class BaseRenameProvider {
         const newPath = path.format({
             dir: path.dirname(uri.path),
             name: newName,
-            ext: '.php',
+            ext: ".php",
         });
 
         edit.renameFile(uri, uri.with({ path: newPath }));
     }
 
     protected isFromVendor(uri: Uri): boolean {
-        return uri.path.includes('vendor');
+        return uri.path.includes("vendor");
     }
 }
