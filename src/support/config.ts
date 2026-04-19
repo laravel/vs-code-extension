@@ -16,7 +16,8 @@ type ConfigKey =
     | "pest.helperFilePath"
     | "env.viteQuickFix"
     | "pint.runOnSave"
-    | "testRunner.enabled";
+    | "testRunner.enabled"
+    | "rename.enable";
 
 export const config = <T>(key: ConfigKey, fallback: T): T =>
     vscode.workspace.getConfiguration("Laravel").get<T>(key, fallback);

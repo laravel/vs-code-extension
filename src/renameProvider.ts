@@ -4,12 +4,13 @@ import {
     TextDocument,
     WorkspaceEdit,
     SymbolKind,
-    LocationLink,
-    Location,
+    window,
+    commands,
 } from "vscode";
 import { getReferences, getSymbol } from "./renameApi";
 import { getTargetUri } from "./renameUtils";
 import { BaseRenameProvider } from "./renameBase";
+import { config } from "./support/config";
 
 export class PhpRenameProvider
     extends BaseRenameProvider
@@ -20,6 +21,24 @@ export class PhpRenameProvider
         position: Position,
         newName: string,
     ): Promise<WorkspaceEdit | null> {
+        if (!config<boolean>("rename.enable", true)) {
+            window
+                .showWarningMessage(
+                    "Laravel rename is disabled in settings.",
+                    "Open Settings",
+                )
+                .then((action) => {
+                    if (action === "Open Settings") {
+                        commands.executeCommand(
+                            "workbench.action.openSettings",
+                            "laravel.rename.enable",
+                        );
+                    }
+                });
+
+            return null;
+        }
+
         const wordRange = document.getWordRangeAtPosition(position);
         if (!wordRange) {
             return null;

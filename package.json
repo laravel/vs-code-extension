@@ -1089,6 +1089,11 @@
                     "default": true,
                     "description": "Enable the test runner integration."
                 },
+                "Laravel.rename.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable Laravel-specific rename functionality. Disable this if another extension already provides rename support."
+                },
                 "Laravel.artisanMake.explorer": {
                     "type": "boolean",
                     "default": true,
