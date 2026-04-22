@@ -30,16 +30,24 @@ type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
 
 let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
+let parserBinaryPathReady: Promise<string | undefined>;
+
+export const getParserBinaryPath = (): Promise<string | undefined> => {
+    return parserBinaryPathReady;
+};
 
 export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
     if (parserBinaryPath) {
+        parserBinaryPathReady = Promise.resolve(parserBinaryPath);
         return;
     }
 
-    downloadBinary(context).then((path) => {
+    parserBinaryPathReady = downloadBinary(context).then((path) => {
         if (path) {
             parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
         }
+
+        return parserBinaryPath;
     });
 };
 

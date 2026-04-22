@@ -9,7 +9,7 @@ import { hoverProvider as env } from "@src/features/env";
 import { hoverProvider as inertia } from "@src/features/inertia";
 import { hoverProvider as middleware } from "@src/features/middleware";
 import { hoverProvider as mix } from "@src/features/mix";
-import { hoverProvider as route } from "@src/features/route";
+// import { hoverProvider as route } from "@src/features/route";
 import { hoverProvider as translation } from "@src/features/translation";
 import { hoverProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
@@ -31,7 +31,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     "inertia.hover": inertia,
     "middleware.hover": middleware,
     "mix.hover": mix,
-    "route.hover": route,
+    // "route.hover": route,
     "translation.hover": translation,
     "view.hover": view,
     "bladeComponent.hover": bladeComponent,

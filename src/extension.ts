@@ -37,6 +37,7 @@ import {
     watchForComposerChanges,
 } from "./support/fileWatcher";
 import { info } from "./support/logger";
+import { startLspClient, stopLspClient } from "./lsp/client";
 import { clearParserCaches, setParserBinaryPath } from "./support/parser";
 import {
     clearDefaultPhpCommand,
@@ -154,6 +155,10 @@ export async function activate(context: vscode.ExtensionContext) {
     initVendorWatchers();
     watchForComposerChanges();
     setParserBinaryPath(context);
+
+    startLspClient().catch((error) => {
+        console.error("Failed to start Laravel LSP:", error);
+    });
 
     const TRIGGER_CHARACTERS = ["'", '"'];
 
@@ -303,4 +308,6 @@ export function deactivate() {
     if (client) {
         client.stop();
     }
+
+    stopLspClient();
 }
