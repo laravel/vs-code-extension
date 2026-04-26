@@ -272,10 +272,11 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             commandName("laravel.createViewWithExtends"),
             async (fileUri: vscode.Uri) => {
-                const layout = await vscode.window.showInputBox({
-                    prompt: "Layout to extend (press Enter to skip)",
-                    placeHolder: "layouts.app",
-                });
+                const views = (await import("./repositories/views.js")).getViewKeys();
+                const layout = await vscode.window.showQuickPick(
+                    Object.keys(views),
+                    { placeHolder: "Select a layout to extend (Escape to skip)" },
+                );
 
                 const content = layout
                     ? `@extends('${layout}')\n\n@section('content')\n\n@endsection\n`
