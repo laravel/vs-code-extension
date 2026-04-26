@@ -76,4 +76,5 @@ export type RegisteredCommand =
     | "laravel.artisan.cacheClear"
     | "laravel.artisan.vendorPublish"
     | "laravel.docker.configure"
+    | "laravel.createViewWithExtends"
     | "laravel.open";

@@ -1000,6 +1000,11 @@
                 "command": "laravel.docker.configure",
                 "title": "Configure Docker Environment",
                 "category": "Laravel"
+            },
+            {
+                "command": "laravel.createViewWithExtends",
+                "title": "Create View with Extends",
+                "category": "Laravel"
             }
         ],
         "configuration": {

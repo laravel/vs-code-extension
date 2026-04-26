@@ -192,8 +192,8 @@ export const codeActionProvider: CodeActionProviderFunction = async (
         ),
     );
 
+    // Action existante — vue vide
     const edit = new vscode.WorkspaceEdit();
-
     edit.createFile(fileUri, {
         overwrite: false,
         contents: Buffer.from(""),
@@ -208,9 +208,20 @@ export const codeActionProvider: CodeActionProviderFunction = async (
     action.isPreferred = true;
     action.command = openFile(fileUri, 1, 0);
 
-    return [action];
-};
+    // Nouvelle action — vue avec @extends
+    const actionWithExtends = new vscode.CodeAction(
+        "Create missing view extending a layout",
+        vscode.CodeActionKind.QuickFix,
+    );
+    actionWithExtends.diagnostics = [diagnostic];
+    actionWithExtends.command = {
+        command: "laravel.createViewWithExtends",
+        title: "Create missing view extending a layout",
+        arguments: [fileUri],
+    };
 
+    return [action, actionWithExtends];
+};
 const getCompletionItem = (
     view: ViewItem,
     document: vscode.TextDocument,

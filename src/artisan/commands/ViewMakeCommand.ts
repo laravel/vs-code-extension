@@ -1,5 +1,6 @@
 import { Command } from "../types";
 import { forceOption, testOptions } from "@src/artisan/options";
+import { getViewKeys } from "@src/repositories/views";
 
 export const ViewMakeCommand: Command = {
     name: "make:view",
@@ -11,5 +12,14 @@ export const ViewMakeCommand: Command = {
             description: "The name of the view",
         },
     ],
-    options: [...testOptions, forceOption],
+    options: [
+        {
+            name: "--extends",
+            type: "select",
+            options: () => getViewKeys(),
+            description: "The parent view to extend",
+        },
+        ...testOptions,
+        forceOption,
+    ],
 };

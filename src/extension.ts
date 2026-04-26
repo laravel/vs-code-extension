@@ -269,6 +269,28 @@ export async function activate(context: vscode.ExtensionContext) {
             htmlClassToBladeDirectiveCommands.all,
             refactorAllHtmlClassesToBladeDirectives,
         ),
+        vscode.commands.registerCommand(
+            commandName("laravel.createViewWithExtends"),
+            async (fileUri: vscode.Uri) => {
+                const layout = await vscode.window.showInputBox({
+                    prompt: "Layout to extend (press Enter to skip)",
+                    placeHolder: "layouts.app",
+                });
+
+                const content = layout
+                    ? `@extends('${layout}')\n\n@section('content')\n\n@endsection\n`
+                    : "";
+
+                const edit = new vscode.WorkspaceEdit();
+                edit.createFile(fileUri, {
+                    overwrite: false,
+                    contents: Buffer.from(content),
+                });
+
+                await vscode.workspace.applyEdit(edit);
+                await vscode.window.showTextDocument(fileUri);
+            },
+        ),
         ...registerArtisanMakeCommands(),
         ...registerArtisanCommands(),
         vscode.commands.registerCommand(

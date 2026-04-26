@@ -27,3 +27,9 @@ export const getViews = repository<ViewItem[]>({
     itemsDefault: [],
     fileWatcherEvents: ["create", "delete", "change"],
 });
+
+export const getViewKeys = (): Record<string, string> => {
+    return Object.fromEntries(
+        getViews().items.map((view) => [view.key, view.key]),
+    );
+};
