@@ -1,17 +1,17 @@
 "use strict";
 
-import { hoverProvider as appBinding } from "@src/features/appBinding";
-import { hoverProvider as auth } from "@src/features/auth";
-import { hoverProvider as bladeComponent } from "@src/features/bladeComponent";
-import { hoverProvider as livewireComponent } from "@src/features/livewireComponent";
-import { hoverProvider as config } from "@src/features/config";
-import { hoverProvider as env } from "@src/features/env";
-import { hoverProvider as inertia } from "@src/features/inertia";
-import { hoverProvider as middleware } from "@src/features/middleware";
-import { hoverProvider as mix } from "@src/features/mix";
+// import { hoverProvider as appBinding } from "@src/features/appBinding";
+// import { hoverProvider as auth } from "@src/features/auth";
+// import { hoverProvider as bladeComponent } from "@src/features/bladeComponent";
+// import { hoverProvider as livewireComponent } from "@src/features/livewireComponent";
+// import { hoverProvider as config } from "@src/features/config";
+// import { hoverProvider as env } from "@src/features/env";
+// import { hoverProvider as inertia } from "@src/features/inertia";
+// import { hoverProvider as middleware } from "@src/features/middleware";
+// import { hoverProvider as mix } from "@src/features/mix";
 // import { hoverProvider as route } from "@src/features/route";
-import { hoverProvider as translation } from "@src/features/translation";
-import { hoverProvider as view } from "@src/features/view";
+// import { hoverProvider as translation } from "@src/features/translation";
+// import { hoverProvider as view } from "@src/features/view";
 import { config as getConfig } from "@src/support/config";
 import { GeneratedConfigKey } from "@src/support/generated-config";
 import {
@@ -24,18 +24,18 @@ import {
 import { HoverProvider as ProviderFunc } from "..";
 
 const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
-    "appBinding.hover": appBinding,
-    "auth.hover": auth,
-    "config.hover": config,
-    "env.hover": env,
-    "inertia.hover": inertia,
-    "middleware.hover": middleware,
-    "mix.hover": mix,
+    // "appBinding.hover": appBinding,
+    // "auth.hover": auth,
+    // "config.hover": config,
+    // "env.hover": env,
+    // "inertia.hover": inertia,
+    // "middleware.hover": middleware,
+    // "mix.hover": mix,
     // "route.hover": route,
-    "translation.hover": translation,
-    "view.hover": view,
-    "bladeComponent.hover": bladeComponent,
-    "livewireComponent.hover": livewireComponent,
+    // "translation.hover": translation,
+    // "view.hover": view,
+    // "bladeComponent.hover": bladeComponent,
+    // "livewireComponent.hover": livewireComponent,
 };
 
 export const hoverProviders: HoverProvider[] = Object.entries(allProviders).map(
