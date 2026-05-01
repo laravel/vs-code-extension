@@ -29,36 +29,36 @@ export const clearParserCaches = (): void => {
 type TokenFormatted = [string, string, number];
 type Token = string | TokenFormatted;
 
-let parserBinaryPath: string | undefined = process.env.PHP_PARSER_BINARY_PATH;
-let parserBinaryPathReady: Promise<string | undefined>;
+let lspBinaryPath: string | undefined = process.env.LARAVEL_LSP_BINARY_PATH;
+let lspBinaryPathReady: Promise<string | undefined>;
 
-export const getParserBinaryPath = (): Promise<string | undefined> => {
-    return parserBinaryPathReady;
+export const getLspBinaryPath = (): Promise<string | undefined> => {
+    return lspBinaryPathReady;
 };
 
-export const setParserBinaryPath = (context: vscode.ExtensionContext) => {
-    if (parserBinaryPath) {
-        parserBinaryPathReady = Promise.resolve(parserBinaryPath);
+export const setLspBinaryPath = (context: vscode.ExtensionContext) => {
+    if (lspBinaryPath) {
+        lspBinaryPathReady = Promise.resolve(lspBinaryPath);
         return;
     }
 
-    parserBinaryPathReady = downloadBinary(context).then((path) => {
+    lspBinaryPathReady = downloadBinary(context).then((path) => {
         if (path) {
-            parserBinaryPath = process.env.PHP_PARSER_BINARY_PATH || path;
+            lspBinaryPath = process.env.LARAVEL_LSP_BINARY_PATH || path;
         }
 
-        return parserBinaryPath;
+        return lspBinaryPath;
     });
 };
 
 const downloadBinary = async (context: vscode.ExtensionContext) => {
-    const binaryVersion = "0.1.44";
+    const binaryVersion = "0.1.40";
     const osPlatform = os.platform();
     const osArch = os.arch();
     const extension = osPlatform === "win32" ? ".exe" : "";
-    const filename = `php-parser-v${binaryVersion}-${osArch}-${osPlatform}${extension}`;
+    const filename = `lsp-v${binaryVersion}-${osArch}-${osPlatform}${extension}`;
 
-    const uri = `https://github.com/laravel/vs-code-php-parser-cli/releases/download/v${binaryVersion}/${filename}`;
+    const uri = `https://github.com/laravel/lsp/releases/download/v${binaryVersion}/${filename}`;
 
     const logger = new OutputLogger(`File Downloader`, context);
     const requestHandler = new HttpRequestHandler(logger);
@@ -159,9 +159,9 @@ export const detect = async (
 
 const runCommand = (command: string, args: string[]): Promise<string> => {
     return new Promise(async function (resolve, reject) {
-        if (!parserBinaryPath) {
+        if (!lspBinaryPath) {
             const waitForPath = async () => {
-                if (!parserBinaryPath) {
+                if (!lspBinaryPath) {
                     await new Promise((resolve) => {
                         setTimeout(resolve, 500);
                     });
@@ -178,7 +178,7 @@ const runCommand = (command: string, args: string[]): Promise<string> => {
         }
 
         cp.execFile(
-            parserBinaryPath!,
+            lspBinaryPath!,
             [command, ...args],
             {
                 cwd: __dirname,

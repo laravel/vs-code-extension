@@ -4,12 +4,12 @@ import {
     ServerOptions,
 } from "vscode-languageclient/node";
 import { config } from "../support/config";
-import { getParserBinaryPath } from "../support/parser";
+import { getLspBinaryPath } from "../support/parser";
 
 let client: LanguageClient | undefined;
 
 export async function startLspClient(): Promise<void> {
-    const binaryPath = await getParserBinaryPath();
+    const binaryPath = await getLspBinaryPath();
 
     if (!binaryPath) {
         return;
