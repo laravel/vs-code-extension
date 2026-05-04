@@ -56,7 +56,7 @@ const downloadBinary = async (context: vscode.ExtensionContext) => {
     const osPlatform = os.platform();
     const osArch = os.arch();
     const extension = osPlatform === "win32" ? ".exe" : "";
-    const filename = `lsp-v${binaryVersion}-${osArch}-${osPlatform}${extension}`;
+    const filename = `server-v${binaryVersion}-${osArch}-${osPlatform}${extension}`;
 
     const uri = `https://github.com/laravel/lsp/releases/download/v${binaryVersion}/${filename}`;
 
