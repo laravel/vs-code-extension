@@ -119,7 +119,7 @@ export async function activate(context: vscode.ExtensionContext) {
         { Registry },
         { completionProviders },
         { Eloquent: EloquentCompletion },
-        { Validation: ValidationCompletion },
+        // { Validation: ValidationCompletion },
         { Blade: BladeCompletion },
         { completionProvider: bladeComponentCompletion },
         { completionProvider: livewireComponentCompletion },
@@ -132,7 +132,7 @@ export async function activate(context: vscode.ExtensionContext) {
         import("./completion/Registry.js"),
         import("./completion/CompletionProvider.js"),
         import("./completion/Eloquent.js"),
-        import("./completion/Validation.js"),
+        // import("./completion/Validation.js"),
         import("./completion/Blade.js"),
         import("./features/bladeComponent.js"),
         import("./features/livewireComponent.js"),
@@ -169,7 +169,7 @@ export async function activate(context: vscode.ExtensionContext) {
         new EloquentCompletion(),
     );
 
-    const validationRegistry = new Registry(new ValidationCompletion());
+    // const validationRegistry = new Registry(new ValidationCompletion());
 
     const documentSelector: vscode.DocumentSelector = {
         language: "blade",
@@ -205,11 +205,11 @@ export async function activate(context: vscode.ExtensionContext) {
             delegatedRegistry,
             ...TRIGGER_CHARACTERS,
         ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            validationRegistry,
-            ...TRIGGER_CHARACTERS.concat(["|"]),
-        ),
+        // vscode.languages.registerCompletionItemProvider(
+        //     LANGUAGES,
+        //     validationRegistry,
+        //     ...TRIGGER_CHARACTERS.concat(["|"]),
+        // ),
         vscode.languages.registerCompletionItemProvider(
             BLADE_LANGUAGES,
             bladeComponentCompletion,
