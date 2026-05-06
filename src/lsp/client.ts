@@ -38,6 +38,7 @@ export async function startLspClient(): Promise<void> {
             authDiagnostics: config("auth.diagnostics", true),
             authHover: config("auth.hover", true),
             authLink: config("auth.link", true),
+            bladeComponentCompletion: config("bladeComponent.completion", true),
             bladeComponentHover: config("bladeComponent.hover", true),
             bladeComponentLink: config("bladeComponent.link", true),
             configCompletion: config("config.completion", true),
