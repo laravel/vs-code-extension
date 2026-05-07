@@ -62,6 +62,10 @@ export async function startLspClient(): Promise<void> {
             inertiaDiagnostics: config("inertia.diagnostics", true),
             inertiaHover: config("inertia.hover", true),
             inertiaLink: config("inertia.link", true),
+            livewireComponentCompletion: config(
+                "livewireComponent.completion",
+                true,
+            ),
             livewireComponentHover: config("livewireComponent.hover", true),
             livewireComponentLink: config("livewireComponent.link", true),
             middlewareCompletion: config("middleware.completion", true),
