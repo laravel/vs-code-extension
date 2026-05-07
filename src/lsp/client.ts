@@ -7,8 +7,25 @@ import { config } from "../support/config";
 import { getLspBinaryPath } from "../support/parser";
 
 let client: LanguageClient | undefined;
+let clientStarting: Promise<void> | undefined;
 
 export async function startLspClient(): Promise<void> {
+    if (client) {
+        return;
+    }
+
+    if (clientStarting) {
+        return clientStarting;
+    }
+
+    clientStarting = start().finally(() => {
+        clientStarting = undefined;
+    });
+
+    return clientStarting;
+}
+
+async function start(): Promise<void> {
     const binaryPath = await getLspBinaryPath();
 
     if (!binaryPath) {
@@ -95,19 +112,40 @@ export async function startLspClient(): Promise<void> {
         },
     };
 
-    client = new LanguageClient(
+    const lspClient = new LanguageClient(
         "laravelLsp",
         "Laravel LSP",
         serverOptions,
         clientOptions,
     );
 
-    await client.start();
+    await lspClient.start();
+
+    client = lspClient;
 }
 
 export async function stopLspClient(): Promise<void> {
+    if (clientStarting) {
+        await clientStarting;
+    }
+
     if (client) {
         await client.stop();
         client = undefined;
     }
+}
+
+export async function sendLspRequest<T>(
+    method: string,
+    params: object = {},
+): Promise<T> {
+    if (!client && clientStarting) {
+        await clientStarting;
+    }
+
+    if (!client) {
+        throw new Error("Laravel LSP client is not running.");
+    }
+
+    return client.sendRequest<T>(method, params);
 }

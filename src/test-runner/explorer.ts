@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 
+import { sendLspRequest } from "@src/lsp/client";
 import { projectPath } from "@src/support/project";
-import { runInLaravel, template } from "@src/support/php";
+// import { runInLaravel, template } from "@src/support/php";
 
 export interface TestSuite {
     name: string;
@@ -26,7 +27,8 @@ export const updateExplorer = async (controller: vscode.TestController) => {
 };
 
 const getTestSuites = () => {
-    return runInLaravel<TestSuite[]>(template("tests"));
+    return sendLspRequest<TestSuite[]>("laravel/data", { name: "tests" });
+    // return runInLaravel<TestSuite[]>(template("tests"));
 };
 
 const buildSuiteItem = (
