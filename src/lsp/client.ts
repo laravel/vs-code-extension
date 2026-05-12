@@ -94,6 +94,11 @@ async function start(): Promise<void> {
             mixHover: config("mix.hover", true),
             mixLink: config("mix.link", true),
             pathsLink: config("paths.link", true),
+            pestGenerateDocBlocks: config("pest.generateDocBlocks", true),
+            pestHelperFilePath: config(
+                "pest.helperFilePath",
+                "storage/framework/testing/_pest.php",
+            ),
             routeDiagnostics: config("route.diagnostics", true),
             routeCompletion: config("route.completion", true),
             routeHover: config("route.hover", true),
