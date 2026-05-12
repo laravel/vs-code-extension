@@ -23,11 +23,11 @@ suite("Route Helper Test Suite", () => {
                 "to_route('dashboard');",
                 "Redirect::route('home');",
                 "Redirect::signedRoute('dashboard');",
-                "Redirect::temporarySignedRoute('home');",
+                "Redirect::temporarySignedRoute('home', now()->addHour());",
                 "redirect()->route('dashboard');",
                 "URL::route('home');",
                 "URL::signedRoute('dashboard');",
-                "URL::temporarySignedRoute('home');",
+                "URL::temporarySignedRoute('home', now()->addHour());",
                 "url()->route('dashboard');",
                 "Response::redirectToRoute('home');",
                 // "response()->redirectToRoute('dashboard');", // Not working: missing expected route completions
