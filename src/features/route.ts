@@ -83,7 +83,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
 
             // @ts-ignore
             if (item.className === "Livewire\\Volt\\Volt") {
-                const view = getViews().items.find(
+                const view = getViews().items.views.find(
                     (v) => v.key === `livewire.${param.value}`,
                 );
 
@@ -106,7 +106,7 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
             }
 
             if (route.livewire) {
-                const view = getViews().items.find(
+                const view = getViews().items.views.find(
                     (v) => v.key === route.livewire,
                 );
 
@@ -148,7 +148,7 @@ export const hoverProvider: HoverProvider = (
         }
 
         if (routeItem.livewire) {
-            const view = getViews().items.find(
+            const view = getViews().items.views.find(
                 (v) => v.key === routeItem.livewire,
             );
 

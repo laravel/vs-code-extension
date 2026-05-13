@@ -1,9 +1,16 @@
-import { getBladeComponents } from "@src/repositories/bladeComponents";
+import {
+    getBladeComponents,
+    patterns,
+} from "@src/repositories/bladeComponents";
+import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
 import { projectPath } from "@src/support/project";
+import { kebab } from "@src/support/str";
+import { globToRegex } from "@src/support/util";
+import fs from "fs/promises";
 import os from "os";
 import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
+import { HoverProvider, LinkProvider, RenameFilesProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
@@ -150,4 +157,142 @@ export const hoverProvider: HoverProvider = (
     }
 
     return null;
+};
+
+const getKey = (path: string): string => {
+    const key = path
+        .replace(/^app\/View(\/Components)?/, "")
+        .replace("resources/views/components/", "")
+        .replace(/(\.[^/.]+)+$/, "")
+        .replace(/^\/+/, "")
+        .replaceAll("/", ".");
+
+    return kebab(key);
+};
+
+const getUri = (key: string): vscode.Uri =>
+    vscode.Uri.file(
+        projectPath(
+            `resources/views/components/${key.replaceAll(".", "/")}.blade.php`,
+        ),
+    );
+
+export const renameFilesProvider: RenameFilesProvider = {
+    customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
+        const components = getBladeComponents().items.components;
+
+        return event.files.filter((file) => {
+            // asRelativePath returns paths with forward slashes on all platforms
+            const path = vscode.workspace.asRelativePath(file.oldUri, false);
+            const key = getKey(path);
+
+            return (
+                Object.values(patterns).some((pattern) =>
+                    globToRegex(pattern).test(path),
+                ) && components[key]
+            );
+        });
+    },
+
+    async provideRenameFiles(files: vscode.FileWillRenameEvent["files"]) {
+        const pLimit = (await import("p-limit")).default;
+        const limit = pLimit(10);
+
+        const keys: Cache<string, string> = new Cache(100);
+
+        const filePromise = files.map((file) =>
+            limit(async () => {
+                const oldPath = vscode.workspace.asRelativePath(
+                    file.oldUri.fsPath,
+                    false,
+                );
+                const oldKey = getKey(oldPath);
+
+                const newPath = vscode.workspace.asRelativePath(
+                    file.newUri,
+                    false,
+                );
+                const newKey = getKey(newPath);
+
+                if (newKey === oldKey) {
+                    return;
+                }
+
+                keys.set(oldKey, newKey);
+
+                if (newPath.endsWith(".blade.php")) {
+                    return;
+                }
+
+                const oldBladePath = getUri(oldKey);
+                const newBladePath = getUri(newKey);
+
+                vscode.workspace.fs.rename(oldBladePath, newBladePath);
+
+                // Case when a component class namespace is changed by Intelephense or other extension.
+                // We can't use fs.readFile/fs.writeFile because Intelephense overwrites content file after our change
+                const doc = await vscode.workspace.openTextDocument(
+                    file.newUri,
+                );
+                const text = doc.getText();
+
+                const regex = new RegExp(
+                    `(?<=\\b(?:view|View::make)\\((['"])components\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                    "g",
+                );
+
+                const updated = text.replace(regex, newKey);
+
+                if (updated === text) {
+                    return;
+                }
+
+                const edit = new vscode.WorkspaceEdit();
+
+                edit.replace(
+                    file.newUri,
+                    new vscode.Range(0, 0, doc.lineCount, 0),
+                    updated,
+                );
+
+                await vscode.workspace.applyEdit(edit);
+            }),
+        );
+
+        await Promise.all(filePromise);
+
+        if (keys.size() === 0) {
+            return;
+        }
+
+        const componentFiles = await vscode.workspace.findFiles(
+            patterns.bladeFiles,
+        );
+
+        const pattern = new RegExp(
+            `(<\\/?x-)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+            "g",
+        );
+
+        const componentPromise = componentFiles.map((file) =>
+            limit(async () => {
+                const filePath = file.fsPath;
+
+                const text = await fs.readFile(filePath, "utf-8");
+
+                const updated = text.replace(
+                    pattern,
+                    (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
+                );
+
+                if (updated === text) {
+                    return;
+                }
+
+                await fs.writeFile(filePath, updated, "utf-8");
+            }),
+        );
+
+        await Promise.all(componentPromise);
+    },
 };

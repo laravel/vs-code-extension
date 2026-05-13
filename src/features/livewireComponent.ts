@@ -1,15 +1,19 @@
-import { getViews } from "@src/repositories/views";
+import { getViews, patterns } from "@src/repositories/views";
+import { Cache } from "@src/support/cache";
 import { config } from "@src/support/config";
-import { projectPath } from "@src/support/project";
-import * as vscode from "vscode";
-import { HoverProvider, LinkProvider } from "..";
 import { livewireHover } from "@src/support/markdown";
+import { projectPath } from "@src/support/project";
+import { kebab } from "@src/support/str";
+import { globToRegex } from "@src/support/util";
+import fs from "fs/promises";
+import * as vscode from "vscode";
+import { HoverProvider, LinkProvider, RenameFilesProvider } from "..";
 
 export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
     const links: vscode.DocumentLink[] = [];
     const text = doc.getText();
     const lines = text.split("\n");
-    const views = getViews().items;
+    const views = getViews().items.views;
 
     lines.forEach((line, index) => {
         const match = line.match(/<\/?livewire:([^\s>]+)/);
@@ -54,7 +58,7 @@ export const hoverProvider: HoverProvider = (
         return;
     }
 
-    const views = getViews().items;
+    const views = getViews().items.views;
 
     const match = doc
         .getText(linkRange)
@@ -95,10 +99,175 @@ export const completionProvider: vscode.CompletionItemProvider = {
         }
 
         return getViews()
-            .items.filter((view) => view.livewire)
+            .items.views.filter((view) => view.livewire)
             .map(
                 (view) =>
                     new vscode.CompletionItem(view.key.replace(pathPrefix, "")),
             );
+    },
+};
+
+const getKey = (path: string): string => {
+    const views = getViews().items;
+
+    const livewireLocations = views.livewireLocations
+        .map((location) => location.replaceAll("\\", "/"))
+        // Backward compatibility with Livewire 3 Volt
+        .concat("resources/views/livewire");
+
+    const livewireNamespaces = Object.fromEntries(
+        Object.entries(views.livewireNamespaces).map(([namespace, nsPath]) => [
+            namespace,
+            nsPath.replaceAll("\\", "/"),
+        ]),
+    );
+
+    const namespace = Object.entries(livewireNamespaces).find(([_, nsPath]) =>
+        path.startsWith(nsPath),
+    );
+
+    const basePath = namespace
+        ? path.replace(new RegExp(`^${namespace[1]}`), "")
+        : path.replace(new RegExp(`^(${livewireLocations.join("|")})`), "");
+
+    const key = basePath
+        .replaceAll("⚡", "")
+        .replace(/^app\/Livewire(\/Components)?/, "")
+        .replace(/(\.[^/.]+)+$/, "")
+        .replace(/^\/+/, "")
+        .replaceAll("/", ".");
+
+    return kebab(namespace ? `${namespace[0]}::${key}` : key);
+};
+
+const getUri = (key: string): vscode.Uri =>
+    vscode.Uri.file(
+        projectPath(
+            `resources/views/livewire/${key.replaceAll(".", "/")}.blade.php`,
+        ),
+    );
+
+export const renameFilesProvider: RenameFilesProvider = {
+    customCheck(event: vscode.FileWillRenameEvent | vscode.FileRenameEvent) {
+        const components = getViews().items.views;
+
+        return event.files.filter((file) => {
+            // asRelativePath returns paths with forward slashes on all platforms
+            const path = vscode.workspace.asRelativePath(file.oldUri, false);
+            const key = getKey(path);
+
+            return (
+                Object.values(patterns).some((pattern) =>
+                    globToRegex(pattern).test(path),
+                ) &&
+                components.find(
+                    (component) =>
+                        component.key === `livewire.${key}` ||
+                        (component.livewire && component.key === key),
+                )
+            );
+        });
+    },
+
+    async provideRenameFiles(files: vscode.FileRenameEvent["files"]) {
+        const pLimit = (await import("p-limit")).default;
+        const limit = pLimit(10);
+
+        const keys: Cache<string, string> = new Cache(100);
+
+        const filePromise = files.map((file) =>
+            limit(async () => {
+                const oldPath = vscode.workspace.asRelativePath(
+                    file.oldUri.fsPath,
+                    false,
+                );
+                const oldKey = getKey(oldPath);
+
+                const newPath = vscode.workspace.asRelativePath(
+                    file.newUri,
+                    false,
+                );
+                const newKey = getKey(newPath);
+
+                if (newKey === oldKey) {
+                    return;
+                }
+
+                keys.set(oldKey, newKey);
+
+                if (newPath.endsWith(".blade.php")) {
+                    return;
+                }
+
+                const oldBladePath = getUri(oldKey);
+                const newBladePath = getUri(newKey);
+
+                vscode.workspace.fs.rename(oldBladePath, newBladePath);
+
+                // Case when a component class namespace is changed by Intelephense or other extension.
+                // We can't use fs.readFile/fs.writeFile because Intelephense overwrites content file after our change
+                const doc = await vscode.workspace.openTextDocument(
+                    file.newUri,
+                );
+                const text = doc.getText();
+
+                const regex = new RegExp(
+                    `(?<=\\b(?:view|View::make)\\(('|")livewire\\.)${oldKey.replaceAll(".", "\\.")}(?=\\1\\))`,
+                    "g",
+                );
+
+                const updated = text.replace(regex, newKey);
+
+                if (updated === text) {
+                    return;
+                }
+
+                const edit = new vscode.WorkspaceEdit();
+
+                edit.replace(
+                    file.newUri,
+                    new vscode.Range(0, 0, doc.lineCount, 0),
+                    updated,
+                );
+
+                await vscode.workspace.applyEdit(edit);
+            }),
+        );
+
+        await Promise.all(filePromise);
+
+        if (keys.size() === 0) {
+            return;
+        }
+
+        const componentFiles = await vscode.workspace.findFiles(
+            patterns.bladeFiles,
+        );
+
+        const pattern = new RegExp(
+            `(<\\/?livewire:)(${Array.from(keys.all().keys()).join("|")})(?=\\s|>|\\/>)`,
+            "g",
+        );
+
+        const componentPromise = componentFiles.map((file) =>
+            limit(async () => {
+                const filePath = file.fsPath;
+
+                const text = await fs.readFile(filePath, "utf-8");
+
+                const updated = text.replace(
+                    pattern,
+                    (_, prefix, oldKey) => `${prefix}${keys.get(oldKey)}`,
+                );
+
+                if (updated === text) {
+                    return;
+                }
+
+                await fs.writeFile(filePath, updated, "utf-8");
+            }),
+        );
+
+        await Promise.all(componentPromise);
     },
 };
