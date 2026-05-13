@@ -1,4 +1,3 @@
-import { getPintConfig } from "@src/repositories/pint";
 import { fixFilePath, getCommand } from "@src/support/php";
 import {
     statusBarError,
@@ -6,6 +5,8 @@ import {
     statusBarWorking,
 } from "@src/support/statusBar";
 import * as cp from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
@@ -19,10 +20,32 @@ import {
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let runningProcess: cp.ChildProcess | undefined;
 
+interface PintConfig {
+    exclude?: string[];
+    notName?: string[];
+    notPath?: string[];
+}
+
 export const pintCommands = {
     all: commandName("laravel.pint.run"),
     currentFile: commandName("laravel.pint.runOnCurrentFile"),
     dirtyFiles: commandName("laravel.pint.runOnDirtyFiles"),
+};
+
+const getPintConfig = (): PintConfig => {
+    const workspaceFolder = getWorkspaceFolders()[0];
+
+    if (!workspaceFolder) {
+        return {};
+    }
+
+    const pintConfigPath = path.join(workspaceFolder.uri.fsPath, "pint.json");
+
+    if (!fs.existsSync(pintConfigPath)) {
+        return {};
+    }
+
+    return JSON.parse(fs.readFileSync(pintConfigPath, "utf8"));
 };
 
 const runPintCommand = (
@@ -76,7 +99,7 @@ export const runPint = () => {
 };
 
 const isFileExcluded = (filePath: string): boolean => {
-    const pintConfig = getPintConfig().items;
+    const pintConfig = getPintConfig();
     const fileName = filePath.split("/").pop() ?? "";
 
     return (

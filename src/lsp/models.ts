@@ -1,9 +1,14 @@
-import { Eloquent } from "..";
 import { escapeNamespace } from "@src/support/util";
 import { sendLspRequest } from "./client";
 
-export const getModels = (): Promise<Eloquent.Models> => {
-    return sendLspRequest<Eloquent.Models>("laravel/data", {
+interface ModelItem {
+    class: string;
+}
+
+type Models = Record<string, ModelItem>;
+
+export const getModels = (): Promise<Models> => {
+    return sendLspRequest<Models>("laravel/data", {
         name: "models",
     });
 };

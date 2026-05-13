@@ -4,28 +4,6 @@ import * as vscode from "vscode";
 import { config } from "./config";
 import { isPhpEnv } from "./php";
 
-let internalVendorExists: boolean | null = null;
-
-export const setInternalVendorExists = (value: boolean) => {
-    internalVendorExists = value;
-};
-
-export const internalVendorPath = (subPath = ""): string => {
-    const baseDir = path.join("vendor", "_laravel_ide");
-
-    if (internalVendorExists !== true) {
-        const baseVendorDir = projectPath(baseDir);
-
-        internalVendorExists = fs.existsSync(baseVendorDir);
-
-        if (!internalVendorExists) {
-            fs.mkdirSync(baseVendorDir, { recursive: true });
-        }
-    }
-
-    return projectPath(`${baseDir}/${subPath}`);
-};
-
 const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };

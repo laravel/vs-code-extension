@@ -4,7 +4,7 @@ import {
     ServerOptions,
 } from "vscode-languageclient/node";
 import { config } from "../support/config";
-import { getLspBinaryPath } from "../support/parser";
+import { getLspBinaryPath } from "./binary";
 
 let client: LanguageClient | undefined;
 
