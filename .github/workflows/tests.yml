@@ -7,6 +7,9 @@ on:
             - reopened
             - synchronize
 
+permissions:
+  contents: read
+
 jobs:
     extension-tests:
         runs-on: ${{ matrix.os }}
@@ -18,16 +21,18 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+              with:
+                persist-credentials: false
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 20
                   cache: npm
 
             - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
               with:
                   php-version: "8.4"
                   tools: composer:v2
