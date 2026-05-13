@@ -128,30 +128,30 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const [
         { Registry },
-        { completionProviders },
-        { Eloquent: EloquentCompletion },
+        // { completionProviders },
+        // { Eloquent: EloquentCompletion },
         // { Validation: ValidationCompletion },
         // { Blade: BladeCompletion },
         // { completionProvider: bladeComponentCompletion },
         // { completionProvider: livewireComponentCompletion },
-        { CodeActionProvider },
-        { updateDiagnostics },
+        // { CodeActionProvider },
+        // { updateDiagnostics },
         { viteEnvCodeActionProvider },
-        { hoverProviders },
-        { linkProviders },
+        // { hoverProviders },
+        // { linkProviders },
     ] = await Promise.all([
         import("./completion/Registry.js"),
-        import("./completion/CompletionProvider.js"),
-        import("./completion/Eloquent.js"),
+        // import("./completion/CompletionProvider.js"),
+        // import("./completion/Eloquent.js"),
         // import("./completion/Validation.js"),
         // import("./completion/Blade.js"),
         // import("./features/bladeComponent.js"),
         // import("./features/livewireComponent.js"),
-        import("./codeAction/codeActionProvider.js"),
-        import("./diagnostic/diagnostic.js"),
+        // import("./codeAction/codeActionProvider.js"),
+        // import("./diagnostic/diagnostic.js"),
         import("./features/env.js"),
-        import("./hover/HoverProvider.js"),
-        import("./link/LinkProvider.js"),
+        // import("./hover/HoverProvider.js"),
+        // import("./link/LinkProvider.js"),
     ]);
 
     console.log("Laravel VS Code Started...");
@@ -165,27 +165,27 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const TRIGGER_CHARACTERS = ["'", '"'];
 
-    updateDiagnostics(vscode.window.activeTextEditor);
+    // updateDiagnostics(vscode.window.activeTextEditor);
 
     const delegatedRegistry = new Registry(
-        ...completionProviders,
-        new EloquentCompletion(),
+        // ...completionProviders,
+        // new EloquentCompletion(),
     );
 
     // const validationRegistry = new Registry(new ValidationCompletion());
 
-    const documentSelector: vscode.DocumentSelector = {
-        language: "blade",
-    };
+    // const documentSelector: vscode.DocumentSelector = {
+    //     language: "blade",
+    // };
 
     client = initClient(context);
 
     context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor((editor) => {
-            updateDiagnostics(editor);
-        }),
+        // vscode.window.onDidChangeActiveTextEditor((editor) => {
+        //     updateDiagnostics(editor);
+        // }),
         vscode.workspace.onDidSaveTextDocument((event) => {
-            updateDiagnostics(vscode.window.activeTextEditor);
+            // updateDiagnostics(vscode.window.activeTextEditor);
             runPintOnSave(event);
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
@@ -229,22 +229,22 @@ export async function activate(context: vscode.ExtensionContext) {
         //     new BladeCompletion(),
         //     "@",
         // ),
-        ...linkProviders.map((provider) =>
-            vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
-        ),
-        ...hoverProviders.map((provider) =>
-            vscode.languages.registerHoverProvider(LANGUAGES, provider),
-        ),
+        // ...linkProviders.map((provider) =>
+        //     vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
+        // ),
+        // ...hoverProviders.map((provider) =>
+        //     vscode.languages.registerHoverProvider(LANGUAGES, provider),
+        // ),
         // ...testRunnerCommands,
         // testController,
-        vscode.languages.registerCodeActionsProvider(
-            LANGUAGES,
-            new CodeActionProvider(),
-            {
-                providedCodeActionKinds:
-                    CodeActionProvider.providedCodeActionKinds,
-            },
-        ),
+        // vscode.languages.registerCodeActionsProvider(
+        //     LANGUAGES,
+        //     new CodeActionProvider(),
+        //     {
+        //         providedCodeActionKinds:
+        //             CodeActionProvider.providedCodeActionKinds,
+        //     },
+        // ),
         vscode.languages.registerCodeActionsProvider(
             [
                 { scheme: "file", language: "plaintext" },
