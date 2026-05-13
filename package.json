@@ -26,7 +26,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:php"
+        "onLanguage:php",
+        "workspaceContains:artisan"
     ],
     "main": "./dist/extension.js",
     "grammars": [
