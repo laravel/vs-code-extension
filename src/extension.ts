@@ -130,51 +130,51 @@ export async function activate(context: vscode.ExtensionContext) {
         registerTestRunner();
     }
 
-    const [
-        { Registry },
-        // { completionProviders },
-        // { Eloquent: EloquentCompletion },
-        // { Validation: ValidationCompletion },
-        // { Blade: BladeCompletion },
-        // { completionProvider: bladeComponentCompletion },
-        // { completionProvider: livewireComponentCompletion },
-        // { CodeActionProvider },
-        // { updateDiagnostics },
-        // { viteEnvCodeActionProvider },
-        // { hoverProviders },
-        // { linkProviders },
-    ] = await Promise.all([
-        import("./completion/Registry.js"),
-        // import("./completion/CompletionProvider.js"),
-        // import("./completion/Eloquent.js"),
-        // import("./completion/Validation.js"),
-        // import("./completion/Blade.js"),
-        // import("./features/bladeComponent.js"),
-        // import("./features/livewireComponent.js"),
-        // import("./codeAction/codeActionProvider.js"),
-        // import("./diagnostic/diagnostic.js"),
-        // import("./features/env.js"),
-        // import("./hover/HoverProvider.js"),
-        // import("./link/LinkProvider.js"),
-    ]);
+    // const [
+    //     { Registry },
+    //     { completionProviders },
+    //     { Eloquent: EloquentCompletion },
+    //     { Validation: ValidationCompletion },
+    //     { Blade: BladeCompletion },
+    //     { completionProvider: bladeComponentCompletion },
+    //     { completionProvider: livewireComponentCompletion },
+    //     { CodeActionProvider },
+    //     { updateDiagnostics },
+    //     { viteEnvCodeActionProvider },
+    //     { hoverProviders },
+    //     { linkProviders },
+    // ] = await Promise.all([
+    //     import("./completion/Registry.js"),
+    //     import("./completion/CompletionProvider.js"),
+    //     import("./completion/Eloquent.js"),
+    //     import("./completion/Validation.js"),
+    //     import("./completion/Blade.js"),
+    //     import("./features/bladeComponent.js"),
+    //     import("./features/livewireComponent.js"),
+    //     import("./codeAction/codeActionProvider.js"),
+    //     import("./diagnostic/diagnostic.js"),
+    //     import("./features/env.js"),
+    //     import("./hover/HoverProvider.js"),
+    //     import("./link/LinkProvider.js"),
+    // ]);
 
     console.log("Laravel VS Code Started...");
 
-    const BLADE_LANGUAGES = [
-        { scheme: "file", language: "blade" },
-        { scheme: "file", language: "laravel-blade" },
-    ];
+    // const BLADE_LANGUAGES = [
+    //     { scheme: "file", language: "blade" },
+    //     { scheme: "file", language: "laravel-blade" },
+    // ];
 
-    const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
+    // const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
 
-    const TRIGGER_CHARACTERS = ["'", '"'];
+    // const TRIGGER_CHARACTERS = ["'", '"'];
 
     // updateDiagnostics(vscode.window.activeTextEditor);
 
-    const delegatedRegistry = new Registry(
-        // ...completionProviders,
-        // new EloquentCompletion(),
-    );
+    // const delegatedRegistry = new Registry(
+    //     ...completionProviders,
+    //     new EloquentCompletion(),
+    // );
 
     // const validationRegistry = new Registry(new ValidationCompletion());
 
@@ -207,11 +207,11 @@ export async function activate(context: vscode.ExtensionContext) {
         //     documentSelector,
         //     new BladeFormattingEditProvider(),
         // ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            delegatedRegistry,
-            ...TRIGGER_CHARACTERS,
-        ),
+        // vscode.languages.registerCompletionItemProvider(
+        //     LANGUAGES,
+        //     delegatedRegistry,
+        //     ...TRIGGER_CHARACTERS,
+        // ),
         // vscode.languages.registerCompletionItemProvider(
         //     LANGUAGES,
         //     validationRegistry,
