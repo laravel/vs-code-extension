@@ -10,7 +10,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('dashboard/{foo}', function () {
+Route::get('dashboard', function () {
     return Inertia::render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
