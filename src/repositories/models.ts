@@ -3,8 +3,9 @@ import { Eloquent } from "..";
 import { writeEloquentDocBlocks } from "../support/docblocks";
 import { runInLaravel, template } from "./../support/php";
 import { escapeNamespace } from "../support/util";
+import { config } from "@src/support/config";
 
-const modelPaths = ["app", "app/Models"];
+const modelPaths = config("eloquent.modelPaths", ["app/Models"]);
 
 const load = () => {
     return runInLaravel<Eloquent.Result>(
