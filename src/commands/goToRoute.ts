@@ -1,5 +1,5 @@
-import { getRoutes, type RouteItem } from "@src/repositories/routes";
-import { getViews, type ViewItem } from "@src/repositories/views";
+import { getRoutes, type RouteItem } from "@src/lsp/routes";
+import { getViews, type ViewItem } from "@src/lsp/views";
 import { projectPath } from "@src/support/project";
 import * as vscode from "vscode";
 import { commandName } from ".";
@@ -77,23 +77,11 @@ export const buildRouteQuickPickItems = (
 };
 
 const loadRoutes = async (): Promise<RouteItem[]> => {
-    const repository = getRoutes();
-
-    if (repository.loaded) {
-        return repository.items;
-    }
-
-    return (await repository.whenLoaded((items) => items)) ?? [];
+    return await getRoutes();
 };
 
 const loadViews = async (): Promise<ViewItem[]> => {
-    const repository = getViews();
-
-    if (repository.loaded) {
-        return repository.items;
-    }
-
-    return (await repository.whenLoaded((items) => items)) ?? [];
+    return await getViews();
 };
 
 const resolveRouteTarget = async (
