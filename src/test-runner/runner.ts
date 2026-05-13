@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 
 import { projectPath } from "@src/support/project";
 import { getCommand } from "@src/support/php";
+import { getPaths, type PathItem } from "@src/lsp/paths";
 import { parseLine, buildErrorMessage, TeamcityEvent } from "./teamcity";
 
 export const runHandler = async (
@@ -11,11 +12,12 @@ export const runHandler = async (
     token: vscode.CancellationToken,
 ) => {
     const run = controller.createTestRun(request);
+    const paths = await getPaths();
 
     if (!request.include) {
         const testMap = buildTestMapFromController(controller);
         testMap.forEach((test) => run.enqueued(test));
-        await executeTests([], testMap, run, token);
+        await executeTests([], testMap, run, token, paths);
     } else {
         for (const item of request.include) {
             if (token.isCancellationRequested) break;
@@ -23,7 +25,13 @@ export const runHandler = async (
 
             const testMap = buildTestMap(item, request.exclude);
             testMap.forEach((test) => run.enqueued(test));
-            await executeTests(buildCommandArgs(item), testMap, run, token);
+            await executeTests(
+                buildCommandArgs(item),
+                testMap,
+                run,
+                token,
+                paths,
+            );
         }
     }
 
@@ -108,6 +116,7 @@ const executeTests = async (
     testMap: Map<string, vscode.TestItem>,
     run: vscode.TestRun,
     token: vscode.CancellationToken,
+    paths: PathItem[],
 ): Promise<void> => {
     return new Promise((resolve) => {
         const proc = spawn(
@@ -133,13 +142,7 @@ const executeTests = async (
             buffer = lines.pop() ?? "";
 
             for (const line of lines) {
-                const event = parseLine(line);
-
-                if (event) {
-                    handleEvent(event, testMap, run);
-                } else if (line.trim()) {
-                    run.appendOutput(line + "\r\n");
-                }
+                processLine(line, testMap, run, paths);
             }
         };
 
@@ -164,11 +167,27 @@ const executeTests = async (
     });
 };
 
+const processLine = (
+    line: string,
+    testMap: Map<string, vscode.TestItem>,
+    run: vscode.TestRun,
+    paths: PathItem[],
+): void => {
+    const event = parseLine(line);
+
+    if (event) {
+        handleEvent(event, testMap, run, paths);
+    } else if (line.trim()) {
+        run.appendOutput(line + "\r\n");
+    }
+};
+
 const handleEvent = (
     event: TeamcityEvent,
     testMap: Map<string, vscode.TestItem>,
     run: vscode.TestRun,
-) => {
+    paths: PathItem[],
+): void => {
     const test = testMap.get(event.attributes.name);
 
     if (!test) return;
@@ -186,7 +205,7 @@ const handleEvent = (
         case "testFailed":
             run.failed(
                 test,
-                buildErrorMessage(event),
+                buildErrorMessage(event, paths),
                 parseInt(event.attributes.duration, 10) || 0,
             );
             testMap.delete(event.attributes.name);

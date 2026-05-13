@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getPaths } from "@src/repositories/paths";
+import type { PathItem } from "@src/lsp/paths";
 import { projectPath } from "@src/support/project";
 
 export interface TeamcityEvent {
@@ -38,7 +38,10 @@ const unescapeValue = (value: string): string => {
         .replace(/\|\|/g, "|");
 };
 
-export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
+export const buildErrorMessage = (
+    event: TeamcityEvent,
+    paths: PathItem[],
+): vscode.TestMessage => {
     const message = new vscode.TestMessage(
         event.attributes.message || "Test failed.",
     );
@@ -62,7 +65,10 @@ export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
         return message;
     }
 
-    const file = resolveToHostPath(lastLine.substring(0, lastColonIndex));
+    const file = resolveToHostPath(
+        lastLine.substring(0, lastColonIndex),
+        paths,
+    );
     const line = parseInt(lastLine.substring(lastColonIndex + 1), 10);
 
     if (isNaN(line)) {
@@ -77,8 +83,11 @@ export const buildErrorMessage = (event: TeamcityEvent): vscode.TestMessage => {
     return message;
 };
 
-const resolveToHostPath = (containerPath: string): string => {
-    const basePath = getPaths().items.find(
+const resolveToHostPath = (
+    containerPath: string,
+    paths: PathItem[],
+): string => {
+    const basePath = paths.find(
         (item) => item.key === "base_path",
     )?.path;
 
