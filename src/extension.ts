@@ -118,13 +118,17 @@ export async function activate(context: vscode.ExtensionContext) {
     watchForComposerChanges();
     setLspBinaryPath(context);
 
-    startLspClient().catch((error) => {
+    const lspClient = await startLspClient().catch((error) => {
         console.error("Failed to start Laravel LSP:", error);
+
+        return undefined;
     });
 
-    const { registerTestRunner } = await import("./test-runner/index.js");
+    if (lspClient) {
+        const { registerTestRunner } = await import("./test-runner/index.js");
 
-    registerTestRunner();
+        registerTestRunner();
+    }
 
     const [
         { Registry },
