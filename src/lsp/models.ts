@@ -15,3 +15,4 @@ export const getModelClassnames = async (): Promise<Record<string, string>> => {
             escapeNamespace(model.class),
         ]),
     );
+};
