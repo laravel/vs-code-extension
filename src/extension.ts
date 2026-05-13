@@ -136,7 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // { completionProvider: livewireComponentCompletion },
         // { CodeActionProvider },
         // { updateDiagnostics },
-        { viteEnvCodeActionProvider },
+        // { viteEnvCodeActionProvider },
         // { hoverProviders },
         // { linkProviders },
     ] = await Promise.all([
@@ -149,7 +149,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // import("./features/livewireComponent.js"),
         // import("./codeAction/codeActionProvider.js"),
         // import("./diagnostic/diagnostic.js"),
-        import("./features/env.js"),
+        // import("./features/env.js"),
         // import("./hover/HoverProvider.js"),
         // import("./link/LinkProvider.js"),
     ]);
@@ -245,16 +245,16 @@ export async function activate(context: vscode.ExtensionContext) {
         //             CodeActionProvider.providedCodeActionKinds,
         //     },
         // ),
-        vscode.languages.registerCodeActionsProvider(
-            [
-                { scheme: "file", language: "plaintext" },
-                { scheme: "file", language: "ini" },
-            ],
-            viteEnvCodeActionProvider,
-            {
-                providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
-            },
-        ),
+        // vscode.languages.registerCodeActionsProvider(
+        //     [
+        //         { scheme: "file", language: "plaintext" },
+        //         { scheme: "file", language: "ini" },
+        //     ],
+        //     viteEnvCodeActionProvider,
+        //     {
+        //         providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
+        //     },
+        // ),
         vscode.commands.registerCommand(
             wrapWithHelperCommands.wrap,
             openSubmenuCommand,

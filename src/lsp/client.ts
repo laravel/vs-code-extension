@@ -42,6 +42,7 @@ async function start(): Promise<void> {
             { scheme: "file", language: "php" },
             { scheme: "file", language: "blade" },
             { scheme: "file", language: "laravel-blade" },
+            { scheme: "file", pattern: "**/.env*" },
         ],
         initializationOptions: {
             appBindingCompletion: config("appBinding.completion", true),
@@ -75,6 +76,7 @@ async function start(): Promise<void> {
             envDiagnostics: config("env.diagnostics", true),
             envHover: config("env.hover", true),
             envLink: config("env.link", true),
+            envViteQuickFix: config("env.viteQuickFix", true),
             inertiaCompletion: config("inertia.completion", true),
             inertiaDiagnostics: config("inertia.diagnostics", true),
             inertiaHover: config("inertia.hover", true),
