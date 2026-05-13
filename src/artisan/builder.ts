@@ -160,8 +160,9 @@ const getUserOptions = async (
         );
 
         if (option?.type === "select" && option?.options) {
+            const options = await option.options();
             const optionsChoice = await artisanBuilderUi.showQuickPick(
-                Object.entries(option.options()).map(([key, value]) => ({
+                Object.entries(options).map(([key, value]) => ({
                     label: key,
                     command: value,
                 })),
