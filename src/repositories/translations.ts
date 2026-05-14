@@ -1,6 +1,7 @@
 import { runInLaravel, template } from "@src/support/php";
 import { projectPath } from "@src/support/project";
 import { waitForValue } from "@src/support/util";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 export interface TranslationItem {
@@ -35,11 +36,12 @@ interface TranslationGroupPhpResult {
     languages: string[];
 }
 
-let dirsToWatch: string[] | null = null;
+let dirsToWatch: Record<string, string[]> = {};
 
-const load = () => {
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
     return runInLaravel<TranslationGroupPhpResult>(
         template("translations"),
+        workspaceFolder,
         "Translations",
     ).then((res) => {
         const result: TranslationGroupResult["translations"] = {};
@@ -53,7 +55,7 @@ const load = () => {
 
                     result[namespace][key] = {
                         value: res.values[v],
-                        path: projectPath(res.paths[p]),
+                        path: projectPath(res.paths[p], workspaceFolder),
                         line: li,
                         params: pa === null ? [] : res.params[pa],
                     };
@@ -61,7 +63,7 @@ const load = () => {
             },
         );
 
-        dirsToWatch = res.to_watch;
+        dirsToWatch[workspaceFolder.name] = res.to_watch;
 
         return {
             default: res.default,
@@ -110,8 +112,8 @@ export const getTranslationPathByName = (
 
 export const getTranslations = repository<TranslationGroupResult>({
     load,
-    pattern: () =>
-        waitForValue(() => dirsToWatch).then((value) => {
+    pattern: (workspaceFolder: vscode.WorkspaceFolder) =>
+        waitForValue(() => dirsToWatch[workspaceFolder.name]).then((value) => {
             if (value === null || value.length === 0) {
                 return null;
             }

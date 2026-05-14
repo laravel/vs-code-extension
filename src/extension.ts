@@ -4,9 +4,14 @@ import * as vscode from "vscode";
 
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
+import {
+    registerArtisanCommands,
+    registerArtisanMakeCommands,
+} from "./artisan/registry";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import { goToRouteCommand } from "./commands/goToRoute";
 import {
@@ -30,6 +35,7 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { registerPestHelper } from "./features/pest";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import {
@@ -44,14 +50,9 @@ import {
     initPhp,
     initVendorWatchers,
 } from "./support/php";
-import { hasWorkspace, projectPathExists } from "./support/project";
+import { projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
-import {
-    registerArtisanCommands,
-    registerArtisanMakeCommands,
-} from "./artisan/registry";
-import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
-import { registerPestHelper } from "./features/pest";
+import { hasWorkspace } from "./support/workspace";
 import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;

@@ -3,27 +3,37 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
 import { isPhpEnv } from "./php";
+import {
+    getFirstWorkspaceFolder,
+    getWorkspaceFolder,
+    getWorkspaceFolders,
+} from "./workspace";
 
-let internalVendorExists: boolean | null = null;
+let internalVendorExists: Record<string, boolean> = {};
 
-export const setInternalVendorExists = (value: boolean) => {
-    internalVendorExists = value;
-};
+export const setInternalVendorExists = (
+    value: boolean,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => (internalVendorExists[workspaceFolder.name] = value);
 
-export const internalVendorPath = (subPath = ""): string => {
+export const internalVendorPath = (
+    subPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = getFirstWorkspaceFolder()!,
+): string => {
     const baseDir = path.join("vendor", "_laravel_ide");
 
-    if (internalVendorExists !== true) {
-        const baseVendorDir = projectPath(baseDir);
+    if (internalVendorExists[workspaceFolder.name] !== true) {
+        const baseVendorDir = path.join(projectPath(baseDir, workspaceFolder));
 
-        internalVendorExists = fs.existsSync(baseVendorDir);
+        internalVendorExists[workspaceFolder.name] =
+            fs.existsSync(baseVendorDir);
 
-        if (!internalVendorExists) {
+        if (!internalVendorExists[workspaceFolder.name]) {
             fs.mkdirSync(baseVendorDir, { recursive: true });
         }
     }
 
-    return projectPath(`${baseDir}/${subPath}`);
+    return path.join(projectPath(baseDir, workspaceFolder), subPath);
 };
 
 const trimFirstSlash = (srcPath: string): string => {
@@ -42,24 +52,13 @@ export const basePath = (srcPath = ""): string => {
     return path.join(config<string>("basePath", ""), pathForPhpEnv(srcPath));
 };
 
-export const projectPath = (srcPath = ""): string => {
+export const projectPath = (
+    srcPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): string => {
     srcPath = basePath(srcPath);
 
-    for (let workspaceFolder of getWorkspaceFolders()) {
-        if (
-            fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            )
-        ) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
-        }
-
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, srcPath))) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
-        }
-    }
-
-    return "";
+    return path.join(workspaceFolder.uri.fsPath, srcPath);
 };
 
 export const relativePath = (srcPath: string): string => {
@@ -77,20 +76,16 @@ export const relativePath = (srcPath: string): string => {
     return srcPath;
 };
 
-export const hasWorkspace = (): boolean => {
-    return (
-        vscode.workspace.workspaceFolders instanceof Array &&
-        vscode.workspace.workspaceFolders.length > 0
-    );
+export const projectPathExists = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): boolean => {
+    return fs.existsSync(projectPath(path, workspaceFolder));
 };
 
-export const getWorkspaceFolders = () =>
-    vscode.workspace.workspaceFolders || [];
-
-export const projectPathExists = (path: string): boolean => {
-    return fs.existsSync(projectPath(path));
-};
-
-export const readFileInProject = (path: string): string => {
-    return fs.readFileSync(projectPath(path), "utf8");
+export const readFileInProject = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getWorkspaceFolder()!,
+): string => {
+    return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
 };

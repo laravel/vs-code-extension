@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 
 import { config } from "@src/support/config";
 import { loadAndWatch } from "@src/support/fileWatcher";
+import { getLaravelWorkspaceFolders } from "@src/support/workspace";
 import { updateExplorer } from "./explorer";
 import { runHandler } from "./runner";
 
@@ -10,29 +11,32 @@ export const registerTestRunner = () => {
         return;
     }
 
-    const controller = vscode.tests.createTestController(
-        "laravel-tests",
-        "Laravel Tests",
-    );
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
+        const controller = vscode.tests.createTestController(
+            `${workspaceFolder.name}-tests`,
+            `${workspaceFolder.name} Tests`,
+        );
 
-    controller.createRunProfile(
-        "Run Tests",
-        vscode.TestRunProfileKind.Run,
-        (request, token) => runHandler(controller, request, token),
-        true,
-    );
+        controller.createRunProfile(
+            "Run Tests",
+            vscode.TestRunProfileKind.Run,
+            (request, token) => runHandler(controller, request, token),
+            true,
+        );
 
-    controller.resolveHandler = async (item) => {
-        if (!item) {
-            await updateExplorer(controller);
-        }
-    };
+        controller.resolveHandler = async (item) => {
+            if (!item) {
+                await updateExplorer(controller, workspaceFolder);
+            }
+        };
 
-    loadAndWatch(
-        () => {
-            void updateExplorer(controller);
-        },
-        ["tests/**/*"],
-        ["create", "delete", "change"],
-    );
+        loadAndWatch(
+            () => {
+                void updateExplorer(controller, workspaceFolder);
+            },
+            ["tests/**/*"],
+            ["create", "delete", "change"],
+            workspaceFolder,
+        );
+    });
 };

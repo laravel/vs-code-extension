@@ -1,6 +1,6 @@
-import { getWorkspaceFolders } from "@src/support/project";
 import * as fs from "fs";
 import * as path from "path";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 interface PintConfig {
@@ -10,17 +10,9 @@ interface PintConfig {
 }
 
 export const getPintConfig = repository<PintConfig>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         new Promise((resolve, reject) => {
             try {
-                const workspaceFolder = getWorkspaceFolders()[0];
-
-                if (!workspaceFolder) {
-                    resolve({});
-
-                    return;
-                }
-
                 const pintConfigPath = path.join(
                     workspaceFolder.uri.fsPath,
                     "pint.json",

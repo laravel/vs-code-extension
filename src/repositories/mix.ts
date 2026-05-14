@@ -1,5 +1,6 @@
 import { projectPathExists, readFileInProject } from "@src/support/project";
 import * as sysPath from "path";
+import * as vscode from "vscode";
 import { Uri } from "vscode";
 import { repository } from ".";
 
@@ -9,16 +10,16 @@ interface MixManifestItem {
     uri: Uri;
 }
 
-const load = () => {
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
     const path = "public/mix-manifest.json";
 
-    if (!projectPathExists(path)) {
+    if (!projectPathExists(path, workspaceFolder)) {
         return [];
     }
 
     const results: {
         [key: string]: string;
-    } = JSON.parse(readFileInProject(path));
+    } = JSON.parse(readFileInProject(path, workspaceFolder));
 
     return Object.entries(results).map(([key, value]) => ({
         key: key.replace(sysPath.sep, ""),
@@ -28,10 +29,10 @@ const load = () => {
 };
 
 export const getMixManifest = repository<MixManifestItem[]>({
-    load: () => {
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
         return new Promise((resolve, reject) => {
             try {
-                resolve(load());
+                resolve(load(workspaceFolder));
             } catch (error) {
                 reject(error);
             }

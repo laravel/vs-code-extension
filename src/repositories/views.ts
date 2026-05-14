@@ -1,5 +1,6 @@
 import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 export interface ViewItem {
@@ -17,8 +18,12 @@ export interface ViewItem {
     };
 }
 
-const load = () => {
-    return runInLaravel<ViewItem[]>(template("views"));
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
+    return runInLaravel<ViewItem[]>(
+        template("views"),
+        workspaceFolder,
+        "Views",
+    );
 };
 
 export const getViews = repository<ViewItem[]>({

@@ -1,10 +1,12 @@
-import fs from "fs";
-import path from "path";
 import { config } from "@src/support/config";
 import { loadAndWatch } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
 import { projectPath } from "@src/support/project";
 import { indent } from "@src/support/util";
+import { getLaravelWorkspaceFolders } from "@src/support/workspace";
+import fs from "fs";
+import path from "path";
+import * as vscode from "vscode";
 
 export interface PestConfig {
     uses: PestUse[];
@@ -27,18 +29,27 @@ export const registerPestHelper = () => {
         return;
     }
 
-    loadAndWatch(
-        () => {
-            runInLaravel<PestConfig | null>(template("pest"))
-                .then(writePestDocBlocks)
-                .catch(console.error);
-        },
-        "tests/**/*",
-        ["create", "delete", "change"],
-    );
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
+        loadAndWatch(
+            (workspaceFolder: vscode.WorkspaceFolder) => {
+                runInLaravel<PestConfig | null>(
+                    template("pest"),
+                    workspaceFolder,
+                )
+                    .then((pest) => writePestDocBlocks(pest, workspaceFolder))
+                    .catch(console.error);
+            },
+            "tests/**/*",
+            ["create", "delete", "change"],
+            workspaceFolder,
+        );
+    });
 };
 
-const writePestDocBlocks = (pest: PestConfig | null): void => {
+const writePestDocBlocks = (
+    pest: PestConfig | null,
+    workspaceFolder: vscode.WorkspaceFolder,
+): void => {
     if (!pest || (!pest.uses.length && !pest.expectations.length)) {
         return;
     }
@@ -51,6 +62,7 @@ const writePestDocBlocks = (pest: PestConfig | null): void => {
 
     const pestFilePath = projectPath(
         config("pest.helperFilePath", "storage/framework/testing/_pest.php"),
+        workspaceFolder,
     );
 
     fs.mkdirSync(path.dirname(pestFilePath), { recursive: true });
