@@ -5,6 +5,7 @@ import {
 } from "vscode-languageclient/node";
 import { config } from "../support/config";
 import { getLspBinaryPath } from "./binary";
+import { getPhpCommand } from "./php";
 
 let client: LanguageClient | undefined;
 
@@ -88,6 +89,7 @@ export async function startLspClient(): Promise<LanguageClient | undefined> {
                 "pest.helperFilePath",
                 "storage/framework/testing/_pest.php",
             ),
+            phpCommand: getPhpCommand(),
             routeDiagnostics: config("route.diagnostics", true),
             routeCompletion: config("route.completion", true),
             routeHover: config("route.hover", true),

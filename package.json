@@ -1045,6 +1045,14 @@
                     "type": "string",
                     "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
                 },
+                "Laravel.lspPhpCommand": {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "PHP command used by the Laravel LSP server, in argv format. Defaults to php when empty."
+                },
                 "Laravel.basePath": {
                     "type": "string",
                     "default": "",
