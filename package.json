@@ -1051,7 +1051,7 @@
                     "items": {
                         "type": "string"
                     },
-                    "description": "PHP command used by the Laravel LSP server, Artisan commands, Pint, and test runner, in argv format. Defaults to php when empty."
+                    "description": "PHP command used by the Laravel LSP server, Docker environment configuration, Artisan commands, Pint, and test runner, in argv format. Defaults to php when empty."
                 },
                 "Laravel.basePath": {
                     "type": "string",
