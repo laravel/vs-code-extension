@@ -106,8 +106,8 @@ const getUserArguments = async (
     return userArguments;
 };
 
-const getArgumentsAsString = (userArguments: Record<string, string>) =>
-    Object.values(userArguments).join(" ");
+const getArgumentsAsArgv = (userArguments: Record<string, string>) =>
+    Object.values(userArguments);
 
 const getUserOptions = async (
     commandOptions: Option[] | undefined,
@@ -126,7 +126,7 @@ const getUserOptions = async (
     }));
 
     while (true) {
-        const optionsAsString = getOptionsAsString(userOptions);
+        const optionsAsString = getOptionsAsDisplayString(userOptions);
 
         const choice = await artisanBuilderUi.showQuickPick(
             [
@@ -229,7 +229,14 @@ const getUserOptions = async (
     return userOptions;
 };
 
-const getOptionsAsString = (userOptions: Record<string, string | undefined>) =>
+const getOptionsAsArgv = (userOptions: Record<string, string | undefined>) =>
+    Object.entries(userOptions).map(([key, value]) =>
+        key !== value ? `${key}=${value}` : key,
+    );
+
+const getOptionsAsDisplayString = (
+    userOptions: Record<string, string | undefined>,
+) =>
     Object.entries(userOptions)
         .map(([key, value]) => (key !== value ? `${key}=${value}` : key))
         .join(" ");
@@ -238,7 +245,7 @@ export const buildArtisanCommand = async (
     command: Command,
     uri: vscode.Uri,
     workspaceFolder: vscode.WorkspaceFolder,
-): Promise<string | undefined> => {
+): Promise<string[] | undefined> => {
     const userArguments = await getUserArguments(
         command.arguments,
         workspaceFolder,
@@ -257,9 +264,7 @@ export const buildArtisanCommand = async (
 
     return [
         command.name,
-        getArgumentsAsString(userArguments),
-        getOptionsAsString(userOptions),
-    ]
-        .filter((part) => part.length > 0)
-        .join(" ");
+        ...getArgumentsAsArgv(userArguments),
+        ...getOptionsAsArgv(userOptions),
+    ];
 };

@@ -1,5 +1,7 @@
 import * as cp from "child_process";
 import * as vscode from "vscode";
+import { getPhpCommand as getPhpCommandArgv } from "../lsp/php";
+import { argvToShellCommand } from "./argv";
 import { config } from "./config";
 import { info } from "./logger";
 import {
@@ -105,15 +107,22 @@ export const getCommandTemplate = (): string => {
     return config<string>("phpCommand", "") || getDefaultPhpCommand();
 };
 
+const getArtisanCommand = (command: string[]): string[] => [
+    ...getPhpCommandArgv(),
+    "artisan",
+    ...command,
+];
+
 export const artisan = (
-    command: string,
+    command: string[],
     workspaceFolder: string,
 ): Promise<string> => {
-    const fullCommand = `${getCommand("artisan")} ${command}`.trim();
+    const [executable, ...args] = getArtisanCommand(command);
 
     return new Promise<string>((resolve, error) => {
-        cp.exec(
-            fullCommand,
+        cp.execFile(
+            executable,
+            args,
             {
                 cwd: workspaceFolder,
             },
@@ -125,7 +134,10 @@ export const artisan = (
                 const errorOutput = stderr.length > 0 ? stderr : stdout;
 
                 showErrorPopup(
-                    "Error:\n " + (command ?? "") + "\n\n" + errorOutput,
+                    "Error:\n " +
+                        argvToShellCommand(getArtisanCommand(command)) +
+                        "\n\n" +
+                        errorOutput,
                 );
 
                 error(errorOutput);
@@ -137,10 +149,10 @@ export const artisan = (
 let artisanTerminal: vscode.Terminal | undefined;
 
 export const runArtisanInTerminal = async (
-    command: string,
+    command: string[],
     workspaceFolder: string,
 ): Promise<void> => {
-    const fullCommand = `${getCommand("artisan")} ${command}`.trim();
+    const fullCommand = argvToShellCommand(getArtisanCommand(command));
 
     if (
         !artisanTerminal ||

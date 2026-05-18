@@ -1,4 +1,5 @@
-import { fixFilePath, getCommand } from "@src/support/php";
+import { getPhpCommand } from "@src/lsp/php";
+import { fixFilePath } from "@src/support/php";
 import {
     statusBarError,
     statusBarSuccess,
@@ -49,7 +50,7 @@ const getPintConfig = (): PintConfig => {
 };
 
 const runPintCommand = (
-    args: string = "",
+    args: string[] = [],
     showSuccessMessage: boolean = true,
 ): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
@@ -62,10 +63,15 @@ const runPintCommand = (
             return;
         }
 
-        const command = `${getCommand("vendor/bin/pint")} ${args}`.trim();
+        const [executable, ...commandArgs] = [
+            ...getPhpCommand(),
+            "vendor/bin/pint",
+            ...args,
+        ];
 
-        runningProcess = cp.exec(
-            command,
+        runningProcess = cp.execFile(
+            executable,
+            commandArgs,
             {
                 cwd: projectPath(),
             },
@@ -121,19 +127,19 @@ export const runPintOnCurrentFile = () => {
     }
 
     statusBarWorking("Running Pint on current file...");
-    return runPintCommand(`"${fixFilePath(filePath)}"`);
+    return runPintCommand([fixFilePath(filePath)]);
 };
 
 export const runPintOnDirtyFiles = () => {
     statusBarWorking("Running Pint on dirty files...");
-    return runPintCommand("--dirty");
+    return runPintCommand(["--dirty"]);
 };
 
 const runPintOnFile = (
     filePath: string,
     showSuccessMessage: boolean = true,
 ): Promise<string> => {
-    return runPintCommand(`"${fixFilePath(filePath)}"`, showSuccessMessage);
+    return runPintCommand([fixFilePath(filePath)], showSuccessMessage);
 };
 
 export const runPintOnSave = (document: vscode.TextDocument) => {

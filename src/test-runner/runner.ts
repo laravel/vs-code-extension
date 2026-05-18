@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import { spawn } from "child_process";
 
+import { getPhpCommand } from "@src/lsp/php";
 import { projectPath } from "@src/support/project";
-import { getCommand } from "@src/support/php";
 import { getPaths, type PathItem } from "@src/lsp/paths";
 import { parseLine, buildErrorMessage, TeamcityEvent } from "./teamcity";
 
@@ -52,14 +52,14 @@ const buildCommandArgs = (item: vscode.TestItem): string[] => {
 
     switch (type) {
         case "suite":
-            return [`--testsuite="${item.id.slice(6)}"`];
+            return [`--testsuite=${item.id.slice(6)}`];
         case "directory":
             return [item.id.slice(4)];
         case "file":
             return [item.id.slice(5)];
         case "test":
             const match = item.id.match(/^test:(.+?):.+$/);
-            return match ? [match[1], `--filter="${item.label}"`] : [];
+            return match ? [match[1], `--filter=${item.label}`] : [];
     }
 };
 
@@ -119,16 +119,20 @@ const executeTests = async (
     paths: PathItem[],
 ): Promise<void> => {
     return new Promise((resolve) => {
-        const proc = spawn(
-            getCommand("artisan"),
-            ["test", ...args, "--colors=always", "--log-teamcity=php://stdout"],
-            {
-                cwd: projectPath(),
-                shell: true,
-                detached: true,
-                env: getProcessEnv(),
-            },
-        );
+        const [executable, ...commandArgs] = [
+            ...getPhpCommand(),
+            "artisan",
+            "test",
+            ...args,
+            "--colors=always",
+            "--log-teamcity=php://stdout",
+        ];
+
+        const proc = spawn(executable, commandArgs, {
+            cwd: projectPath(),
+            detached: true,
+            env: getProcessEnv(),
+        });
 
         const subscription = token.onCancellationRequested(() => {
             killProcessTree(proc.pid);
