@@ -30,13 +30,11 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
-import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { startLspClient, stopLspClient } from "./lsp/client";
 import { setLspBinaryPath } from "./lsp/binary";
-import { clearDefaultPhpCommand } from "./support/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import {
@@ -159,12 +157,6 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     collectDebugInfo();
-
-    vscode.workspace.onDidChangeConfiguration((event) => {
-        if (configAffected(event, "phpCommand", "phpEnvironment")) {
-            clearDefaultPhpCommand();
-        }
-    });
 }
 
 export function deactivate() {

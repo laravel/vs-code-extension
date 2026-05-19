@@ -86,7 +86,7 @@ export const configureDockerEnvironment = async () => {
         return;
     }
 
-    if (config<string[]>("lspPhpCommand", []).length > 0) {
+    if (hasExistingPhpCommandConfig()) {
         const override = await vscode.window.showQuickPick(["Yes", "No"], {
             placeHolder:
                 "A Laravel PHP command is already configured. Do you want to override it?",
@@ -110,11 +110,19 @@ export const configureDockerEnvironment = async () => {
         : ["docker", "exec", selectedContainer.container.Names, "php"];
 
     await updateConfig("phpEnvironment", "docker", scope.target);
-    await updateConfig("lspPhpCommand", phpCommand, scope.target);
+    await updateConfig("phpCommand", phpCommand, scope.target);
 
     vscode.commands.executeCommand("workbench.action.reloadWindow");
 
     vscode.window.showInformationMessage(
         "Docker environment configured successfully.",
+    );
+};
+
+const hasExistingPhpCommandConfig = (): boolean => {
+    const configuredPhpCommand = config<unknown>("phpCommand", []);
+
+    return (
+        Array.isArray(configuredPhpCommand) && configuredPhpCommand.length > 0
     );
 };

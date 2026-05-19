@@ -1039,13 +1039,9 @@
                         "Docker"
                     ],
                     "default": "auto",
-                    "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."
+                    "markdownDescription": "Local PHP environment used for path handling in environments such as Sail, Lando, DDEV, and Docker. PHP execution uses `#Laravel.phpCommand#`."
                 },
                 "Laravel.phpCommand": {
-                    "type": "string",
-                    "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
-                },
-                "Laravel.lspPhpCommand": {
                     "type": "array",
                     "default": [],
                     "items": {
