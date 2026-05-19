@@ -1,6 +1,6 @@
 import os from "os";
 import { sendLspRequest } from "@src/lsp/client";
-import { getCommandTemplate } from "./php";
+import { getPhpCommand } from "../lsp/php";
 
 export const debugInfo: Record<string, string> = {};
 
@@ -20,6 +20,6 @@ export const collectDebugInfo = () => {
     }).catch((error) => {
         console.error(error);
     }).finally(() => {
-        debugInfo["php_command"] = getCommandTemplate();
+        debugInfo["php_command"] = getPhpCommand().join(" ");
     });
 };
