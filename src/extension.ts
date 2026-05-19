@@ -30,10 +30,11 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
-import { startLspClient, stopLspClient } from "./lsp/client";
+import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
 import { setLspBinaryPath } from "./lsp/binary";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
@@ -154,6 +155,13 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (configAffected(event, "phpCommand")) {
+                restartLspClient().catch((error) => {
+                    console.error("Failed to restart Laravel LSP:", error);
+                });
+            }
+        }),
     );
 
     collectDebugInfo();

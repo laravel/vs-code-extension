@@ -129,6 +129,12 @@ export async function stopLspClient(): Promise<void> {
     }
 }
 
+export async function restartLspClient(): Promise<LanguageClient | undefined> {
+    await stopLspClient();
+
+    return startLspClient();
+}
+
 export async function sendLspRequest<T>(
     method: string,
     params: object = {},
