@@ -36,7 +36,7 @@ import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
 import { setLspBinaryPath } from "./lsp/binary";
-import { clearResolvedPhpCommand } from "./lsp/php";
+import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import {
@@ -102,6 +102,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     info("Started");
+
+    warnAboutLegacyPhpCommand();
 
     setLspBinaryPath(context);
 

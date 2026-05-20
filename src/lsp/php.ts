@@ -17,31 +17,23 @@ export const getPhpCommand = (): string[] => {
         return resolvedPhpCommand;
     }
 
-    const command = config<unknown>("phpCommand", []);
+    const command = config<unknown>("phpCommand", ["php"]);
 
-    if (isLegacyCommand(command)) {
-        return ["php"];
-    }
-
-    if (Array.isArray(command) && command.length > 0) {
-        return command;
-    }
-
-    return ["php"];
+    return Array.isArray(command) ? command : ["php"];
 };
 
-const isLegacyCommand = (command: unknown): boolean => {
-    if (Array.isArray(command)) {
-        return false;
+export const warnAboutLegacyPhpCommand = (): void => {
+    if (hasShownLegacyPhpCommandWarning) {
+        return;
     }
 
-    if (!hasShownLegacyPhpCommandWarning) {
-        hasShownLegacyPhpCommandWarning = true;
-
-        vscode.window.showErrorMessage(
-            'Laravel.phpCommand must now be configured as an array of strings, for example ["php"] or ["docker", "exec", "app", "php"].',
-        );
+    if (Array.isArray(config<unknown>("phpCommand", []))) {
+        return;
     }
 
-    return true;
+    hasShownLegacyPhpCommandWarning = true;
+
+    vscode.window.showErrorMessage(
+        'Laravel.phpCommand must now be configured as an array of strings, for example ["php"] or ["docker", "exec", "app", "php"].',
+    );
 };
