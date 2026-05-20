@@ -5,9 +5,15 @@ import {
 } from "vscode-languageclient/node";
 import { config } from "../support/config";
 import { getLspBinaryPath } from "./binary";
-import { getPhpCommand } from "./php";
+import { clearResolvedPhpCommand, setResolvedPhpCommand } from "./php";
 
 let client: LanguageClient | undefined;
+
+type LaravelInitializeResult = {
+    laravel?: {
+        phpCommand: string[];
+    };
+};
 
 export async function startLspClient(): Promise<LanguageClient | undefined> {
     if (client) {
@@ -89,7 +95,8 @@ export async function startLspClient(): Promise<LanguageClient | undefined> {
                 "pest.helperFilePath",
                 "storage/framework/testing/_pest.php",
             ),
-            phpCommand: getPhpCommand(),
+            phpCommand: config<unknown>("phpCommand", []),
+            phpEnvironment: config("phpEnvironment", "auto"),
             routeDiagnostics: config("route.diagnostics", true),
             routeCompletion: config("route.completion", true),
             routeHover: config("route.hover", true),
@@ -117,12 +124,22 @@ export async function startLspClient(): Promise<LanguageClient | undefined> {
 
     await lspClient.start();
 
+    const initializeResult = lspClient.initializeResult as
+        | LaravelInitializeResult
+        | undefined;
+
+    if (initializeResult?.laravel) {
+        setResolvedPhpCommand(initializeResult.laravel.phpCommand);
+    }
+
     client = lspClient;
 
     return client;
 }
 
 export async function stopLspClient(): Promise<void> {
+    clearResolvedPhpCommand();
+
     if (client) {
         await client.stop();
         client = undefined;

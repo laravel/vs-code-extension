@@ -2,8 +2,21 @@ import * as vscode from "vscode";
 import { config } from "../support/config";
 
 let hasShownLegacyPhpCommandWarning = false;
+let resolvedPhpCommand: string[] | undefined;
+
+export const setResolvedPhpCommand = (command: string[]): void => {
+    resolvedPhpCommand = command;
+};
+
+export const clearResolvedPhpCommand = (): void => {
+    resolvedPhpCommand = undefined;
+};
 
 export const getPhpCommand = (): string[] => {
+    if (resolvedPhpCommand) {
+        return resolvedPhpCommand;
+    }
+
     const command = config<unknown>("phpCommand", []);
 
     if (isLegacyCommand(command)) {
@@ -31,4 +44,4 @@ const isLegacyCommand = (command: unknown): boolean => {
     }
 
     return true;
-}
+};
