@@ -134,6 +134,44 @@ const getFunctionMatches = (text: string): FunctionMatch[] => {
     return matches;
 };
 
+const laravelReturnMatchers: [RegExp, string][] = [
+    [/^(?:\\?Response::json|response\(\)->json)\(/, "JsonResponse"],
+    [
+        /^(?:\\?Response::stream|response\(\)->stream|response\(\)->eventStream)\(/,
+        "StreamedResponse",
+    ],
+    [
+        /^(?:\\?Response::(?:download|file)|response\(\)->(?:download|file))\(/,
+        "BinaryFileResponse",
+    ],
+    [
+        /^(?:back\(\)|redirect\(\)->(?:to|route|away|back|action|guest|intended)|\\?Redirect::(?:to|route|away|back|action|guest|intended))/,
+        "RedirectResponse",
+    ],
+    [/^(?:back\(\)->with|redirect\(\)->with)\(/, "RedirectResponse"],
+    [/^(?:view\(|(?:\\?View)::(?:make|first|file))\(/, "View"],
+    [/^(?:\\?Inertia\\Inertia::render|inertia)\(/, "Response"],
+    [
+        /^(?:\\?response\(\)->(?:make|noContent|view)|\\?Response::(?:make|noContent|view))\(/,
+        "Response",
+    ],
+    [/^(?:request\(\)|\\?Request::capture\()/, "Request"],
+    [/^(?:collect\(|\\?Collection::(?:make|wrap|times|empty)\()/, "Collection"],
+    [/^(?:\\?DB::table\([^)]*\)->(?:get|pluck)|\\?Cache::many\()/, "Collection"],
+    [/^(?:\\?DB::table\([^)]*\)->paginate|[^;]+->paginate)\(/, "LengthAwarePaginator"],
+    [/^(?:\\?DB::table\([^)]*\)->simplePaginate|[^;]+->simplePaginate)\(/, "Paginator"],
+    [/^(?:\\?DB::table\([^)]*\)->cursorPaginate|[^;]+->cursorPaginate)\(/, "CursorPaginator"],
+    [/^[A-Za-z_\x80-\xff][\w\\\x80-\xff]*Resource::collection\(/, "AnonymousResourceCollection"],
+    [/^(?:route\(|url\(|asset\(|secure_asset\(|action\(|to_route\()/, "string"],
+    [/^(?:config\(|env\(|old\(|__\(|trans\()/, "mixed"],
+    [/^(?:\\?Auth::user\(\)|auth\(\)->user\(\)|request\(\)->user\(\))/, "Authenticatable"],
+    [/^(?:\\?DB::transaction|rescue|retry)\(/, "mixed"],
+    [/^(?:\\?Cache::(?:get|pull|remember|rememberForever)|cache\()/, "mixed"],
+    [/^(?:\\?Cache::(?:put|forever|forget|flush)|event\(|dispatch\(|broadcast\()/, "bool"],
+    [/^(?:\\?Log::(?:debug|info|notice|warning|error|critical|alert|emergency)|logger\()/, "void"],
+    [/^(?:\\?Storage::disk|storage_path\(|app_path\(|base_path\(|config_path\(|database_path\(|public_path\(|resource_path\()/, "string"],
+];
+
 const inferReturnType = (functionBody: string): string => {
     const returnMatches = [...functionBody.matchAll(/return\s+([^;]+);/g)]
         .map((match) => match[1].trim())
@@ -144,6 +182,12 @@ const inferReturnType = (functionBody: string): string => {
     }
 
     const [firstReturn] = returnMatches;
+
+    for (const [pattern, type] of laravelReturnMatchers) {
+        if (pattern.test(firstReturn)) {
+            return type;
+        }
+    }
 
     if (/^\[\s*[\s\S]*\]$/.test(firstReturn)) {
         return "array";
