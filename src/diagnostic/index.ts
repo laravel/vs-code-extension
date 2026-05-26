@@ -15,6 +15,7 @@ export type DiagnosticCode =
     | "inertia"
     | "middleware"
     | "mix"
+    | "returnType"
     | "route"
     | "translation"
     | "view"

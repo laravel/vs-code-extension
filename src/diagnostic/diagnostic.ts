@@ -7,6 +7,7 @@ import { diagnosticProvider as env } from "@src/features/env";
 import { diagnosticProvider as inertia } from "@src/features/inertia";
 import { diagnosticProvider as middleware } from "@src/features/middleware";
 import { diagnosticProvider as mix } from "@src/features/mix";
+import { diagnosticProvider as returnType } from "@src/features/returnType";
 import { diagnosticProvider as route } from "@src/features/route";
 import { diagnosticProvider as storage } from "@src/features/storage";
 import { diagnosticProvider as translation } from "@src/features/translation";
@@ -30,6 +31,7 @@ const providers: {
     { provider: inertia, configKey: "inertia.diagnostics" },
     { provider: middleware, configKey: "middleware.diagnostics" },
     { provider: mix, configKey: "mix.diagnostics" },
+    { provider: returnType, configKey: "returnType.diagnostics" },
     { provider: route, configKey: "route.diagnostics" },
     { provider: storage, configKey: "storage.diagnostics" },
     { provider: translation, configKey: "translation.diagnostics" },

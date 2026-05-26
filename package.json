@@ -1362,6 +1362,12 @@
                     "generated": true,
                     "description": "Enable linking for paths."
                 },
+                "Laravel.returnType.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable diagnostics for return types."
+                },
                 "Laravel.route.diagnostics": {
                     "type": "boolean",
                     "default": true,

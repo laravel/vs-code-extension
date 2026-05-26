@@ -42,6 +42,7 @@ export type GeneratedConfigKey =
     | "mix.link"
     | "mix.completion"
     | "paths.link"
+    | "returnType.diagnostics"
     | "route.diagnostics"
     | "route.hover"
     | "route.link"

@@ -95,6 +95,22 @@ export async function getDiagnostics(
     return diagnostics;
 }
 
+export async function getCodeActions(
+    doc: vscode.TextDocument,
+    range?: vscode.Range,
+): Promise<(vscode.CodeAction | vscode.Command)[]> {
+    await vscode.window.showTextDocument(doc, {
+        preview: false,
+        preserveFocus: false,
+    });
+
+    return vscode.commands.executeCommand<(vscode.CodeAction | vscode.Command)[]>(
+        "vscode.executeCodeActionProvider",
+        doc.uri,
+        range ?? new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+    );
+}
+
 export function diagnosticCode(
     diagnostic: vscode.Diagnostic,
 ): string | undefined {
