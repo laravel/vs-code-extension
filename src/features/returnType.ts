@@ -89,11 +89,12 @@ type FunctionMatch = {
 
 const getFunctionMatches = (text: string): FunctionMatch[] => {
     const matches: FunctionMatch[] = [];
+    const ignoredFunctions = new Set(["__construct"]);
 
     for (const match of text.matchAll(functionRegex)) {
         const name = match.groups?.name;
 
-        if (!name) {
+        if (!name || ignoredFunctions.has(name.toLowerCase())) {
             continue;
         }
 
@@ -176,6 +177,14 @@ const inferReturnType = (functionBody: string): string => {
 
     if (newClassMatch?.[1]) {
         return newClassMatch[1].split("\\").pop() ?? "mixed";
+    }
+
+    const classMethodMatch = firstReturn.match(
+        /^\\?([A-Za-z_\x80-\xff][\w\\\x80-\xff]*)::[A-Za-z_\x80-\xff][\w\x80-\xff]*\(/,
+    );
+
+    if (classMethodMatch?.[1]) {
+        return classMethodMatch[1].split("\\").pop() ?? "mixed";
     }
 
     return "mixed";

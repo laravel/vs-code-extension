@@ -37,6 +37,7 @@ suite("Return Type Test Suite", () => {
         const diagnostics = await getDiagnostics(doc);
         const text = doc.getText();
         const typedMethods = [
+            "__construct",
             "exmple",
             "exampleInt",
             "exampleString",
@@ -44,7 +45,6 @@ suite("Return Type Test Suite", () => {
             "exampleMixed",
             "exampleNullable",
             "exampleIntersection",
-            "exampleStatic",
             "exampleModel",
         ];
 

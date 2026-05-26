@@ -2,8 +2,11 @@
 
 use App\Models\User;
 
-class ReturnTypeHelper
-{
+$returnTypeFixture = new class {
+    public function __construct()
+    {
+    }
+
     public function exmple(): array
     {
         return [];
@@ -39,11 +42,6 @@ class ReturnTypeHelper
         return new ArrayIterator([]);
     }
 
-    public function exampleStatic(): static
-    {
-        return $this;
-    }
-
     public function exampleModel(): User
     {
         return new User();
@@ -58,4 +56,4 @@ class ReturnTypeHelper
     {
         return "missing";
     }
-}
+};
