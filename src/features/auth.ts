@@ -5,6 +5,7 @@ import { config } from "@src/support/config";
 import { findHoverMatchesInDoc } from "@src/support/doc";
 import { detectedRange, detectInDoc } from "@src/support/parser";
 import { wordMatchRegex } from "@src/support/patterns";
+import { projectPath } from "@src/support/project";
 import { contract, facade, relativeMarkdownLink } from "@src/support/util";
 import { AutocompleteParsingResult } from "@src/types";
 import * as vscode from "vscode";
@@ -199,9 +200,11 @@ export const linkProvider: LinkProvider = (doc: vscode.TextDocument) => {
                                     detectedRange(
                                         param as AutocompleteParsingResult.StringValue,
                                     ),
-                                    vscode.Uri.file(item.uri).with({
-                                        fragment: `L${item.line}`,
-                                    }),
+                                    vscode.Uri.file(projectPath(item.uri)).with(
+                                        {
+                                            fragment: `L${item.line}`,
+                                        },
+                                    ),
                                 );
                             },
                         )
@@ -234,7 +237,7 @@ export const hoverProvider: HoverProvider = (
                     return [
                         "`" + item.policy + "`",
                         relativeMarkdownLink(
-                            vscode.Uri.file(item.uri).with({
+                            vscode.Uri.file(projectPath(item.uri)).with({
                                 fragment: `L${item.line}`,
                             }),
                         ),
@@ -242,7 +245,7 @@ export const hoverProvider: HoverProvider = (
                 }
 
                 return relativeMarkdownLink(
-                    vscode.Uri.file(item.uri).with({
+                    vscode.Uri.file(projectPath(item.uri)).with({
                         fragment: `L${item.line}`,
                     }),
                 );
