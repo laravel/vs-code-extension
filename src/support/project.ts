@@ -15,6 +15,45 @@ export const basePath = (srcPath = ""): string => {
     return path.join(config<string>("basePath", ""), pathForPhpEnv(srcPath));
 };
 
+export const resolveWorkspaceProjectPath = (
+    workspaceFolder: vscode.WorkspaceFolder,
+    configuredBasePath = config<string>("basePath", ""),
+): string => {
+    return path.resolve(workspaceFolder.uri.fsPath, configuredBasePath);
+};
+
+export const resolveWorkspaceProjectFolder = (
+    workspaceFolder: vscode.WorkspaceFolder,
+    configuredBasePath = config<string>("basePath", ""),
+): vscode.WorkspaceFolder => {
+    const projectPath = resolveWorkspaceProjectPath(
+        workspaceFolder,
+        configuredBasePath,
+    );
+
+    if (projectPath === workspaceFolder.uri.fsPath) {
+        return workspaceFolder;
+    }
+
+    return {
+        uri: vscode.Uri.file(projectPath),
+        name: path.basename(projectPath),
+        index: workspaceFolder.index,
+    };
+};
+
+export const getProjectWorkspaceFolder = ():
+    | vscode.WorkspaceFolder
+    | undefined => {
+    const workspaceFolder = getWorkspaceFolders()[0];
+
+    if (!workspaceFolder) {
+        return undefined;
+    }
+
+    return resolveWorkspaceProjectFolder(workspaceFolder);
+};
+
 export const projectPath = (srcPath = ""): string => {
     srcPath = basePath(srcPath);
 
