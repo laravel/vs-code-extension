@@ -32,21 +32,25 @@ echo "Current version: $(node -p "require('./package.json').version")"
 echo
 
 echo "Select version bump type:"
-echo "1) patch (bug fixes)"
-echo "2) minor (new features)"
-echo "3) major (breaking changes)"
+echo "1) prerelease (e.g. 2.0.0-beta.1 -> 2.0.0-beta.2)"
+echo "2) patch (bug fixes)"
+echo "3) minor (new features)"
+echo "4) major (breaking changes)"
 echo
 
-read -p "Enter your choice (1-3): " choice
+read -p "Enter your choice (1-4): " choice
 
 case $choice in
     1)
-        version_type="patch"
+        version_type="prerelease"
         ;;
     2)
-        version_type="minor"
+        version_type="patch"
         ;;
     3)
+        version_type="minor"
+        ;;
+    4)
         version_type="major"
         ;;
     *)
@@ -63,7 +67,7 @@ echo "✅ Version updated to $new_version"
 
 echo
 echo "📤 Pushing to repository..."
-git push origin main --follow-tags
+git push origin lsp --follow-tags
 
 echo "✅ Pushed to repository"
 
