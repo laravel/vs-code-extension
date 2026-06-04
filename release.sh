@@ -7,8 +7,8 @@ echo "=========================================="
 
 # Ensure we are on main and the working tree is clean
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo "Error: must be on main branch (current: $CURRENT_BRANCH)" >&2
+if [ "$CURRENT_BRANCH" != "lsp" ]; then
+  echo "Error: must be on lsp branch (current: $CURRENT_BRANCH)" >&2
   exit 1
 fi
 
@@ -72,9 +72,9 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-gh release create "$new_version" --generate-notes
+gh release create "$new_version" --generate-notes --prerelease --latest=false
 
-npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
+npx ovsx publish --pre-release -p "$OPEN_VSX_ACCESS_TOKEN"
 
 echo "\n✅ Release $new_version completed successfully."
 echo "🔗 https://github.com/laravel/vs-code-extension/releases/tag/$new_version"
