@@ -18,12 +18,12 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
+BINARY_VERSION=`grep 'const binaryVersion' src/lsp/binary.ts | sed -E 's/.*"([^"]+)".*/\1/'`
 
 read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
 
 if [ "$confirmation" != "y" ]; then
-  echo "Please update the binary version in src/support/parser.ts"
+  echo "Please update the binary version in src/lsp/binary.ts"
   exit 1
 fi
 
