@@ -1,10 +1,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import * as vscode from "vscode";
-import {
-    createClientOptions,
-    createServerOptions,
-} from "../lsp/options";
+import { createClientOptions, createServerOptions } from "../lsp/options";
 import {
     resolveWorkspaceProjectFolder,
     resolveWorkspaceProjectPath,

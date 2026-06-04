@@ -10,16 +10,19 @@ export const collectDebugInfo = () => {
 
     sendLspRequest<Record<string, string>>("laravel/data", {
         name: "debugInfo",
-    }).then((output) => {
-        if (output) {
-            for (const key in output as Record<string, string>) {
-                // @ts-ignore
-                debugInfo[key] = output[key];
+    })
+        .then((output) => {
+            if (output) {
+                for (const key in output as Record<string, string>) {
+                    // @ts-ignore
+                    debugInfo[key] = output[key];
+                }
             }
-        }
-    }).catch((error) => {
-        console.error(error);
-    }).finally(() => {
-        debugInfo["php_command"] = getPhpCommand().join(" ");
-    });
+        })
+        .catch((error) => {
+            console.error(error);
+        })
+        .finally(() => {
+            debugInfo["php_command"] = getPhpCommand().join(" ");
+        });
 };

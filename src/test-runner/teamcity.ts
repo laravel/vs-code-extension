@@ -87,9 +87,7 @@ const resolveToHostPath = (
     containerPath: string,
     paths: PathItem[],
 ): string => {
-    const basePath = paths.find(
-        (item) => item.key === "base_path",
-    )?.path;
+    const basePath = paths.find((item) => item.key === "base_path")?.path;
 
     if (basePath && containerPath.startsWith(basePath)) {
         return projectPath(containerPath.slice(basePath.length + 1));
