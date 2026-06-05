@@ -64,6 +64,7 @@ export function createClientOptions(
                 true,
             ),
             controllerActionLink: config("controllerAction.link", true),
+            definitionProvider: false,
             envCompletion: config("env.completion", true),
             envDiagnostics: config("env.diagnostics", true),
             envHover: config("env.hover", true),
