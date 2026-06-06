@@ -1,4 +1,4 @@
-import type * as vscode from "vscode";
+import * as vscode from "vscode";
 import {
     LanguageClientOptions,
     ServerOptions,
@@ -36,6 +36,8 @@ export function createClientOptions(
             { scheme: "file", language: "laravel-blade" },
             { scheme: "file", pattern: "**/.env*" },
         ],
+        traceOutputChannel:
+            vscode.window.createOutputChannel("Laravel LSP Trace"),
         initializationOptions: {
             appBindingCompletion: config("appBinding.completion", true),
             appBindingDiagnostics: config("appBinding.diagnostics", true),
