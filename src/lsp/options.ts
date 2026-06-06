@@ -1,4 +1,4 @@
-import type * as vscode from "vscode";
+import * as vscode from "vscode";
 import {
     LanguageClientOptions,
     ServerOptions,
