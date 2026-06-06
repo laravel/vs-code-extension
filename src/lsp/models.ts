@@ -1,4 +1,3 @@
-import { escapeNamespace } from "@src/support/util";
 import { sendLspRequest } from "./client";
 
 interface ModelItem {
