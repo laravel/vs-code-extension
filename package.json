@@ -1049,6 +1049,17 @@
                     },
                     "description": "PHP command used by the Laravel LSP server, Docker environment configuration, Artisan commands, Pint, and test runner, in argv format. Defaults to php when empty."
                 },
+                "laravelLsp.trace.server": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VS Code and the Laravel LSP server."
+                },                
                 "Laravel.basePath": {
                     "type": "string",
                     "default": "",
