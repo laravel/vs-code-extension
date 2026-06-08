@@ -1,8 +1,7 @@
-import * as vscode from "vscode";
 import path from "path";
+import * as vscode from "vscode";
 
 import { getNamespace } from "@src/commands/generateNamespace";
-import { escapeNamespace } from "@src/support/util";
 import { Argument, ArgumentType, Command, Option } from "./types";
 
 const EndSelection = "End Selection";
@@ -43,7 +42,7 @@ const getValueForArgumentType = async (
 
             namespace = namespace ? (namespace += `\\${fileName}`) : value;
 
-            return escapeNamespace(namespace.replaceAll("/", "\\").trim());
+            return namespace.replaceAll("/", "\\").trim();
 
         case "path":
             // OS path separators

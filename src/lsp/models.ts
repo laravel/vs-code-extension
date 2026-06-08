@@ -1,4 +1,3 @@
-import { escapeNamespace } from "@src/support/util";
 import { sendLspRequest } from "./client";
 
 interface ModelItem {
@@ -17,7 +16,7 @@ export const getModelClassnames = async (): Promise<Record<string, string>> => {
     return Object.fromEntries(
         Object.values(await getModels()).map((model) => [
             model.class,
-            escapeNamespace(model.class),
+            model.class,
         ]),
     );
 };
