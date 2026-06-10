@@ -106,7 +106,7 @@ export async function assertLinks({
         );
 
         assert.ok(
-            includesNormalized(matchedLink?.target?.fsPath ?? "", item.target),
+            includesNormalized(matchedLink?.target?.toString() ?? "", item.target),
             `Case '${item.line}': Expected link target to include '${item.target}'. Got: ${matchedLink?.target?.toString()}`,
         );
     }
