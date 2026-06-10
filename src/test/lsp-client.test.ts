@@ -14,7 +14,11 @@ const workspaceFolder = (fsPath: string): vscode.WorkspaceFolder => ({
 });
 
 suite("Laravel LSP Client Test Suite", () => {
-    const root = path.join(path.parse(process.cwd()).root, "repo");
+    // Round-trip through vscode.Uri.file() so the expected path carries the
+    // same lowercase Windows drive letter that fsPath produces for actuals.
+    const root = vscode.Uri.file(
+        path.join(path.parse(process.cwd()).root, "repo"),
+    ).fsPath;
 
     test("resolves an empty base path to the workspace root", () => {
         assert.strictEqual(
