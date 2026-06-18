@@ -1,7 +1,15 @@
 import * as assert from "assert";
+import fs from "fs/promises";
+import path from "path";
 import * as vscode from "vscode";
 import { assertHovers, assertLinks } from "./assertions";
-import { activateExtension, getCompletions, uri } from "./helper";
+import {
+    activateExtension,
+    getCompletions,
+    getLinks,
+    sleep,
+    uri,
+} from "./helper";
 
 suite("Blade Component Test Suite", () => {
     suiteSetup(async () => {
@@ -62,6 +70,238 @@ suite("Blade Component Test Suite", () => {
                     ],
                 },
             ],
+        });
+    });
+
+    suite("auto refactor blade component namespaces", () => {
+        const files = {
+            component: uri(
+                "resources/views/components/rename-source.blade.php",
+            ),
+            classComponent: uri("app/View/Components/RenameSource.php"),
+            consumer: uri(
+                "resources/views/components/rename-consumer.blade.php",
+            ),
+            movedComponent: uri(
+                "resources/views/components/testing/rename-source.blade.php",
+            ),
+            movedClassComponent: uri(
+                "app/View/Components/Testing/RenameSource.php",
+            ),
+        };
+
+        const waitForFileToContain = async (
+            uri: vscode.Uri,
+            expected: string,
+            retryUntil = 5000,
+        ) => {
+            const start = Date.now();
+
+            while (Date.now() - start < retryUntil) {
+                const text = (
+                    await vscode.workspace.openTextDocument(uri)
+                ).getText();
+
+                if (text.includes(expected)) {
+                    return text;
+                }
+
+                await sleep(100);
+            }
+
+            return (await vscode.workspace.openTextDocument(uri)).getText();
+        };
+
+        const waitForFileToExist = async (
+            uri: vscode.Uri,
+            retryUntil = 5000,
+        ) => {
+            const start = Date.now();
+
+            while (Date.now() - start < retryUntil) {
+                try {
+                    await fs.access(uri.fsPath);
+
+                    return;
+                } catch {
+                    await sleep(100);
+                }
+            }
+
+            assert.fail(`Expected file to exist: ${uri.fsPath}`);
+        };
+
+        const waitForFileToBeIndexed = async (
+            uri: vscode.Uri,
+            expectedUri: vscode.Uri,
+            retryUntil = 5000,
+        ) => {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            const start = Date.now();
+
+            while (Date.now() - start < retryUntil) {
+                const links = await getLinks(doc);
+                const hasExpectedLink = links.some((link) =>
+                    link.target?.fsPath
+                        ?.replaceAll("\\", "/")
+                        .endsWith(expectedUri.fsPath.replaceAll("\\", "/")),
+                );
+
+                if (hasExpectedLink) {
+                    return;
+                }
+
+                await sleep(100);
+            }
+
+            assert.fail(
+                `File '${expectedUri}' was not linked in time by Blade components repository`,
+            );
+        };
+
+        const deleteFileIfExist = async (target: vscode.Uri) =>
+            fs.rm(target.fsPath, {
+                force: true,
+            });
+
+        setup(async () => {
+            await Promise.all(
+                Object.values(files).map((file) => deleteFileIfExist(file)),
+            );
+        });
+
+        teardown(async () => {
+            await Promise.all(
+                Object.values(files).map((file) => deleteFileIfExist(file)),
+            );
+        });
+
+        const componentNamespaceCases = [
+            {
+                name: "self-closing component tag",
+                expectedFile: uri(
+                    "resources/views/components/rename-source.blade.php",
+                ),
+                source: "<x-rename-source />",
+                expected: "<x-testing.rename-source />",
+            },
+            {
+                name: "paired component tag",
+                expectedFile: uri(
+                    "resources/views/components/rename-source.blade.php",
+                ),
+                source: "<x-rename-source></x-rename-source>",
+                expected: "<x-testing.rename-source></x-testing.rename-source>",
+            },
+        ];
+
+        for (const componentNamespaceCase of componentNamespaceCases) {
+            test(`updates blade component namespace after moving component file (${componentNamespaceCase.name})`, async () => {
+                await fs.writeFile(
+                    files.component.fsPath,
+                    "<div>Component</div>",
+                );
+
+                await fs.writeFile(
+                    files.consumer.fsPath,
+                    componentNamespaceCase.source,
+                );
+
+                await waitForFileToBeIndexed(
+                    files.consumer,
+                    componentNamespaceCase.expectedFile,
+                );
+
+                const edit = new vscode.WorkspaceEdit();
+
+                edit.renameFile(files.component, files.movedComponent, {
+                    overwrite: true,
+                });
+
+                const applied = await vscode.workspace.applyEdit(edit);
+
+                assert.ok(
+                    applied,
+                    "Expected rename WorkspaceEdit to be applied",
+                );
+
+                const text = await waitForFileToContain(
+                    files.consumer,
+                    componentNamespaceCase.expected,
+                );
+
+                assert.ok(
+                    text.includes(componentNamespaceCase.expected),
+                    `Expected consumer file to contain '${componentNamespaceCase.expected}', got: ${text}`,
+                );
+            });
+        }
+
+        test(`updates blade component namespace after moving class component file`, async () => {
+            await fs.writeFile(files.component.fsPath, "<div>Component</div>");
+
+            await fs.mkdir(path.dirname(files.classComponent.fsPath), {
+                recursive: true,
+            });
+
+            await fs.writeFile(
+                files.classComponent.fsPath,
+                `<?php
+
+                namespace App\\View\\Components;
+
+                use Illuminate\\Contracts\\View\\View;
+                use Illuminate\\View\\Component;
+
+                class RenameSource extends Component
+                {
+                    public function render(): View
+                    {
+                        return view('components.rename-source');
+                    }
+                }`,
+            );
+
+            await fs.writeFile(files.consumer.fsPath, "<x-rename-source />");
+
+            await waitForFileToBeIndexed(
+                files.consumer,
+                uri("resources/views/components/rename-source.blade.php"),
+            );
+
+            const edit = new vscode.WorkspaceEdit();
+
+            edit.renameFile(files.classComponent, files.movedClassComponent, {
+                overwrite: true,
+            });
+
+            const applied = await vscode.workspace.applyEdit(edit);
+
+            assert.ok(applied, "Expected rename WorkspaceEdit to be applied");
+
+            await waitForFileToExist(files.movedComponent);
+
+            const hasOldComponent = await fs
+                .access(files.component.fsPath)
+                .then(() => true)
+                .catch(() => false);
+
+            assert.ok(
+                !hasOldComponent,
+                `Expected old component file to be moved from '${files.component.fsPath}'`,
+            );
+
+            const classContent = await waitForFileToContain(
+                files.movedClassComponent,
+                "return view('components.testing.rename-source');",
+            );
+
+            assert.ok(
+                classContent.includes(
+                    "return view('components.testing.rename-source');",
+                ),
+                `Expected class component render view to be updated, got: ${classContent}`,
+            );
         });
     });
 });

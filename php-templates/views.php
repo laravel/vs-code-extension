@@ -1,8 +1,9 @@
 <?php
 
 $livewire = new class {
-    protected $namespaces;
-    protected $paths;
+    public $paths;
+    public $namespaces;
+    public $locations;
     protected $extensions = [".blade.php", ".php", ".js", ".global.css", ".css", ".test.php"];
 
     public function __construct()
@@ -11,8 +12,11 @@ $livewire = new class {
             config("livewire.component_namespaces", [])
         )->map(LaravelVsCode::relativePath(...));
 
+        $this->locations = collect(config("livewire.component_locations", []))
+            ->map(LaravelVsCode::relativePath(...));
+
         $this->paths = collect($this->namespaces->values())
-            ->merge(config("livewire.component_locations", []))
+            ->merge($this->locations->values())
             ->unique()
             ->map(LaravelVsCode::relativePath(...));
     }
@@ -278,4 +282,8 @@ $blade = new class ($livewire) {
     }
 };
 
-echo json_encode($blade->getAllViews()->merge($blade->getAllComponents()));
+echo json_encode([
+    "views" => $blade->getAllViews()->merge($blade->getAllComponents())->all(),
+    "livewireLocations" => $livewire->locations->all(),
+    "livewireNamespaces" => $livewire->namespaces->all(),
+]);

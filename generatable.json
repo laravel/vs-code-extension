@@ -50,7 +50,8 @@
         "features": [
             "link",
             "completion",
-            "hover"
+            "hover",
+            "rename"
         ]
     },
     {
@@ -59,7 +60,8 @@
         "features": [
             "link",
             "completion",
-            "hover"
+            "hover",
+            "rename"
         ]
     },
     {

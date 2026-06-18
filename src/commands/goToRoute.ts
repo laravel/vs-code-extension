@@ -90,7 +90,7 @@ const loadViews = async (): Promise<ViewItem[]> => {
     const repository = getViews();
 
     if (repository.loaded) {
-        return repository.items;
+        return repository.items.views;
     }
 
     return (await repository.whenLoaded((items) => items)) ?? [];

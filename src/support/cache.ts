@@ -45,6 +45,10 @@ export class Cache<K, V> {
     size(): number {
         return this.cache.size;
     }
+
+    all(): Map<K, V> {
+        return this.cache;
+    }
 }
 
 export class BoundedFileCache {

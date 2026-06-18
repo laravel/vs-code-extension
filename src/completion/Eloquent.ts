@@ -222,7 +222,10 @@ export class Eloquent implements CompletionProvider {
                 vscode.window.activeTextEditor?.document.uri.fsPath;
 
             if (isInsideObjectValue && filePath) {
-                const relativePath = vscode.workspace.asRelativePath(filePath);
+                const relativePath = vscode.workspace.asRelativePath(
+                    filePath,
+                    false,
+                );
 
                 const model = Object.values(getModels().items).find(
                     (model) => model.path.replace(/\\/g, "/") === relativePath,
