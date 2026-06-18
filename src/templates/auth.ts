@@ -60,7 +60,7 @@ if (!\\Illuminate\\Support\\Facades\\App::bound('auth')) {
 
         return collect($methods)->map(fn(ReflectionMethod $method) => [
             'key' => $method->getName(),
-            'uri' => $method->getFileName(),
+            'uri' => LaravelVsCode::relativePath($method->getFileName()),
             'policy' => is_string($policy) ? $policy : get_class($policy),
             'model' => $model,
             'line' => $method->getStartLine(),
@@ -91,7 +91,7 @@ if (!\\Illuminate\\Support\\Facades\\App::bound('auth')) {
 
                             return [
                                 'key' => $key,
-                                'uri' => $reflection->getFileName(),
+                                'uri' => LaravelVsCode::relativePath($reflection->getFileName()),
                                 'policy' => $policyClass,
                                 'line' => $reflection->getStartLine(),
                             ];
