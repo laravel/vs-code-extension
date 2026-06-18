@@ -69,6 +69,18 @@ $tests = new class {
         if (file_exists($pestFile = base_path('tests/Pest.php'))) {
             require_once $pestFile;
         }
+
+        if (is_dir($helpersDir = base_path('tests/Helpers'))) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($helpersDir)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    require_once $file->getRealPath();
+                }
+            }
+        }
     }
 
     /**
