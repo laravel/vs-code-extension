@@ -4,7 +4,6 @@ import {
     ServerOptions,
 } from "vscode-languageclient/node";
 import { config } from "../support/config";
-import { createLspOutputChannel } from "./output";
 
 export function createServerOptions(
     binaryPath: string,
@@ -39,7 +38,6 @@ export function createClientOptions(
         ],
         traceOutputChannel:
             vscode.window.createOutputChannel("Laravel LSP Trace"),
-        outputChannel: createLspOutputChannel(),
         initializationOptions: {
             appBindingCompletion: config("appBinding.completion", true),
             appBindingDiagnostics: config("appBinding.diagnostics", true),
