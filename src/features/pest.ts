@@ -173,6 +173,15 @@ const renderPestDocBlockFile = (blocks: string[]): string => {
 
 const pestNamespace = (filePath: string): string => {
     const relative = filePath.replace(/^tests[/\\]?/, "");
-    const segment = relative ? relative.replace(/[/\\]/g, "\\") : "Global";
-    return `_Pest\\${segment}`;
+    if (!relative) {
+        return "_Pest\\Global";
+    }
+
+    const segments = relative.split(/[/\\]/);
+    const sanitizedSegments = segments
+        .map((segment) => segment.replace(/[^a-zA-Z0-9_\x7f-\xff]/g, "_"))
+        .map((segment) => (/^[0-9]/.test(segment) ? `_${segment}` : segment))
+        .filter((segment) => segment.length > 0);
+
+    return `_Pest\\${sanitizedSegments.join("\\")}`;
 };
