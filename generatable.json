@@ -33,6 +33,13 @@
         "type": "route"
     },
     {
+        "type": "returnType",
+        "label": "return types",
+        "features": [
+            "diagnostics"
+        ]
+    },
+    {
         "type": "translation"
     },
     {

@@ -1,5 +1,6 @@
 import { codeActionProvider as envProvider } from "@src/features/env";
 import { codeActionProvider as inertiaProvider } from "@src/features/inertia";
+import { codeActionProvider as returnTypeProvider } from "@src/features/returnType";
 import { codeActionProvider as viewProvider } from "@src/features/view";
 import * as vscode from "vscode";
 import { CodeActionProviderFunction } from "..";
@@ -7,6 +8,7 @@ import { CodeActionProviderFunction } from "..";
 const providers: CodeActionProviderFunction[] = [
     envProvider,
     inertiaProvider,
+    returnTypeProvider,
     viewProvider,
 ];
 
