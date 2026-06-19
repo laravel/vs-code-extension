@@ -8,7 +8,7 @@ import * as cp from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as vscode from "vscode";
-import { FeatureTag, ValidDetectParamTypes } from "..";
+import { FeatureTag, FeatureTagParam, ValidDetectParamTypes } from "..";
 import { Cache } from "./cache";
 import { showErrorPopup } from "./popup";
 import { md5, tempPath, toArray } from "./util";
@@ -240,6 +240,26 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
     }) => T[] | T | null,
     validParamTypes: ValidDetectParamTypes[] = ["string"],
 ): Promise<T[]> => {
+    const findByClassOrFunction = (
+        result:
+            | AutocompleteParsingResult.MethodCall
+            | AutocompleteParsingResult.ObjectValue,
+    ) => {
+        const hasClass = (classes: FeatureTagParam["class"]) =>
+            toArray(classes ?? null).includes(result.className ?? null);
+
+        const hasFunc = (funcs: FeatureTagParam["method"]) =>
+            toArray(funcs ?? null).includes(
+                // @ts-ignore
+                result.methodName ?? null,
+            );
+
+        return toArray(toFind).find(
+            (toFindItem) =>
+                hasClass(toFindItem.class) && hasFunc(toFindItem.method),
+        );
+    };
+
     return detect(document).then((results) => {
         if (!results) {
             return Promise.resolve([]);
@@ -252,23 +272,32 @@ export const detectInDoc = <T, U extends ValidDetectParamTypes>(
                         result.type === "object" ||
                         result.type === "methodCall",
                 )
-                .filter((result) => {
-                    return toArray(toFind).some((toFind) => {
-                        return (
-                            toArray(toFind.class ?? null).includes(
-                                result.className ?? null,
-                            ) &&
-                            toArray(toFind.method ?? null).includes(
-                                // @ts-ignore
-                                result.methodName ?? null,
-                            )
-                        );
-                    });
-                })
                 .map((item) => {
+                    const param = findByClassOrFunction(item);
+
+                    if (!param) {
+                        return null;
+                    }
+
+                    return { item, param };
+                })
+                .filter((item) => item !== null)
+                .map(({ item, param }) => {
+                    const isArgumentIndex = (index: number) => {
+                        if (param.argumentIndex === undefined) {
+                            return true;
+                        }
+
+                        return toArray(param.argumentIndex).includes(index);
+                    };
+
                     return repo().whenLoaded(() =>
                         item.arguments.children
                             .flatMap((arg, index) => {
+                                if (!isArgumentIndex(index)) {
+                                    return [];
+                                }
+
                                 // @ts-ignore
                                 return arg.children.map((child) => {
                                     if (
