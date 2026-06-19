@@ -1,4 +1,5 @@
 import { projectPathExists, readFileInProject } from "@src/support/project";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 interface EnvItem {
@@ -14,14 +15,14 @@ const getKeyValue = (str: string) => {
     return [parts[0], parts.slice(1).join("=")];
 };
 
-const load = () => {
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
     let items: EnvItem = {};
 
-    if (!projectPathExists(".env")) {
+    if (!projectPathExists(".env", workspaceFolder)) {
         return items;
     }
 
-    readFileInProject(".env")
+    readFileInProject(".env", workspaceFolder)
         .split("\n")
         .map((env, index) => ({
             line: env.trim(),
@@ -46,10 +47,10 @@ const load = () => {
 };
 
 export const getEnv = repository<EnvItem>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         new Promise<EnvItem>((resolve, reject) => {
             try {
-                resolve(load());
+                resolve(load(workspaceFolder));
             } catch (error) {
                 reject(error);
             }

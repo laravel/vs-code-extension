@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import { repository } from ".";
 import { Config } from "..";
 import { runInLaravel, template } from "../support/php";
@@ -27,28 +28,30 @@ export const getConfigPathByName = (match: string): string | undefined => {
 };
 
 export const getConfigs = repository<ConfigGroupResult>({
-    load: () => {
-        return runInLaravel<Config[]>(template("configs"), "Configs").then(
-            (result) => {
-                return {
-                    configs: result.map((item) => {
-                        return {
-                            name: item.name,
-                            value: item.value,
-                            file: item.file,
-                            line: item.line,
-                        };
-                    }),
-                    paths: [
-                        ...new Set(
-                            result
-                                .filter((item) => typeof item.file === "string")
-                                .map((item) => item.file),
-                        ),
-                    ],
-                } as ConfigGroupResult;
-            },
-        );
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
+        return runInLaravel<Config[]>(
+            template("configs"),
+            workspaceFolder,
+            "Configs",
+        ).then((result) => {
+            return {
+                configs: result.map((item) => {
+                    return {
+                        name: item.name,
+                        value: item.value,
+                        file: item.file,
+                        line: item.line,
+                    };
+                }),
+                paths: [
+                    ...new Set(
+                        result
+                            .filter((item) => typeof item.file === "string")
+                            .map((item) => item.file),
+                    ),
+                ],
+            } as ConfigGroupResult;
+        });
     },
     pattern: ["config/{,*,**/*}.php", ".env"],
     itemsDefault: {

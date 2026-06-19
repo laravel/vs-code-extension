@@ -13,7 +13,6 @@ import {
 } from "./phpEnvironments";
 import { showErrorPopup } from "./popup";
 import {
-    getWorkspaceFolders,
     internalVendorPath,
     projectPath,
     projectPathExists,
@@ -21,6 +20,10 @@ import {
     setInternalVendorExists,
 } from "./project";
 import { md5 } from "./util";
+import {
+    getFirstWorkspaceFolder,
+    getLaravelWorkspaceFolders,
+} from "./workspace";
 
 const toTemplateVar = (str: string) => {
     const suffix = str === "output" ? ";" : "";
@@ -32,12 +35,20 @@ let defaultPhpCommand: string | null = null;
 
 const discoverFiles = new BoundedFileCache(50);
 
-let hasVendor: boolean | null = null;
-let hasBootstrap: boolean | null = null;
+let hasVendor: Record<string, boolean> = {};
+let hasBootstrap: Record<string, boolean> = {};
 
 export const initPhp = () => {
-    hasVendor = projectPathExists("vendor/autoload.php");
-    hasBootstrap = projectPathExists("bootstrap/app.php");
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
+        hasVendor[workspaceFolder.name] = projectPathExists(
+            "vendor/autoload.php",
+            workspaceFolder,
+        );
+        hasBootstrap[workspaceFolder.name] = projectPathExists(
+            "bootstrap/app.php",
+            workspaceFolder,
+        );
+    });
 };
 
 let phpEnvKey: PhpEnvironment | null = null;
@@ -49,46 +60,54 @@ export const initVendorWatchers = () => {
     //     }
     // });
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(internalVendorPath(), "discover-*"),
-        true,
-        true,
-    );
-
-    watcher.onDidDelete((file) => {
-        discoverFiles.deleteByFilePath(file.fsPath);
-    });
-
-    [internalVendorPath(), projectPath("vendor")].forEach((path) => {
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
         const watcher = vscode.workspace.createFileSystemWatcher(
-            path,
+            new vscode.RelativePattern(
+                internalVendorPath("", workspaceFolder),
+                "discover-*",
+            ),
             true,
             true,
         );
 
-        watcher.onDidDelete(() => {
-            setInternalVendorExists(false);
-            discoverFiles.clear();
-            hasVendor = false;
+        watcher.onDidDelete((file) => {
+            discoverFiles.deleteByFilePath(file.fsPath);
         });
+
+        [
+            internalVendorPath("", workspaceFolder),
+            projectPath("vendor", workspaceFolder),
+        ].forEach((path) => {
+            const watcher = vscode.workspace.createFileSystemWatcher(
+                path,
+                true,
+                true,
+            );
+
+            watcher.onDidDelete(() => {
+                setInternalVendorExists(false, workspaceFolder);
+                discoverFiles.clear();
+                hasVendor[workspaceFolder.name] = false;
+            });
+        });
+
+        const autoloadWatcher = vscode.workspace.createFileSystemWatcher(
+            projectPath("vendor/autoload.php", workspaceFolder),
+            false,
+            true,
+        );
+
+        autoloadWatcher.onDidCreate(() => {
+            hasVendor[workspaceFolder.name] = true;
+        });
+
+        autoloadWatcher.onDidDelete(() => {
+            hasVendor[workspaceFolder.name] = false;
+        });
+
+        registerWatcher(watcher);
+        registerWatcher(autoloadWatcher);
     });
-
-    const autoloadWatcher = vscode.workspace.createFileSystemWatcher(
-        projectPath("vendor/autoload.php"),
-        false,
-        true,
-    );
-
-    autoloadWatcher.onDidCreate(() => {
-        hasVendor = true;
-    });
-
-    autoloadWatcher.onDidDelete(() => {
-        hasVendor = false;
-    });
-
-    registerWatcher(watcher);
-    registerWatcher(autoloadWatcher);
 };
 
 const getPhpCommand = (): string => {
@@ -193,23 +212,32 @@ const getFormattedError = (
 
 export const runInLaravel = <T>(
     code: string,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstWorkspaceFolder()!,
     description: string | null = null,
     asJson: boolean = true,
     tryCount = 0,
 ): Promise<T> => {
-    if (!hasVendor) {
+    if (!hasVendor[workspaceFolder.name]) {
         if (tryCount >= 30) {
             throw new Error("Vendor autoload not found, run composer install");
         }
 
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(runInLaravel(code, description, asJson, tryCount + 1));
+                resolve(
+                    runInLaravel(
+                        code,
+                        workspaceFolder,
+                        description,
+                        asJson,
+                        tryCount + 1,
+                    ),
+                );
             }, 1000);
         });
     }
 
-    if (!hasBootstrap) {
+    if (!hasBootstrap[workspaceFolder.name]) {
         throw new Error("Bootstrap file not found, not a Laravel project");
     }
 
@@ -217,7 +245,7 @@ export const runInLaravel = <T>(
         output: code,
     });
 
-    return runPhp(command, description)
+    return runPhp(command, workspaceFolder, description)
         .then((result: string) => {
             const regex = new RegExp(
                 toTemplateVar("start_output") +
@@ -257,16 +285,24 @@ export const fixFilePath = (path: string) => {
     return path;
 };
 
-const getHashedFile = (code: string) => {
-    if (discoverFiles.has(code)) {
-        return fixFilePath(discoverFiles.get(code)!);
+const getHashedFile = (
+    code: string,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
+    const key = [workspaceFolder.name, code].join(":");
+
+    if (discoverFiles.has(key)) {
+        return fixFilePath(discoverFiles.get(key)!);
     }
 
-    const hashedFile = internalVendorPath(`discover-${md5(code)}.php`);
+    const hashedFile = internalVendorPath(
+        `discover-${md5(code)}.php`,
+        workspaceFolder,
+    );
 
     fs.writeFileSync(hashedFile, code);
 
-    discoverFiles.set(code, hashedFile);
+    discoverFiles.set(key, hashedFile);
 
     return fixFilePath(hashedFile);
 };
@@ -285,19 +321,20 @@ export const getCommandTemplate = (): string => {
 
 export const runPhp = (
     code: string,
+    workspaceFolder: vscode.WorkspaceFolder,
     description: string | null = null,
 ): Promise<string> => {
     if (!code.startsWith("<?php")) {
         code = "<?php\n\n" + code;
     }
 
-    const command = getCommand(getHashedFile(code));
+    const command = getCommand(getHashedFile(code, workspaceFolder));
 
     return new Promise<string>(function (resolve, error) {
         let result = "";
 
         const child = cp.spawn(command, {
-            cwd: getWorkspaceFolders()[0]?.uri?.fsPath,
+            cwd: workspaceFolder?.uri?.fsPath,
             shell: true,
         });
 

@@ -1,4 +1,9 @@
 import {
+    getLaravelWorkspaceFolders,
+    getWorkspaceFolder,
+} from "@src/support/workspace";
+import * as vscode from "vscode";
+import {
     type FileEvent,
     WatcherPattern,
     defaultFileEvents,
@@ -12,51 +17,63 @@ export const repository = <T>({
     fileWatcherEvents = defaultFileEvents,
     reloadOnComposerChanges = true,
 }: {
-    load: () => Promise<T>;
+    load: (workspaceFolder: vscode.WorkspaceFolder) => Promise<T>;
     pattern: WatcherPattern;
     itemsDefault: T;
     fileWatcherEvents?: FileEvent[];
     reloadOnComposerChanges?: boolean;
 }) => {
-    let items: T = itemsDefault;
-    let loaded = false;
+    let items: Record<string, T> = {};
+    let loaded: Record<string, boolean> = {};
 
-    loadAndWatch(
-        () => {
-            load()
-                .then((result) => {
-                    if (typeof result === "undefined") {
-                        throw new Error("Failed to load items");
-                    }
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
+        items[workspaceFolder.name] = itemsDefault;
+        loaded[workspaceFolder.name] = false;
 
-                    items = result;
-                    loaded = true;
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
-        },
-        pattern,
-        fileWatcherEvents,
-        reloadOnComposerChanges,
-    );
+        loadAndWatch(
+            (workspaceFolder: vscode.WorkspaceFolder) => {
+                load(workspaceFolder)
+                    .then((result) => {
+                        if (typeof result === "undefined") {
+                            throw new Error("Failed to load items");
+                        }
+
+                        items[workspaceFolder.name] = result;
+                        loaded[workspaceFolder.name] = true;
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                    });
+            },
+            pattern,
+            fileWatcherEvents,
+            workspaceFolder,
+            reloadOnComposerChanges,
+        );
+    });
 
     const whenLoaded = async (callback: (items: T) => any, maxTries = 20) => {
+        const workspace = getWorkspaceFolder()!;
+
         let tries = 0;
 
-        while (!loaded && tries < maxTries) {
+        while (!loaded[workspace.name] && tries < maxTries) {
             tries++;
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        if (loaded) {
-            return callback(items);
+        if (loaded[workspace.name]) {
+            return callback(items[workspace.name]);
         }
     };
 
-    return () => ({
-        loaded,
-        items,
-        whenLoaded,
-    });
+    return () => {
+        const workspace = getWorkspaceFolder()!;
+
+        return {
+            loaded: loaded[workspace.name],
+            items: items[workspace.name],
+            whenLoaded,
+        };
+    };
 };

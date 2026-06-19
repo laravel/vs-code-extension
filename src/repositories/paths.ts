@@ -1,4 +1,5 @@
 import { runInLaravel } from "@src/support/php";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 interface PathItem {
@@ -7,7 +8,7 @@ interface PathItem {
 }
 
 export const getPaths = repository<PathItem[]>({
-    load: () => {
+    load: (workspaceFolder: vscode.WorkspaceFolder) => {
         return runInLaravel<{ key: string; path: string }[]>(
             `
             echo json_encode([
@@ -45,6 +46,7 @@ export const getPaths = repository<PathItem[]>({
                 ],
         ]);
         `,
+            workspaceFolder,
             "Paths",
         );
     },

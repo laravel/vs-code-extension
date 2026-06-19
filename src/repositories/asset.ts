@@ -9,8 +9,12 @@ interface Item {
     uri: vscode.Uri;
 }
 
-const getFilesInDirectory = (dir: string, depth: number = 0): Item[] => {
-    let dirFullPath = projectPath(dir);
+const getFilesInDirectory = (
+    dir: string,
+    workspaceFolder: vscode.WorkspaceFolder,
+    depth: number = 0,
+): Item[] => {
+    let dirFullPath = projectPath(dir, workspaceFolder);
 
     if (!fs.existsSync(dirFullPath)) {
         return [];
@@ -28,7 +32,11 @@ const getFilesInDirectory = (dir: string, depth: number = 0): Item[] => {
             let stat = fs.lstatSync(fullFilePath);
 
             if (stat.isDirectory()) {
-                return getFilesInDirectory(shortFilePath, depth + 1);
+                return getFilesInDirectory(
+                    shortFilePath,
+                    workspaceFolder,
+                    depth + 1,
+                );
             }
 
             if (
@@ -54,10 +62,10 @@ const getFilesInDirectory = (dir: string, depth: number = 0): Item[] => {
 };
 
 export const getAssets = repository<Item[]>({
-    load: () =>
+    load: (workspaceFolder: vscode.WorkspaceFolder) =>
         new Promise((resolve, reject) => {
             try {
-                resolve(getFilesInDirectory("public"));
+                resolve(getFilesInDirectory("public", workspaceFolder));
             } catch (exception) {
                 reject(exception);
             }

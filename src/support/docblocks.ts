@@ -1,4 +1,5 @@
 import fs from "fs";
+import * as vscode from "vscode";
 import { Eloquent } from "..";
 import { config } from "./config";
 import { internalVendorPath } from "./project";
@@ -17,6 +18,7 @@ const modelBuilderType = (className: string) =>
 export const writeEloquentDocBlocks = (
     models: Eloquent.Models,
     builderMethods: Eloquent.BuilderMethod[],
+    workspaceFolder: vscode.WorkspaceFolder,
 ) => {
     if (!models || !config("eloquent.generateDocBlocks", true)) {
         return;
@@ -59,7 +61,7 @@ export const writeEloquentDocBlocks = (
     finalContent.unshift("<?php");
 
     fs.writeFileSync(
-        internalVendorPath("_model_helpers.php"),
+        internalVendorPath("_model_helpers.php", workspaceFolder),
         finalContent.join("\n\n"),
     );
 };

@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 
-import { projectPath } from "@src/support/project";
 import { runInLaravel, template } from "@src/support/php";
+import { projectPath } from "@src/support/project";
+import path from "path";
 
 export interface TestSuite {
     name: string;
@@ -17,21 +18,27 @@ export interface TestSuite {
     }[];
 }
 
-export const updateExplorer = async (controller: vscode.TestController) => {
-    const suites = await getTestSuites();
+export const updateExplorer = async (
+    controller: vscode.TestController,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
+    const suites = await getTestSuites(workspaceFolder);
 
     controller.items.replace(
-        suites.map((suite) => buildSuiteItem(controller, suite)),
+        suites.map((suite) =>
+            buildSuiteItem(controller, suite, workspaceFolder),
+        ),
     );
 };
 
-const getTestSuites = () => {
-    return runInLaravel<TestSuite[]>(template("tests"));
+const getTestSuites = (workspaceFolder: vscode.WorkspaceFolder) => {
+    return runInLaravel<TestSuite[]>(template("tests"), workspaceFolder);
 };
 
 const buildSuiteItem = (
     controller: vscode.TestController,
     suite: TestSuite,
+    workspaceFolder: vscode.WorkspaceFolder,
 ) => {
     const suiteItem = controller.createTestItem(
         `suite:${suite.name}`,
@@ -40,7 +47,7 @@ const buildSuiteItem = (
     );
 
     suite.files.forEach((file) => {
-        const uri = vscode.Uri.file(projectPath(file.path));
+        const uri = vscode.Uri.file(projectPath(file.path, workspaceFolder));
         const basePath = getBasePath(file.path, file.directories);
 
         const parent = ensureFolderPath(

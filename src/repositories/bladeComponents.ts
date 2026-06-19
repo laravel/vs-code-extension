@@ -1,5 +1,6 @@
 import { inAppDirs } from "@src/support/fileWatcher";
 import { runInLaravel, template } from "@src/support/php";
+import * as vscode from "vscode";
 import { repository } from ".";
 
 export interface BladeComponents {
@@ -19,8 +20,11 @@ export interface BladeComponents {
     prefixes: string[];
 }
 
-const load = () => {
-    return runInLaravel<BladeComponents>(template("bladeComponents"));
+const load = (workspaceFolder: vscode.WorkspaceFolder) => {
+    return runInLaravel<BladeComponents>(
+        template("bladeComponents"),
+        workspaceFolder,
+    );
 };
 
 export const getBladeComponents = repository<BladeComponents>({

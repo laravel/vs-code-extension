@@ -5,16 +5,13 @@ import {
     statusBarSuccess,
     statusBarWorking,
 } from "@src/support/statusBar";
+import { getWorkspaceFolder } from "@src/support/workspace";
 import * as cp from "child_process";
 import * as vscode from "vscode";
 import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
-import {
-    getWorkspaceFolders,
-    projectPath,
-    projectPathExists,
-} from "../support/project";
+import { projectPath, projectPathExists } from "../support/project";
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let runningProcess: cp.ChildProcess | undefined;
@@ -123,9 +120,7 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
     }
 
     if (
-        !document.uri.fsPath.startsWith(
-            getWorkspaceFolders()[0]?.uri?.fsPath || "",
-        )
+        !document.uri.fsPath.startsWith(getWorkspaceFolder()?.uri?.fsPath || "")
     ) {
         return;
     }
