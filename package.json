@@ -1064,6 +1064,13 @@
                     "default": true,
                     "description": "Automatically generate Eloquent doc blocks for models as IDE helpers."
                 },
+                "Laravel.eloquent.modelPaths": {
+                    "type": "array",
+                    "default": [
+                        "app/Models"
+                    ],
+                    "description": "Directory paths or glob patterns for model files, relative to the project root."
+                },
                 "Laravel.pest.generateDocBlocks": {
                     "type": "boolean",
                     "default": true,

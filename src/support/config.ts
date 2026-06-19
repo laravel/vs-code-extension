@@ -12,6 +12,7 @@ type ConfigKey =
     | "showErrorPopups"
     | "blade.autoSpaceTags"
     | "eloquent.generateDocBlocks"
+    | "eloquent.modelPaths"
     | "pest.generateDocBlocks"
     | "pest.helperFilePath"
     | "env.viteQuickFix"
