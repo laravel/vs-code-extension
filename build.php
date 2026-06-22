@@ -2,9 +2,6 @@
 
 $building = true;
 
-echo 'Generating templates...' . PHP_EOL;
-require 'generate-templates.php';
-
 echo 'Generating config...' . PHP_EOL;
 require 'generate-config.php';
 

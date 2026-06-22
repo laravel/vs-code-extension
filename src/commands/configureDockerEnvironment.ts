@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { config, updateConfig } from "@src/support/config";
 
 interface DockerContainer {
@@ -13,7 +13,7 @@ export const configureDockerEnvironment = async () => {
     let containers: DockerContainer[];
 
     try {
-        const output = execSync("docker ps --format=json", {
+        const output = execFileSync("docker", ["ps", "--format=json"], {
             encoding: "utf-8",
         });
 
@@ -86,7 +86,7 @@ export const configureDockerEnvironment = async () => {
         return;
     }
 
-    if (config<string | null>("phpCommand", null)) {
+    if (hasExistingPhpCommandConfig()) {
         const override = await vscode.window.showQuickPick(["Yes", "No"], {
             placeHolder:
                 "A Laravel PHP command is already configured. Do you want to override it?",
@@ -99,8 +99,15 @@ export const configureDockerEnvironment = async () => {
     }
 
     const phpCommand = workingDirectory
-        ? `docker exec -w ${workingDirectory} ${selectedContainer.container.Names} php`
-        : `docker exec ${selectedContainer.container.Names} php`;
+        ? [
+              "docker",
+              "exec",
+              "-w",
+              workingDirectory,
+              selectedContainer.container.Names,
+              "php",
+          ]
+        : ["docker", "exec", selectedContainer.container.Names, "php"];
 
     await updateConfig("phpEnvironment", "docker", scope.target);
     await updateConfig("phpCommand", phpCommand, scope.target);
@@ -109,5 +116,13 @@ export const configureDockerEnvironment = async () => {
 
     vscode.window.showInformationMessage(
         "Docker environment configured successfully.",
+    );
+};
+
+const hasExistingPhpCommandConfig = (): boolean => {
+    const configuredPhpCommand = config<unknown>("phpCommand", []);
+
+    return (
+        Array.isArray(configuredPhpCommand) && configuredPhpCommand.length > 0
     );
 };

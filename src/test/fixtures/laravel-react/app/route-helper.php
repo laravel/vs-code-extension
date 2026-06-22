@@ -16,13 +16,13 @@ to_route('dashboard');
 // 2. Redirect Facade & Helper
 Redirect::route('home');
 Redirect::signedRoute('dashboard');
-Redirect::temporarySignedRoute('home');
+Redirect::temporarySignedRoute('home', now()->addHour());
 redirect()->route('dashboard');
 
 // 3. URL Facade & Helper
 URL::route('home');
 URL::signedRoute('dashboard');
-URL::temporarySignedRoute('home');
+URL::temporarySignedRoute('home', now()->addHour());
 url()->route('dashboard');
 
 // 4. Response Facade & Factory

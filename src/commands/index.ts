@@ -20,10 +20,14 @@ export const openFile = (
 };
 
 export const openFileCommand = (
-    uri: vscode.Uri,
+    uri: vscode.Uri | string,
     lineNumber: number,
     position: number,
 ) => {
+    if (typeof uri === "string") {
+        uri = vscode.Uri.parse(uri);
+    }
+
     return vscode.window.showTextDocument(uri, {
         selection: new vscode.Range(
             new vscode.Position(lineNumber, position),

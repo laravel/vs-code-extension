@@ -65,7 +65,7 @@ export const runArtisanCommand = async (
 };
 
 const executeArtisanCommand = async (
-    artisanCommand: string,
+    artisanCommand: string[],
     workspaceFolder: vscode.WorkspaceFolder,
 ): Promise<string | undefined> => {
     const output = await artisan(artisanCommand, workspaceFolder.uri.fsPath);

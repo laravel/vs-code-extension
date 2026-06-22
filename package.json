@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "1.7.0",
+    "version": "2.0.0-beta.2",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -26,7 +26,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:php"
+        "onLanguage:php",
+        "workspaceContains:artisan"
     ],
     "main": "./dist/extension.js",
     "grammars": [
@@ -1038,12 +1039,27 @@
                         "Docker"
                     ],
                     "default": "auto",
-                    "markdownDescription": "Local PHP environment. If you have a value for `#Laravel.phpCommand#` this setting will be ignored and that value will be used instead."
+                    "markdownDescription": "Local PHP environment used for path handling in environments such as Sail, Lando, DDEV, and Docker. PHP execution uses `#Laravel.phpCommand#`."
                 },
                 "Laravel.phpCommand": {
-                    "type": "string",
-                    "description": "Template for running PHP code. Use {code} as an optional placeholder for the php file to run. e.g. `php \"{code}\"`.\n\nIf no {code} is present, code filepath will be appended to the command."
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "PHP command used by the Laravel LSP server, Docker environment configuration, Artisan commands, Pint, and test runner, in argv format. Defaults to php when empty."
                 },
+                "laravelLsp.trace.server": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VS Code and the Laravel LSP server."
+                },                
                 "Laravel.basePath": {
                     "type": "string",
                     "default": "",
@@ -1058,11 +1074,6 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable quickfix for adding VITE_ variables from regular env variables."
-                },
-                "Laravel.eloquent.generateDocBlocks": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Automatically generate Eloquent doc blocks for models as IDE helpers."
                 },
                 "Laravel.pest.generateDocBlocks": {
                     "type": "boolean",
@@ -1456,7 +1467,7 @@
         }
     },
     "scripts": {
-        "pretest": "npm run compile && tsc && npm run lint",
+        "pretest": "rimraf out && npm run compile && tsc && npm run lint",
         "lint": "eslint src --ext ts",
         "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
         "test": "vscode-test",
@@ -1485,14 +1496,9 @@
     "dependencies": {
         "axios": "^1.8.2",
         "extract-zip": "^2.0.1",
-        "find-up": "^7.0.0",
-        "glob": "^11.0.0",
         "npm-run-all": "^4.1.5",
         "rimraf": "^6.0.1",
         "uuid": "^11.0.3",
-        "vscode-html-languageservice": "^5.2.0",
-        "vscode-languageclient": "^9.0.1",
-        "vscode-languageserver-textdocument": "^1.0.11",
-        "vscode-languageserver-types": "^3.17.5"
+        "vscode-languageclient": "^9.0.1"
     }
 }

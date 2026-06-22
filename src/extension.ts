@@ -32,18 +32,11 @@ import {
 } from "./commands/wrapWithHelper";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
-import {
-    disposeWatchers,
-    watchForComposerChanges,
-} from "./support/fileWatcher";
+import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
-import { clearParserCaches, setParserBinaryPath } from "./support/parser";
-import {
-    clearDefaultPhpCommand,
-    clearPhpFileCache,
-    initPhp,
-    initVendorWatchers,
-} from "./support/php";
+import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
+import { setLspBinaryPath } from "./lsp/binary";
+import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import {
@@ -51,8 +44,6 @@ import {
     registerArtisanMakeCommands,
 } from "./artisan/registry";
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
-import { registerPestHelper } from "./features/pest";
-import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;
 
@@ -72,8 +63,6 @@ function shouldActivate(): boolean {
 
 export async function activate(context: vscode.ExtensionContext) {
     info("Activating Laravel Extension...");
-
-    initPhp();
 
     const PHP_LANGUAGE = { scheme: "file", language: "php" };
 
@@ -114,139 +103,33 @@ export async function activate(context: vscode.ExtensionContext) {
 
     info("Started");
 
-    const [
-        { Registry },
-        { completionProviders },
-        { Eloquent: EloquentCompletion },
-        { Validation: ValidationCompletion },
-        { Blade: BladeCompletion },
-        { completionProvider: bladeComponentCompletion },
-        { completionProvider: livewireComponentCompletion },
-        { CodeActionProvider },
-        { updateDiagnostics },
-        { viteEnvCodeActionProvider },
-        { hoverProviders },
-        { linkProviders },
-    ] = await Promise.all([
-        import("./completion/Registry.js"),
-        import("./completion/CompletionProvider.js"),
-        import("./completion/Eloquent.js"),
-        import("./completion/Validation.js"),
-        import("./completion/Blade.js"),
-        import("./features/bladeComponent.js"),
-        import("./features/livewireComponent.js"),
-        import("./codeAction/codeActionProvider.js"),
-        import("./diagnostic/diagnostic.js"),
-        import("./features/env.js"),
-        import("./hover/HoverProvider.js"),
-        import("./link/LinkProvider.js"),
-    ]);
+    warnAboutLegacyPhpCommand();
+
+    setLspBinaryPath(context);
+
+    const lspClient = await startLspClient().catch((error) => {
+        console.error("Failed to start Laravel LSP:", error);
+
+        return undefined;
+    });
+
+    if (lspClient) {
+        const { registerTestRunner } = await import("./test-runner/index.js");
+
+        registerTestRunner();
+    }
 
     console.log("Laravel VS Code Started...");
-
-    const BLADE_LANGUAGES = [
-        { scheme: "file", language: "blade" },
-        { scheme: "file", language: "laravel-blade" },
-    ];
-
-    const LANGUAGES = [PHP_LANGUAGE, ...BLADE_LANGUAGES];
-
-    initVendorWatchers();
-    watchForComposerChanges();
-    setParserBinaryPath(context);
-
-    const TRIGGER_CHARACTERS = ["'", '"'];
-
-    updateDiagnostics(vscode.window.activeTextEditor);
-
-    const delegatedRegistry = new Registry(
-        ...completionProviders,
-        new EloquentCompletion(),
-    );
-
-    const validationRegistry = new Registry(new ValidationCompletion());
-
-    const documentSelector: vscode.DocumentSelector = {
-        language: "blade",
-    };
 
     client = initClient(context);
 
     context.subscriptions.push(
-        vscode.window.onDidChangeActiveTextEditor((editor) => {
-            updateDiagnostics(editor);
-        }),
         vscode.workspace.onDidSaveTextDocument((event) => {
-            updateDiagnostics(vscode.window.activeTextEditor);
             runPintOnSave(event);
         }),
         vscode.workspace.onDidChangeTextDocument((event) => {
             bladeSpacer(event, vscode.window.activeTextEditor);
         }),
-        // vscode.languages.registerDocumentHighlightProvider(
-        //     documentSelector,
-        //     new DocumentHighlight(),
-        // ),
-        // vscode.languages.registerDocumentFormattingEditProvider(
-        //     documentSelector,
-        //     new BladeFormattingEditProvider(),
-        // ),
-        // vscode.languages.registerDocumentRangeFormattingEditProvider(
-        //     documentSelector,
-        //     new BladeFormattingEditProvider(),
-        // ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            delegatedRegistry,
-            ...TRIGGER_CHARACTERS,
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            LANGUAGES,
-            validationRegistry,
-            ...TRIGGER_CHARACTERS.concat(["|"]),
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            BLADE_LANGUAGES,
-            bladeComponentCompletion,
-            "x",
-            "-",
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            BLADE_LANGUAGES,
-            livewireComponentCompletion,
-            ":",
-        ),
-        vscode.languages.registerCompletionItemProvider(
-            BLADE_LANGUAGES,
-            new BladeCompletion(),
-            "@",
-        ),
-        ...linkProviders.map((provider) =>
-            vscode.languages.registerDocumentLinkProvider(LANGUAGES, provider),
-        ),
-        ...hoverProviders.map((provider) =>
-            vscode.languages.registerHoverProvider(LANGUAGES, provider),
-        ),
-        // ...testRunnerCommands,
-        // testController,
-        vscode.languages.registerCodeActionsProvider(
-            LANGUAGES,
-            new CodeActionProvider(),
-            {
-                providedCodeActionKinds:
-                    CodeActionProvider.providedCodeActionKinds,
-            },
-        ),
-        vscode.languages.registerCodeActionsProvider(
-            [
-                { scheme: "file", language: "plaintext" },
-                { scheme: "file", language: "ini" },
-            ],
-            viteEnvCodeActionProvider,
-            {
-                providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
-            },
-        ),
         vscode.commands.registerCommand(
             wrapWithHelperCommands.wrap,
             openSubmenuCommand,
@@ -275,18 +158,18 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
         ),
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (configAffected(event, "phpCommand", "phpEnvironment")) {
+                clearResolvedPhpCommand();
+
+                restartLspClient().catch((error) => {
+                    console.error("Failed to restart Laravel LSP:", error);
+                });
+            }
+        }),
     );
 
     collectDebugInfo();
-
-    vscode.workspace.onDidChangeConfiguration((event) => {
-        if (configAffected(event, "phpCommand", "phpEnvironment")) {
-            clearDefaultPhpCommand();
-        }
-    });
-
-    registerPestHelper();
-    registerTestRunner();
 }
 
 export function deactivate() {
@@ -297,10 +180,10 @@ export function deactivate() {
     }
 
     disposeWatchers();
-    clearParserCaches();
-    clearPhpFileCache();
 
     if (client) {
         client.stop();
     }
+
+    stopLspClient();
 }

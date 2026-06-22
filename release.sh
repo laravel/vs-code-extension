@@ -7,8 +7,8 @@ echo "=========================================="
 
 # Ensure we are on main and the working tree is clean
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo "Error: must be on main branch (current: $CURRENT_BRANCH)" >&2
+if [ "$CURRENT_BRANCH" != "lsp" ]; then
+  echo "Error: must be on lsp branch (current: $CURRENT_BRANCH)" >&2
   exit 1
 fi
 
@@ -18,12 +18,12 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
+BINARY_VERSION=`grep 'const binaryVersion' src/lsp/binary.ts | sed -E 's/.*"([^"]+)".*/\1/'`
 
 read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
 
 if [ "$confirmation" != "y" ]; then
-  echo "Please update the binary version in src/support/parser.ts"
+  echo "Please update the binary version in src/lsp/binary.ts"
   exit 1
 fi
 
@@ -32,21 +32,25 @@ echo "Current version: $(node -p "require('./package.json').version")"
 echo
 
 echo "Select version bump type:"
-echo "1) patch (bug fixes)"
-echo "2) minor (new features)"
-echo "3) major (breaking changes)"
+echo "1) prerelease (e.g. 2.0.0-beta.1 -> 2.0.0-beta.2)"
+echo "2) patch (bug fixes)"
+echo "3) minor (new features)"
+echo "4) major (breaking changes)"
 echo
 
-read -p "Enter your choice (1-3): " choice
+read -p "Enter your choice (1-4): " choice
 
 case $choice in
     1)
-        version_type="patch"
+        version_type="prerelease"
         ;;
     2)
-        version_type="minor"
+        version_type="patch"
         ;;
     3)
+        version_type="minor"
+        ;;
+    4)
         version_type="major"
         ;;
     *)
@@ -63,7 +67,7 @@ echo "✅ Version updated to $new_version"
 
 echo
 echo "📤 Pushing to repository..."
-git push origin main --follow-tags
+git push origin lsp --follow-tags
 
 echo "✅ Pushed to repository"
 
@@ -72,9 +76,9 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-gh release create "$new_version" --generate-notes
+gh release create "$new_version" --generate-notes --prerelease --latest=false
 
-npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
+npx ovsx publish --pre-release -p "$OPEN_VSX_ACCESS_TOKEN"
 
 echo "\n✅ Release $new_version completed successfully."
 echo "🔗 https://github.com/laravel/vs-code-extension/releases/tag/$new_version"
