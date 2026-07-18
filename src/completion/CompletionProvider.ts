@@ -3,6 +3,7 @@
 import { completionProvider as appBinding } from "@src/features/appBinding";
 import { completionProvider as asset } from "@src/features/asset";
 import { completionProvider as auth } from "@src/features/auth";
+import { completionProvider as command } from "@src/features/command";
 import { completionProvider as config } from "@src/features/config";
 import { completionProvider as controllerAction } from "@src/features/controllerAction";
 import { completionProvider as env } from "@src/features/env";
@@ -20,6 +21,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, CompletionProvider>> = {
     "appBinding.completion": appBinding,
     "asset.completion": asset,
     "auth.completion": auth,
+    "command.completion": command,
     "config.completion": config,
     "controllerAction.completion": controllerAction,
     "env.completion": env,

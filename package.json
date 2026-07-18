@@ -1194,6 +1194,30 @@
                     "generated": true,
                     "description": "Enable hover information for Blade components."
                 },
+                "Laravel.command.diagnostics": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable diagnostics for Artisan commands."
+                },
+                "Laravel.command.hover": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable hover information for Artisan commands."
+                },
+                "Laravel.command.link": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable linking for Artisan commands."
+                },
+                "Laravel.command.completion": {
+                    "type": "boolean",
+                    "default": true,
+                    "generated": true,
+                    "description": "Enable completion for Artisan commands."
+                },
                 "Laravel.config.diagnostics": {
                     "type": "boolean",
                     "default": true,

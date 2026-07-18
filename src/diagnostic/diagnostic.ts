@@ -1,6 +1,7 @@
 import { diagnosticProvider as appBinding } from "@src/features/appBinding";
 import { diagnosticProvider as asset } from "@src/features/asset";
 import { diagnosticProvider as auth } from "@src/features/auth";
+import { diagnosticProvider as command } from "@src/features/command";
 import { diagnosticProvider as config } from "@src/features/config";
 import { diagnosticProvider as controllerAction } from "@src/features/controllerAction";
 import { diagnosticProvider as env } from "@src/features/env";
@@ -24,6 +25,7 @@ const providers: {
     { provider: appBinding, configKey: "appBinding.diagnostics" },
     { provider: asset, configKey: "asset.diagnostics" },
     { provider: auth, configKey: "auth.diagnostics" },
+    { provider: command, configKey: "command.diagnostics" },
     { provider: config, configKey: "config.diagnostics" },
     { provider: controllerAction, configKey: "controllerAction.diagnostics" },
     { provider: env, configKey: "env.diagnostics" },

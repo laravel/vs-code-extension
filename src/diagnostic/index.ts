@@ -9,6 +9,7 @@ export type DiagnosticCode =
     | "appBinding"
     | "asset"
     | "auth"
+    | "command"
     | "config"
     | "controllerAction"
     | "env"

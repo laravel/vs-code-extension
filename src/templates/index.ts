@@ -3,6 +3,7 @@ import auth from "./auth";
 import bladeComponents from "./blade-components";
 import bladeDirectives from "./blade-directives";
 import bootstrapLaravel from "./bootstrap-laravel";
+import commands from "./commands";
 import configs from "./configs";
 import inertia from "./inertia";
 import middleware from "./middleware";
@@ -19,6 +20,7 @@ const templates = {
     bladeComponents,
     bladeDirectives,
     bootstrapLaravel,
+    commands,
     configs,
     inertia,
     middleware,

@@ -4,6 +4,7 @@ import { linkProvider as appBinding } from "@src/features/appBinding";
 import { linkProvider as asset } from "@src/features/asset";
 import { linkProvider as auth } from "@src/features/auth";
 import { linkProvider as bladeComponent } from "@src/features/bladeComponent";
+import { linkProvider as command } from "@src/features/command";
 import { linkProvider as config } from "@src/features/config";
 import { linkProvider as controllerAction } from "@src/features/controllerAction";
 import { linkProvider as env } from "@src/features/env";
@@ -31,6 +32,7 @@ const allProviders: Partial<Record<GeneratedConfigKey, LinkProviderType>> = {
     "asset.link": asset,
     "auth.link": auth,
     "bladeComponent.link": bladeComponent,
+    "command.link": command,
     "config.link": config,
     "controllerAction.link": controllerAction,
     "env.link": env,

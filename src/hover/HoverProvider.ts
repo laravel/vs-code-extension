@@ -3,6 +3,7 @@
 import { hoverProvider as appBinding } from "@src/features/appBinding";
 import { hoverProvider as auth } from "@src/features/auth";
 import { hoverProvider as bladeComponent } from "@src/features/bladeComponent";
+import { hoverProvider as command } from "@src/features/command";
 import { hoverProvider as livewireComponent } from "@src/features/livewireComponent";
 import { hoverProvider as config } from "@src/features/config";
 import { hoverProvider as env } from "@src/features/env";
@@ -26,6 +27,7 @@ import { HoverProvider as ProviderFunc } from "..";
 const allProviders: Partial<Record<GeneratedConfigKey, ProviderFunc>> = {
     "appBinding.hover": appBinding,
     "auth.hover": auth,
+    "command.hover": command,
     "config.hover": config,
     "env.hover": env,
     "inertia.hover": inertia,

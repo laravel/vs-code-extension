@@ -10,6 +10,10 @@
         "type": "auth"
     },
     {
+        "type": "command",
+        "label": "Artisan commands"
+    },
+    {
         "type": "config"
     },
     {
