@@ -37,6 +37,7 @@ import { info } from "./support/logger";
 import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
 import { setLspBinaryPath } from "./lsp/binary";
 import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
+import { checkForLspUpdate, forceLspUpdate } from "./lsp/updater";
 import { hasWorkspace, projectPathExists } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import {
@@ -92,6 +93,9 @@ export async function activate(context: vscode.ExtensionContext) {
             commandName("laravel.goToRoute"),
             goToRouteCommand,
         ),
+        vscode.commands.registerCommand(commandName("laravel.lsp.update"), () =>
+            forceLspUpdate(context, shouldActivate()),
+        ),
     );
 
     if (!shouldActivate()) {
@@ -118,6 +122,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
         registerTestRunner();
     }
+
+    void checkForLspUpdate(context);
 
     console.log("Laravel VS Code Started...");
 

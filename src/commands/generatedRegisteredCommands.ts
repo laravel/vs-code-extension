@@ -15,6 +15,7 @@ export type RegisteredCommand =
     | "laravel.refactorAllHtmlClassesToBladeDirectives"
     | "laravel.namespace.generate"
     | "laravel.goToRoute"
+    | "laravel.lsp.update"
     | "laravel.artisan.make.cast"
     | "laravel.artisan.make.channel"
     | "laravel.artisan.make.class"
