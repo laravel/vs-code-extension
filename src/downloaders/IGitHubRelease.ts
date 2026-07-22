@@ -21,7 +21,7 @@ export interface IGithubRelease {
     mentions_count: number;
 }
 
-interface IAsset {
+export interface IAsset {
     url: string;
     id: number;
     node_id: string;

@@ -38,6 +38,36 @@ export class FileDownloader implements IFileDownloader {
         );
     }
 
+    public async getLatestGitHubRelease(
+        owner: string,
+        repository: string,
+    ): Promise<IGithubRelease | undefined> {
+        const headers: Record<string, string> = {
+            Accept: `application/vnd.github+json`,
+        };
+
+        try {
+            const response: AxiosResponse<IGithubRelease> = await axios.get(
+                `https://api.github.com/repos/${owner}/${repository}/releases/latest`,
+                {
+                    headers,
+                    proxy: false,
+                    timeout: DefaultTimeoutInMs,
+                },
+            );
+
+            return response.data;
+        } catch (error) {
+            this._logger.error(
+                `Failed to access https://api.github.com/repos/${owner}/${repository}/releases/latest. Technical details: ${JSON.stringify(
+                    error,
+                )}`,
+            );
+        }
+
+        return undefined;
+    }
+
     /**
      * @param settings optional additional settings for the download. If this is not provided, we will set the Accept header
      * to application/octet-stream.
@@ -74,14 +104,6 @@ export class FileDownloader implements IFileDownloader {
             };
         } else if (settings.headers.Accept === undefined) {
             settings.headers.Accept = `application/octet-stream`;
-        }
-
-        // If the GITHUB_TOKEN is set, then use it to download the file
-        // and then we wont get rate limited.
-        const token = process.env.GITHUB_TOKEN;
-        if (token !== null) {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            settings.headers.Authorization = `Bearer ${token}`;
         }
 
         return this.downloadFile(
@@ -360,22 +382,14 @@ export class FileDownloader implements IFileDownloader {
         repository: string,
         fileName: string,
     ): Promise<Uri | undefined> {
-        try {
-            const response: AxiosResponse<IGithubRelease> = await axios.get(
-                `https://api.github.com/repos/${owner}/${repository}/releases/latest`,
-            );
-            for (const asset of response.data.assets) {
+        const release = await this.getLatestGitHubRelease(owner, repository);
+
+        if (release) {
+            for (const asset of release.assets) {
                 if (asset.name === fileName) {
                     return Uri.parse(asset.url);
                 }
             }
-        } catch (error) {
-            // Maybe GitHub is down, don't stop the extension from working.
-            this._logger.error(
-                `Failed to access https://api.github.com/repos/${owner}/${repository} for ${fileName}. Technical details: ${JSON.stringify(
-                    error,
-                )}`,
-            );
         }
 
         this._logger.error(`${fileName} not found in latest release.`);

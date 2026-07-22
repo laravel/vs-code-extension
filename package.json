@@ -698,6 +698,11 @@
                 "category": "Laravel"
             },
             {
+                "command": "laravel.lsp.update",
+                "title": "Update LSP",
+                "category": "Laravel"
+            },
+            {
                 "command": "laravel.artisan.make.cast",
                 "title": "Make Cast",
                 "category": "Laravel"

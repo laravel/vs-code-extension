@@ -18,15 +18,6 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-BINARY_VERSION=`grep 'const binaryVersion' src/lsp/binary.ts | sed -E 's/.*"([^"]+)".*/\1/'`
-
-read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
-
-if [ "$confirmation" != "y" ]; then
-  echo "Please update the binary version in src/lsp/binary.ts"
-  exit 1
-fi
-
 echo
 echo "Current version: $(node -p "require('./package.json').version")"
 echo
