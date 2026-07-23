@@ -1,5 +1,3 @@
-# Official Laravel VS Code Extension
-
 ## Introduction
 
 The Laravel VS Code extension integrates the [Laravel LSP](https://github.com/laravel/lsp) server with Visual Studio Code, providing completions, hover information, diagnostics, links, and code actions for your PHP and Blade files.
@@ -22,7 +20,7 @@ To choose the PHP environment used by the Laravel LSP server, configure `Laravel
 
 ```json
 {
-  "Laravel.phpEnvironment": "sail"
+    "Laravel.phpEnvironment": "sail"
 }
 ```
 
