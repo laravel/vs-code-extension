@@ -49,6 +49,6 @@ body:
     - type: textarea
       id: code_sample
       attributes:
-          label: Mimimal Code Sample
+          label: Minimal Code Sample
           description: If you can, please provide a minimal code sample that reproduces the bug.
           render: php
