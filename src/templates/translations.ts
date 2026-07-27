@@ -337,6 +337,7 @@ $translator = new class
             ->after($path.DIRECTORY_SEPARATOR)
             ->after(DIRECTORY_SEPARATOR)
             ->replaceLast('.php', '')
+            ->replace(DIRECTORY_SEPARATOR, '/')
             ->value();
 
         if ($namespace) {
