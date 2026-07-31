@@ -80,8 +80,12 @@ export const diagnosticProvider = (
         doc,
         toFind,
         getEnv,
-        ({ param, index }) => {
+        ({ param, index, item }) => {
             if (index > 0) {
+                return null;
+            }
+
+            if ("arguments" in item && item.arguments.children.length > 1) {
                 return null;
             }
 
