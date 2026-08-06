@@ -2,6 +2,30 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v2.0.0 - 2026-08-06
+
+### What's Changed
+
+* Pin GitHub Actions to commit SHAs and add Dependabot config by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/648
+* GitHub Actions hardening by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/vs-code-extension/pull/656
+* Add Dependabot cooldown of 5 days by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/vs-code-extension/pull/659
+* Enable Dependabot auto-merge by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/vs-code-extension/pull/660
+* Bump the github-actions group across 1 directory with 2 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/664
+* Bump shivammathur/setup-php from 2.37.1 to 2.37.2 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/669
+* Fix: typo mimimal to minimal in bug report template by [@eranishojha](https://github.com/eranishojha) in https://github.com/laravel/vs-code-extension/pull/672
+* Bump form-data from 4.0.1 to 4.0.6 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/671
+* Bump js-yaml from 4.1.0 to 4.2.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/670
+* Bump esbuild from 0.25.0 to 0.28.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/667
+* Bump shell-quote from 1.8.1 to 1.8.4 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/665
+* LSP by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/661
+
+### New Contributors
+
+* [@nunomaduro](https://github.com/nunomaduro) made their first contribution in https://github.com/laravel/vs-code-extension/pull/656
+* [@eranishojha](https://github.com/eranishojha) made their first contribution in https://github.com/laravel/vs-code-extension/pull/672
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v1.7.0...v2.0.0
+
 ## v1.7.0 - 2026-04-09
 
 ### What's Changed
