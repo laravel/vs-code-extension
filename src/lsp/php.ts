@@ -34,6 +34,6 @@ export const warnAboutLegacyPhpCommand = (): void => {
     hasShownLegacyPhpCommandWarning = true;
 
     vscode.window.showErrorMessage(
-        'Laravel.phpCommand must now be configured as an array of strings, for example ["php"] or ["docker", "exec", "app", "php"].',
+        'MIGRATION WARNING: Please update your Laravel.phpCommand setting to use the new argv array-of-strings format, for example ["php"] or ["docker", "exec", "app", "php"].',
     );
 };
