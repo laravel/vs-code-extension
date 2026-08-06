@@ -7,8 +7,8 @@ echo "=========================================="
 
 # Ensure we are on main and the working tree is clean
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "lsp" ]; then
-  echo "Error: must be on lsp branch (current: $CURRENT_BRANCH)" >&2
+if [ "$CURRENT_BRANCH" != "main" ]; then
+  echo "Error: must be on main branch (current: $CURRENT_BRANCH)" >&2
   exit 1
 fi
 
@@ -23,25 +23,21 @@ echo "Current version: $(node -p "require('./package.json').version")"
 echo
 
 echo "Select version bump type:"
-echo "1) prerelease (e.g. 2.0.0-beta.1 -> 2.0.0-beta.2)"
-echo "2) patch (bug fixes)"
-echo "3) minor (new features)"
-echo "4) major (breaking changes)"
+echo "1) patch (bug fixes)"
+echo "2) minor (new features)"
+echo "3) major (breaking changes)"
 echo
 
-read -p "Enter your choice (1-4): " choice
+read -p "Enter your choice (1-3): " choice
 
 case $choice in
     1)
-        version_type="prerelease"
-        ;;
-    2)
         version_type="patch"
         ;;
-    3)
+    2)
         version_type="minor"
         ;;
-    4)
+    3)
         version_type="major"
         ;;
     *)
@@ -58,7 +54,7 @@ echo "✅ Version updated to $new_version"
 
 echo
 echo "📤 Pushing to repository..."
-git push origin lsp --follow-tags
+git push origin main --follow-tags
 
 echo "✅ Pushed to repository"
 
@@ -67,9 +63,9 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-gh release create "$new_version" --generate-notes --prerelease --latest=false
+gh release create "$new_version" --generate-notes --notes-start-tag v1.7.0
 
-npx ovsx publish --pre-release -p "$OPEN_VSX_ACCESS_TOKEN"
+npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
 
 echo "\n✅ Release $new_version completed successfully."
 echo "🔗 https://github.com/laravel/vs-code-extension/releases/tag/$new_version"
