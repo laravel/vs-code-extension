@@ -1,8 +1,7 @@
-import * as vscode from "vscode";
 import path from "path";
+import * as vscode from "vscode";
 
 import { getNamespace } from "@src/commands/generateNamespace";
-import { escapeNamespace } from "@src/support/util";
 import { Argument, ArgumentType, Command, Option } from "./types";
 
 const EndSelection = "End Selection";
@@ -43,7 +42,7 @@ const getValueForArgumentType = async (
 
             namespace = namespace ? (namespace += `\\${fileName}`) : value;
 
-            return escapeNamespace(namespace.replaceAll("/", "\\").trim());
+            return namespace.replaceAll("/", "\\").trim();
 
         case "path":
             // OS path separators
@@ -106,8 +105,8 @@ const getUserArguments = async (
     return userArguments;
 };
 
-const getArgumentsAsString = (userArguments: Record<string, string>) =>
-    Object.values(userArguments).join(" ");
+const getArgumentsAsArgv = (userArguments: Record<string, string>) =>
+    Object.values(userArguments);
 
 const getUserOptions = async (
     commandOptions: Option[] | undefined,
@@ -126,7 +125,7 @@ const getUserOptions = async (
     }));
 
     while (true) {
-        const optionsAsString = getOptionsAsString(userOptions);
+        const optionsAsString = getOptionsAsDisplayString(userOptions);
 
         const choice = await artisanBuilderUi.showQuickPick(
             [
@@ -160,8 +159,9 @@ const getUserOptions = async (
         );
 
         if (option?.type === "select" && option?.options) {
+            const options = await option.options();
             const optionsChoice = await artisanBuilderUi.showQuickPick(
-                Object.entries(option.options()).map(([key, value]) => ({
+                Object.entries(options).map(([key, value]) => ({
                     label: key,
                     command: value,
                 })),
@@ -228,7 +228,14 @@ const getUserOptions = async (
     return userOptions;
 };
 
-const getOptionsAsString = (userOptions: Record<string, string | undefined>) =>
+const getOptionsAsArgv = (userOptions: Record<string, string | undefined>) =>
+    Object.entries(userOptions).map(([key, value]) =>
+        key !== value ? `${key}=${value}` : key,
+    );
+
+const getOptionsAsDisplayString = (
+    userOptions: Record<string, string | undefined>,
+) =>
     Object.entries(userOptions)
         .map(([key, value]) => (key !== value ? `${key}=${value}` : key))
         .join(" ");
@@ -237,7 +244,7 @@ export const buildArtisanCommand = async (
     command: Command,
     uri: vscode.Uri,
     workspaceFolder: vscode.WorkspaceFolder,
-): Promise<string | undefined> => {
+): Promise<string[] | undefined> => {
     const userArguments = await getUserArguments(
         command.arguments,
         workspaceFolder,
@@ -256,9 +263,7 @@ export const buildArtisanCommand = async (
 
     return [
         command.name,
-        getArgumentsAsString(userArguments),
-        getOptionsAsString(userOptions),
-    ]
-        .filter((part) => part.length > 0)
-        .join(" ");
+        ...getArgumentsAsArgv(userArguments),
+        ...getOptionsAsArgv(userOptions),
+    ];
 };

@@ -18,15 +18,6 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-BINARY_VERSION=`grep 'const binaryVersion' src/support/parser.ts | sed -E 's/.*"([^"]+)".*/\1/'`
-
-read -p "Correct binary version (y/n)? $BINARY_VERSION " confirmation
-
-if [ "$confirmation" != "y" ]; then
-  echo "Please update the binary version in src/support/parser.ts"
-  exit 1
-fi
-
 echo
 echo "Current version: $(node -p "require('./package.json').version")"
 echo
@@ -72,7 +63,7 @@ echo "🎉 Release $new_version is ready!"
 echo
 echo "📋 Opening GitHub release page..."
 
-gh release create "$new_version" --generate-notes
+gh release create "$new_version" --generate-notes --notes-start-tag v1.7.0
 
 npx ovsx publish -p "$OPEN_VSX_ACCESS_TOKEN"
 

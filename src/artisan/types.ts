@@ -17,7 +17,7 @@ export interface Confirmation {
 export interface Option {
     name: string;
     type?: OptionType | undefined;
-    options?: () => Record<string, string>;
+    options?: () => Promise<Record<string, string>> | Record<string, string>;
     default?: ((...args: string[]) => string) | string;
     description?: string;
     excludeIf?: string[];

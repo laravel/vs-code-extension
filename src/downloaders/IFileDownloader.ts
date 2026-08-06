@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CancellationToken, ExtensionContext, Uri } from "vscode";
+import { IGithubRelease } from "./IGitHubRelease";
 
 export interface FileDownloadSettings {
     /**
@@ -41,6 +42,13 @@ export interface FileDownloadSettings {
 }
 
 export interface IFileDownloader {
+    /**
+     * Gets the latest stable, published release for a GitHub repository.
+     */
+    getLatestGitHubRelease(
+        owner: string,
+        repository: string,
+    ): Promise<IGithubRelease | undefined>;
     /**
      * Downloads a file from a URL and gives back the file path, file name, and a checksum. Allows you to specify the
      * timeout, the number of acceptable retries, whether or not to unzip the file, and whether or not to check the

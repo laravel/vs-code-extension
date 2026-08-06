@@ -1,5 +1,5 @@
 import { Command } from "../types";
-import { getModelClassnames } from "@src/repositories/models";
+import { getModelClassnames } from "@src/lsp/models";
 import { forceOption, testOptions } from "@src/artisan/options";
 
 export const ControllerMakeCommand: Command = {
