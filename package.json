@@ -3,7 +3,7 @@
     "publisher": "laravel",
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
-    "version": "2.0.0-beta.2",
+    "version": "2.0.0",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -1064,7 +1064,7 @@
                     ],
                     "default": "off",
                     "description": "Traces the communication between VS Code and the Laravel LSP server."
-                },                
+                },
                 "Laravel.basePath": {
                     "type": "string",
                     "default": "",
