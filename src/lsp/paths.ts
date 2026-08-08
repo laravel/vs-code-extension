@@ -1,3 +1,6 @@
+import * as vscode from "vscode";
+
+import { getProjectWorkspaceFolder } from "@src/support/project";
 import { sendLspRequest } from "./client";
 
 export interface PathItem {
@@ -5,8 +8,13 @@ export interface PathItem {
     path: string;
 }
 
-export const getPaths = (): Promise<PathItem[]> => {
+export const getPaths = (
+    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
+): Promise<PathItem[]> => {
     return sendLspRequest<PathItem[]>("laravel/data", {
         name: "paths",
+        textDocument: {
+            uri: workspaceFolder.uri.toString(),
+        },
     });
 };

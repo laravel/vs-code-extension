@@ -13,6 +13,7 @@ import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
 import {
+    getProjectWorkspaceFolder,
     getWorkspaceFolders,
     projectPath,
     projectPathExists,
@@ -153,7 +154,7 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
 
     if (
         !document.uri.fsPath.startsWith(
-            getWorkspaceFolders()[0]?.uri?.fsPath || "",
+            getProjectWorkspaceFolder()?.uri?.fsPath || "",
         )
     ) {
         return;

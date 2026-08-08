@@ -25,7 +25,7 @@ export async function startLspClient(): Promise<LanguageClient | undefined> {
 
     const workspaceFolder = getProjectWorkspaceFolder();
     const serverOptions = createServerOptions(binaryPath, workspaceFolder);
-    const clientOptions = createClientOptions(workspaceFolder);
+    const clientOptions = createClientOptions();
 
     const lspClient = new LanguageClient(
         "laravelLsp",

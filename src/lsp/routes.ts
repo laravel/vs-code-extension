@@ -1,3 +1,6 @@
+import * as vscode from "vscode";
+
+import { getProjectWorkspaceFolder } from "@src/support/project";
 import { sendLspRequest } from "./client";
 
 export interface RouteItem {
@@ -11,8 +14,13 @@ export interface RouteItem {
     livewire: string | null;
 }
 
-export const getRoutes = (): Promise<RouteItem[]> => {
+export const getRoutes = (
+    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
+): Promise<RouteItem[]> => {
     return sendLspRequest<RouteItem[]>("laravel/data", {
         name: "routes",
+        textDocument: {
+            uri: workspaceFolder.uri.toString(),
+        },
     });
 };

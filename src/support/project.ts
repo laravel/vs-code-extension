@@ -42,36 +42,64 @@ export const resolveWorkspaceProjectFolder = (
     };
 };
 
-export const getProjectWorkspaceFolder = ():
-    | vscode.WorkspaceFolder
-    | undefined => {
-    const workspaceFolder = getWorkspaceFolders()[0];
+export const getProjectWorkspaceFolder = (
+    uri?: vscode.Uri | undefined,
+): vscode.WorkspaceFolder | undefined => {
+    // Case when we know the file URI and we want to get the VSCode workspace folder for it.
+    // Useful for Laravel artisan commands in the VSCode file explorer
+    if (uri) {
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
-    if (!workspaceFolder) {
-        return undefined;
+        if (workspaceFolder) {
+            return workspaceFolder;
+        }
     }
 
-    return resolveWorkspaceProjectFolder(workspaceFolder);
+    // Case when we don't know the file URI but we have an active text editor,
+    // so we try to get the workspace folder from it
+    if (vscode.window.activeTextEditor) {
+        const fileUri = vscode.window.activeTextEditor.document.uri;
+
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+
+        if (workspaceFolder) {
+            return workspaceFolder;
+        }
+    }
+
+    // Fallback, just return the first workspace folder if it exists
+    return getFirstLaravelWorkspaceFolder();
 };
 
-export const projectPath = (srcPath = ""): string => {
+export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
+    vscode.workspace.workspaceFolders || [];
+
+export const getLaravelWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
+    return getWorkspaceFolders().filter((workspaceFolder) =>
+        fs.existsSync(
+            path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+        ),
+    )!;
+};
+
+export const getFirstLaravelWorkspaceFolder = ():
+    | vscode.WorkspaceFolder
+    | undefined => getLaravelWorkspaceFolders()?.[0];
+
+export const hasWorkspace = (): boolean => {
+    return (
+        getWorkspaceFolders() instanceof Array &&
+        getWorkspaceFolders().length > 0
+    );
+};
+
+export const projectPath = (
+    srcPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
+): string => {
     srcPath = basePath(srcPath);
 
-    for (let workspaceFolder of getWorkspaceFolders()) {
-        if (
-            fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            )
-        ) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
-        }
-
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, srcPath))) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
-        }
-    }
-
-    return "";
+    return path.join(workspaceFolder.uri.fsPath, srcPath);
 };
 
 export const relativePath = (srcPath: string): string => {
@@ -89,20 +117,16 @@ export const relativePath = (srcPath: string): string => {
     return srcPath;
 };
 
-export const hasWorkspace = (): boolean => {
-    return (
-        vscode.workspace.workspaceFolders instanceof Array &&
-        vscode.workspace.workspaceFolders.length > 0
-    );
+export const projectPathExists = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+): boolean => {
+    return fs.existsSync(projectPath(path, workspaceFolder));
 };
 
-export const getWorkspaceFolders = () =>
-    vscode.workspace.workspaceFolders || [];
-
-export const projectPathExists = (path: string): boolean => {
-    return fs.existsSync(projectPath(path));
-};
-
-export const readFileInProject = (path: string): string => {
-    return fs.readFileSync(projectPath(path), "utf8");
+export const readFileInProject = (
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+): string => {
+    return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
 };

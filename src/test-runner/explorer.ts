@@ -17,21 +17,32 @@ export interface TestSuite {
     }[];
 }
 
-export const updateExplorer = async (controller: vscode.TestController) => {
-    const suites = await getTestSuites();
+export const updateExplorer = async (
+    controller: vscode.TestController,
+    workspaceFolder: vscode.WorkspaceFolder,
+) => {
+    const suites = await getTestSuites(workspaceFolder);
 
     controller.items.replace(
-        suites.map((suite) => buildSuiteItem(controller, suite)),
+        suites.map((suite) =>
+            buildSuiteItem(controller, suite, workspaceFolder),
+        ),
     );
 };
 
-const getTestSuites = () => {
-    return sendLspRequest<TestSuite[]>("laravel/data", { name: "tests" });
+const getTestSuites = (workspaceFolder: vscode.WorkspaceFolder) => {
+    return sendLspRequest<TestSuite[]>("laravel/data", {
+        name: "tests",
+        textDocument: {
+            uri: workspaceFolder.uri.toString(),
+        },
+    });
 };
 
 const buildSuiteItem = (
     controller: vscode.TestController,
     suite: TestSuite,
+    workspaceFolder: vscode.WorkspaceFolder,
 ) => {
     const suiteItem = controller.createTestItem(
         `suite:${suite.name}`,
@@ -40,7 +51,7 @@ const buildSuiteItem = (
     );
 
     suite.files.forEach((file) => {
-        const uri = vscode.Uri.file(projectPath(file.path));
+        const uri = vscode.Uri.file(projectPath(file.path, workspaceFolder));
         const basePath = getBasePath(file.path, file.directories);
 
         const parent = ensureFolderPath(
