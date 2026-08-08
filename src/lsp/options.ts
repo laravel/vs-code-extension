@@ -29,6 +29,7 @@ export function createClientOptions(
     workspaceFolder?: vscode.WorkspaceFolder,
 ): LanguageClientOptions {
     return {
+        workspaceFolder,
         documentSelector: [
             { scheme: "file", language: "php" },
             { scheme: "file", language: "blade" },
