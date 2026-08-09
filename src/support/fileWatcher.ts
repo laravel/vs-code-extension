@@ -4,7 +4,6 @@ import {
     getFirstLaravelWorkspaceFolder,
     getLaravelWorkspaceFolders,
     getProjectWorkspaceFolder,
-    getWorkspaceFolders,
 } from "./project";
 import { debounce, leadingDebounce } from "./util";
 
@@ -148,7 +147,7 @@ export const createFileWatcher = (
         }
 
         const watcher = vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(getWorkspaceFolders()[0], pattern),
+            new vscode.RelativePattern(workspaceFolder, pattern),
         );
 
         watcher.onDidChange((...args) => {
