@@ -11,7 +11,7 @@ export const registerTestRunner = async () => {
         return;
     }
 
-    for (const workspaceFolder of getLaravelWorkspaceFolders()) {
+    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
         const controller = vscode.tests.createTestController(
             `${workspaceFolder.name}-tests`,
             `${workspaceFolder.name} Tests`,
@@ -39,5 +39,5 @@ export const registerTestRunner = async () => {
             ["create", "delete", "change"],
             workspaceFolder,
         );
-    }
+    });
 };
