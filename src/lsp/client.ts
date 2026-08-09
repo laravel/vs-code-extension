@@ -1,5 +1,5 @@
 import { LanguageClient } from "vscode-languageclient/node";
-import { getProjectWorkspaceFolder } from "../support/project";
+import { getFirstLaravelWorkspaceFolder } from "../support/project";
 import { getLspBinaryPath } from "./binary";
 import { createClientOptions, createServerOptions } from "./options";
 import { clearResolvedPhpCommand, setResolvedPhpCommand } from "./php";
@@ -23,7 +23,7 @@ export async function startLspClient(): Promise<LanguageClient | undefined> {
         return undefined;
     }
 
-    const workspaceFolder = getProjectWorkspaceFolder();
+    const workspaceFolder = getFirstLaravelWorkspaceFolder();
     const serverOptions = createServerOptions(binaryPath, workspaceFolder);
     const clientOptions = createClientOptions();
 
