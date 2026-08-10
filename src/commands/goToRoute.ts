@@ -74,7 +74,7 @@ const selectWorkspaceFolder = async (): Promise<
 > => {
     const workspaceFolders = getLaravelWorkspaceFolders();
 
-    if (workspaceFolders.length === 0) {
+    if (workspaceFolders.length <= 1) {
         return undefined;
     }
 
