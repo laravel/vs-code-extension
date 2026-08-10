@@ -7,7 +7,7 @@ import { config } from "../support/config";
 
 export function createServerOptions(
     binaryPath: string,
-    workspaceFolder: vscode.WorkspaceFolder,
+    workspaceFolder?: vscode.WorkspaceFolder,
 ): ServerOptions {
     if (!workspaceFolder) {
         return {
