@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { LanguageClient, Trace } from "vscode-languageclient/node";
+import { LanguageClient } from "vscode-languageclient/node";
 import { getFirstLaravelWorkspaceFolder } from "../support/project";
 import { getLspBinaryPath } from "./binary";
 import { createClientOptions, createServerOptions } from "./options";

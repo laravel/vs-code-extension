@@ -7,15 +7,8 @@ import { config } from "../support/config";
 
 export function createServerOptions(
     binaryPath: string,
-    workspaceFolder?: vscode.WorkspaceFolder,
+    workspaceFolder: vscode.WorkspaceFolder,
 ): ServerOptions {
-    if (!workspaceFolder) {
-        return {
-            command: binaryPath,
-            args: ["lsp"],
-        };
-    }
-
     return {
         command: binaryPath,
         args: ["lsp"],
