@@ -17,10 +17,11 @@ export interface RouteItem {
 export const getRoutes = (
     workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
 ): Promise<RouteItem[]> => {
-    return sendLspRequest<RouteItem[]>("laravel/data", {
-        name: "routes",
-        textDocument: {
-            uri: workspaceFolder.uri.toString(),
+    return sendLspRequest<RouteItem[]>(
+        "laravel/data",
+        {
+            name: "routes",
         },
-    });
+        workspaceFolder,
+    );
 };

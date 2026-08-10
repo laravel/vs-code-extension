@@ -12,12 +12,13 @@ type Models = Record<string, ModelItem>;
 export const getModels = (
     workspaceFolder: vscode.WorkspaceFolder,
 ): Promise<Models> => {
-    return sendLspRequest<Models>("laravel/data", {
-        name: "models",
-        textDocument: {
-            uri: workspaceFolder.uri.toString(),
+    return sendLspRequest<Models>(
+        "laravel/data",
+        {
+            name: "models",
         },
-    });
+        workspaceFolder,
+    );
 };
 
 export const getModelClassnames = async (

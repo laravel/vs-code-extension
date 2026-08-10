@@ -102,20 +102,22 @@ export const watchForComposerChanges = () => {
         }
     }, 1000);
 
-    getLaravelWorkspaceFolders().forEach((workspaceFolder) => {
-        const watcher = vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(
-                workspaceFolder,
-                "vendor/composer/autoload_*.php",
-            ),
-        );
+    Promise.all(
+        getLaravelWorkspaceFolders().map((workspaceFolder) => {
+            const watcher = vscode.workspace.createFileSystemWatcher(
+                new vscode.RelativePattern(
+                    workspaceFolder,
+                    "vendor/composer/autoload_*.php",
+                ),
+            );
 
-        watcher.onDidChange(onChange);
-        watcher.onDidCreate(onChange);
-        watcher.onDidDelete(onChange);
+            watcher.onDidChange(onChange);
+            watcher.onDidCreate(onChange);
+            watcher.onDidDelete(onChange);
 
-        registerWatcher(watcher);
-    });
+            registerWatcher(watcher);
+        }),
+    );
 };
 
 export const createFileWatcher = (

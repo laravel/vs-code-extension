@@ -4,9 +4,14 @@ import * as vscode from "vscode";
 
 import os from "os";
 import { LanguageClient } from "vscode-languageclient/node";
+import {
+    registerArtisanCommands,
+    registerArtisanMakeCommands,
+} from "./artisan/registry";
 import { bladeSpacer } from "./blade/bladeSpacer";
 import { initClient } from "./blade/client";
 import { commandName, openFileCommand } from "./commands";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
 import { generateNamespaceCommand } from "./commands/generateNamespace";
 import { goToRouteCommand } from "./commands/goToRoute";
 import {
@@ -30,21 +35,21 @@ import {
     wrapSelectionCommand,
     wrapWithHelperCommands,
 } from "./commands/wrapWithHelper";
+import { setLspBinaryPath } from "./lsp/binary";
+import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
+import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
+import { checkForLspUpdate, forceLspUpdate } from "./lsp/updater";
 import { configAffected } from "./support/config";
 import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
-import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
-import { setLspBinaryPath } from "./lsp/binary";
-import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
-import { checkForLspUpdate, forceLspUpdate } from "./lsp/updater";
-import { hasWorkspace, projectPathExists } from "./support/project";
-import { cleanUpTemp } from "./support/util";
 import {
-    registerArtisanCommands,
-    registerArtisanMakeCommands,
-} from "./artisan/registry";
-import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
+    getLaravelWorkspaceFolders,
+    hasWorkspace,
+    projectPathExists,
+} from "./support/project";
+import { cleanUpTemp } from "./support/util";
+import { registerTestRunner } from "./test-runner";
 
 let client: LanguageClient;
 
@@ -111,17 +116,24 @@ export async function activate(context: vscode.ExtensionContext) {
 
     setLspBinaryPath(context);
 
-    const lspClient = await startLspClient().catch((error) => {
-        console.error("Failed to start Laravel LSP:", error);
+    await Promise.all(
+        getLaravelWorkspaceFolders().map(async (workspaceFolder) => {
+            const lspClient = await startLspClient(workspaceFolder).catch(
+                (error) => {
+                    console.error(
+                        `Failed to start Laravel LSP for ${workspaceFolder.name}:`,
+                        error,
+                    );
 
-        return undefined;
-    });
+                    return undefined;
+                },
+            );
 
-    if (lspClient) {
-        const { registerTestRunner } = await import("./test-runner/index.js");
-
-        registerTestRunner();
-    }
+            if (lspClient) {
+                registerTestRunner(workspaceFolder);
+            }
+        }),
+    );
 
     void checkForLspUpdate(context);
 

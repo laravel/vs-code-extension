@@ -21,10 +21,11 @@ export interface ViewItem {
 export const getViews = (
     workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
 ): Promise<ViewItem[]> => {
-    return sendLspRequest<ViewItem[]>("laravel/data", {
-        name: "views",
-        textDocument: {
-            uri: workspaceFolder.uri.toString(),
+    return sendLspRequest<ViewItem[]>(
+        "laravel/data",
+        {
+            name: "views",
         },
-    });
+        workspaceFolder,
+    );
 };

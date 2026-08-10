@@ -7,7 +7,7 @@ import { config } from "../support/config";
 
 export function createServerOptions(
     binaryPath: string,
-    workspaceFolder?: vscode.WorkspaceFolder,
+    workspaceFolder: vscode.WorkspaceFolder,
 ): ServerOptions {
     if (!workspaceFolder) {
         return {
@@ -26,18 +26,25 @@ export function createServerOptions(
 }
 
 export function createClientOptions(
-    workspaceFolder?: vscode.WorkspaceFolder,
+    workspaceFolder: vscode.WorkspaceFolder,
 ): LanguageClientOptions {
+    const path = vscode.workspace.asRelativePath(workspaceFolder.uri, true);
+
     return {
         workspaceFolder,
         documentSelector: [
-            { scheme: "file", language: "php" },
-            { scheme: "file", language: "blade" },
-            { scheme: "file", language: "laravel-blade" },
-            { scheme: "file", pattern: "**/.env*" },
+            { scheme: "file", language: "php", pattern: `${path}/**/*` },
+            { scheme: "file", language: "blade", pattern: `${path}/**/*` },
+            {
+                scheme: "file",
+                language: "laravel-blade",
+                pattern: `${path}/**/*`,
+            },
+            { scheme: "file", pattern: `${path}/**/.env*` },
         ],
-        traceOutputChannel:
-            vscode.window.createOutputChannel("Laravel LSP Trace"),
+        traceOutputChannel: vscode.window.createOutputChannel(
+            `Laravel LSP Trace (${workspaceFolder.name})`,
+        ),
         initializationOptions: {
             appBindingCompletion: config("appBinding.completion", true),
             appBindingDiagnostics: config("appBinding.diagnostics", true),

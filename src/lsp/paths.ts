@@ -11,10 +11,11 @@ export interface PathItem {
 export const getPaths = (
     workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
 ): Promise<PathItem[]> => {
-    return sendLspRequest<PathItem[]>("laravel/data", {
-        name: "paths",
-        textDocument: {
-            uri: workspaceFolder.uri.toString(),
+    return sendLspRequest<PathItem[]>(
+        "laravel/data",
+        {
+            name: "paths",
         },
-    });
+        workspaceFolder,
+    );
 };

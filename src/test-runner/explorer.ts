@@ -31,12 +31,13 @@ export const updateExplorer = async (
 };
 
 const getTestSuites = (workspaceFolder: vscode.WorkspaceFolder) => {
-    return sendLspRequest<TestSuite[]>("laravel/data", {
-        name: "tests",
-        textDocument: {
-            uri: workspaceFolder.uri.toString(),
+    return sendLspRequest<TestSuite[]>(
+        "laravel/data",
+        {
+            name: "tests",
         },
-    });
+        workspaceFolder,
+    );
 };
 
 const buildSuiteItem = (
