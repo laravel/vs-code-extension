@@ -11,7 +11,7 @@ const getDefaultTerminal = (): string => {
 
 const quoteShellArg = (arg: string, quote: ShellQuote = "'"): string => {
     if (arg === "") {
-        return "";
+        return "''";
     }
 
     if (/^[A-Za-z0-9_/:=-]+$/.test(arg)) {
@@ -38,10 +38,5 @@ const argvToShell = (argv: string[]): string[] => {
     }
 };
 
-export const argvToShellCommand = (argv: string[]): string => {
-    if (argv.length === 0) {
-        return "";
-    }
-
-    return argvToShell(argv).join(" ");
-};
+export const argvToShellCommand = (argv: string[]): string =>
+    argvToShell(argv).join(" ");
