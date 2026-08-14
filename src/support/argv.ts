@@ -1,14 +1,47 @@
-const quoteShellArg = (arg: string): string => {
+import path from "path";
+import * as vscode from "vscode";
+
+type ShellQuote = "'" | '"';
+
+const getDefaultTerminal = (): string => {
+    const terminal = vscode.env.shell.toLowerCase();
+
+    return path.basename(terminal, path.extname(terminal));
+};
+
+const quoteShellArg = (arg: string, quote: ShellQuote = "'"): string => {
     if (arg === "") {
-        return "''";
+        return "";
     }
 
     if (/^[A-Za-z0-9_/:=-]+$/.test(arg)) {
         return arg;
     }
 
-    return `'${arg.replace(/'/g, "'\\''")}'`;
+    if (quote === "'") {
+        return `'${arg.replace(/'/g, "'\\''")}'`;
+    }
+
+    return `"${arg.replace(/"/g, '\\"')}"`;
 };
 
-export const argvToShellCommand = (argv: string[]): string =>
-    argv.map(quoteShellArg).join(" ");
+const argvToShell = (argv: string[]): string[] => {
+    switch (getDefaultTerminal()) {
+        case "powershell":
+            return ["&", ...argv.map((arg) => quoteShellArg(arg))];
+
+        case "cmd":
+            return argv.map((arg) => quoteShellArg(arg, '"'));
+
+        default:
+            return argv.map((arg) => quoteShellArg(arg));
+    }
+};
+
+export const argvToShellCommand = (argv: string[]): string => {
+    if (argv.length === 0) {
+        return "";
+    }
+
+    return argvToShell(argv).join(" ");
+};
