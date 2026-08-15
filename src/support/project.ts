@@ -3,6 +3,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
 
+type WorkspaceQuickPickItem = vscode.QuickPickItem & {
+    workspaceFolder: vscode.WorkspaceFolder;
+};
+
 const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
@@ -130,3 +134,31 @@ export const readFileInProject = (
 ): string => {
     return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
 };
+
+export const selectWorkspaceFolder = async (): Promise<
+    WorkspaceQuickPickItem | undefined
+> => {
+    const workspaceFolders = resolveWorkspaceProjectFolders();
+
+    if (workspaceFolders.length <= 1) {
+        return buildWorkspaceFolderQuickPickItems(workspaceFolders)?.[0];
+    }
+
+    return await vscode.window.showQuickPick(
+        buildWorkspaceFolderQuickPickItems(workspaceFolders),
+        {
+            title: "Laravel: Go to Route",
+            matchOnDescription: false,
+            matchOnDetail: false,
+            placeHolder: "Select a workspace folder to load routes from",
+        },
+    );
+};
+
+const buildWorkspaceFolderQuickPickItems = (
+    workspaceFolders: vscode.WorkspaceFolder[],
+): WorkspaceQuickPickItem[] =>
+    workspaceFolders.map((workspaceFolder) => ({
+        label: workspaceFolder.name,
+        workspaceFolder,
+    }));

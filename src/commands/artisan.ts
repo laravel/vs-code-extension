@@ -7,6 +7,7 @@ import { artisan, runArtisanInTerminal } from "@src/support/php";
 import {
     getProjectWorkspaceFolder,
     resolveWorkspaceProjectFolder,
+    selectWorkspaceFolder,
 } from "@src/support/project";
 import { openFileCommand } from ".";
 
@@ -26,9 +27,9 @@ export const runArtisanCommand = async (
         }
     }
 
-    const workspaceFolder = resolveWorkspaceProjectFolder(
-        getProjectWorkspaceFolder(uri),
-    );
+    const workspaceFolder = uri
+        ? resolveWorkspaceProjectFolder(getProjectWorkspaceFolder(uri))
+        : (await selectWorkspaceFolder())?.workspaceFolder;
 
     if (!workspaceFolder) {
         vscode.window.showErrorMessage("Cannot detect active workspace");

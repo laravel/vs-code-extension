@@ -1,15 +1,8 @@
 import { getRoutes, type RouteItem } from "@src/lsp/routes";
 import { getViews, type ViewItem } from "@src/lsp/views";
-import {
-    projectPath,
-    resolveWorkspaceProjectFolders,
-} from "@src/support/project";
+import { projectPath, selectWorkspaceFolder } from "@src/support/project";
 import * as vscode from "vscode";
 import { commandName } from ".";
-
-type WorkspaceQuickPickItem = vscode.QuickPickItem & {
-    workspaceFolder: vscode.WorkspaceFolder;
-};
 
 type RouteQuickPickItem = vscode.QuickPickItem & {
     route: RouteItem;
@@ -24,9 +17,9 @@ type RouteTarget = {
 const unnamedRouteLabel = "(unnamed)";
 
 export const goToRouteCommand = async () => {
-    const selectedWorkspaceFolder = await selectWorkspaceFolder();
+    const workspaceFolder = (await selectWorkspaceFolder())?.workspaceFolder;
 
-    const routes = await loadRoutes(selectedWorkspaceFolder?.workspaceFolder);
+    const routes = await loadRoutes(workspaceFolder);
 
     if (routes.length === 0) {
         vscode.window.showWarningMessage("No Laravel routes found.");
@@ -48,14 +41,8 @@ export const goToRouteCommand = async () => {
     }
 
     const target =
-        (await resolveLivewireRouteTarget(
-            selected.route,
-            selectedWorkspaceFolder?.workspaceFolder,
-        )) ??
-        (await resolveRouteTarget(
-            selected.route,
-            selectedWorkspaceFolder?.workspaceFolder,
-        ));
+        (await resolveLivewireRouteTarget(selected.route, workspaceFolder)) ??
+        (await resolveRouteTarget(selected.route, workspaceFolder));
 
     if (!target) {
         vscode.window.showWarningMessage(
@@ -72,37 +59,9 @@ export const goToRouteCommand = async () => {
     );
 };
 
-const selectWorkspaceFolder = async (): Promise<
-    WorkspaceQuickPickItem | undefined
-> => {
-    const workspaceFolders = resolveWorkspaceProjectFolders();
-
-    if (workspaceFolders.length <= 1) {
-        return undefined;
-    }
-
-    return await vscode.window.showQuickPick(
-        buildWorkspaceFolderQuickPickItems(workspaceFolders),
-        {
-            title: "Laravel: Go to Route",
-            matchOnDescription: false,
-            matchOnDetail: false,
-            placeHolder: "Select a workspace folder to load routes from",
-        },
-    );
-};
-
 export const formatRouteLabel = (route: RouteItem): string => {
     return `${route.method} ${route.uri} | ${route.name || unnamedRouteLabel}`;
 };
-
-const buildWorkspaceFolderQuickPickItems = (
-    workspaceFolders: vscode.WorkspaceFolder[],
-): WorkspaceQuickPickItem[] =>
-    workspaceFolders.map((workspaceFolder) => ({
-        label: workspaceFolder.name,
-        workspaceFolder,
-    }));
 
 export const buildRouteQuickPickItems = (
     routes: RouteItem[],
