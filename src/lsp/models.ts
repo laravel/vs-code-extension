@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { getProjectWorkspaceFolder } from "@src/support/project";
+import { resolveWorkspaceProjectFolder } from "@src/support/project";
 import { sendLspRequest } from "./client";
 
 interface ModelItem {
@@ -22,7 +22,7 @@ export const getModels = (
 };
 
 export const getModelClassnames = async (
-    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = resolveWorkspaceProjectFolder()!,
 ): Promise<Record<string, string>> => {
     return Object.fromEntries(
         Object.values(await getModels(workspaceFolder)).map((model) => [

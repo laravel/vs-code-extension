@@ -1,9 +1,8 @@
 import { readdirSync } from "fs";
 import * as vscode from "vscode";
 import {
-    getFirstProjectWorkspaceFolder,
-    getProjectWorkspaceFolder,
-    getProjectWorkspaceFolders,
+    resolveWorkspaceProjectFolder,
+    resolveWorkspaceProjectFolders,
 } from "./project";
 import { debounce, leadingDebounce } from "./util";
 
@@ -61,7 +60,7 @@ const ignoreDirs = ["node_modules", ".git", "vendor", "storage"];
 export const inAppDirs = (pattern: string) => {
     if (!appDirsRead) {
         appDirsRead = true;
-        readdirSync(getProjectWorkspaceFolder()!.uri.fsPath, {
+        readdirSync(resolveWorkspaceProjectFolder()!.uri.fsPath, {
             withFileTypes: true,
         }).forEach((file) => {
             if (file.isDirectory() && !ignoreDirs.includes(file.name)) {
@@ -103,7 +102,7 @@ export const watchForComposerChanges = () => {
     }, 1000);
 
     Promise.all(
-        getProjectWorkspaceFolders().map((workspaceFolder) => {
+        resolveWorkspaceProjectFolders().map((workspaceFolder) => {
             const watcher = vscode.workspace.createFileSystemWatcher(
                 new vscode.RelativePattern(
                     workspaceFolder,
@@ -126,7 +125,7 @@ export const createFileWatcher = (
     events: FileEvent[] = defaultFileEvents,
     workspaceFolder:
         | vscode.WorkspaceFolder
-        | undefined = getFirstProjectWorkspaceFolder(),
+        | undefined = resolveWorkspaceProjectFolder(),
     reloadOnComposerChanges: boolean = true,
 ): vscode.FileSystemWatcher[] => {
     if (!workspaceFolder) {

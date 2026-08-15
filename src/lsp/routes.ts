@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { getProjectWorkspaceFolder } from "@src/support/project";
+import { resolveWorkspaceProjectFolder } from "@src/support/project";
 import { sendLspRequest } from "./client";
 
 export interface RouteItem {
@@ -15,7 +15,7 @@ export interface RouteItem {
 }
 
 export const getRoutes = (
-    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = resolveWorkspaceProjectFolder()!,
 ): Promise<RouteItem[]> => {
     return sendLspRequest<RouteItem[]>(
         "laravel/data",

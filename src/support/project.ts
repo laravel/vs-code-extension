@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { WorkspaceFolder } from "vscode-languageclient";
 import { config } from "./config";
 
 const trimFirstSlash = (srcPath: string): string => {
@@ -23,8 +22,13 @@ export const resolveWorkspaceProjectPath = (
     return path.resolve(workspaceFolder.uri.fsPath, configuredBasePath);
 };
 
+export const resolveWorkspaceProjectFolders = (): vscode.WorkspaceFolder[] =>
+    getProjectWorkspaceFolders().map((workspaceFolder) =>
+        resolveWorkspaceProjectFolder(workspaceFolder),
+    );
+
 export const resolveWorkspaceProjectFolder = (
-    workspaceFolder: vscode.WorkspaceFolder,
+    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
     configuredBasePath = config<string>("basePath", ""),
 ): vscode.WorkspaceFolder => {
     const projectPath = resolveWorkspaceProjectPath(
@@ -75,21 +79,16 @@ export const getProjectWorkspaceFolder = (
 export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
     vscode.workspace.workspaceFolders || [];
 
-export const getProjectWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
-    return getWorkspaceFolders()
-        .filter((workspaceFolder) =>
-            fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            ),
-        )
-        .map((workspaceFolder) =>
-            resolveWorkspaceProjectFolder(workspaceFolder),
-        )!;
+const getProjectWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
+    return getWorkspaceFolders().filter((workspaceFolder) =>
+        fs.existsSync(
+            path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+        ),
+    )!;
 };
 
-export const getFirstProjectWorkspaceFolder = ():
-    | vscode.WorkspaceFolder
-    | undefined => getProjectWorkspaceFolders()?.[0];
+const getFirstProjectWorkspaceFolder = (): vscode.WorkspaceFolder | undefined =>
+    getProjectWorkspaceFolders()?.[0];
 
 export const hasWorkspace = (): boolean => {
     return (
@@ -100,12 +99,8 @@ export const hasWorkspace = (): boolean => {
 
 export const projectPath = (
     srcPath = "",
-    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
-): string => {
-    srcPath = basePath(srcPath);
-
-    return path.join(workspaceFolder.uri.fsPath, srcPath);
-};
+    workspaceFolder: vscode.WorkspaceFolder = resolveWorkspaceProjectFolder()!,
+): string => path.join(workspaceFolder.uri.fsPath, srcPath);
 
 export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {

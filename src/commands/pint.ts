@@ -13,10 +13,10 @@ import { commandName } from ".";
 import { config } from "../support/config";
 import { showErrorPopup } from "../support/popup";
 import {
-    getProjectWorkspaceFolder,
     getWorkspaceFolders,
     projectPath,
     projectPathExists,
+    resolveWorkspaceProjectFolder,
 } from "../support/project";
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -154,7 +154,7 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
 
     if (
         !document.uri.fsPath.startsWith(
-            getProjectWorkspaceFolder()?.uri?.fsPath || "",
+            resolveWorkspaceProjectFolder()?.uri?.fsPath || "",
         )
     ) {
         return;

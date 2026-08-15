@@ -44,9 +44,9 @@ import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import {
-    getProjectWorkspaceFolders,
     hasWorkspace,
     projectPathExists,
+    resolveWorkspaceProjectFolders,
 } from "./support/project";
 import { cleanUpTemp } from "./support/util";
 import { registerTestRunner } from "./test-runner";
@@ -117,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
     setLspBinaryPath(context);
 
     await Promise.all(
-        getProjectWorkspaceFolders().map(async (workspaceFolder) => {
+        resolveWorkspaceProjectFolders().map(async (workspaceFolder) => {
             const lspClient = await startLspClient(workspaceFolder).catch(
                 (error) => {
                     console.error(

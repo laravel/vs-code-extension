@@ -1,4 +1,4 @@
-import { getProjectWorkspaceFolders } from "@src/support/project";
+import { resolveWorkspaceProjectFolders } from "@src/support/project";
 import * as vscode from "vscode";
 import {
     completeLspBinaryUpdate,
@@ -47,8 +47,8 @@ export async function forceLspUpdate(
                     let result: LspBinaryUpdateResult | undefined;
 
                     await Promise.all(
-                        getProjectWorkspaceFolders().map((workspaceFolder) =>
-                            stopLspClient(workspaceFolder),
+                        resolveWorkspaceProjectFolders().map(
+                            (workspaceFolder) => stopLspClient(workspaceFolder),
                         ),
                     );
 
@@ -58,7 +58,7 @@ export async function forceLspUpdate(
                         });
 
                         await Promise.all(
-                            getProjectWorkspaceFolders().map(
+                            resolveWorkspaceProjectFolders().map(
                                 async (workspaceFolder) => {
                                     const updatedClient =
                                         await startLspClient(workspaceFolder);
@@ -77,7 +77,7 @@ export async function forceLspUpdate(
                         }
 
                         await Promise.all(
-                            getProjectWorkspaceFolders().map(
+                            resolveWorkspaceProjectFolders().map(
                                 (workspaceFolder) =>
                                     startLspClient(workspaceFolder),
                             ),

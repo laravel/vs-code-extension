@@ -1,6 +1,9 @@
 import { getRoutes, type RouteItem } from "@src/lsp/routes";
 import { getViews, type ViewItem } from "@src/lsp/views";
-import { getProjectWorkspaceFolders, projectPath } from "@src/support/project";
+import {
+    projectPath,
+    resolveWorkspaceProjectFolders,
+} from "@src/support/project";
 import * as vscode from "vscode";
 import { commandName } from ".";
 
@@ -72,7 +75,7 @@ export const goToRouteCommand = async () => {
 const selectWorkspaceFolder = async (): Promise<
     WorkspaceQuickPickItem | undefined
 > => {
-    const workspaceFolders = getProjectWorkspaceFolders();
+    const workspaceFolders = resolveWorkspaceProjectFolders();
 
     if (workspaceFolders.length <= 1) {
         return undefined;

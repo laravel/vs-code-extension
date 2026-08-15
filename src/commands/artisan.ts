@@ -4,7 +4,10 @@ import { buildArtisanCommand } from "@src/artisan/builder";
 import { Command } from "@src/artisan/types";
 import { getPathFromOutput } from "@src/support/artisan";
 import { artisan, runArtisanInTerminal } from "@src/support/php";
-import { getProjectWorkspaceFolder } from "@src/support/project";
+import {
+    getProjectWorkspaceFolder,
+    resolveWorkspaceProjectFolder,
+} from "@src/support/project";
 import { openFileCommand } from ".";
 
 export const runArtisanCommand = async (
@@ -23,7 +26,9 @@ export const runArtisanCommand = async (
         }
     }
 
-    const workspaceFolder = getProjectWorkspaceFolder(uri);
+    const workspaceFolder = resolveWorkspaceProjectFolder(
+        getProjectWorkspaceFolder(uri),
+    );
 
     if (!workspaceFolder) {
         vscode.window.showErrorMessage("Cannot detect active workspace");
