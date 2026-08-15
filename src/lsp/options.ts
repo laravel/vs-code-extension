@@ -21,19 +21,28 @@ export function createServerOptions(
 export function createClientOptions(
     workspaceFolder: vscode.WorkspaceFolder,
 ): LanguageClientOptions {
-    const path = vscode.workspace.asRelativePath(workspaceFolder.uri, true);
-
     return {
         workspaceFolder,
         documentSelector: [
-            { scheme: "file", language: "php", pattern: `${path}/**/*` },
-            { scheme: "file", language: "blade", pattern: `${path}/**/*` },
+            {
+                scheme: "file",
+                language: "php",
+                pattern: `${workspaceFolder.uri.fsPath}/**/*`,
+            },
+            {
+                scheme: "file",
+                language: "blade",
+                pattern: `${workspaceFolder.uri.fsPath}/**/*`,
+            },
             {
                 scheme: "file",
                 language: "laravel-blade",
-                pattern: `${path}/**/*`,
+                pattern: `${workspaceFolder.uri.fsPath}/**/*`,
             },
-            { scheme: "file", pattern: `${path}/**/.env*` },
+            {
+                scheme: "file",
+                pattern: `${workspaceFolder.uri.fsPath}/**/.env*`,
+            },
         ],
         traceOutputChannel: vscode.window.createOutputChannel(
             `Laravel LSP Trace (${workspaceFolder.name})`,

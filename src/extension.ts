@@ -44,7 +44,7 @@ import { collectDebugInfo } from "./support/debug";
 import { disposeWatchers } from "./support/fileWatcher";
 import { info } from "./support/logger";
 import {
-    getLaravelWorkspaceFolders,
+    getProjectWorkspaceFolders,
     hasWorkspace,
     projectPathExists,
 } from "./support/project";
@@ -117,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
     setLspBinaryPath(context);
 
     await Promise.all(
-        getLaravelWorkspaceFolders().map(async (workspaceFolder) => {
+        getProjectWorkspaceFolders().map(async (workspaceFolder) => {
             const lspClient = await startLspClient(workspaceFolder).catch(
                 (error) => {
                     console.error(

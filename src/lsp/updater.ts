@@ -1,4 +1,4 @@
-import { getLaravelWorkspaceFolders } from "@src/support/project";
+import { getProjectWorkspaceFolders } from "@src/support/project";
 import * as vscode from "vscode";
 import {
     completeLspBinaryUpdate,
@@ -47,7 +47,7 @@ export async function forceLspUpdate(
                     let result: LspBinaryUpdateResult | undefined;
 
                     await Promise.all(
-                        getLaravelWorkspaceFolders().map((workspaceFolder) =>
+                        getProjectWorkspaceFolders().map((workspaceFolder) =>
                             stopLspClient(workspaceFolder),
                         ),
                     );
@@ -58,7 +58,7 @@ export async function forceLspUpdate(
                         });
 
                         await Promise.all(
-                            getLaravelWorkspaceFolders().map(
+                            getProjectWorkspaceFolders().map(
                                 async (workspaceFolder) => {
                                     const updatedClient =
                                         await startLspClient(workspaceFolder);
@@ -77,7 +77,7 @@ export async function forceLspUpdate(
                         }
 
                         await Promise.all(
-                            getLaravelWorkspaceFolders().map(
+                            getProjectWorkspaceFolders().map(
                                 (workspaceFolder) =>
                                     startLspClient(workspaceFolder),
                             ),

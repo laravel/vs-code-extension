@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/node";
-import { getFirstLaravelWorkspaceFolder } from "../support/project";
+import { getFirstProjectWorkspaceFolder } from "../support/project";
 import { getLspBinaryPath } from "./binary";
 import { createClientOptions, createServerOptions } from "./options";
 import { clearResolvedPhpCommand, setResolvedPhpCommand } from "./php";
@@ -15,7 +15,7 @@ type LaravelInitializeResult = {
 };
 
 export async function startLspClient(
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstProjectWorkspaceFolder()!,
 ): Promise<LanguageClient | undefined> {
     const client = clients.get(workspaceFolder.name);
 
@@ -55,7 +55,7 @@ export async function startLspClient(
 }
 
 export async function stopLspClient(
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstProjectWorkspaceFolder()!,
 ): Promise<void> {
     clearResolvedPhpCommand();
 
@@ -69,7 +69,7 @@ export async function stopLspClient(
 }
 
 export async function restartLspClient(
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstProjectWorkspaceFolder()!,
 ): Promise<LanguageClient | undefined> {
     await stopLspClient(workspaceFolder);
 
@@ -79,7 +79,7 @@ export async function restartLspClient(
 export async function sendLspRequest<T>(
     method: string,
     params: object = {},
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder: vscode.WorkspaceFolder = getFirstProjectWorkspaceFolder()!,
 ): Promise<T> {
     const client = clients.get(workspaceFolder.name);
 

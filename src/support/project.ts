@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { WorkspaceFolder } from "vscode-languageclient";
 import { config } from "./config";
 
 const trimFirstSlash = (srcPath: string): string => {
@@ -68,23 +69,27 @@ export const getProjectWorkspaceFolder = (
     }
 
     // Fallback, just return the first workspace folder if it exists
-    return getFirstLaravelWorkspaceFolder();
+    return getFirstProjectWorkspaceFolder();
 };
 
 export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
     vscode.workspace.workspaceFolders || [];
 
-export const getLaravelWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
-    return getWorkspaceFolders().filter((workspaceFolder) =>
-        fs.existsSync(
-            path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-        ),
-    )!;
+export const getProjectWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
+    return getWorkspaceFolders()
+        .filter((workspaceFolder) =>
+            fs.existsSync(
+                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+            ),
+        )
+        .map((workspaceFolder) =>
+            resolveWorkspaceProjectFolder(workspaceFolder),
+        )!;
 };
 
-export const getFirstLaravelWorkspaceFolder = ():
+export const getFirstProjectWorkspaceFolder = ():
     | vscode.WorkspaceFolder
-    | undefined => getLaravelWorkspaceFolders()?.[0];
+    | undefined => getProjectWorkspaceFolders()?.[0];
 
 export const hasWorkspace = (): boolean => {
     return (
@@ -119,14 +124,14 @@ export const relativePath = (srcPath: string): string => {
 
 export const projectPathExists = (
     path: string,
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder?: vscode.WorkspaceFolder,
 ): boolean => {
     return fs.existsSync(projectPath(path, workspaceFolder));
 };
 
 export const readFileInProject = (
     path: string,
-    workspaceFolder: vscode.WorkspaceFolder = getFirstLaravelWorkspaceFolder()!,
+    workspaceFolder?: vscode.WorkspaceFolder,
 ): string => {
     return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
 };

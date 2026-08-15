@@ -1,9 +1,9 @@
 import { readdirSync } from "fs";
 import * as vscode from "vscode";
 import {
-    getFirstLaravelWorkspaceFolder,
-    getLaravelWorkspaceFolders,
+    getFirstProjectWorkspaceFolder,
     getProjectWorkspaceFolder,
+    getProjectWorkspaceFolders,
 } from "./project";
 import { debounce, leadingDebounce } from "./util";
 
@@ -103,7 +103,7 @@ export const watchForComposerChanges = () => {
     }, 1000);
 
     Promise.all(
-        getLaravelWorkspaceFolders().map((workspaceFolder) => {
+        getProjectWorkspaceFolders().map((workspaceFolder) => {
             const watcher = vscode.workspace.createFileSystemWatcher(
                 new vscode.RelativePattern(
                     workspaceFolder,
@@ -126,7 +126,7 @@ export const createFileWatcher = (
     events: FileEvent[] = defaultFileEvents,
     workspaceFolder:
         | vscode.WorkspaceFolder
-        | undefined = getFirstLaravelWorkspaceFolder(),
+        | undefined = getFirstProjectWorkspaceFolder(),
     reloadOnComposerChanges: boolean = true,
 ): vscode.FileSystemWatcher[] => {
     if (!workspaceFolder) {
