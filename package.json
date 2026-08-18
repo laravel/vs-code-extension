@@ -1054,6 +1054,11 @@
                     },
                     "description": "PHP command used by the Laravel LSP server, Docker environment configuration, Artisan commands, Pint, and test runner, in argv format. Defaults to php when empty."
                 },
+                "Laravel.memoryLimit": {
+                    "type": "string",
+                    "default": "512M",
+                    "markdownDescription": "Memory limit for the Laravel LSP server process. Use PHP shorthand such as `512M`, `1G`, or `-1`. This does not change `#Laravel.phpCommand#`."
+                },
                 "laravelLsp.trace.server": {
                     "scope": "window",
                     "type": "string",
