@@ -1499,7 +1499,7 @@
         "typescript": "^5.4.5"
     },
     "dependencies": {
-        "axios": "^1.8.2",
+        "axios": "^1.18.0",
         "extract-zip": "^2.0.1",
         "npm-run-all": "^4.1.5",
         "rimraf": "^6.0.1",
