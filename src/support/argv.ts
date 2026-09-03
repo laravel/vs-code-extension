@@ -30,10 +30,7 @@ const argvToShell = (argv: string[], terminal: string): string[] => {
         case "powershell":
         case "pwsh":
         case "pwsh-preview":
-            return [
-                "&",
-                ...argv.map((arg) => quoteShellArg(arg, "'", "''")),
-            ];
+            return ["&", ...argv.map((arg) => quoteShellArg(arg, "'", "''"))];
 
         case "cmd":
             return argv.map((arg) => quoteShellArg(arg, '"'));
