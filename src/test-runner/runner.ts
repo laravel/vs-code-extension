@@ -1,27 +1,32 @@
-import * as vscode from "vscode";
 import { spawn } from "child_process";
+import * as vscode from "vscode";
 
+import { getPaths, type PathItem } from "@src/lsp/paths";
 import { getPhpCommand } from "@src/lsp/php";
 import { projectPath } from "@src/support/project";
-import { getPaths, type PathItem } from "@src/lsp/paths";
-import { parseLine, buildErrorMessage, TeamcityEvent } from "./teamcity";
+import { buildErrorMessage, parseLine, TeamcityEvent } from "./teamcity";
 
 export const runHandler = async (
     controller: vscode.TestController,
     request: vscode.TestRunRequest,
     token: vscode.CancellationToken,
+    workspaceFolder: vscode.WorkspaceFolder,
 ) => {
     const run = controller.createTestRun(request);
-    const paths = await getPaths();
+    const paths = await getPaths(workspaceFolder);
 
     if (!request.include) {
         const testMap = buildTestMapFromController(controller);
         testMap.forEach((test) => run.enqueued(test));
-        await executeTests([], testMap, run, token, paths);
+        await executeTests([], testMap, run, token, paths, workspaceFolder);
     } else {
         for (const item of request.include) {
-            if (token.isCancellationRequested) break;
-            if (request.exclude?.includes(item)) continue;
+            if (token.isCancellationRequested) {
+                break;
+            }
+            if (request.exclude?.includes(item)) {
+                continue;
+            }
 
             const testMap = buildTestMap(item, request.exclude);
             testMap.forEach((test) => run.enqueued(test));
@@ -31,6 +36,7 @@ export const runHandler = async (
                 run,
                 token,
                 paths,
+                workspaceFolder,
             );
         }
     }
@@ -41,9 +47,15 @@ export const runHandler = async (
 type ItemType = "suite" | "directory" | "file" | "test";
 
 const getItemType = (item: vscode.TestItem): ItemType => {
-    if (item.id.startsWith("suite:")) return "suite";
-    if (item.id.startsWith("dir:")) return "directory";
-    if (item.id.startsWith("file:")) return "file";
+    if (item.id.startsWith("suite:")) {
+        return "suite";
+    }
+    if (item.id.startsWith("dir:")) {
+        return "directory";
+    }
+    if (item.id.startsWith("file:")) {
+        return "file";
+    }
     return "test";
 };
 
@@ -74,7 +86,9 @@ const buildTestMap = (
     const map = new Map<string, vscode.TestItem>();
 
     const collect = (current: vscode.TestItem) => {
-        if (exclude?.includes(current)) return;
+        if (exclude?.includes(current)) {
+            return;
+        }
 
         if (current.children.size === 0) {
             const eventName = getEventName(current);
@@ -117,6 +131,7 @@ const executeTests = async (
     run: vscode.TestRun,
     token: vscode.CancellationToken,
     paths: PathItem[],
+    workspaceFolder: vscode.WorkspaceFolder,
 ): Promise<void> => {
     return new Promise((resolve) => {
         const [executable, ...commandArgs] = [
@@ -129,7 +144,7 @@ const executeTests = async (
         ];
 
         const proc = spawn(executable, commandArgs, {
-            cwd: projectPath(),
+            cwd: projectPath("", workspaceFolder),
             detached: true,
             env: getProcessEnv(),
         });
@@ -194,7 +209,9 @@ const handleEvent = (
 ): void => {
     const test = testMap.get(event.attributes.name);
 
-    if (!test) return;
+    if (!test) {
+        return;
+    }
 
     switch (event.type) {
         case "testStarted":
