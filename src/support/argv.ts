@@ -9,26 +9,31 @@ const getDefaultTerminal = (): string => {
     return path.basename(terminal, path.extname(terminal));
 };
 
-const quoteShellArg = (arg: string, quote: ShellQuote = "'"): string => {
+const quoteShellArg = (
+    arg: string,
+    quote: ShellQuote = "'",
+    escapedQuote: string = quote === "'" ? "'\\''" : '\\"',
+): string => {
     if (arg === "") {
-        return "''";
+        return `${quote}${quote}`;
     }
 
     if (/^[A-Za-z0-9_/:=-]+$/.test(arg)) {
         return arg;
     }
 
-    if (quote === "'") {
-        return `'${arg.replace(/'/g, "'\\''")}'`;
-    }
-
-    return `"${arg.replace(/"/g, '\\"')}"`;
+    return `${quote}${arg.replaceAll(quote, escapedQuote)}${quote}`;
 };
 
-const argvToShell = (argv: string[]): string[] => {
-    switch (getDefaultTerminal()) {
+const argvToShell = (argv: string[], terminal: string): string[] => {
+    switch (terminal) {
         case "powershell":
-            return ["&", ...argv.map((arg) => quoteShellArg(arg))];
+        case "pwsh":
+        case "pwsh-preview":
+            return [
+                "&",
+                ...argv.map((arg) => quoteShellArg(arg, "'", "''")),
+            ];
 
         case "cmd":
             return argv.map((arg) => quoteShellArg(arg, '"'));
@@ -38,5 +43,7 @@ const argvToShell = (argv: string[]): string[] => {
     }
 };
 
-export const argvToShellCommand = (argv: string[]): string =>
-    argvToShell(argv).join(" ");
+export const argvToShellCommand = (
+    argv: string[],
+    terminal: string = getDefaultTerminal(),
+): string => argvToShell(argv, terminal).join(" ");
