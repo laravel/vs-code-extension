@@ -11,6 +11,7 @@ export type PhpEnvironment =
     | "sail"
     | "lando"
     | "ddev"
+    | "lerd"
     | "docker"
     | "local";
 
@@ -37,6 +38,13 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
     },
     ddev: {
         label: "DDEV",
+        relativePath: true,
+    },
+    lerd: {
+        label: "Lerd",
+        description: "Auto detect the PHP version Lerd is using for the project.",
+        check: 'lerd php -r "echo PHP_BINARY;"',
+        command: "lerd php",
         relativePath: true,
     },
     local: {
