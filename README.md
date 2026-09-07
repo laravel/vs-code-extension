@@ -24,6 +24,14 @@ To choose the PHP environment used by the Laravel LSP server, configure `Laravel
 }
 ```
 
+To raise the Laravel LSP server process memory limit (the default is `512M`):
+
+```json
+{
+    "Laravel.memoryLimit": "1G"
+}
+```
+
 For the full list of available configuration options, open the extension's settings in Visual Studio Code.
 
 ## Updates

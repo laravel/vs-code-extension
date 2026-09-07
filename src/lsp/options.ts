@@ -96,6 +96,7 @@ export function createClientOptions(
                 "pest.helperFilePath",
                 "storage/framework/testing/_pest.php",
             ),
+            memoryLimit: config("memoryLimit", "512M"),
             phpCommand: config<unknown>("phpCommand", []),
             phpEnvironment: config("phpEnvironment", "auto"),
             routeDiagnostics: config("route.diagnostics", true),

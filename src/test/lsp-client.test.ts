@@ -61,4 +61,13 @@ suite("Laravel LSP Client Test Suite", () => {
             path.join(root, "backend"),
         );
     });
+
+    test("forwards the memory limit to the LSP initialization options", () => {
+        const clientOptions = createClientOptions();
+        const initializationOptions = clientOptions.initializationOptions as {
+            memoryLimit?: string;
+        };
+
+        assert.strictEqual(initializationOptions.memoryLimit, "512M");
+    });
 });

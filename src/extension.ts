@@ -165,7 +165,14 @@ export async function activate(context: vscode.ExtensionContext) {
             configureDockerEnvironment,
         ),
         vscode.workspace.onDidChangeConfiguration((event) => {
-            if (configAffected(event, "phpCommand", "phpEnvironment")) {
+            if (
+                configAffected(
+                    event,
+                    "phpCommand",
+                    "phpEnvironment",
+                    "memoryLimit",
+                )
+            ) {
                 clearResolvedPhpCommand();
 
                 restartLspClient().catch((error) => {
