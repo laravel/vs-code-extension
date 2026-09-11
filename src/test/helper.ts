@@ -6,19 +6,20 @@ let extensionReady: Promise<void> | undefined;
 export async function activateExtension(): Promise<void> {
     if (!extensionReady) {
         extensionReady = (async () => {
-            const ext = vscode.extensions.getExtension(
-                "laravel.vscode-laravel",
-            );
+            const ext = vscode.extensions.getExtension<{
+                lspReady: boolean;
+            }>("laravel.vscode-laravel");
 
             if (!ext) {
                 throw new Error("Laravel extension not found");
             }
 
-            if (!ext.isActive) {
-                await ext.activate();
-            }
+            const api = await ext.activate();
 
-            await sleep(2000);
+            assert.ok(
+                api?.lspReady,
+                "Laravel LSP failed to initialize. See the startup/download error above.",
+            );
         })().catch((error) => {
             extensionReady = undefined;
             throw error;

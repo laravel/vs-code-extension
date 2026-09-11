@@ -180,6 +180,10 @@ const initializeLspBinaryPath = async (
 
         return result.path;
     } catch (error) {
+        console.error(
+            "Failed to download binary for Laravel extension:",
+            error,
+        );
         vscode.window.showErrorMessage(
             `Failed to download binary for Laravel extension: ${errorMessage(error)}`,
         );
