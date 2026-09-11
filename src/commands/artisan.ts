@@ -1,10 +1,14 @@
 import * as vscode from "vscode";
 
-import { Command } from "@src/artisan/types";
 import { buildArtisanCommand } from "@src/artisan/builder";
+import { Command } from "@src/artisan/types";
 import { getPathFromOutput } from "@src/support/artisan";
 import { artisan, runArtisanInTerminal } from "@src/support/php";
-import { getWorkspaceFolders } from "@src/support/project";
+import {
+    getProjectWorkspaceFolder,
+    resolveWorkspaceProjectFolder,
+    selectWorkspaceFolder,
+} from "@src/support/project";
 import { openFileCommand } from ".";
 
 export const runArtisanCommand = async (
@@ -23,7 +27,9 @@ export const runArtisanCommand = async (
         }
     }
 
-    const workspaceFolder = getWorkspaceFolder(uri);
+    const workspaceFolder = uri
+        ? resolveWorkspaceProjectFolder(getProjectWorkspaceFolder(uri))
+        : (await selectWorkspaceFolder())?.workspaceFolder;
 
     if (!workspaceFolder) {
         vscode.window.showErrorMessage("Cannot detect active workspace");
@@ -101,28 +107,4 @@ const openGeneratedFile = (
     }
 
     openFileCommand(vscode.Uri.file(outputPath), 1, 1);
-};
-
-const getWorkspaceFolder = (
-    uri: vscode.Uri | undefined,
-): vscode.WorkspaceFolder | undefined => {
-    if (uri) {
-        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    if (vscode.window.activeTextEditor) {
-        const fileUri = vscode.window.activeTextEditor.document.uri;
-
-        const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
-
-        if (workspaceFolder) {
-            return workspaceFolder;
-        }
-    }
-
-    return getWorkspaceFolders()?.[0];
 };

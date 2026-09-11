@@ -1,6 +1,6 @@
 import { getRoutes, type RouteItem } from "@src/lsp/routes";
 import { getViews, type ViewItem } from "@src/lsp/views";
-import { projectPath } from "@src/support/project";
+import { projectPath, selectWorkspaceFolder } from "@src/support/project";
 import * as vscode from "vscode";
 import { commandName } from ".";
 
@@ -17,7 +17,9 @@ type RouteTarget = {
 const unnamedRouteLabel = "(unnamed)";
 
 export const goToRouteCommand = async () => {
-    const routes = await loadRoutes();
+    const workspaceFolder = (await selectWorkspaceFolder())?.workspaceFolder;
+
+    const routes = await loadRoutes(workspaceFolder);
 
     if (routes.length === 0) {
         vscode.window.showWarningMessage("No Laravel routes found.");
@@ -39,8 +41,8 @@ export const goToRouteCommand = async () => {
     }
 
     const target =
-        (await resolveLivewireRouteTarget(selected.route)) ??
-        (await resolveRouteTarget(selected.route));
+        (await resolveLivewireRouteTarget(selected.route, workspaceFolder)) ??
+        (await resolveRouteTarget(selected.route, workspaceFolder));
 
     if (!target) {
         vscode.window.showWarningMessage(
@@ -76,23 +78,28 @@ export const buildRouteQuickPickItems = (
         }));
 };
 
-const loadRoutes = async (): Promise<RouteItem[]> => {
-    return await getRoutes();
+const loadRoutes = async (
+    workspaceFolder?: vscode.WorkspaceFolder,
+): Promise<RouteItem[]> => {
+    return await getRoutes(workspaceFolder);
 };
 
-const loadViews = async (): Promise<ViewItem[]> => {
-    return await getViews();
+const loadViews = async (
+    workspaceFolder?: vscode.WorkspaceFolder,
+): Promise<ViewItem[]> => {
+    return await getViews(workspaceFolder);
 };
 
 const resolveRouteTarget = async (
     route: RouteItem,
+    workspaceFolder?: vscode.WorkspaceFolder,
 ): Promise<RouteTarget | null> => {
     if (!route.filename) {
         return null;
     }
 
     return {
-        uri: vscode.Uri.file(projectPath(route.filename)),
+        uri: vscode.Uri.file(projectPath(route.filename, workspaceFolder)),
         line: Math.max((route.line ?? 1) - 1, 0),
         position: 0,
     };
@@ -100,12 +107,13 @@ const resolveRouteTarget = async (
 
 const resolveLivewireRouteTarget = async (
     route: RouteItem,
+    workspaceFolder?: vscode.WorkspaceFolder,
 ): Promise<RouteTarget | null> => {
     if (!route.livewire) {
         return null;
     }
 
-    const view = (await loadViews()).find(
+    const view = (await loadViews(workspaceFolder)).find(
         (item) => item.key === route.livewire,
     );
 
@@ -114,7 +122,7 @@ const resolveLivewireRouteTarget = async (
     }
 
     return {
-        uri: vscode.Uri.file(projectPath(view.path)),
+        uri: vscode.Uri.file(projectPath(view.path, workspaceFolder)),
         line: 0,
         position: 0,
     };
