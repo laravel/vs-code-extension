@@ -182,11 +182,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }),
     );
 
-    if (lspClient) {
-        collectDebugInfo();
-    }
-
-    return { lspReady: lspClient !== undefined };
+    collectDebugInfo();
 }
 
 export function deactivate() {
