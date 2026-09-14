@@ -2,6 +2,29 @@
 
 All notable changes to the Laravel extension will be documented in this file.
 
+## v2.0.1 - 2026-09-14
+
+### What's Changed
+
+* Bump the github-actions group across 1 directory with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/680
+* Bump axios from 1.8.2 to 1.18.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/682
+* Bump shell-quote from 1.8.4 to 1.10.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/683
+* Bump brace-expansion from 1.1.11 to 1.1.18 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/687
+* Bump js-yaml from 4.2.0 to 4.3.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/693
+* Bump flatted from 3.3.1 to 3.4.4 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/706
+* Fix Artisan terminal commands break on Windows by [@N1ebieski](https://github.com/N1ebieski) in https://github.com/laravel/vs-code-extension/pull/701
+* Bump picomatch, [@typescript-eslint](https://github.com/typescript-eslint)/eslint-plugin, [@typescript-eslint](https://github.com/typescript-eslint)/parser and [@vscode](https://github.com/vscode)/test-cli by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/707
+* Bump glob from 11.0.0 to 11.1.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/vs-code-extension/pull/708
+* Implement memoryLimit Feature Option. by [@RyanPaiva56](https://github.com/RyanPaiva56) in https://github.com/laravel/vs-code-extension/pull/704
+* Update VS Code test runner for renamed macOS executable by [@TitasGailius](https://github.com/TitasGailius) in https://github.com/laravel/vs-code-extension/pull/709
+* Update release process to use Bosun by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/vs-code-extension/pull/711
+
+### New Contributors
+
+* [@RyanPaiva56](https://github.com/RyanPaiva56) made their first contribution in https://github.com/laravel/vs-code-extension/pull/704
+
+**Full Changelog**: https://github.com/laravel/vs-code-extension/compare/v2.0.0...v2.0.1
+
 ## v2.0.0 - 2026-08-06
 
 ### What's Changed
