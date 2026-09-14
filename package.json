@@ -1020,6 +1020,7 @@
                         "sail",
                         "lando",
                         "ddev",
+                        "lerd",
                         "local",
                         "docker"
                     ],
@@ -1030,6 +1031,7 @@
                         "Sail",
                         "Lando",
                         "DDEV",
+                        "Lerd",
                         "Local",
                         "Docker"
                     ],
@@ -1040,6 +1042,7 @@
                         "Sail",
                         "Lando",
                         "DDEV",
+                        "Auto detect the PHP version Lerd is using for the project.",
                         "Use PHP installed on the local machine.",
                         "Docker"
                     ],
