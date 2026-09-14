@@ -18,6 +18,5 @@ esbuild.js
 *.php
 generatable.json
 php-templates
-precheck
 .env
 .env.example

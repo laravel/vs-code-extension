@@ -1,0 +1,6 @@
+{
+    "requiresEnv": ["OPEN_VSX_ACCESS_TOKEN"],
+    "hooks": {
+        "after:publish": ["npx ovsx publish -p \"$OPEN_VSX_ACCESS_TOKEN\""]
+    }
+}
