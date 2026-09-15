@@ -1,3 +1,4 @@
+import { resolveWorkspaceProjectFolders } from "@src/support/project";
 import * as vscode from "vscode";
 import {
     completeLspBinaryUpdate,
@@ -45,26 +46,43 @@ export async function forceLspUpdate(
                 enqueueLspUpdate(async () => {
                     let result: LspBinaryUpdateResult | undefined;
 
-                    await stopLspClient();
+                    await Promise.all(
+                        resolveWorkspaceProjectFolders().map(
+                            (workspaceFolder) => stopLspClient(workspaceFolder),
+                        ),
+                    );
 
                     try {
                         result = await updateLspBinary(context, {
                             force: true,
                         });
 
-                        const updatedClient = await startLspClient();
+                        await Promise.all(
+                            resolveWorkspaceProjectFolders().map(
+                                async (workspaceFolder) => {
+                                    const updatedClient =
+                                        await startLspClient(workspaceFolder);
 
-                        if (!updatedClient) {
-                            throw new Error(
-                                "The updated Laravel LSP did not start",
-                            );
-                        }
+                                    if (!updatedClient) {
+                                        throw new Error(
+                                            `The updated Laravel LSP did not start for ${workspaceFolder.name}`,
+                                        );
+                                    }
+                                },
+                            ),
+                        );
                     } catch (error) {
                         if (result?.status === "updated") {
                             await rollbackLspBinaryUpdate(context, result);
                         }
 
-                        await startLspClient();
+                        await Promise.all(
+                            resolveWorkspaceProjectFolders().map(
+                                (workspaceFolder) =>
+                                    startLspClient(workspaceFolder),
+                            ),
+                        );
+
                         throw error;
                     }
 

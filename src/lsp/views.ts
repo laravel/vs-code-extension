@@ -1,3 +1,6 @@
+import * as vscode from "vscode";
+
+import { resolveWorkspaceProjectFolder } from "@src/support/project";
 import { sendLspRequest } from "./client";
 
 export interface ViewItem {
@@ -15,8 +18,14 @@ export interface ViewItem {
     };
 }
 
-export const getViews = (): Promise<ViewItem[]> => {
-    return sendLspRequest<ViewItem[]>("laravel/data", {
-        name: "views",
-    });
+export const getViews = (
+    workspaceFolder: vscode.WorkspaceFolder = resolveWorkspaceProjectFolder()!,
+): Promise<ViewItem[]> => {
+    return sendLspRequest<ViewItem[]>(
+        "laravel/data",
+        {
+            name: "views",
+        },
+        workspaceFolder,
+    );
 };
