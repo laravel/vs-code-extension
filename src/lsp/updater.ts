@@ -5,8 +5,8 @@ import {
     LspBinaryUpdateResult,
     rollbackLspBinaryUpdate,
     updateLspBinary,
-} from "./binary";
-import { restartLspClient, startLspClient, stopLspClient } from "./client";
+} from "./binary.js";
+import { restartLspClient, startLspClient, stopLspClient } from "./client.js";
 
 let lspUpdateQueue: Promise<void> = Promise.resolve();
 

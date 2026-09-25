@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { execFileSync } from "child_process";
-import { config, updateConfig } from "@src/support/config";
+import { config, updateConfig } from "@src/support/config.js";
 
 interface DockerContainer {
     ID: string;

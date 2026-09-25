@@ -5,7 +5,7 @@ import {
     LanguageClientOptions,
     ServerOptions,
     TransportKind,
-} from "vscode-languageclient/node";
+} from "vscode-languageclient/node.js";
 
 export const initClient = (context: vscode.ExtensionContext) => {
     // Set html indent

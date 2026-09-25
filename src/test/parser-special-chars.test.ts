@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { assertCompletions } from "./assertions";
-import { activateExtension, uri } from "./helper";
+import { assertCompletions } from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 suite("Parser Special Characters Test Suite", () => {
     suiteSetup(async () => {

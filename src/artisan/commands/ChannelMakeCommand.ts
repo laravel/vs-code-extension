@@ -1,5 +1,5 @@
-import { Command } from "../types";
-import { forceOption } from "../options";
+import { Command } from "../types.js";
+import { forceOption } from "../options.js";
 
 export const ChannelMakeCommand: Command = {
     name: "make:channel",

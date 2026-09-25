@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { activateExtension, uri } from "./helper";
+import { activateExtension, uri } from "./helper.js";
 
 const UNFORMATTED = `<?php
 class PintCommandTemp{public function run( ){return 1;}}

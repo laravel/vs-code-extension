@@ -1,6 +1,6 @@
-import { Command } from "../types";
-import { getModelClassnames } from "@src/lsp/models";
-import { forceOption, testOptions } from "@src/artisan/options";
+import { Command } from "../types.js";
+import { getModelClassnames } from "@src/lsp/models.js";
+import { forceOption, testOptions } from "@src/artisan/options.js";
 
 export const ControllerMakeCommand: Command = {
     name: "make:controller",

@@ -8,7 +8,7 @@ import {
     getLinks,
     hoverToText,
     includesNormalized,
-} from "./helper";
+} from "./helper.js";
 
 type AssertCompletionsOptions = {
     doc: vscode.TextDocument;

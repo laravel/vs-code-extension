@@ -3,8 +3,8 @@ import {
     assertCompletions,
     assertDiagnostics,
     assertLinks,
-} from "./assertions";
-import { activateExtension, uri } from "./helper";
+} from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 suite("Asset Test Suite", () => {
     suiteSetup(async () => {

@@ -1,8 +1,8 @@
 import path from "path";
 import * as vscode from "vscode";
 
-import { getNamespace } from "@src/commands/generateNamespace";
-import { Argument, ArgumentType, Command, Option } from "./types";
+import { getNamespace } from "@src/commands/generateNamespace.js";
+import { Argument, ArgumentType, Command, Option } from "./types.js";
 
 const EndSelection = "End Selection";
 

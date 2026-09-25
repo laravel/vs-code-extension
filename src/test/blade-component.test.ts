@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { assertHovers, assertLinks } from "./assertions";
-import { activateExtension, getCompletions, uri } from "./helper";
+import { assertHovers, assertLinks } from "./assertions.js";
+import { activateExtension, getCompletions, uri } from "./helper.js";
 
 suite("Blade Component Test Suite", () => {
     suiteSetup(async () => {

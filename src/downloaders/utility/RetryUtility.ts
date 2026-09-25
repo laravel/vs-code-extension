@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { RetriesExceededError } from "./Errors";
+import { RetriesExceededError } from "./Errors.js";
 
 export class RetryUtility {
     public static async exponentialRetryAsync<T>(

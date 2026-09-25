@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { CancellationToken, ExtensionContext, Uri } from "vscode";
-import { IGithubRelease } from "./IGitHubRelease";
+import { IGithubRelease } from "./IGitHubRelease.js";
 
 export interface FileDownloadSettings {
     /**

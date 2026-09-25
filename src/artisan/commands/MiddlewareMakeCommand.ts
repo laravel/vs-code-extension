@@ -1,5 +1,5 @@
-import { Command } from "../types";
-import { forceOption } from "@src/artisan/options";
+import { Command } from "../types.js";
+import { forceOption } from "@src/artisan/options.js";
 
 export const MiddlewareMakeCommand: Command = {
     name: "make:middleware",

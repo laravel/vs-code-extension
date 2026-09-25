@@ -9,17 +9,17 @@ import { rimraf } from "rimraf";
 import { Readable } from "stream";
 import { v4 as uuid } from "uuid";
 import { CancellationToken, ExtensionContext, Uri } from "vscode";
-import { FileDownloadSettings, IFileDownloader } from "./IFileDownloader";
-import { IGithubRelease } from "./IGitHubRelease";
-import ILogger from "./logging/ILogger";
-import IHttpRequestHandler from "./networking/IHttpRequestHandler";
+import { FileDownloadSettings, IFileDownloader } from "./IFileDownloader.js";
+import { IGithubRelease } from "./IGitHubRelease.js";
+import ILogger from "./logging/ILogger.js";
+import IHttpRequestHandler from "./networking/IHttpRequestHandler.js";
 import {
     DownloadCanceledError,
     ErrorUtils,
     FileNotFoundError,
-} from "./utility/Errors";
-import { RetryUtility } from "./utility/RetryUtility";
-import { pipelineAsync } from "./utility/Stream";
+} from "./utility/Errors.js";
+import { RetryUtility } from "./utility/RetryUtility.js";
+import { pipelineAsync } from "./utility/Stream.js";
 
 const DefaultTimeoutInMs = 5000;
 const DefaultRetries = 5;

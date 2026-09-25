@@ -4,6 +4,7 @@
     "displayName": "Laravel",
     "description": "Official VS Code extension for Laravel",
     "version": "2.0.1",
+    "type": "module",
     "engines": {
         "vscode": "^1.89.0"
     },
@@ -29,7 +30,7 @@
         "onLanguage:php",
         "workspaceContains:artisan"
     ],
-    "main": "./dist/extension.js",
+    "main": "./dist/extension.cjs",
     "grammars": [
         {
             "language": "blade",
