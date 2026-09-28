@@ -3,11 +3,10 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import * as crypto from "crypto";
 
 import axios, { AxiosResponse } from "axios";
-import { rimraf } from "rimraf";
 import { Readable } from "stream";
-import { v4 as uuid } from "uuid";
 import { CancellationToken, ExtensionContext, Uri } from "vscode";
 import { FileDownloadSettings, IFileDownloader } from "./IFileDownloader";
 import { IGithubRelease } from "./IGitHubRelease";
@@ -140,7 +139,7 @@ export class FileDownloader implements IFileDownloader {
         // Generate a temporary filename for the download
         const tempFileDownloadPath: string = path.join(
             downloadsStoragePath,
-            uuid(),
+            crypto.randomUUID(),
         );
         const tempZipFileDownloadPath = `${tempFileDownloadPath}.zip`;
         const fileDownloadPath: string = path.join(
@@ -201,7 +200,7 @@ export class FileDownloader implements IFileDownloader {
             //         await extractZip(tempZipFileDownloadPath, {
             //             dir: tempFileDownloadPath,
             //         });
-            //         await rimraf(tempZipFileDownloadPath);
+            //         await fs.promises.rm(tempZipFileDownloadPath, { recursive: true, force: true });
             //     };
             //     await RetryUtility.exponentialRetryAsync(
             //         unzipDownloadedFileAsyncFn,
@@ -238,7 +237,7 @@ export class FileDownloader implements IFileDownloader {
         }
 
         if (cancellationToken?.isCancellationRequested ?? false) {
-            await rimraf(tempFileDownloadPath);
+            await fs.promises.rm(tempFileDownloadPath, { recursive: true, force: true });
             throw new DownloadCanceledError();
         }
 
@@ -262,7 +261,7 @@ export class FileDownloader implements IFileDownloader {
 
         try {
             // If the file/folder already exists, remove it now
-            await rimraf(fileDownloadPath);
+            await fs.promises.rm(fileDownloadPath, { recursive: true, force: true });
 
             const renameDownloadedFileAsyncFn = async (): Promise<Uri> => {
                 // Move the temp file/folder to its permanent location and return it
@@ -357,16 +356,17 @@ export class FileDownloader implements IFileDownloader {
         filename: string,
         context: ExtensionContext,
     ): Promise<void> {
-        await rimraf(
+        await fs.promises.rm(
             path.join(
                 FileDownloader.getDownloadsStoragePath(context),
                 filename,
             ),
+            { recursive: true, force: true }
         );
     }
 
     public async deleteAllItems(context: ExtensionContext): Promise<void> {
-        await rimraf(FileDownloader.getDownloadsStoragePath(context));
+        await fs.promises.rm(FileDownloader.getDownloadsStoragePath(context), { recursive: true, force: true });
     }
 
     // Gets the download link for the latest release of a repo in GitHub.
