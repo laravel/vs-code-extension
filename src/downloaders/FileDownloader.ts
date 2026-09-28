@@ -7,6 +7,7 @@ import * as path from "path";
 import axios, { AxiosResponse } from "axios";
 import { rimraf } from "rimraf";
 import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { v4 as uuid } from "uuid";
 import { CancellationToken, ExtensionContext, Uri } from "vscode";
 import { FileDownloadSettings, IFileDownloader } from "./IFileDownloader.js";
@@ -19,7 +20,6 @@ import {
     FileNotFoundError,
 } from "./utility/Errors.js";
 import { RetryUtility } from "./utility/RetryUtility.js";
-import { pipelineAsync } from "./utility/Stream.js";
 
 const DefaultTimeoutInMs = 5000;
 const DefaultRetries = 5;
@@ -186,7 +186,7 @@ export class FileDownloader implements IFileDownloader {
             const writeStream = fs.createWriteStream(
                 shouldUnzip ? tempZipFileDownloadPath : tempFileDownloadPath,
             );
-            const pipelinePromise = pipelineAsync([
+            const pipelinePromise = await pipeline([
                 downloadStream,
                 writeStream,
             ]);
