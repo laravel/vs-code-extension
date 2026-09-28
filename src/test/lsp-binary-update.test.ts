@@ -6,7 +6,7 @@ import {
     findLspReleaseAsset,
     LSP_UPDATE_THROTTLE_MS,
     shouldCheckForLspUpdate,
-} from "../lsp/binary";
+} from "../lsp/binary.js";
 
 const assets = [
     {

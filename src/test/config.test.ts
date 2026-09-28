@@ -4,8 +4,8 @@ import {
     assertDiagnostics,
     assertHovers,
     assertLinks,
-} from "./assertions";
-import { activateExtension, uri } from "./helper";
+} from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 suite("Config Test Suite", () => {
     suiteSetup(async () => {

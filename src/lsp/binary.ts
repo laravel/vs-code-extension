@@ -1,7 +1,7 @@
-import { FileDownloader } from "../downloaders/FileDownloader";
-import { IAsset } from "../downloaders/IGitHubRelease";
-import OutputLogger from "../downloaders/logging/OutputLogger";
-import HttpRequestHandler from "../downloaders/networking/HttpRequestHandler";
+import { FileDownloader } from "../downloaders/FileDownloader.js";
+import { IAsset } from "../downloaders/IGitHubRelease.js";
+import OutputLogger from "../downloaders/logging/OutputLogger.js";
+import HttpRequestHandler from "../downloaders/networking/HttpRequestHandler.js";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";

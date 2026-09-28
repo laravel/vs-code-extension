@@ -1,6 +1,10 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { activateExtension, includesNormalized, withQuickPick } from "./helper";
+import {
+    activateExtension,
+    includesNormalized,
+    withQuickPick,
+} from "./helper.js";
 
 suite("Go To Route Command Test Suite", () => {
     suiteSetup(async () => {

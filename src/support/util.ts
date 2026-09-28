@@ -3,7 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import * as vscode from "vscode";
-import { relativePath } from "./project";
+import { relativePath } from "./project.js";
 
 /**
  * Get indent space based on user configuration

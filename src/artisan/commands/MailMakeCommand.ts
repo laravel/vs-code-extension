@@ -1,6 +1,6 @@
-import { Command } from "../types";
-import { kebab } from "@src/support/str";
-import { forceOption, testOptions } from "@src/artisan/options";
+import { Command } from "../types.js";
+import { kebab } from "@src/support/str.js";
+import { forceOption, testOptions } from "@src/artisan/options.js";
 
 export const MailMakeCommand: Command = {
     name: "make:mail",

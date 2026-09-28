@@ -1,22 +1,22 @@
-import { getPhpCommand } from "@src/lsp/php";
-import { fixFilePath } from "@src/support/php";
+import { getPhpCommand } from "@src/lsp/php.js";
+import { fixFilePath } from "@src/support/php.js";
 import {
     statusBarError,
     statusBarSuccess,
     statusBarWorking,
-} from "@src/support/statusBar";
+} from "@src/support/statusBar.js";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { commandName } from ".";
-import { config } from "../support/config";
-import { showErrorPopup } from "../support/popup";
+import { commandName } from "./index.js";
+import { config } from "../support/config.js";
+import { showErrorPopup } from "../support/popup.js";
 import {
     getWorkspaceFolders,
     projectPath,
     projectPathExists,
-} from "../support/project";
+} from "../support/project.js";
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let runningProcess: cp.ChildProcess | undefined;

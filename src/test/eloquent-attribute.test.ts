@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { assertCompletions } from "./assertions";
-import { activateExtension, uri } from "./helper";
+import { assertCompletions } from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

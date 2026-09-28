@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { RegisteredCommand } from "./generatedRegisteredCommands";
+import { RegisteredCommand } from "./generatedRegisteredCommands.js";
 
 export const commandName = (name: RegisteredCommand) => name;
 

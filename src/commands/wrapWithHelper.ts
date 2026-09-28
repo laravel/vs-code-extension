@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { commandName } from ".";
+import { commandName } from "./index.js";
 
 type SubCommand = "dd" | "dump" | "collect" | "str" | "unwrap";
 

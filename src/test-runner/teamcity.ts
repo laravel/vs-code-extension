@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import type { PathItem } from "@src/lsp/paths";
-import { projectPath } from "@src/support/project";
+import type { PathItem } from "@src/lsp/paths.js";
+import { projectPath } from "@src/support/project.js";
 
 export interface TeamcityEvent {
     type: string;

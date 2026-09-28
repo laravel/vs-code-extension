@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { config } from "../support/config";
+import { config } from "../support/config.js";
 
 let hasShownLegacyPhpCommandWarning = false;
 let resolvedPhpCommand: string[] | undefined;

@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import { spawn } from "child_process";
 
-import { getPhpCommand } from "@src/lsp/php";
-import { projectPath } from "@src/support/project";
-import { getPaths, type PathItem } from "@src/lsp/paths";
-import { parseLine, buildErrorMessage, TeamcityEvent } from "./teamcity";
+import { getPhpCommand } from "@src/lsp/php.js";
+import { projectPath } from "@src/support/project.js";
+import { getPaths, type PathItem } from "@src/lsp/paths.js";
+import { parseLine, buildErrorMessage, TeamcityEvent } from "./teamcity.js";
 
 export const runHandler = async (
     controller: vscode.TestController,

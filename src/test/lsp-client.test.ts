@@ -1,11 +1,11 @@
 import * as assert from "assert";
 import * as path from "path";
 import * as vscode from "vscode";
-import { createClientOptions, createServerOptions } from "../lsp/options";
+import { createClientOptions, createServerOptions } from "../lsp/options.js";
 import {
     resolveWorkspaceProjectFolder,
     resolveWorkspaceProjectPath,
-} from "../support/project";
+} from "../support/project.js";
 
 const workspaceFolder = (fsPath: string): vscode.WorkspaceFolder => ({
     uri: vscode.Uri.file(fsPath),
