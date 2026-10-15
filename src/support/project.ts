@@ -3,6 +3,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { config } from "./config";
 
+type WorkspaceQuickPickItem = vscode.QuickPickItem & {
+    workspaceFolder: vscode.WorkspaceFolder;
+};
+
 const trimFirstSlash = (srcPath: string): string => {
     return srcPath[0] === path.sep ? srcPath.substring(1) : srcPath;
 };
@@ -22,8 +26,13 @@ export const resolveWorkspaceProjectPath = (
     return path.resolve(workspaceFolder.uri.fsPath, configuredBasePath);
 };
 
+export const resolveWorkspaceProjectFolders = (): vscode.WorkspaceFolder[] =>
+    getProjectWorkspaceFolders().map((workspaceFolder) =>
+        resolveWorkspaceProjectFolder(workspaceFolder),
+    );
+
 export const resolveWorkspaceProjectFolder = (
-    workspaceFolder: vscode.WorkspaceFolder,
+    workspaceFolder: vscode.WorkspaceFolder = getProjectWorkspaceFolder()!,
     configuredBasePath = config<string>("basePath", ""),
 ): vscode.WorkspaceFolder => {
     const projectPath = resolveWorkspaceProjectPath(
@@ -42,37 +51,60 @@ export const resolveWorkspaceProjectFolder = (
     };
 };
 
-export const getProjectWorkspaceFolder = ():
-    | vscode.WorkspaceFolder
-    | undefined => {
-    const workspaceFolder = getWorkspaceFolders()[0];
+export const getProjectWorkspaceFolder = (
+    uri?: vscode.Uri | undefined,
+): vscode.WorkspaceFolder | undefined => {
+    // Case when we know the file URI and we want to get the VSCode workspace folder for it.
+    // Useful for Laravel artisan commands in the VSCode file explorer
+    if (uri) {
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
 
-    if (!workspaceFolder) {
-        return undefined;
-    }
-
-    return resolveWorkspaceProjectFolder(workspaceFolder);
-};
-
-export const projectPath = (srcPath = ""): string => {
-    srcPath = basePath(srcPath);
-
-    for (let workspaceFolder of getWorkspaceFolders()) {
-        if (
-            fs.existsSync(
-                path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
-            )
-        ) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
-        }
-
-        if (fs.existsSync(path.join(workspaceFolder.uri.fsPath, srcPath))) {
-            return path.join(workspaceFolder.uri.fsPath, srcPath);
+        if (workspaceFolder) {
+            return workspaceFolder;
         }
     }
 
-    return "";
+    // Case when we don't know the file URI but we have an active text editor,
+    // so we try to get the workspace folder from it
+    if (vscode.window.activeTextEditor) {
+        const fileUri = vscode.window.activeTextEditor.document.uri;
+
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+
+        if (workspaceFolder) {
+            return workspaceFolder;
+        }
+    }
+
+    // Fallback, just return the first workspace folder if it exists
+    return getFirstProjectWorkspaceFolder();
 };
+
+export const getWorkspaceFolders = (): readonly vscode.WorkspaceFolder[] =>
+    vscode.workspace.workspaceFolders || [];
+
+const getProjectWorkspaceFolders = (): vscode.WorkspaceFolder[] => {
+    return getWorkspaceFolders().filter((workspaceFolder) =>
+        fs.existsSync(
+            path.join(workspaceFolder.uri.fsPath, basePath("artisan")),
+        ),
+    )!;
+};
+
+const getFirstProjectWorkspaceFolder = (): vscode.WorkspaceFolder | undefined =>
+    getProjectWorkspaceFolders()?.[0];
+
+export const hasWorkspace = (): boolean => {
+    return (
+        getWorkspaceFolders() instanceof Array &&
+        getWorkspaceFolders().length > 0
+    );
+};
+
+export const projectPath = (
+    srcPath = "",
+    workspaceFolder: vscode.WorkspaceFolder = resolveWorkspaceProjectFolder()!,
+): string => path.join(workspaceFolder.uri.fsPath, srcPath);
 
 export const relativePath = (srcPath: string): string => {
     for (let workspaceFolder of getWorkspaceFolders()) {
@@ -89,20 +121,44 @@ export const relativePath = (srcPath: string): string => {
     return srcPath;
 };
 
-export const hasWorkspace = (): boolean => {
-    return (
-        vscode.workspace.workspaceFolders instanceof Array &&
-        vscode.workspace.workspaceFolders.length > 0
+export const projectPathExists = (
+    path: string,
+    workspaceFolder?: vscode.WorkspaceFolder,
+): boolean => {
+    return fs.existsSync(projectPath(path, workspaceFolder));
+};
+
+export const readFileInProject = (
+    path: string,
+    workspaceFolder?: vscode.WorkspaceFolder,
+): string => {
+    return fs.readFileSync(projectPath(path, workspaceFolder), "utf8");
+};
+
+export const selectWorkspaceFolder = async (): Promise<
+    WorkspaceQuickPickItem | undefined
+> => {
+    const workspaceFolders = resolveWorkspaceProjectFolders();
+
+    if (workspaceFolders.length <= 1) {
+        return buildWorkspaceFolderQuickPickItems(workspaceFolders)?.[0];
+    }
+
+    return await vscode.window.showQuickPick(
+        buildWorkspaceFolderQuickPickItems(workspaceFolders),
+        {
+            title: "Laravel: Go to Route",
+            matchOnDescription: false,
+            matchOnDetail: false,
+            placeHolder: "Select a workspace folder to load routes from",
+        },
     );
 };
 
-export const getWorkspaceFolders = () =>
-    vscode.workspace.workspaceFolders || [];
-
-export const projectPathExists = (path: string): boolean => {
-    return fs.existsSync(projectPath(path));
-};
-
-export const readFileInProject = (path: string): string => {
-    return fs.readFileSync(projectPath(path), "utf8");
-};
+const buildWorkspaceFolderQuickPickItems = (
+    workspaceFolders: vscode.WorkspaceFolder[],
+): WorkspaceQuickPickItem[] =>
+    workspaceFolders.map((workspaceFolder) => ({
+        label: workspaceFolder.name,
+        workspaceFolder,
+    }));
