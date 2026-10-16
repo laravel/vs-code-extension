@@ -1,4 +1,4 @@
-import { config } from "@src/support/config";
+import { config } from "@src/support/config.js";
 import {
     Position,
     Range,

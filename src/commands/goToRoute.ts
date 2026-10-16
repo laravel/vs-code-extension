@@ -1,8 +1,8 @@
-import { getRoutes, type RouteItem } from "@src/lsp/routes";
-import { getViews, type ViewItem } from "@src/lsp/views";
-import { projectPath } from "@src/support/project";
+import { getRoutes, type RouteItem } from "@src/lsp/routes.js";
+import { getViews, type ViewItem } from "@src/lsp/views.js";
+import { projectPath } from "@src/support/project.js";
 import * as vscode from "vscode";
-import { commandName } from ".";
+import { commandName } from "./index.js";
 
 type RouteQuickPickItem = vscode.QuickPickItem & {
     route: RouteItem;

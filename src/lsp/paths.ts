@@ -1,4 +1,4 @@
-import { sendLspRequest } from "./client";
+import { sendLspRequest } from "./client.js";
 
 export interface PathItem {
     key: string;

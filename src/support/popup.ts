@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { config } from "./config";
-import { debugInfo } from "./debug";
-import { channel, error } from "./logger";
+import { config } from "./config.js";
+import { debugInfo } from "./debug.js";
+import { channel, error } from "./logger.js";
 
 let showErrorPopups = config<boolean>("showErrorPopups", false);
 let lastErrorMessageShownAt = 0;

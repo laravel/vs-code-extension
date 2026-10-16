@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 
-import { Command } from "@src/artisan/types";
-import { buildArtisanCommand } from "@src/artisan/builder";
-import { getPathFromOutput } from "@src/support/artisan";
-import { artisan, runArtisanInTerminal } from "@src/support/php";
-import { getWorkspaceFolders } from "@src/support/project";
-import { openFileCommand } from ".";
+import { Command } from "@src/artisan/types.js";
+import { buildArtisanCommand } from "@src/artisan/builder.js";
+import { getPathFromOutput } from "@src/support/artisan.js";
+import { artisan, runArtisanInTerminal } from "@src/support/php.js";
+import { getWorkspaceFolders } from "@src/support/project.js";
+import { openFileCommand } from "./index.js";
 
 export const runArtisanCommand = async (
     command: Command,

@@ -2,8 +2,8 @@ import * as vscode from "vscode";
 import {
     LanguageClientOptions,
     ServerOptions,
-} from "vscode-languageclient/node";
-import { config } from "../support/config";
+} from "vscode-languageclient/node.js";
+import { config } from "../support/config.js";
 
 export function createServerOptions(
     binaryPath: string,

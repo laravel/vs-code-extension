@@ -1,6 +1,6 @@
 import os from "os";
-import { sendLspRequest } from "@src/lsp/client";
-import { getPhpCommand } from "../lsp/php";
+import { sendLspRequest } from "@src/lsp/client.js";
+import { getPhpCommand } from "../lsp/php.js";
 
 export const debugInfo: Record<string, string> = {};
 

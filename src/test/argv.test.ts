@@ -1,6 +1,6 @@
 import * as assert from "assert";
 
-import { argvToShellCommand } from "../support/argv";
+import { argvToShellCommand } from "../support/argv.js";
 
 suite("Shell Argument Test Suite", () => {
     test("invokes quoted executables in Windows PowerShell", () => {

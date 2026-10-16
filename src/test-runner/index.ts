@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 
-import { config } from "@src/support/config";
-import { loadAndWatch } from "@src/support/fileWatcher";
-import { updateExplorer } from "./explorer";
-import { runHandler } from "./runner";
+import { config } from "@src/support/config.js";
+import { loadAndWatch } from "@src/support/fileWatcher.js";
+import { updateExplorer } from "./explorer.js";
+import { runHandler } from "./runner.js";
 
 export const registerTestRunner = () => {
     if (!config("testRunner.enabled", true)) {
