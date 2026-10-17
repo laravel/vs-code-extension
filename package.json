@@ -1478,7 +1478,7 @@
     },
     "scripts": {
         "pretest": "rimraf out && npm run compile && tsc && npm run lint",
-        "lint": "eslint src --ext ts",
+        "lint": "eslint src/",
         "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
         "test": "vscode-test",
         "compile": "npm run check-types && node esbuild.js",
@@ -1491,24 +1491,26 @@
         "installLocal": "vsce package && code --install-extension ./vscode-laravel-$npm_package_version.vsix"
     },
     "devDependencies": {
-        "@types/mocha": "^10.0.6",
+        "@types/mocha": "^10.0.10",
         "@types/node": "18.x",
         "@types/vscode": "^1.89.0",
-        "@typescript-eslint/eslint-plugin": "^8.69.0",
-        "@typescript-eslint/parser": "^8.69.0",
         "@vscode/test-cli": "^0.0.15",
         "@vscode/test-electron": "^3.1.0",
-        "esbuild": ">=0.28.1",
-        "eslint": "^8.57.0",
-        "prettier": "^3.0.0",
-        "typescript": "^5.4.5"
+        "esbuild": "^0.28.2",
+        "eslint": "^9.39.5",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^17.12.0",
+        "npm-run-all2": "^8.0.4",
+        "prettier": "^3.9.9",
+        "rimraf": "^6.1.3",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.70.1"
     },
     "dependencies": {
         "axios": "^1.18.0",
-        "extract-zip": "^2.0.1",
-        "npm-run-all": "^4.1.5",
-        "rimraf": "^6.0.1",
-        "uuid": "^11.0.3",
         "vscode-languageclient": "^9.0.1"
+    },
+    "allowScripts": {
+        "esbuild@0.28.2": true
     }
 }
