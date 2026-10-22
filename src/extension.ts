@@ -45,6 +45,7 @@ import {
     registerArtisanMakeCommands,
 } from "./artisan/registry";
 import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
+import { configurePodmanEnvironment } from "./commands/configurePodmanEnvironment";
 
 let client: LanguageClient;
 
@@ -163,6 +164,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(
             commandName("laravel.docker.configure"),
             configureDockerEnvironment,
+        ),
+        vscode.commands.registerCommand(
+            commandName("laravel.podman.configure"),
+            configurePodmanEnvironment,
         ),
         vscode.workspace.onDidChangeConfiguration((event) => {
             if (

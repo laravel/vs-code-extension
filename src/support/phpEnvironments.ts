@@ -12,6 +12,7 @@ export type PhpEnvironment =
     | "lando"
     | "ddev"
     | "docker"
+    | "podman"
     | "local";
 
 export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
@@ -45,6 +46,10 @@ export const phpEnvironments: Record<PhpEnvironment, PhpEnvironmentConfig> = {
     },
     docker: {
         label: "Docker",
+        relativePath: true,
+    },
+    podman: {
+        label: "Podman",
         relativePath: true,
     },
 };
