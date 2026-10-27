@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { assertCompletions, assertHovers, assertLinks } from "./assertions";
-import { activateExtension, uri } from "./helper";
+import { assertCompletions, assertHovers, assertLinks } from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 suite("Auth Test Suite", () => {
     suiteSetup(async () => {

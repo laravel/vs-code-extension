@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
-import { sendLspRequest } from "@src/lsp/client";
-import { projectPath } from "@src/support/project";
+import { sendLspRequest } from "@src/lsp/client.js";
+import { projectPath } from "@src/support/project.js";
 
 export interface TestSuite {
     name: string;

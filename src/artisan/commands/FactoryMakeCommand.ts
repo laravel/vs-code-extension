@@ -1,5 +1,5 @@
-import { Command } from "../types";
-import { getModelClassnames } from "@src/lsp/models";
+import { Command } from "../types.js";
+import { getModelClassnames } from "@src/lsp/models.js";
 
 export const FactoryMakeCommand: Command = {
     name: "make:factory",

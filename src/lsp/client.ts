@@ -1,8 +1,8 @@
-import { LanguageClient } from "vscode-languageclient/node";
-import { getProjectWorkspaceFolder } from "../support/project";
-import { getLspBinaryPath } from "./binary";
-import { createClientOptions, createServerOptions } from "./options";
-import { clearResolvedPhpCommand, setResolvedPhpCommand } from "./php";
+import { LanguageClient } from "vscode-languageclient/node.js";
+import { getProjectWorkspaceFolder } from "../support/project.js";
+import { getLspBinaryPath } from "./binary.js";
+import { createClientOptions, createServerOptions } from "./options.js";
+import { clearResolvedPhpCommand, setResolvedPhpCommand } from "./php.js";
 
 let client: LanguageClient | undefined;
 

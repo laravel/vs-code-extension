@@ -1,4 +1,4 @@
-import { Command } from "../types";
+import { Command } from "../types.js";
 
 export const DbWipeCommand: Command = {
     name: "db:wipe",

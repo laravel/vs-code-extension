@@ -3,12 +3,12 @@
 import * as vscode from "vscode";
 
 import os from "os";
-import { LanguageClient } from "vscode-languageclient/node";
-import { bladeSpacer } from "./blade/bladeSpacer";
-import { initClient } from "./blade/client";
-import { commandName, openFileCommand } from "./commands";
-import { generateNamespaceCommand } from "./commands/generateNamespace";
-import { goToRouteCommand } from "./commands/goToRoute";
+import { LanguageClient } from "vscode-languageclient/node.js";
+import { bladeSpacer } from "./blade/bladeSpacer.js";
+import { initClient } from "./blade/client.js";
+import { commandName, openFileCommand } from "./commands/index.js";
+import { generateNamespaceCommand } from "./commands/generateNamespace.js";
+import { goToRouteCommand } from "./commands/goToRoute.js";
 import {
     pintCommands,
     PintEditProvider,
@@ -16,12 +16,12 @@ import {
     runPintOnCurrentFile,
     runPintOnDirtyFiles,
     runPintOnSave,
-} from "./commands/pint";
+} from "./commands/pint.js";
 import {
     htmlClassToBladeDirectiveCommands,
     refactorAllHtmlClassesToBladeDirectives,
     refactorSelectedHtmlClassToBladeDirective,
-} from "./commands/refactorHtmlClassToBladeDirective";
+} from "./commands/refactorHtmlClassToBladeDirective.js";
 import {
     helpers,
     openSubmenuCommand,
@@ -29,22 +29,29 @@ import {
     wrapHelperCommandNameSubCommandName,
     wrapSelectionCommand,
     wrapWithHelperCommands,
-} from "./commands/wrapWithHelper";
-import { configAffected } from "./support/config";
-import { collectDebugInfo } from "./support/debug";
-import { disposeWatchers } from "./support/fileWatcher";
-import { info } from "./support/logger";
-import { restartLspClient, startLspClient, stopLspClient } from "./lsp/client";
-import { setLspBinaryPath } from "./lsp/binary";
-import { clearResolvedPhpCommand, warnAboutLegacyPhpCommand } from "./lsp/php";
-import { checkForLspUpdate, forceLspUpdate } from "./lsp/updater";
-import { hasWorkspace, projectPathExists } from "./support/project";
-import { cleanUpTemp } from "./support/util";
+} from "./commands/wrapWithHelper.js";
+import { configAffected } from "./support/config.js";
+import { collectDebugInfo } from "./support/debug.js";
+import { disposeWatchers } from "./support/fileWatcher.js";
+import { info } from "./support/logger.js";
+import {
+    restartLspClient,
+    startLspClient,
+    stopLspClient,
+} from "./lsp/client.js";
+import { setLspBinaryPath } from "./lsp/binary.js";
+import {
+    clearResolvedPhpCommand,
+    warnAboutLegacyPhpCommand,
+} from "./lsp/php.js";
+import { checkForLspUpdate, forceLspUpdate } from "./lsp/updater.js";
+import { hasWorkspace, projectPathExists } from "./support/project.js";
+import { cleanUpTemp } from "./support/util.js";
 import {
     registerArtisanCommands,
     registerArtisanMakeCommands,
-} from "./artisan/registry";
-import { configureDockerEnvironment } from "./commands/configureDockerEnvironment";
+} from "./artisan/registry.js";
+import { configureDockerEnvironment } from "./commands/configureDockerEnvironment.js";
 
 let client: LanguageClient;
 

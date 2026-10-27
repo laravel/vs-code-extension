@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext, OutputChannel, window } from "vscode";
-import ILogger from "./ILogger";
+import ILogger from "./ILogger.js";
 
 export default class OutputLogger implements ILogger {
     private readonly _outputChannel: OutputChannel;

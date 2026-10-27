@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { assertLinks } from "./assertions";
-import { activateExtension, uri } from "./helper";
+import { assertLinks } from "./assertions.js";
+import { activateExtension, uri } from "./helper.js";
 
 suite("Paths Test Suite", () => {
     suiteSetup(async () => {

@@ -1,7 +1,7 @@
 import { readdirSync } from "fs";
 import * as vscode from "vscode";
-import { getWorkspaceFolders, hasWorkspace } from "./project";
-import { debounce, leadingDebounce } from "./util";
+import { getWorkspaceFolders, hasWorkspace } from "./project.js";
+import { debounce, leadingDebounce } from "./util.js";
 
 export type FileEvent = "change" | "create" | "delete";
 

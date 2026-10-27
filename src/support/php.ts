@@ -1,14 +1,14 @@
 import * as cp from "child_process";
 import * as vscode from "vscode";
-import { getPhpCommand as getPhpCommandArgv } from "../lsp/php";
-import { argvToShellCommand } from "./argv";
-import { config } from "./config";
+import { getPhpCommand as getPhpCommandArgv } from "../lsp/php.js";
+import { argvToShellCommand } from "./argv.js";
+import { config } from "./config.js";
 import {
     PhpEnvironment,
     phpEnvironmentsThatUseRelativePaths,
-} from "./phpEnvironments";
-import { showErrorPopup } from "./popup";
-import { relativePath } from "./project";
+} from "./phpEnvironments.js";
+import { showErrorPopup } from "./popup.js";
+import { relativePath } from "./project.js";
 
 export const fixFilePath = (path: string) => {
     const phpEnv = config<PhpEnvironment>("phpEnvironment", "auto");

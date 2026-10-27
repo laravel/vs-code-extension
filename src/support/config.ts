@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { GeneratedConfigKey } from "./generated-config";
+import { GeneratedConfigKey } from "./generated-config.js";
 
 type ConfigKey =
     | GeneratedConfigKey

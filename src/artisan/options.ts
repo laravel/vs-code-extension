@@ -1,4 +1,4 @@
-import { Option } from "./types";
+import { Option } from "./types.js";
 
 export const forceOption: Option = {
     name: "--force",

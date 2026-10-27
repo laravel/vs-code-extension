@@ -1,5 +1,5 @@
-import { Command } from "../types";
-import { forceOption, testOptions } from "@src/artisan/options";
+import { Command } from "../types.js";
+import { forceOption, testOptions } from "@src/artisan/options.js";
 
 export const JobMakeCommand: Command = {
     name: "make:job",

@@ -4,9 +4,9 @@
 import { Readable } from "stream";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { CancellationToken } from "vscode";
-import ILogger from "../logging/ILogger";
-import { RetryUtility } from "../utility/RetryUtility";
-import IHttpRequestHandler from "./IHttpRequestHandler";
+import ILogger from "../logging/ILogger.js";
+import { RetryUtility } from "../utility/RetryUtility.js";
+import IHttpRequestHandler from "./IHttpRequestHandler.js";
 
 export default class HttpRequestHandler implements IHttpRequestHandler {
     public constructor(private readonly _logger: ILogger) {}
