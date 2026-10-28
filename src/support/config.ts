@@ -8,6 +8,7 @@ type ConfigKey =
     | "phpCommand"
     | "memoryLimit"
     | "tests.docker.enabled"
+    | "tests.podman.enabled"
     | "tests.ssh.enabled"
     | "tests.suiteSuffix"
     | "showErrorPopups"
