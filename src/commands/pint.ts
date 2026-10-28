@@ -16,6 +16,7 @@ import {
     getWorkspaceFolders,
     projectPath,
     projectPathExists,
+    resolveWorkspaceProjectFolder,
 } from "../support/project";
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -153,7 +154,7 @@ export const runPintOnSave = (document: vscode.TextDocument) => {
 
     if (
         !document.uri.fsPath.startsWith(
-            getWorkspaceFolders()[0]?.uri?.fsPath || "",
+            resolveWorkspaceProjectFolder()?.uri?.fsPath || "",
         )
     ) {
         return;
