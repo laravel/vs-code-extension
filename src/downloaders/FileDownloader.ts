@@ -142,7 +142,6 @@ export class FileDownloader implements IFileDownloader {
             downloadsStoragePath,
             uuid(),
         );
-        const tempZipFileDownloadPath = `${tempFileDownloadPath}.zip`;
         const fileDownloadPath: string = path.join(
             downloadsStoragePath,
             filename,
@@ -153,7 +152,6 @@ export class FileDownloader implements IFileDownloader {
         const retries = settings?.retries ?? DefaultRetries;
         const retryDelayInMs =
             settings?.retryDelayInMs ?? DefaultRetryDelayInMs;
-        const shouldUnzip = settings?.shouldUnzip ?? false;
         const makeExecutable = settings?.makeExecutable ?? false;
         const headers = settings?.headers;
         let progress = 0;
@@ -183,9 +181,7 @@ export class FileDownloader implements IFileDownloader {
                 onDownloadProgressChange,
             );
 
-            const writeStream = fs.createWriteStream(
-                shouldUnzip ? tempZipFileDownloadPath : tempFileDownloadPath,
-            );
+            const writeStream = fs.createWriteStream(tempFileDownloadPath);
             const pipelinePromise = pipelineAsync([
                 downloadStream,
                 writeStream,
@@ -194,22 +190,6 @@ export class FileDownloader implements IFileDownloader {
                 writeStream.on(`close`, resolve),
             );
             await Promise.all([pipelinePromise, writeStreamClosePromise]);
-
-            // if (shouldUnzip) {
-            //     const unzipDownloadedFileAsyncFn = async (): Promise<void> => {
-            //         await fs.promises.access(tempZipFileDownloadPath);
-            //         await extractZip(tempZipFileDownloadPath, {
-            //             dir: tempFileDownloadPath,
-            //         });
-            //         await rimraf(tempZipFileDownloadPath);
-            //     };
-            //     await RetryUtility.exponentialRetryAsync(
-            //         unzipDownloadedFileAsyncFn,
-            //         unzipDownloadedFileAsyncFn.name,
-            //         retries,
-            //         retryDelayInMs,
-            //     );
-            // }
 
             // Set progress to 100%
             if (
