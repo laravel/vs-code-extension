@@ -21,11 +21,6 @@ export interface FileDownloadSettings {
      */
     retryDelayInMs?: number;
     /**
-     * Whether to unzip the downloaded file.
-     * @default false
-     */
-    shouldUnzip?: boolean;
-    /**
      * Whether to make the downloaded file executable.
      * @default false
      */
@@ -51,8 +46,7 @@ export interface IFileDownloader {
     ): Promise<IGithubRelease | undefined>;
     /**
      * Downloads a file from a URL and gives back the file path, file name, and a checksum. Allows you to specify the
-     * timeout, the number of acceptable retries, whether or not to unzip the file, and whether or not to check the
-     * downloaded file against a checksum.
+     * timeout, the number of acceptable retries, and whether or not to check the downloaded file against a checksum.
      *
      * @param url the URL to make a GET request to
      * @param filename the name of the file to retrieve the stored data in
@@ -62,7 +56,7 @@ export interface IFileDownloader {
      * Note: the totalBytes parameter corresponds to the content-length provided by the server in the GET response
      * header. It could differ from the actual number of bytes in the download, or may not be provided at all.
      * @param settings optional additional settings for the download
-     * @returns the URI containing the path to the downloaded file or unzipped directory
+     * @returns the URI containing the path to the downloaded file
      */
     downloadFile(
         url: Uri,
@@ -77,8 +71,8 @@ export interface IFileDownloader {
     ): Promise<Uri>;
     /**
      * Downloads a file from a GitHub release and gives back the file path, file name, and a checksum. Allows you to
-     * specify the timeout, the number of acceptable retries, whether or not to unzip the file, and whether or not to
-     * check the downloaded file against a checksum.
+     * specify the timeout, the number of acceptable retries, and whether or not to check the downloaded file against a
+     * checksum.
      *
      * @param owner the owner of the repository
      * @param repository the repository to download from
@@ -89,7 +83,7 @@ export interface IFileDownloader {
      * Note: the totalBytes parameter corresponds to the content-length provided by the server in the GET response
      * header. It could differ from the actual number of bytes in the download, or may not be provided at all.
      * @param settings optional additional settings for the download.
-     * @returns the URI containing the path to the downloaded file or unzipped directory
+     * @returns the URI containing the path to the downloaded file
      * @throws Error if the file is not found in the latest release
      * @example downloadFileFromGitHubRelease(`microsoft`, `vscode`, `VSCode-linux-x64.zip`, context);
      * @remarks This method is a wrapper around `downloadFile` that constructs the URL for the latest release of a
@@ -115,21 +109,20 @@ export interface IFileDownloader {
      */
     listDownloadedItems(context: ExtensionContext): Promise<Uri[]>;
     /**
-     * Gets the path to a downloaded or unzipped item.
+     * Gets the path to a downloaded item.
      *
      * @param filename the name of the file or folder to remove
      * @param context The calling extension's context
-     * @returns the path to the downloaded file (or folder if the download was unzipped)
+     * @returns the path to the downloaded file
      * @throws FileNotFoundError if there is no such file or folder
      */
     getItem(filename: string, context: ExtensionContext): Promise<Uri>;
     /**
-     * Gets the path to a downloaded or unzipped item, but returns undefined instead of throwing an error if the file
-     * isn't found.
+     * Gets the path to a downloaded item, but returns undefined instead of throwing an error if the file isn't found.
      *
      * @param filename the name of the file or folder to remove
      * @param context The calling extension's context
-     * @returns the path to the downloaded file (or folder if the download was unzipped)
+     * @returns the path to the downloaded file
      */
     tryGetItem(
         filename: string,
