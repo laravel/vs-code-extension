@@ -31,4 +31,4 @@ export interface Argument {
     description?: string;
 }
 
-export type ArgumentType = "namespaceOrPath" | "namespace" | "path";
+export type ArgumentType = "namespaceOrPath" | "namespace" | "model" | "path";
