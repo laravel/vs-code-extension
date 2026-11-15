@@ -1,7 +1,7 @@
 import path from "path";
 import * as vscode from "vscode";
 
-import { getNamespace } from "@src/commands/generateNamespace";
+import { getNamespace } from "../commands/generateNamespace";
 import { Argument, ArgumentType, Command, Option } from "./types";
 
 const EndSelection = "End Selection";
@@ -43,6 +43,26 @@ const getValueForArgumentType = async (
             namespace = namespace ? (namespace += `\\${fileName}`) : value;
 
             return namespace.replaceAll("/", "\\").trim();
+
+        case "model":
+            const model = await getValueForArgumentType(
+                value,
+                "namespace",
+                workspaceFolder,
+                uri,
+            );
+
+            const modelsNamespace = await getNamespace(
+                workspaceFolder,
+                vscode.Uri.joinPath(
+                    workspaceFolder.uri,
+                    "app/Models/Model.php",
+                ),
+            );
+
+            return modelsNamespace && model.startsWith(`${modelsNamespace}\\`)
+                ? model.slice(modelsNamespace.length + 1)
+                : model;
 
         case "path":
             // OS path separators

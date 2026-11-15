@@ -1,5 +1,5 @@
 import { Command } from "../types";
-import { forceOption, testOptions } from "@src/artisan/options";
+import { forceOption, testOptions } from "../options";
 
 export const ModelMakeCommand: Command = {
     name: "make:model",
@@ -7,7 +7,7 @@ export const ModelMakeCommand: Command = {
     arguments: [
         {
             name: "name",
-            type: "namespace",
+            type: "model",
             description: "The name of the model",
         },
     ],
